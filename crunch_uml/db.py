@@ -79,6 +79,11 @@ class Database:
     def count_enumeratie(self):
         return self.session.query(Enumeratie).count()
 
+    def add_enumeratieliteral(self, enumlit):
+        self.session.add(enumlit)
+    def count_enumeratieliteral(self):
+        return self.session.query(EnumerationLiteral).count()
+
 
     def commit(self):
         self.session.commit()

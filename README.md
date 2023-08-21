@@ -2,14 +2,14 @@
 
 # Crunch-UML
 
-Crunch-UML is a parser for XMI files originating from UML tools such as Enterprise Architect. The tool reads the XMI and stores entities and relationships in an SQLite database for further analysis or use.
+Crunch_UML is a parser for XMI files originating from UML tools such as Enterprise Architect. The tool reads the XMI and stores entities and relationships in an SQLite database for further analysis or use.
+
+**Crunch_UML is stillunder heavy development and does not have any releases.**
 
 [![Build Status](https://github.com/brienen/crunch_uml/workflows/build/badge.svg)](https://github.com/brienen/crunch_uml/actions)
 [![Coverage Status](https://coveralls.io/repos/github/brienen/crunch_uml/badge.svg?branch=main)](https://coveralls.io/github/brienen/crunch_uml?branch=main)
 [![PyPi](https://img.shields.io/pypi/v/crunch_uml)](https://pypi.org/project/crunch_uml)
-[![Licence](https://img.shields.io/github/license/brienen/crunch_uml)](LICENSE)
-
-<img src="https://raw.githubusercontent.com/justintime50/assets/main/src/python-template/showcase.png" alt="Showcase">
+[![Licence](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 </div>
 

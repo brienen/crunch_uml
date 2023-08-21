@@ -6,8 +6,6 @@ from crunch_uml.db import Database
 import crunch_uml.db as db
 import crunch_uml.const as const
 
-# Nees to initialized in main
-database = None
 
 # Configureer logging
 logging.basicConfig(
@@ -20,7 +18,7 @@ logger = logging.getLogger()
 
 
 #Recursieve functie om de parsetree te doorlopen
-def process_package(node, parent_package_id=None):
+def process_package(node, database, parent_package_id=None):
     tp = node.get('{'+const.NS_XMI+'}type')
     if tp == 'uml:Package':
         package = db.Package(id=node.get('{'+const.NS_XMI+'}id'), name=node.get('name'), parent_package_id=parent_package_id)
@@ -29,7 +27,7 @@ def process_package(node, parent_package_id=None):
 
         database.add_package(package)
         for childnode in node:
-            process_package(childnode, package.id)
+            process_package(childnode, database, package.id)
 
     elif tp == 'uml:Class':
         clazz = db.Class(id=node.get('{'+const.NS_XMI+'}id'), name=node.get('name'), package_id=parent_package_id)
@@ -53,12 +51,12 @@ def process_package(node, parent_package_id=None):
             if sub_tp == 'uml:EnumerationLiteral':    
                 enumliteral = db.EnumerationLiteral(id=childnode.get('{'+const.NS_XMI+'}id'), name=childnode.get('name'), enumeratie_id=enum.id)
                 logger.debug(f'EnumerationLiteral {enumliteral.name} met id {enumliteral.id} ingelezen met inhoud: {vars(enumliteral)}')
-                database.add_attribute(enumliteral)
+                database.add_enumeratieliteral(enumliteral)
 
     else:
         for childnode in node:
             logger.debug(f'Parsing something with tag {node.tag}, no handling implemented yet values: {node}') 
-            process_package(childnode, parent_package_id)
+            process_package(childnode, database, parent_package_id)
         
 
 
@@ -84,7 +82,7 @@ def main(args=None):
         root = ET.parse(args.file).getroot()
         main_package = root.find(".//{*}Model")
         if root is not None:
-            process_package(root)
+            process_package(root, database)
     except Exception as ex:
         logger.error(f"Error while parsing file and writing data tot database with message: {ex}") 
     finally:
