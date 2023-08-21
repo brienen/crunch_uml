@@ -52,7 +52,7 @@ class EnumerationLiteral(Base, UML_Generic): # type: ignore
 class Database:
     _instance = None
 
-    def __new__(cls, db_url=const.DATABASE_URL, db_create=True, dc_upsert=False):
+    def __new__(cls, db_url=const.DATABASE_URL, db_create=True, db_upsert=False):
         if cls._instance is None:
             cls._instance = super(Database, cls).__new__(cls)
             # Setting up the database
