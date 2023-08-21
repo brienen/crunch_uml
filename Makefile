@@ -1,7 +1,7 @@
 PYTHON_BINARY := python3
-VIRTUAL_ENV := venv
+VIRTUAL_ENV := .venv
 VIRTUAL_BIN := $(VIRTUAL_ENV)/bin
-PROJECT_NAME := project_name
+crunch_uml := crunch_uml
 TEST_DIR := test
 
 ## help - Display help about make targets for this Makefile
@@ -14,20 +14,20 @@ build:
 
 ## coverage - Test the project and generate an HTML coverage report
 coverage:
-	$(VIRTUAL_BIN)/pytest --cov=$(PROJECT_NAME) --cov-branch --cov-report=html --cov-report=lcov --cov-report=term-missing
+	$(VIRTUAL_BIN)/pytest --cov=$(crunch_uml) --cov-branch --cov-report=html --cov-report=lcov --cov-report=term-missing
 
 ## clean - Remove the virtual environment and clear out .pyc files
 clean:
-	rm -rf $(VIRTUAL_ENV) dist *.egg-info .coverage
+	rm -rf dist *.egg-info .coverage build .pytest_cache
 	find . -name '*.pyc' -delete
 
 ## black - Runs the Black Python formatter against the project
 black:
-	$(VIRTUAL_BIN)/black $(PROJECT_NAME)/ $(TEST_DIR)/
+	$(VIRTUAL_BIN)/black $(crunch_uml)/ $(TEST_DIR)/
 
 ## black-check - Checks if the project is formatted correctly against the Black rules
 black-check:
-	$(VIRTUAL_BIN)/black $(PROJECT_NAME)/ $(TEST_DIR)/ --check
+	$(VIRTUAL_BIN)/black $(crunch_uml)/ $(TEST_DIR)/ --check
 
 ## format - Runs all formatting tools against the project
 format: black isort lint mypy
@@ -42,19 +42,19 @@ install:
 
 ## isort - Sorts imports throughout the project
 isort:
-	$(VIRTUAL_BIN)/isort $(PROJECT_NAME)/ $(TEST_DIR)/
+	$(VIRTUAL_BIN)/isort $(crunch_uml)/ $(TEST_DIR)/
 
 ## isort-check - Checks that imports throughout the project are sorted correctly
 isort-check:
-	$(VIRTUAL_BIN)/isort $(PROJECT_NAME)/ $(TEST_DIR)/ --check-only
+	$(VIRTUAL_BIN)/isort $(crunch_uml)/ $(TEST_DIR)/ --check-only
 
 ## lint - Lint the project
 lint:
-	$(VIRTUAL_BIN)/flake8 $(PROJECT_NAME)/ $(TEST_DIR)/
+	$(VIRTUAL_BIN)/flake8 $(crunch_uml)/ $(TEST_DIR)/
 
 ## mypy - Run mypy type checking on the project
 mypy:
-	$(VIRTUAL_BIN)/mypy $(PROJECT_NAME)/ $(TEST_DIR)/
+	$(VIRTUAL_BIN)/mypy $(crunch_uml)/ $(TEST_DIR)/
 
 ## test - Test the project
 test:

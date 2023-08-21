@@ -1,48 +1,68 @@
 <div align="center">
 
-# Python Template
+# Crunch-UML
 
-A Python project template to save you time and energy.
+Crunch-UML is a parser for XMI files originating from UML tools such as Enterprise Architect. The tool reads the XMI and stores entities and relationships in an SQLite database for further analysis or use.
 
-[![Build Status](https://github.com/Justintime50/python-template/workflows/build/badge.svg)](https://github.com/Justintime50/python-template/actions)
-[![Coverage Status](https://coveralls.io/repos/github/Justintime50/python-template/badge.svg?branch=main)](https://coveralls.io/github/Justintime50/python-template?branch=main)
-[![Licence](https://img.shields.io/github/license/justintime50/python-template)](LICENSE)
+[![Build Status](https://github.com/brienen/crunch_uml/workflows/build/badge.svg)](https://github.com/brienen/crunch_uml/actions)
+[![Coverage Status](https://coveralls.io/repos/github/brienen/crunch_uml/badge.svg?branch=main)](https://coveralls.io/github/brienen/crunch_uml?branch=main)
+[![PyPi](https://img.shields.io/pypi/v/crunch_uml)](https://pypi.org/project/crunch_uml)
+[![Licence](https://img.shields.io/github/license/brienen/crunch_uml)](LICENSE)
 
 <img src="https://raw.githubusercontent.com/justintime50/assets/main/src/python-template/showcase.png" alt="Showcase">
 
 </div>
 
-Python projects take a long time to setup with all the various files, the virtual environment, and keeping things uniform across projects. With this Python template, you can quickly setup boilerplate code and miscellaneous items for your Python project saving you time and energy so you can get back to coding.
+- Parses entities such as `Package`, `Class`, and `Relation` from an XMI file.
+- Uses SQLAlchemy for database access and manipulation.
+- Configurable logging support.
+- Supports setting the logging level via command line parameters.
+- Singleton Database Design for centralized database manipulation.
 
 ## Install
 
-Click the [Use this template](https://github.com/Justintime50/python-template/generate) button at the top of this project's GitHub page to get started.
+```bash
+# Install tool
+pip3 install crunch_uml
+
+# Install locally
+make install
+```
 
 ## Usage
 
-### Easy text replacements
+Usage instructions go here.
 
-1. Replace all instances of `project_name` with the name of your project
-    * These are the Python snake_case references (eg: `project_name`)
-1. Replace all instances of `PROJECT_NAME_URL` with the name of your project
-    * These are the references to your project that will appear in URLs and are typically hyphenated (eg: `project-name`)
-1. Replace all instances of `USERNAME` with the name of the author or owner of the project
-    * These are references typically found in the URL of your project as it appears on GitHub
+```bash
+python main.py -f <path_to_xmi_file> [--verbose] [--debug]
+```
 
-### File configuration
+Arguments:
+- `-f, --file` : Specify the XMI file to be parsed.
+- `--verbose` : Set the logging level to INFO.
+- `--debug` : Set the logging level to DEBUG.
 
-1. Configure the `setup.py` file
-1. Configure the `Makefile` targets
-1. Update the name in the `LICENSE` or swap it out entirely
-1. Configure the `.github/workflows/build.yml` file
-1. Update the `CHANGELOG.md` with your own info
-1. Rename other files/folders as needed and configure their content
-1. Delete this `README` and rename `README_project.md` to `README.md`
+## Modules
 
-### GitHub configuration
+- `main.py` : Main script for parsing and handling command line arguments.
+- `db.py` : Contains the singleton database class and related functions for managing database operations.
 
-1. Add a `PYPI_API_TOKEN` GitHub secret to your project so that automated releasing can occur from GitHub Actions to PyPI and uncomment the final step on the `release` job in `.github/workflows/release.yml`
+## Logging
 
-## Attribution
+Logging is implemented with Python's built-in `logging` module. By default, logs are sent to `stderr`. Use `--verbose` for INFO logs and `--debug` for DEBUG logs.
 
-* Watch [the video](https://youtu.be/ZMfcl3CnRhA) where I built this template.
+## Development
+
+```bash
+# Get a comprehensive list of development tools
+make help
+```
+
+## Future Improvements
+
+- Expansion to other database backends such as PostgreSQL or MySQL.
+- Provide more granular control over logging, for example specifying log files.
+
+---
+
+You can use this foundation and expand upon it as you continue to develop your program and add new features.

@@ -1,0 +1,9 @@
+#### Requirements for development 
+black == 23.*
+build == 0.10.*
+flake8 == 6.*
+isort == 5.*
+mypy == 1.2
+pytest == 7.*
+pytest-cov == 4.*
+twine == 4.*
