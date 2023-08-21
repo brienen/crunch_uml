@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship, sessionmaker
 
 import crunch_uml.const as const
 
-Base = sqlalchemy.orm.declarative_base() # type: ignore
+Base = sqlalchemy.orm.declarative_base()  # type: ignore
 
 
 # Model definitions
@@ -14,35 +14,35 @@ class UML_Generic:
     descr = Column(Text)
 
 
-class Package(Base, UML_Generic): # type: ignore
+class Package(Base, UML_Generic):  # type: ignore
     __tablename__ = 'packages'
 
     parent_package_id = Column(String, ForeignKey('packages.id', deferrable=True), index=True)
     parent_package = relationship("Package")
 
 
-class Class(Base, UML_Generic): # type: ignore
+class Class(Base, UML_Generic):  # type: ignore
     __tablename__ = 'classes'
 
     package_id = Column(String, ForeignKey('packages.id', deferrable=True), index=True, nullable=False)
     package = relationship("Package")
 
 
-class Attribute(Base, UML_Generic): # type: ignore
+class Attribute(Base, UML_Generic):  # type: ignore
     __tablename__ = 'attributes'
 
     clazz_id = Column(String, ForeignKey('classes.id', deferrable=True), index=True, nullable=False)
     clazz = relationship("Class")
 
 
-class Enumeratie(Base, UML_Generic): # type: ignore
+class Enumeratie(Base, UML_Generic):  # type: ignore
     __tablename__ = 'enumeraties'
 
     package_id = Column(String, ForeignKey('packages.id', deferrable=True), index=True)
     package = relationship("Package")
 
 
-class EnumerationLiteral(Base, UML_Generic): # type: ignore
+class EnumerationLiteral(Base, UML_Generic):  # type: ignore
     __tablename__ = 'enumeratieliterals'
 
     enumeratie_id = Column(String, ForeignKey('enumeraties.id', deferrable=True), index=True, nullable=False)
