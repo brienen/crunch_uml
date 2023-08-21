@@ -4,6 +4,7 @@ from crunch_uml import const
 from crunch_uml.db import Database
 import xml.etree.ElementTree as ET
 import logging
+
 logger = logging.getLogger()
 
 
@@ -13,9 +14,7 @@ class Parser(ABC):
         pass
 
 
-
 class XMIParser(Parser):
-
     # Recursieve functie om de parsetree te doorlopen
     def process_package(self, node, database: db.Database, parent_package_id=None):
         tp = node.get('{' + const.NS_XMI + '}type')
@@ -31,7 +30,9 @@ class XMIParser(Parser):
                 self.process_package(childnode, database, package.id)
 
         elif tp == 'uml:Class':
-            clazz = db.Class(id=node.get('{' + const.NS_XMI + '}id'), name=node.get('name'), package_id=parent_package_id)
+            clazz = db.Class(
+                id=node.get('{' + const.NS_XMI + '}id'), name=node.get('name'), package_id=parent_package_id
+            )
             logger.debug(f'Class {clazz.name} met id {clazz.id} ingelezen met inhoud: {clazz}')
             database.add_class(clazz)
 
@@ -69,8 +70,6 @@ class XMIParser(Parser):
             for childnode in node:
                 logger.debug(f'Parsing something with tag {node.tag}, no handling implemented yet values: {node}')
                 self.process_package(childnode, database, parent_package_id)
-
-
 
     def parse(self, args, database: db.Database):
         logger.info(f'Parsing file with name {args.file}...')
