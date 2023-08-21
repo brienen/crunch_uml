@@ -1,7 +1,5 @@
-from crunch_uml import cli
-from crunch_uml import db
-from crunch_uml import const
-import pytest
+from crunch_uml import cli, const, db
+
 
 def test_import_onderwijs():
     test_args = ["-f", "./test/data/GGM_Onderwijs_XMI.2.1.xml"]
