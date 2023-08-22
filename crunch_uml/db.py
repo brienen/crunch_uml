@@ -1,5 +1,5 @@
 import sqlalchemy
-from sqlalchemy import Column, ForeignKey, String, Text, create_engine
+from sqlalchemy import Column, ForeignKey, String, Text, create_engine, Float
 from sqlalchemy.orm import relationship, sessionmaker
 
 import crunch_uml.const as const
@@ -13,40 +13,67 @@ class UML_Generic:
     name = Column(String)
     descr = Column(Text)
 
+class UMLBase(UML_Generic):
+    author = Column(String)
+    version = Column(String)
+    phase = Column(String)
+    status = Column(String)
+    created = Column(String)
+    modified = Column(String)
+    stereotype = Column(String)
+    uri = Column(String)
+    visibility = Column(String)
+    alias = Column(String)
 
-class Package(Base, UML_Generic):  # type: ignore
+class UMLTags:
+    archimate_type = Column(String)
+    bron = Column(String)
+    datum_tijd_export = Column(String)
+    domein_dcat = Column(String)
+    domein_gemma = Column(String)
+    gemma_guid = Column(String) 
+    synoniemen = Column(String) 
+    toelichting = Column(String) 
+
+
+class Package(Base, UMLBase):  # type: ignore
     __tablename__ = 'packages'
 
     parent_package_id = Column(String, ForeignKey('packages.id', deferrable=True), index=True)
-    parent_package = relationship("Package")
+    parent_package = relationship("Package", back_populates="subpackages")
+    subpackages = relationship("Class", back_populates="parent_package")
+    classes = relationship("Class", back_populates="package")
+    enumerations = relationship("Enumeratie", back_populates="package")
 
 
-class Class(Base, UML_Generic):  # type: ignore
+class Class(Base, UMLBase, UMLTags):  # type: ignore
     __tablename__ = 'classes'
 
     package_id = Column(String, ForeignKey('packages.id', deferrable=True), index=True, nullable=False)
-    package = relationship("Package")
+    package = relationship("Package", back_populates="classes")
+    attributes = relationship("Attribute", back_populates="clazz")
 
 
 class Attribute(Base, UML_Generic):  # type: ignore
     __tablename__ = 'attributes'
 
     clazz_id = Column(String, ForeignKey('classes.id', deferrable=True), index=True, nullable=False)
-    clazz = relationship("Class")
+    clazz = relationship("Class", back_populates="attributes")
 
 
-class Enumeratie(Base, UML_Generic):  # type: ignore
+class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
     __tablename__ = 'enumeraties'
 
     package_id = Column(String, ForeignKey('packages.id', deferrable=True), index=True)
-    package = relationship("Package")
+    package = relationship("Package", back_populates="enumerations")
+    literals = relationship("EnumerationLiteral", back_populates="enumeratie")
 
 
 class EnumerationLiteral(Base, UML_Generic):  # type: ignore
     __tablename__ = 'enumeratieliterals'
 
     enumeratie_id = Column(String, ForeignKey('enumeraties.id', deferrable=True), index=True, nullable=False)
-    enumeratie = relationship("Enumeratie")
+    enumeratie = relationship("Enumeratie", back_populates='literals')
 
 
 class Database:
@@ -67,14 +94,20 @@ class Database:
             Base.metadata.create_all(bind=cls._instance.engine)
         return cls._instance
 
-    def add_package(self, package):
-        self.session.add(package)
+    def save_package(self, package):
+        self.session.merge(package)
 
     def count_packages(self):
         return self.session.query(Package).count()
 
-    def add_class(self, clazz):
+    def get_package(self, id):
+        return self.session.get(Package, id)
+
+    def save_class(self, clazz):
         self.session.add(clazz)
+
+    def get_class(self, id):
+        return self.session.get(Class, id)
 
     def count_class(self):
         return self.session.query(Class).count()

@@ -1,12 +1,10 @@
 import argparse
 import logging
 import sys
-import xml.etree.ElementTree as ET
 
 import crunch_uml.const as const
-import crunch_uml.db as db
 from crunch_uml.db import Database
-from crunch_uml.parsers.parser import XMIParser
+from crunch_uml.parsers.parser import XMIParser, EAXMIParser
 
 # Configureer logging
 logging.basicConfig(
@@ -31,7 +29,9 @@ def main(args=None):
         help='geeft inputtype aan, voorlopig is alleen "xmi" ondersteund.',
         default='xmi',
     )
-    parser.add_argument('-db_create', '--database_create_new', action='store_true', help='maak altijd een nieuwe database aan')
+    parser.add_argument(
+        '-db_create', '--database_create_new', action='store_true', help='maak altijd een nieuwe database aan'
+    )
     args = parser.parse_args(args)
 
     # Bepaal het logniveau op basis van commandline argumenten
@@ -42,8 +42,10 @@ def main(args=None):
 
     database = Database(const.DATABASE_URL, db_create=True)
     try:
-        if args.inputtype == 'xmi':
+        if args.inputtype == 'eaxmi':
             parser = XMIParser()
+        elif args.inputtype == 'xmi':
+            parser = EAXMIParser()
         else:
             raise (f"Parser error: unknown inputtype {args.inputtype}, use 'xmi'")
 

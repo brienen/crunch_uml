@@ -12,15 +12,7 @@ def test_import_monumenten():
     assert database.count_attribute() == 40
     assert database.count_enumeratieliteral() == 2
 
-
-'''def test_import_onderwijs_empty():
-    test_args = ["-f", "./test/data/GGM_Onderwijs_XMI.2.1.xml"]
-    cli.main(test_args)
-
-    database = db.Database(const.DATABASE_URL, db_create=True)
-    assert database.count_packages() == 0
-    assert database.count_enumeratie() == 0
-    assert database.count_class() == 0
-    assert database.count_attribute() == 0
-    assert database.count_enumeratieliteral() == 0
-'''
+    clazz = database.get_class('EAID_4AD539EC_A308_43da_B025_17A1647303F3')
+    assert clazz.archimate_type == 'Business object'
+    assert clazz.gemma_guid == 'id-4ad539ec-a308-43da-b025-17a1647303f3'
+    assert clazz.descr == 'Het bouwen van een bouwwerk.'
