@@ -12,8 +12,8 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                "-f", "./test/data/GGM_Onderwijs_XMI.2.1.xml",
-                "-v"
+                "-f", "./test/data/GGM_Monumenten_EA2.1.xml",
+                "-d"
             ]
         }
     ]

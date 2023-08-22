@@ -59,9 +59,12 @@ class Database:
             cls._instance.engine = create_engine(db_url)
             if db_create:
                 Base.metadata.drop_all(bind=cls._instance.engine)  # Drop all tables
-            Base.metadata.create_all(bind=cls._instance.engine)
+                Base.metadata.create_all(bind=cls._instance.engine)
             Session = sessionmaker(bind=cls._instance.engine)
             cls._instance.session = Session()
+        elif db_create:
+            Base.metadata.drop_all(bind=cls._instance.engine)  # Drop all tables
+            Base.metadata.create_all(bind=cls._instance.engine)
         return cls._instance
 
     def add_package(self, package):

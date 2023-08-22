@@ -1,0 +1,1675 @@
+<?xml  version='1.0' encoding='windows-1252' ?>
+<xmi:XMI xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmi:version="2.1" xmlns:uml="http://schema.omg.org/spec/UML/2.1" xmlns:thecustomprofile="http://www.sparxsystems.com/profiles/thecustomprofile/1.0">
+	<xmi:Documentation exporter="Enterprise Architect" exporterVersion="6.5" exporterID="1622"/>
+	<uml:Model xmi:type="uml:Model" name="EA_Model" visibility="public">
+		<packagedElement xmi:type="uml:Package" xmi:id="EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E" name="Erfgoed: Monumenten " visibility="public">
+			<packagedElement xmi:type="uml:Package" xmi:id="EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652" name="Diagram" visibility="public">
+				<ownedComment xmi:type="uml:Comment" xmi:id="EAID_EBF38EE2_DAF0_4704_ADA6_705868BA7C05" body="Kadastrale Aanduiding">
+					<annotatedElement xmi:idref="EAID_9775E778_DBF8_4122_94CE_551466B62F46"/>
+				</ownedComment>
+				<ownedComment xmi:type="uml:Comment" xmi:id="EAID_78218601_F6B3_40b0_90AE_3513B4919064" body="Monumentinformatie">
+					<annotatedElement xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+				</ownedComment>
+			</packagedElement>
+			<packagedElement xmi:type="uml:Package" xmi:id="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" name="Model Monumenten" visibility="public">
+				<packagedElement xmi:type="uml:Class" xmi:id="EAID_54944273_F312_44b2_A78D_43488F915429" name="Ambacht" visibility="public">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_6FEBCD91_8B50_4942_A989_6C9B242CEBC2" name="ambachtjaartot" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000001_8B50_4942_A989_6C9B242CEBC2" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000002_8B50_4942_A989_6C9B242CEBC2" value="1"/>
+						<type xmi:idref="EAJava_int"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_6277018C_A2EC_4069_9625_487494821237" name="ambachtjaarvanaf" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000003_A2EC_4069_9625_487494821237" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000004_A2EC_4069_9625_487494821237" value="1"/>
+						<type xmi:idref="EAJava_int"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_97B64E49_D913_4648_985D_C2692F1EDC51" name="ambachtsoort" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000005_D913_4648_985D_C2692F1EDC51" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000006_D913_4648_985D_C2692F1EDC51" value="1"/>
+						<type xmi:idref="EAJava_AN300"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Association" xmi:id="EAID_8E18F665_2A86_44fd_AD55_3E435A282BDF" name="monument ambacht" visibility="public">
+					<memberEnd xmi:idref="EAID_dst18F665_2A86_44fd_AD55_3E435A282BDF"/>
+					<memberEnd xmi:idref="EAID_src18F665_2A86_44fd_AD55_3E435A282BDF"/>
+					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src18F665_2A86_44fd_AD55_3E435A282BDF" visibility="public" association="EAID_8E18F665_2A86_44fd_AD55_3E435A282BDF" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000007__2A86_44fd_AD55_3E435A282BDF" value="0"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000008__2A86_44fd_AD55_3E435A282BDF" value="-1"/>
+					</ownedEnd>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Class" xmi:id="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" name="Beschermde Status" visibility="public">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_0E956D19_44D9_42f6_9C44_15FDAAF5AEF1" name="bronnen" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000009_44D9_42f6_9C44_15FDAAF5AEF1" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000010_44D9_42f6_9C44_15FDAAF5AEF1" value="1"/>
+						<type xmi:idref="EAJava_AN400"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_04B5CEE9_8929_4729_A545_FEEB5604B5C8" name="complex" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000011_8929_4729_A545_FEEB5604B5C8" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000012_8929_4729_A545_FEEB5604B5C8" value="1"/>
+						<type xmi:idref="EAJava_AN200"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_B2A9E96D_DC0F_453b_99F3_D75390210700" name="datuminschrijvingregister" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000013_DC0F_453b_99F3_D75390210700" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000014_DC0F_453b_99F3_D75390210700" value="1"/>
+						<type xmi:idref="EAJava_Date"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_CFD1E016_5347_4e65_9463_B06E114AE5C8" name="gemeentelijkmonumentcode" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000015_5347_4e65_9463_B06E114AE5C8" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000016_5347_4e65_9463_B06E114AE5C8" value="1"/>
+						<type xmi:idref="EAJava_AN80"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_399FC352_454E_478d_8129_4F6BBCE00ABE" name="gezichtscode" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000017_454E_478d_8129_4F6BBCE00ABE" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000018_454E_478d_8129_4F6BBCE00ABE" value="1"/>
+						<type xmi:idref="EAJava_AN20"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_0637412A_E928_4608_969E_ACF9350F4594" name="naam" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000019_E928_4608_969E_ACF9350F4594" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000020_E928_4608_969E_ACF9350F4594" value="1"/>
+						<type xmi:idref="EAJava_AN200"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_7A602A0E_AC3C_4ce0_A81C_6812EE227662" name="omschrijving" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000021_AC3C_4ce0_A81C_6812EE227662" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000022_AC3C_4ce0_A81C_6812EE227662" value="1"/>
+						<type xmi:idref="EAJava_Text"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_38278B83_0BD7_4bba_A69E_1B6D519F95C9" name="opmerking" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000023_0BD7_4bba_A69E_1B6D519F95C9" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000024_0BD7_4bba_A69E_1B6D519F95C9" value="1"/>
+						<type xmi:idref="EAJava_text"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_658B0AAC_0653_4fa1_A6AD_DF1D656311BC" name="rijksmonumentcode" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000025_0653_4fa1_A6AD_DF1D656311BC" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000026_0653_4fa1_A6AD_DF1D656311BC" value="1"/>
+						<type xmi:idref="EAJava_AN80"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_EBD24559_2F60_43fb_B865_2A7AAA4E3001" name="type" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<type xmi:idref="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000027_2F60_43fb_B865_2A7AAA4E3001" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000028_2F60_43fb_B865_2A7AAA4E3001" value="1"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_dst4ADF26_C2E9_4080_8F4F_32F9B255E4AE" visibility="public" association="EAID_144ADF26_C2E9_4080_8F4F_32F9B255E4AE" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000029__C2E9_4080_8F4F_32F9B255E4AE" value="0"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000030__C2E9_4080_8F4F_32F9B255E4AE" value="-1"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_dst08C810_A491_4e07_B859_C3D4EDEBA557" visibility="public" association="EAID_1F08C810_A491_4e07_B859_C3D4EDEBA557" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_7FE4B466_B051_4068_9ED1_6E60C3B2DBAD"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000031__A491_4e07_B859_C3D4EDEBA557" value="0"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000032__A491_4e07_B859_C3D4EDEBA557" value="-1"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_dstE4F035_7E96_48df_B6CF_93C945FF97C3" visibility="public" association="EAID_44E4F035_7E96_48df_B6CF_93C945FF97C3" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_FB13857C_C695_4b53_8060_BACFA0E16950"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000035__7E96_48df_B6CF_93C945FF97C3" value="0"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000036__7E96_48df_B6CF_93C945FF97C3" value="-1"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_dst585CB9_E569_47ca_9EFE_B9D5CF46BCBD" visibility="public" association="EAID_55585CB9_E569_47ca_9EFE_B9D5CF46BCBD" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000039__E569_47ca_9EFE_B9D5CF46BCBD" value="0"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000040__E569_47ca_9EFE_B9D5CF46BCBD" value="-1"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_dstA9090E_CF7A_4e6f_91E1_592085B0DA94" visibility="public" association="EAID_59A9090E_CF7A_4e6f_91E1_592085B0DA94" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_9775E778_DBF8_4122_94CE_551466B62F46"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_dst18F665_2A86_44fd_AD55_3E435A282BDF" visibility="public" association="EAID_8E18F665_2A86_44fd_AD55_3E435A282BDF" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000041__2A86_44fd_AD55_3E435A282BDF" value="0"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000042__2A86_44fd_AD55_3E435A282BDF" value="-1"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_dst893BFE_1A66_4760_9124_B62A81F45997" visibility="public" association="EAID_F7893BFE_1A66_4760_9124_B62A81F45997" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_26D1113F_F7B3_4bdd_9AAE_EA14CC9F3C3F"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000045__1A66_4760_9124_B62A81F45997" value="0"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000046__1A66_4760_9124_B62A81F45997" value="-1"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_dst27EB67_1CFA_4f40_AE79_329DE9DE6754" visibility="public" association="EAID_FD27EB67_1CFA_4f40_AE79_329DE9DE6754" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000049__1CFA_4f40_AE79_329DE9DE6754" value="0"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000050__1CFA_4f40_AE79_329DE9DE6754" value="-1"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Association" xmi:id="EAID_144ADF26_C2E9_4080_8F4F_32F9B255E4AE" name="monument bouwstijl" visibility="public">
+					<memberEnd xmi:idref="EAID_dst4ADF26_C2E9_4080_8F4F_32F9B255E4AE"/>
+					<memberEnd xmi:idref="EAID_src4ADF26_C2E9_4080_8F4F_32F9B255E4AE"/>
+					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src4ADF26_C2E9_4080_8F4F_32F9B255E4AE" visibility="public" association="EAID_144ADF26_C2E9_4080_8F4F_32F9B255E4AE" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000071__C2E9_4080_8F4F_32F9B255E4AE" value="0"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000072__C2E9_4080_8F4F_32F9B255E4AE" value="-1"/>
+					</ownedEnd>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Usage" xmi:id="EAID_1ED1613A_DE5F_4ee2_8356_4BB729911C69" name="documentatie" visibility="public" supplier="EAID_5641C50A_C0FA_4e71_B07B_26C7B1CE94ED" client="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+				<packagedElement xmi:type="uml:Association" xmi:id="EAID_1F08C810_A491_4e07_B859_C3D4EDEBA557" name="monument fotos" visibility="public">
+					<memberEnd xmi:idref="EAID_dst08C810_A491_4e07_B859_C3D4EDEBA557"/>
+					<memberEnd xmi:idref="EAID_src08C810_A491_4e07_B859_C3D4EDEBA557"/>
+					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src08C810_A491_4e07_B859_C3D4EDEBA557" visibility="public" association="EAID_1F08C810_A491_4e07_B859_C3D4EDEBA557" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000033__A491_4e07_B859_C3D4EDEBA557" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000034__A491_4e07_B859_C3D4EDEBA557" value="1"/>
+					</ownedEnd>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Association" xmi:id="EAID_44E4F035_7E96_48df_B6CF_93C945FF97C3" name="betreft" visibility="public">
+					<memberEnd xmi:idref="EAID_dstE4F035_7E96_48df_B6CF_93C945FF97C3"/>
+					<memberEnd xmi:idref="EAID_srcE4F035_7E96_48df_B6CF_93C945FF97C3"/>
+					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_srcE4F035_7E96_48df_B6CF_93C945FF97C3" visibility="public" association="EAID_44E4F035_7E96_48df_B6CF_93C945FF97C3" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000037__7E96_48df_B6CF_93C945FF97C3" value="0"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000038__7E96_48df_B6CF_93C945FF97C3" value="1"/>
+					</ownedEnd>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Association" xmi:id="EAID_55585CB9_E569_47ca_9EFE_B9D5CF46BCBD" name="monument bouwactiviteit" visibility="public">
+					<memberEnd xmi:idref="EAID_dst585CB9_E569_47ca_9EFE_B9D5CF46BCBD"/>
+					<memberEnd xmi:idref="EAID_src585CB9_E569_47ca_9EFE_B9D5CF46BCBD"/>
+					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src585CB9_E569_47ca_9EFE_B9D5CF46BCBD" visibility="public" association="EAID_55585CB9_E569_47ca_9EFE_B9D5CF46BCBD" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000061__E569_47ca_9EFE_B9D5CF46BCBD" value="0"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000062__E569_47ca_9EFE_B9D5CF46BCBD" value="-1"/>
+					</ownedEnd>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Association" xmi:id="EAID_59A9090E_CF7A_4e6f_91E1_592085B0DA94" name="betreft" visibility="public">
+					<memberEnd xmi:idref="EAID_dstA9090E_CF7A_4e6f_91E1_592085B0DA94"/>
+					<memberEnd xmi:idref="EAID_srcA9090E_CF7A_4e6f_91E1_592085B0DA94"/>
+					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_srcA9090E_CF7A_4e6f_91E1_592085B0DA94" visibility="public" association="EAID_59A9090E_CF7A_4e6f_91E1_592085B0DA94" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+					</ownedEnd>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Association" xmi:id="EAID_D9634EAD_2869_40a1_B243_805897E4B1B3" name="monument bouwtype" visibility="public">
+					<memberEnd xmi:idref="EAID_dst634EAD_2869_40a1_B243_805897E4B1B3"/>
+					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dst634EAD_2869_40a1_B243_805897E4B1B3" visibility="public" association="EAID_D9634EAD_2869_40a1_B243_805897E4B1B3" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000043__2869_40a1_B243_805897E4B1B3" value="0"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000044__2869_40a1_B243_805897E4B1B3" value="-1"/>
+					</ownedEnd>
+					<memberEnd xmi:idref="EAID_src634EAD_2869_40a1_B243_805897E4B1B3"/>
+					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src634EAD_2869_40a1_B243_805897E4B1B3" visibility="public" association="EAID_D9634EAD_2869_40a1_B243_805897E4B1B3" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000079__2869_40a1_B243_805897E4B1B3" value="0"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000080__2869_40a1_B243_805897E4B1B3" value="-1"/>
+					</ownedEnd>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Association" xmi:id="EAID_F7893BFE_1A66_4760_9124_B62A81F45997" name="betreft" visibility="public">
+					<memberEnd xmi:idref="EAID_dst893BFE_1A66_4760_9124_B62A81F45997"/>
+					<memberEnd xmi:idref="EAID_src893BFE_1A66_4760_9124_B62A81F45997"/>
+					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src893BFE_1A66_4760_9124_B62A81F45997" visibility="public" association="EAID_F7893BFE_1A66_4760_9124_B62A81F45997" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000047__1A66_4760_9124_B62A81F45997" value="0"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000048__1A66_4760_9124_B62A81F45997" value="1"/>
+					</ownedEnd>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Association" xmi:id="EAID_FD27EB67_1CFA_4f40_AE79_329DE9DE6754" name="monument functie" visibility="public">
+					<memberEnd xmi:idref="EAID_dst27EB67_1CFA_4f40_AE79_329DE9DE6754"/>
+					<memberEnd xmi:idref="EAID_src27EB67_1CFA_4f40_AE79_329DE9DE6754"/>
+					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src27EB67_1CFA_4f40_AE79_329DE9DE6754" visibility="public" association="EAID_FD27EB67_1CFA_4f40_AE79_329DE9DE6754" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000095__1CFA_4f40_AE79_329DE9DE6754" value="0"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000096__1CFA_4f40_AE79_329DE9DE6754" value="-1"/>
+					</ownedEnd>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Class" xmi:id="EAID_4AD539EC_A308_43da_B025_17A1647303F3" name="Bouwactiviteit" visibility="public">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_9561214E_44CD_42e3_AC07_CD73506F1241" name="bouwjaarklasse" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000051_44CD_42e3_AC07_CD73506F1241" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000052_44CD_42e3_AC07_CD73506F1241" value="1"/>
+						<type xmi:idref="EAJava_AN80"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_CDFCF97C_39D8_410d_B591_D6FEF8CF41B1" name="bouwjaartot" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000053_39D8_410d_B591_D6FEF8CF41B1" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000054_39D8_410d_B591_D6FEF8CF41B1" value="1"/>
+						<type xmi:idref="EAJava_int"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_60D6B0E6_F9D5_467c_8B02_4848752DC97C" name="bouwjaarvan" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000055_F9D5_467c_8B02_4848752DC97C" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000056_F9D5_467c_8B02_4848752DC97C" value="1"/>
+						<type xmi:idref="EAJava_int"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_AE9C37BF_B89D_49c7_B5AA_48F8D7329E8E" name="indicatie" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000057_B89D_49c7_B5AA_48F8D7329E8E" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000058_B89D_49c7_B5AA_48F8D7329E8E" value="1"/>
+						<type xmi:idref="EAJava_AN8"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_597FF0BC_0D0B_447a_B84C_77400DF2FADF" name="omschrijving" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000059_0D0B_447a_B84C_77400DF2FADF" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000060_0D0B_447a_B84C_77400DF2FADF" value="1"/>
+						<type xmi:idref="EAJava_AN300"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Class" xmi:id="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA" name="Bouwstijl" visibility="public">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_44497CB2_F315_4af5_8119_A10357D8EBEA" name="hoofdstijl" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000063_F315_4af5_8119_A10357D8EBEA" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000064_F315_4af5_8119_A10357D8EBEA" value="1"/>
+						<type xmi:idref="EAJava_AN200"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_F17EBA71_A509_4b7c_B481_BEB999EC1E3B" name="substijl" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000065_A509_4b7c_B481_BEB999EC1E3B" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000066_A509_4b7c_B481_BEB999EC1E3B" value="1"/>
+						<type xmi:idref="EAJava_AN200"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_491D0BF2_5FFE_446e_B90E_5267BE035670" name="toelichting" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000067_5FFE_446e_B90E_5267BE035670" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000068_5FFE_446e_B90E_5267BE035670" value="1"/>
+						<type xmi:idref="EAJava_text"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_5B8476E8_9A80_4d9f_A8B3_ACFAF59A9C58" name="zuiverheid" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000069_9A80_4d9f_A8B3_ACFAF59A9C58" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000070_9A80_4d9f_A8B3_ACFAF59A9C58" value="1"/>
+						<type xmi:idref="EAJava_AN200"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Class" xmi:id="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4" name="Bouwtype" visibility="public">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_7DA39723_70C0_40cf_AE51_E7769275DC7F" name="hoofdcategorie" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000073_70C0_40cf_AE51_E7769275DC7F" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000074_70C0_40cf_AE51_E7769275DC7F" value="1"/>
+						<type xmi:idref="EAJava_AN200"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_2781DF4B_E651_4033_8C4D_F9676E1E7F85" name="subcategorie" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000075_E651_4033_8C4D_F9676E1E7F85" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000076_E651_4033_8C4D_F9676E1E7F85" value="1"/>
+						<type xmi:idref="EAJava_AN200"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_A21A8DA2_B53E_44e3_AA67_A06D67E22D3A" name="toelichting" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000077_B53E_44e3_AA67_A06D67E22D3A" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000078_B53E_44e3_AA67_A06D67E22D3A" value="1"/>
+						<type xmi:idref="EAJava_text"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Class" xmi:id="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D" name="Oorspronkelijke Functie" visibility="public">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_81A910B1_E4CE_4953_9FED_6AA16332E0C4" name="functie" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000081_E4CE_4953_9FED_6AA16332E0C4" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000082_E4CE_4953_9FED_6AA16332E0C4" value="1"/>
+						<type xmi:idref="EAJava_AN200"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_9654B4C5_953E_4b72_96C6_C476A597CAEC" name="functiesoort" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000083_953E_4b72_96C6_C476A597CAEC" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000084_953E_4b72_96C6_C476A597CAEC" value="1"/>
+						<type xmi:idref="EAJava_An200"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_C5D26518_353C_4399_9E00_BCC1FDB5DD61" name="hoofdcategorie" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000085_353C_4399_9E00_BCC1FDB5DD61" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000086_353C_4399_9E00_BCC1FDB5DD61" value="1"/>
+						<type xmi:idref="EAJava_AN200"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_127EBC2C_5CBD_439f_8A06_13CEAE8EEF09" name="hoofdfunctie" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000087_5CBD_439f_8A06_13CEAE8EEF09" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000088_5CBD_439f_8A06_13CEAE8EEF09" value="1"/>
+						<type xmi:idref="EAJava_Boolean"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_6556EB21_AE8A_475d_9B53_9A06409CAA07" name="subcategorie" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000089_AE8A_475d_9B53_9A06409CAA07" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000090_AE8A_475d_9B53_9A06409CAA07" value="1"/>
+						<type xmi:idref="EAJava_AN200"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_7E77EC52_B954_4e5d_BAAB_BDD88DFFB8CA" name="toelichting" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000091_B954_4e5d_BAAB_BDD88DFFB8CA" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000092_B954_4e5d_BAAB_BDD88DFFB8CA" value="1"/>
+						<type xmi:idref="EAJava_Text"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_200B84E0_1D73_4608_9258_12338B5EC034" name="verbijzondering" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000093_1D73_4608_9258_12338B5EC034" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000094_1D73_4608_9258_12338B5EC034" value="1"/>
+						<type xmi:idref="EAJava_AN200"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Enumeration" xmi:id="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8" name="TypeMonument" visibility="public">
+					<ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="EAID_B2AE8AFC_C1D5_4d83_BFD3_EBF1663F3468" name="rijksmonument" visibility="public" classifier="EAJava__"/>
+					<ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="EAID_774B86B6_5B16_4f29_ABF0_40671AD9E0F9" name="gemeentelijkmonument" visibility="public" classifier="EAJava__"/>
+				</packagedElement>
+			</packagedElement>
+		</packagedElement>
+		<thecustomprofile:datum-tijd-export base_Class="EAID_54944273_F312_44b2_A78D_43488F915429" datum-tijd-export="28062023-11:06:06"/>
+		<thecustomprofile:archimate-type base_Class="EAID_54944273_F312_44b2_A78D_43488F915429" archimate-type="Business object"/>
+		<thecustomprofile:gemma-guid base_Class="EAID_54944273_F312_44b2_A78D_43488F915429" gemma-guid="id-54944273-f312-44b2-a78d-43488f915429"/>
+		<thecustomprofile:domein-gemma base_Class="EAID_54944273_F312_44b2_A78D_43488F915429" domein-gemma="nan"/>
+		<thecustomprofile:datum-tijd-export base_Class="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" datum-tijd-export="28062023-11:06:06"/>
+		<thecustomprofile:archimate-type base_Class="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" archimate-type="Business object"/>
+		<thecustomprofile:gemma-guid base_Class="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" gemma-guid="id-32c02923-ee3a-4553-b94b-31e0c273a829"/>
+		<thecustomprofile:domein-gemma base_Class="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" domein-gemma="nan"/>
+		<thecustomprofile:datum-tijd-export base_Class="EAID_4AD539EC_A308_43da_B025_17A1647303F3" datum-tijd-export="28062023-11:06:06"/>
+		<thecustomprofile:archimate-type base_Class="EAID_4AD539EC_A308_43da_B025_17A1647303F3" archimate-type="Business object"/>
+		<thecustomprofile:gemma-guid base_Class="EAID_4AD539EC_A308_43da_B025_17A1647303F3" gemma-guid="id-4ad539ec-a308-43da-b025-17a1647303f3"/>
+		<thecustomprofile:domein-gemma base_Class="EAID_4AD539EC_A308_43da_B025_17A1647303F3" domein-gemma="nan"/>
+		<thecustomprofile:datum-tijd-export base_Class="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA" datum-tijd-export="28062023-11:06:06"/>
+		<thecustomprofile:archimate-type base_Class="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA" archimate-type="Business object"/>
+		<thecustomprofile:gemma-guid base_Class="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA" gemma-guid="id-8c0888c9-7b2e-4fcb-aeff-e1733875cdca"/>
+		<thecustomprofile:domein-gemma base_Class="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA" domein-gemma="nan"/>
+		<thecustomprofile:bron base_Class="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA" bron="https://thesaurus.cultureelerfgoed.nl/concept/cht:f6cfd2c0-d452-4de8-985a-e67887b71c35/nl"/>
+		<thecustomprofile:datum-tijd-export base_Class="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4" datum-tijd-export="28062023-11:06:06"/>
+		<thecustomprofile:archimate-type base_Class="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4" archimate-type="Data object"/>
+		<thecustomprofile:gemma-guid base_Class="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4" gemma-guid="id-5e9dafbb-c9b5-4706-a43d-07ad4979ded4"/>
+		<thecustomprofile:domein-gemma base_Class="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4" domein-gemma="nan"/>
+		<thecustomprofile:datum-tijd-export base_Class="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D" datum-tijd-export="28062023-11:06:06"/>
+		<thecustomprofile:archimate-type base_Class="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D" archimate-type="Data object"/>
+		<thecustomprofile:gemma-guid base_Class="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D" gemma-guid="id-49993ef9-ed8b-49e0-b8f7-fc7c8c28669d"/>
+		<thecustomprofile:domein-gemma base_Class="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D" domein-gemma="nan"/>
+		<thecustomprofile:datum-tijd-export base_Enumeration="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8" datum-tijd-export="28062023-11:06:06"/>
+		<thecustomprofile:archimate-type base_Enumeration="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8" archimate-type="Data object"/>
+		<thecustomprofile:gemma-guid base_Enumeration="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8" gemma-guid="id-5c808ac9-cb09-4f4d-813e-821829856ba8"/>
+		<thecustomprofile:domein-gemma base_Enumeration="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8" domein-gemma="nan"/>
+	</uml:Model>
+	<xmi:Extension extender="Enterprise Architect" extenderID="6.5">
+		<elements>
+			<element xmi:idref="EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E" xmi:type="uml:Package" name="Erfgoed: Monumenten " scope="public">
+				<model package2="EAID_45B88627_6F44_4b6d_BE77_3EC51BBE679E" package="EAPK_40A8E0F6_63CB_4ac6_B378_95CC70E4A840" tpos="0" ea_localid="40" ea_eleType="package"/>
+				<properties isSpecification="false" sType="Package" nType="0" scope="public"/>
+				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 14:46:07" modified="2019-07-03 14:46:07" complexity="1" status="Proposed"/>
+				<code gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags/>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Sport, Cultuur en Recreatie"/>
+				<packageproperties version="1.0" tpos="0"/>
+				<paths/>
+				<times created="2019-07-03 14:46:07" modified="2022-12-12 16:28:23" lastloaddate="2019-07-06 17:08:07" lastsavedate="2019-07-06 17:08:07"/>
+				<flags iscontrolled="0" isprotected="0" batchsave="0" batchload="0" usedtd="0" logxml="0"/>
+			</element>
+			<element xmi:idref="EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652" xmi:type="uml:Package" name="Diagram" scope="public">
+				<model package2="EAID_5B6708DC_CE09_4284_8DCE_DD1B744BB652" package="EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E" tpos="0" ea_localid="41" ea_eleType="package"/>
+				<properties isSpecification="false" sType="Package" nType="0" scope="public"/>
+				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 14:46:15" modified="2019-07-03 14:46:15" complexity="1" status="Proposed"/>
+				<code gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags/>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Erfgoed: Monumenten "/>
+				<packageproperties version="1.0" tpos="0"/>
+				<paths/>
+				<times created="2019-07-03 14:46:15" modified="2022-12-12 16:28:22" lastloaddate="2019-07-06 17:08:07" lastsavedate="2019-07-06 17:08:07"/>
+				<flags iscontrolled="0" isprotected="0" batchsave="0" batchload="0" usedtd="0" logxml="0"/>
+			</element>
+			<element xmi:idref="EAID_78218601_F6B3_40b0_90AE_3513B4919064" xmi:type="uml:Note" scope="public">
+				<model package="EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652" tpos="0" ea_localid="380" ea_eleType="element"/>
+				<properties documentation="Monumentinformatie" isSpecification="false" sType="Note" nType="0" scope="public"/>
+				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 15:17:59" modified="2022-12-12 16:28:22" complexity="1" status="Proposed"/>
+				<code gentype="&lt;none&gt;"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags/>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Diagram"/>
+				<links>
+					<NoteLink xmi:id="EAID_1FC4D245_AD8E_44cb_ACFB_E6B5CB971001" start="EAID_78218601_F6B3_40b0_90AE_3513B4919064" end="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+				</links>
+			</element>
+			<element xmi:idref="EAID_EBF38EE2_DAF0_4704_ADA6_705868BA7C05" xmi:type="uml:Note" scope="public">
+				<model package="EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652" tpos="0" ea_localid="379" ea_eleType="element"/>
+				<properties documentation="Kadastrale Aanduiding" isSpecification="false" sType="Note" nType="0" scope="public"/>
+				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 15:16:52" modified="2022-12-12 16:28:22" complexity="1" status="Proposed"/>
+				<code gentype="&lt;none&gt;"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags/>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Diagram"/>
+				<links>
+					<NoteLink xmi:id="EAID_D07FFC12_AA8D_421a_A795_28E66B5E6C9C" start="EAID_EBF38EE2_DAF0_4704_ADA6_705868BA7C05" end="EAID_9775E778_DBF8_4122_94CE_551466B62F46"/>
+				</links>
+			</element>
+			<element xmi:idref="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" xmi:type="uml:Package" name="Model Monumenten" scope="public">
+				<model package2="EAID_F7651B45_2B64_4197_A6E5_BFC56EC98466" package="EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E" tpos="0" ea_localid="42" ea_eleType="package"/>
+				<properties isSpecification="false" sType="Package" nType="0" scope="public"/>
+				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 14:46:25" modified="2019-07-03 14:46:25" complexity="1" status="Proposed"/>
+				<code gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags/>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Erfgoed: Monumenten "/>
+				<packageproperties version="1.0" tpos="0"/>
+				<paths/>
+				<times created="2019-07-03 14:46:25" modified="2022-12-12 16:28:23" lastloaddate="2019-07-06 17:08:08" lastsavedate="2019-07-06 17:08:08"/>
+				<flags iscontrolled="0" isprotected="0" batchsave="0" batchload="0" usedtd="0" logxml="0"/>
+			</element>
+			<element xmi:idref="EAID_54944273_F312_44b2_A78D_43488F915429" xmi:type="uml:Class" name="Ambacht" scope="public">
+				<model package="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" tpos="0" ea_localid="382" ea_eleType="element"/>
+				<properties documentation="Beroep waarbij een handwerker met gereedschap eindproducten maakt." isSpecification="false" sType="Class" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 15:42:28" modified="2022-12-12 16:28:22" complexity="1" status="Proposed"/>
+				<code gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_E0C65F37_A2DA_4E79_BDF0_CC3F4607167C" name="archimate-type" value="Business object" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+					<tag xmi:id="EAID_65401341_DD83_4620_A236_CEC4681C9708" name="bron" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+					<tag xmi:id="EAID_C5257D00_86DC_4657_9CBC_1EC6C03C74C9" name="datum-tijd-export" value="28062023-11:06:06" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+					<tag xmi:id="EAID_6ED287EA_0F4E_4177_AD1E_3AAF7842374A" name="domein-dcat" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+					<tag xmi:id="EAID_5F5875A4_4C61_4BC6_958F_BD7A49149B10" name="domein-gemma" value="nan" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+					<tag xmi:id="EAID_8CEA0788_DDCB_4399_AB94_971F87A49504" name="gemma-guid" value="id-54944273-f312-44b2-a78d-43488f915429" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+					<tag xmi:id="EAID_B3E0FB89_EA91_4663_8492_3C550E53D598" name="synoniemen" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+					<tag xmi:id="EAID_DCA255D6_C1C9_4222_82C1_5AE4D1347690" name="toelichting" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+				</tags>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Model Monumenten"/>
+				<attributes>
+					<attribute xmi:idref="EAID_6FEBCD91_8B50_4942_A989_6C9B242CEBC2" name="ambachtjaartot" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3201" ea_guid="{6FEBCD91-8B50-4942-A989-6C9B242CEBC2}"/>
+						<properties type="int" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="1"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_6277018C_A2EC_4069_9625_487494821237" name="ambachtjaarvanaf" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3202" ea_guid="{6277018C-A2EC-4069-9625-487494821237}"/>
+						<properties type="int" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="0"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_97B64E49_D913_4648_985D_C2692F1EDC51" name="ambachtsoort" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3203" ea_guid="{97B64E49-D913-4648-985D-C2692F1EDC51}"/>
+						<properties type="AN300" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="2"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+				</attributes>
+				<links>
+					<Association xmi:id="EAID_8E18F665_2A86_44fd_AD55_3E435A282BDF" start="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" end="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+				</links>
+			</element>
+			<element xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" xmi:type="uml:Class" name="Beschermde Status" scope="public">
+				<model package="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" tpos="0" ea_localid="383" ea_eleType="element"/>
+				<properties documentation="Status van de bescherming van een monument. Een monument / erfgoed is een overblijfsel van kunst, cultuur, architectuur of nijverheid dat van algemeen belang wordt geacht vanwege de historische, volkskundige, artistieke, wetenschappelijke, industrieel-archeologische of andere sociaal-culturele waarde. Vormen van monument / erfgoed met de status rijks- provinciaal- of gemeentelijke monument / erfgoed zijn beschermd op grond van een besluit van respectievelijk het Ministerie OCW, de provincie of de gemeente," isSpecification="false" sType="Class" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 15:12:51" modified="2022-12-12 16:28:22" complexity="1" status="Proposed"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_5B794A70_9122_4C93_AE0C_5FD78F370C8E" name="archimate-type" value="Business object" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+					<tag xmi:id="EAID_8AC33CB6_F563_4C32_989B_C3AB682F1FFE" name="bron" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+					<tag xmi:id="EAID_E8CB676D_290E_4AC5_AD60_B47008D5C530" name="datum-tijd-export" value="28062023-11:06:06" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+					<tag xmi:id="EAID_13CBB5EC_6DC0_40AD_AD9E_8597C4E9A246" name="domein-dcat" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+					<tag xmi:id="EAID_57DBD26F_8E32_4E45_8BA0_C811908CFDA1" name="domein-gemma" value="nan" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+					<tag xmi:id="EAID_0731CCB8_BBF7_42AE_B73F_1AD844DC2B86" name="gemma-guid" value="id-32c02923-ee3a-4553-b94b-31e0c273a829" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+					<tag xmi:id="EAID_F93861B4_6E83_4974_AE4C_F86EA393A47A" name="synoniemen" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+					<tag xmi:id="EAID_8E550CBE_BDEA_4ADA_8E93_5720B05F73AD" name="toelichting" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+				</tags>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Model Monumenten"/>
+				<attributes>
+					<attribute xmi:idref="EAID_0E956D19_44D9_42f6_9C44_15FDAAF5AEF1" name="bronnen" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3204" ea_guid="{0E956D19-44D9-42f6-9C44-15FDAAF5AEF1}"/>
+						<properties type="AN400" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="8"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_04B5CEE9_8929_4729_A545_FEEB5604B5C8" name="complex" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3205" ea_guid="{04B5CEE9-8929-4729-A545-FEEB5604B5C8}"/>
+						<properties type="AN200" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="6"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_B2A9E96D_DC0F_453b_99F3_D75390210700" name="datuminschrijvingregister" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3206" ea_guid="{B2A9E96D-DC0F-453b-99F3-D75390210700}"/>
+						<properties type="Date" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="2"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_CFD1E016_5347_4e65_9463_B06E114AE5C8" name="gemeentelijkmonumentcode" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3207" ea_guid="{CFD1E016-5347-4e65-9463-B06E114AE5C8}"/>
+						<properties type="AN80" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="1"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_399FC352_454E_478d_8129_4F6BBCE00ABE" name="gezichtscode" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3208" ea_guid="{399FC352-454E-478d-8129-4F6BBCE00ABE}"/>
+						<properties type="AN20" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="5"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_0637412A_E928_4608_969E_ACF9350F4594" name="naam" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3209" ea_guid="{0637412A-E928-4608-969E-ACF9350F4594}"/>
+						<properties type="AN200" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="3"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_7A602A0E_AC3C_4ce0_A81C_6812EE227662" name="omschrijving" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3210" ea_guid="{7A602A0E-AC3C-4ce0-A81C-6812EE227662}"/>
+						<properties type="Text" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="9"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_38278B83_0BD7_4bba_A69E_1B6D519F95C9" name="opmerking" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3211" ea_guid="{38278B83-0BD7-4bba-A69E-1B6D519F95C9}"/>
+						<properties type="text" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="7"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_658B0AAC_0653_4fa1_A6AD_DF1D656311BC" name="rijksmonumentcode" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3212" ea_guid="{658B0AAC-0653-4fa1-A6AD-DF1D656311BC}"/>
+						<properties type="AN80" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="0"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_EBD24559_2F60_43fb_B865_2A7AAA4E3001" name="type" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3213" ea_guid="{EBD24559-2F60-43fb-B865-2A7AAA4E3001}"/>
+						<properties type="TypeMonument" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="4"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+				</attributes>
+				<links>
+					<Association xmi:id="EAID_144ADF26_C2E9_4080_8F4F_32F9B255E4AE" start="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" end="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+					<Usage xmi:id="EAID_1ED1613A_DE5F_4ee2_8356_4BB729911C69" start="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" end="EAID_5641C50A_C0FA_4e71_B07B_26C7B1CE94ED"/>
+					<Association xmi:id="EAID_1F08C810_A491_4e07_B859_C3D4EDEBA557" start="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" end="EAID_7FE4B466_B051_4068_9ED1_6E60C3B2DBAD"/>
+					<Association xmi:id="EAID_44E4F035_7E96_48df_B6CF_93C945FF97C3" start="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" end="EAID_FB13857C_C695_4b53_8060_BACFA0E16950"/>
+					<Association xmi:id="EAID_55585CB9_E569_47ca_9EFE_B9D5CF46BCBD" start="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" end="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+					<Association xmi:id="EAID_59A9090E_CF7A_4e6f_91E1_592085B0DA94" start="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" end="EAID_9775E778_DBF8_4122_94CE_551466B62F46"/>
+					<Association xmi:id="EAID_8E18F665_2A86_44fd_AD55_3E435A282BDF" start="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" end="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+					<Association xmi:id="EAID_D9634EAD_2869_40a1_B243_805897E4B1B3" start="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" end="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4"/>
+					<Association xmi:id="EAID_F7893BFE_1A66_4760_9124_B62A81F45997" start="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" end="EAID_26D1113F_F7B3_4bdd_9AAE_EA14CC9F3C3F"/>
+					<Association xmi:id="EAID_FD27EB67_1CFA_4f40_AE79_329DE9DE6754" start="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" end="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D"/>
+					<NoteLink xmi:id="EAID_1FC4D245_AD8E_44cb_ACFB_E6B5CB971001" start="EAID_78218601_F6B3_40b0_90AE_3513B4919064" end="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+				</links>
+			</element>
+			<element xmi:idref="EAID_4AD539EC_A308_43da_B025_17A1647303F3" xmi:type="uml:Class" name="Bouwactiviteit" scope="public">
+				<model package="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" tpos="0" ea_localid="384" ea_eleType="element"/>
+				<properties documentation="Het bouwen van een bouwwerk." isSpecification="false" sType="Class" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 15:45:18" modified="2022-12-12 16:28:22" complexity="1" status="Proposed"/>
+				<code gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_4040F505_FF4C_4577_9E2F_353481E5B6E1" name="archimate-type" value="Business object" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+					<tag xmi:id="EAID_95664B0B_EAB6_4D6A_8263_876D82ED14C1" name="bron" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+					<tag xmi:id="EAID_ED1EC1FC_1C71_4C16_8854_2FD8BAA14431" name="datum-tijd-export" value="28062023-11:06:06" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+					<tag xmi:id="EAID_69D1579B_7B00_4DC1_9AEB_6C992B3D8CD1" name="domein-dcat" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+					<tag xmi:id="EAID_CD0EAF02_5735_423D_957E_4E83A0ED5F31" name="domein-gemma" value="nan" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+					<tag xmi:id="EAID_D01F2324_ED7C_4153_BDC8_B32465177E44" name="gemma-guid" value="id-4ad539ec-a308-43da-b025-17a1647303f3" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+					<tag xmi:id="EAID_FCE19BD3_C9AD_4A3C_89C1_6AA449C03554" name="synoniemen" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+					<tag xmi:id="EAID_E8F480E8_F3DB_499C_B80B_DBED4A5E4D36" name="toelichting" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+				</tags>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Model Monumenten"/>
+				<attributes>
+					<attribute xmi:idref="EAID_9561214E_44CD_42e3_AC07_CD73506F1241" name="bouwjaarklasse" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3214" ea_guid="{9561214E-44CD-42e3-AC07-CD73506F1241}"/>
+						<properties type="AN80" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="3"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_CDFCF97C_39D8_410d_B591_D6FEF8CF41B1" name="bouwjaartot" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3215" ea_guid="{CDFCF97C-39D8-410d-B591-D6FEF8CF41B1}"/>
+						<properties type="int" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="1"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_60D6B0E6_F9D5_467c_8B02_4848752DC97C" name="bouwjaarvan" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3216" ea_guid="{60D6B0E6-F9D5-467c-8B02-4848752DC97C}"/>
+						<properties type="int" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="0"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_AE9C37BF_B89D_49c7_B5AA_48F8D7329E8E" name="indicatie" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3217" ea_guid="{AE9C37BF-B89D-49c7-B5AA-48F8D7329E8E}"/>
+						<properties type="AN8" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="2"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_597FF0BC_0D0B_447a_B84C_77400DF2FADF" name="omschrijving" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3218" ea_guid="{597FF0BC-0D0B-447a-B84C-77400DF2FADF}"/>
+						<properties type="AN300" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="4"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+				</attributes>
+				<links>
+					<Association xmi:id="EAID_55585CB9_E569_47ca_9EFE_B9D5CF46BCBD" start="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" end="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+				</links>
+			</element>
+			<element xmi:idref="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA" xmi:type="uml:Class" name="Bouwstijl" scope="public">
+				<model package="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" tpos="0" ea_localid="385" ea_eleType="element"/>
+				<properties documentation="Trant van bouwen met bepaalde kenmerken in een bepaalde periode. In de betrokken tijdperken waren het geen levende voorstellingen; het zijn later geformuleerde (generaliserende) geschiedkundige constructies. Doelbewust komt deze tendens op sedert c. 1830. (Haslinghuis)" isSpecification="false" sType="Class" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 15:39:34" modified="2022-12-12 16:28:22" complexity="1" status="Proposed"/>
+				<code gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_F1D6F986_EC6F_4AF8_BB5A_2B01515394CA" name="archimate-type" value="Business object" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+					<tag xmi:id="EAID_6714183E_6DF3_40A8_B776_E5FBCB276347" name="bron" value="https://thesaurus.cultureelerfgoed.nl/concept/cht:f6cfd2c0-d452-4de8-985a-e67887b71c35/nl" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+					<tag xmi:id="EAID_940AB084_D4CD_466A_AB97_28A257842923" name="datum-tijd-export" value="28062023-11:06:06" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+					<tag xmi:id="EAID_2DF5ACA4_CE98_4530_8622_174258FC922C" name="domein-dcat" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+					<tag xmi:id="EAID_F91116A1_BBE8_42A2_ABB3_647CEE8390E2" name="domein-gemma" value="nan" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+					<tag xmi:id="EAID_010398F8_5945_4C9B_B4A3_8D6005C3726D" name="gemma-guid" value="id-8c0888c9-7b2e-4fcb-aeff-e1733875cdca" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+					<tag xmi:id="EAID_C0D00B67_500F_4F2F_8D66_0B3E0C5B93F2" name="synoniemen" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+					<tag xmi:id="EAID_D005707A_2F4E_4D79_BECC_E9A2CEC44926" name="toelichting" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+				</tags>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Model Monumenten"/>
+				<attributes>
+					<attribute xmi:idref="EAID_44497CB2_F315_4af5_8119_A10357D8EBEA" name="hoofdstijl" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3219" ea_guid="{44497CB2-F315-4af5-8119-A10357D8EBEA}"/>
+						<properties type="AN200" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="0"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_F17EBA71_A509_4b7c_B481_BEB999EC1E3B" name="substijl" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3220" ea_guid="{F17EBA71-A509-4b7c-B481-BEB999EC1E3B}"/>
+						<properties type="AN200" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="1"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_491D0BF2_5FFE_446e_B90E_5267BE035670" name="toelichting" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3221" ea_guid="{491D0BF2-5FFE-446e-B90E-5267BE035670}"/>
+						<properties type="text" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="3"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_5B8476E8_9A80_4d9f_A8B3_ACFAF59A9C58" name="zuiverheid" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3222" ea_guid="{5B8476E8-9A80-4d9f-A8B3-ACFAF59A9C58}"/>
+						<properties type="AN200" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="2"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+				</attributes>
+				<links>
+					<Association xmi:id="EAID_144ADF26_C2E9_4080_8F4F_32F9B255E4AE" start="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" end="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+				</links>
+			</element>
+			<element xmi:idref="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4" xmi:type="uml:Class" name="Bouwtype" scope="public">
+				<model package="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" tpos="0" ea_localid="386" ea_eleType="element"/>
+				<properties documentation="Typering van een bouwstijl" isSpecification="false" sType="Class" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 15:39:43" modified="2022-12-12 16:28:23" complexity="1" status="Proposed"/>
+				<code gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_CCDFCEEC_3313_43EB_862B_6104B1439250" name="archimate-type" value="Data object" modelElement="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4"/>
+					<tag xmi:id="EAID_CFFDD7B4_6783_4CD1_93CC_26088BB4A5FD" name="bron" modelElement="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4"/>
+					<tag xmi:id="EAID_0B89D57C_BF92_4312_9907_9E6C88D1815C" name="datum-tijd-export" value="28062023-11:06:06" modelElement="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4"/>
+					<tag xmi:id="EAID_0D4D5C18_F5AA_431E_B7D2_C4702188A141" name="domein-dcat" modelElement="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4"/>
+					<tag xmi:id="EAID_39BE748E_5161_4428_80C1_E1F853645683" name="domein-gemma" value="nan" modelElement="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4"/>
+					<tag xmi:id="EAID_D8FF6588_439C_400C_ACFC_BAA8D3F9F8A5" name="gemma-guid" value="id-5e9dafbb-c9b5-4706-a43d-07ad4979ded4" modelElement="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4"/>
+					<tag xmi:id="EAID_55C64D37_BED0_43DB_8FEF_038047568405" name="synoniemen" modelElement="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4"/>
+					<tag xmi:id="EAID_6858B86D_A6FB_4DD0_91F2_0EB91E0C8A1D" name="toelichting" modelElement="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4"/>
+				</tags>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Model Monumenten"/>
+				<attributes>
+					<attribute xmi:idref="EAID_7DA39723_70C0_40cf_AE51_E7769275DC7F" name="hoofdcategorie" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3223" ea_guid="{7DA39723-70C0-40cf-AE51-E7769275DC7F}"/>
+						<properties type="AN200" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="0"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_2781DF4B_E651_4033_8C4D_F9676E1E7F85" name="subcategorie" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3224" ea_guid="{2781DF4B-E651-4033-8C4D-F9676E1E7F85}"/>
+						<properties type="AN200" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="1"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_A21A8DA2_B53E_44e3_AA67_A06D67E22D3A" name="toelichting" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3225" ea_guid="{A21A8DA2-B53E-44e3-AA67-A06D67E22D3A}"/>
+						<properties type="text" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="2"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+				</attributes>
+				<links>
+					<Association xmi:id="EAID_D9634EAD_2869_40a1_B243_805897E4B1B3" start="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" end="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4"/>
+				</links>
+			</element>
+			<element xmi:idref="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D" xmi:type="uml:Class" name="Oorspronkelijke Functie" scope="public">
+				<model package="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" tpos="0" ea_localid="387" ea_eleType="element"/>
+				<properties documentation="De functie van een object na bouw of oplevering" isSpecification="false" sType="Class" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 15:39:16" modified="2022-12-12 16:28:23" complexity="1" status="Proposed"/>
+				<code gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_176CA572_54A9_4668_989F_B1EE048DB84B" name="archimate-type" value="Data object" modelElement="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D"/>
+					<tag xmi:id="EAID_A4166442_FCF1_4A34_9DB4_8E685E5C17D2" name="bron" modelElement="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D"/>
+					<tag xmi:id="EAID_24543EFB_9762_487E_8B2D_7282BCE05F56" name="datum-tijd-export" value="28062023-11:06:06" modelElement="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D"/>
+					<tag xmi:id="EAID_0C725074_12A8_483B_9E13_5AB864BF2D3C" name="domein-dcat" modelElement="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D"/>
+					<tag xmi:id="EAID_A6D060A2_F043_4F18_AFD9_7A500888F2D9" name="domein-gemma" value="nan" modelElement="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D"/>
+					<tag xmi:id="EAID_F8E59919_A4C6_448E_ADC7_1CAA20E7BDB3" name="gemma-guid" value="id-49993ef9-ed8b-49e0-b8f7-fc7c8c28669d" modelElement="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D"/>
+					<tag xmi:id="EAID_A2E28CA3_4173_4621_B20A_B116E4B7D316" name="synoniemen" modelElement="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D"/>
+					<tag xmi:id="EAID_84243843_0DFA_48D8_AA73_7FAF7C5F8A29" name="toelichting" modelElement="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D"/>
+				</tags>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Model Monumenten"/>
+				<attributes>
+					<attribute xmi:idref="EAID_81A910B1_E4CE_4953_9FED_6AA16332E0C4" name="functie" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3226" ea_guid="{81A910B1-E4CE-4953-9FED-6AA16332E0C4}"/>
+						<properties type="AN200" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="6"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_9654B4C5_953E_4b72_96C6_C476A597CAEC" name="functiesoort" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3227" ea_guid="{9654B4C5-953E-4b72-96C6-C476A597CAEC}"/>
+						<properties type="An200" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="3"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_C5D26518_353C_4399_9E00_BCC1FDB5DD61" name="hoofdcategorie" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3228" ea_guid="{C5D26518-353C-4399-9E00-BCC1FDB5DD61}"/>
+						<properties type="AN200" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="4"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_127EBC2C_5CBD_439f_8A06_13CEAE8EEF09" name="hoofdfunctie" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3229" ea_guid="{127EBC2C-5CBD-439f-8A06-13CEAE8EEF09}"/>
+						<properties type="Boolean" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="2"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_6556EB21_AE8A_475d_9B53_9A06409CAA07" name="subcategorie" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3230" ea_guid="{6556EB21-AE8A-475d-9B53-9A06409CAA07}"/>
+						<properties type="AN200" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="5"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_7E77EC52_B954_4e5d_BAAB_BDD88DFFB8CA" name="toelichting" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3231" ea_guid="{7E77EC52-B954-4e5d-BAAB-BDD88DFFB8CA}"/>
+						<properties type="Text" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="8"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_200B84E0_1D73_4608_9258_12338B5EC034" name="verbijzondering" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3232" ea_guid="{200B84E0-1D73-4608-9258-12338B5EC034}"/>
+						<properties type="AN200" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="7"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+				</attributes>
+				<links>
+					<Association xmi:id="EAID_FD27EB67_1CFA_4f40_AE79_329DE9DE6754" start="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" end="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D"/>
+				</links>
+			</element>
+			<element xmi:idref="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8" xmi:type="uml:Enumeration" name="TypeMonument" scope="public">
+				<model package="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" tpos="0" ea_localid="388" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Enumeration" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false"/>
+				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 15:31:50" modified="2022-12-12 16:28:23" complexity="1" status="Proposed"/>
+				<code gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_15DA9636_FB30_4DEC_9C0D_652ED30CBDC0" name="archimate-type" value="Data object" modelElement="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8"/>
+					<tag xmi:id="EAID_DE995E99_1134_4C83_B49A_8249C2A8649B" name="bron" modelElement="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8"/>
+					<tag xmi:id="EAID_27F6A2B0_A612_4D96_A634_05F1BB92DC36" name="datum-tijd-export" value="28062023-11:06:06" modelElement="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8"/>
+					<tag xmi:id="EAID_2538997D_606D_4C52_986D_0422A73D8127" name="domein-dcat" modelElement="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8"/>
+					<tag xmi:id="EAID_520911A2_0AB6_4D26_9BCF_64E8B69E35E5" name="domein-gemma" value="nan" modelElement="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8"/>
+					<tag xmi:id="EAID_8516D8D3_FFF4_4223_AA0E_85B534035F86" name="gemma-guid" value="id-5c808ac9-cb09-4f4d-813e-821829856ba8" modelElement="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8"/>
+					<tag xmi:id="EAID_EC28F592_5F50_412A_BDCA_A8BB93760DFF" name="synoniemen" modelElement="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8"/>
+					<tag xmi:id="EAID_40E70020_C98A_4129_AF1D_8859C55705EB" name="toelichting" modelElement="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8"/>
+				</tags>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Model Monumenten"/>
+				<attributes>
+					<attribute xmi:idref="EAID_B2AE8AFC_C1D5_4d83_BFD3_EBF1663F3468" name="rijksmonument" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3233" ea_guid="{B2AE8AFC-C1D5-4d83-BFD3-EBF1663F3468}"/>
+						<properties type="1" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="0"/>
+						<stereotype stereotype="enum"/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="IsLiteral=1;volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_774B86B6_5B16_4f29_ABF0_40671AD9E0F9" name="gemeentelijkmonument" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="3234" ea_guid="{774B86B6-5B16-4f29-ABF0-40671AD9E0F9}"/>
+						<properties type="1" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="1"/>
+						<stereotype stereotype="enum"/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="IsLiteral=1;volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+				</attributes>
+			</element>
+		</elements>
+		<connectors>
+			<connector xmi:idref="EAID_1FC4D245_AD8E_44cb_ACFB_E6B5CB971001">
+				<source xmi:idref="EAID_78218601_F6B3_40b0_90AE_3513B4919064">
+					<model ea_localid="380" type="Note"/>
+					<role visibility="Public"/>
+					<type aggregation="none"/>
+					<constraints/>
+					<modifiers isOrdered="false" isNavigable="false"/>
+					<style/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
+					<model ea_localid="383" type="Class" name="Beschermde Status"/>
+					<role visibility="Public"/>
+					<type aggregation="none"/>
+					<constraints/>
+					<modifiers isOrdered="false" isNavigable="false"/>
+					<style/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>
+				<model ea_localid="8"/>
+				<properties ea_type="NoteLink" direction="Source -&gt; Destination"/>
+				<modifiers isRoot="false" isLeaf="false"/>
+				<documentation/>
+				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
+				<labels/>
+				<extendedProperties virtualInheritance="0"/>
+				<style/>
+				<xrefs/>
+				<tags/>
+			</connector>
+			<connector xmi:idref="EAID_D07FFC12_AA8D_421a_A795_28E66B5E6C9C">
+				<source xmi:idref="EAID_EBF38EE2_DAF0_4704_ADA6_705868BA7C05">
+					<model ea_localid="379" type="Note"/>
+					<role visibility="Public"/>
+					<type aggregation="none"/>
+					<constraints/>
+					<modifiers isOrdered="false" isNavigable="false"/>
+					<style/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_9775E778_DBF8_4122_94CE_551466B62F46">
+					<model ea_localid="904" type="Class" name="KADASTRALE ONROERENDE ZAAK"/>
+					<role visibility="Public"/>
+					<type aggregation="none"/>
+					<constraints/>
+					<modifiers isOrdered="false" isNavigable="false"/>
+					<style/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>
+				<model ea_localid="7"/>
+				<properties ea_type="NoteLink" direction="Source -&gt; Destination"/>
+				<modifiers isRoot="false" isLeaf="false"/>
+				<documentation/>
+				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
+				<labels/>
+				<extendedProperties virtualInheritance="0"/>
+				<style/>
+				<xrefs/>
+				<tags/>
+			</connector>
+			<connector xmi:idref="EAID_8E18F665_2A86_44fd_AD55_3E435A282BDF" name="monument ambacht">
+				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
+					<model ea_localid="383" type="Class" name="Beschermde Status"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_54944273_F312_44b2_A78D_43488F915429">
+					<model ea_localid="382" type="Class" name="Ambacht"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Navigable;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>
+				<model ea_localid="799"/>
+				<properties ea_type="Association" direction="Source -&gt; Destination"/>
+				<modifiers isRoot="false" isLeaf="false"/>
+				<parameterSubstitutions/>
+				<documentation/>
+				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
+				<labels lb="0..*" mt="monument ambacht" rb="0..*"/>
+				<extendedProperties virtualInheritance="0"/>
+				<style/>
+				<xrefs/>
+				<tags/>
+			</connector>
+			<connector xmi:idref="EAID_144ADF26_C2E9_4080_8F4F_32F9B255E4AE" name="monument bouwstijl">
+				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
+					<model ea_localid="383" type="Class" name="Beschermde Status"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA">
+					<model ea_localid="385" type="Class" name="Bouwstijl"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Navigable;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>
+				<model ea_localid="798"/>
+				<properties ea_type="Association" direction="Source -&gt; Destination"/>
+				<modifiers isRoot="false" isLeaf="false"/>
+				<parameterSubstitutions/>
+				<documentation/>
+				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
+				<labels lb="0..*" mt="monument bouwstijl" rb="0..*"/>
+				<extendedProperties virtualInheritance="0"/>
+				<style/>
+				<xrefs/>
+				<tags/>
+			</connector>
+			<connector xmi:idref="EAID_1ED1613A_DE5F_4ee2_8356_4BB729911C69" name="documentatie">
+				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
+					<model ea_localid="383" type="Class" name="Beschermde Status"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..1" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Non-Navigable;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_5641C50A_C0FA_4e71_B07B_26C7B1CE94ED">
+					<model ea_localid="795" type="Class" name="DOCUMENT"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Navigable;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>
+				<model ea_localid="66"/>
+				<properties ea_type="Usage" direction="Source -&gt; Destination"/>
+				<modifiers isRoot="false" isLeaf="false"/>
+				<documentation/>
+				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
+				<labels lb="0..1" mb="«use»" mt="documentatie" rb="0..*"/>
+				<extendedProperties conditional="«use»" virtualInheritance="0"/>
+				<style/>
+				<xrefs/>
+				<tags/>
+			</connector>
+			<connector xmi:idref="EAID_1F08C810_A491_4e07_B859_C3D4EDEBA557" name="monument fotos">
+				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
+					<model ea_localid="383" type="Class" name="Beschermde Status"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="1" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_7FE4B466_B051_4068_9ED1_6E60C3B2DBAD">
+					<model ea_localid="739" type="Class" name="Foto"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Navigable;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>
+				<model ea_localid="797"/>
+				<properties ea_type="Association" direction="Source -&gt; Destination"/>
+				<modifiers isRoot="false" isLeaf="false"/>
+				<parameterSubstitutions/>
+				<documentation/>
+				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
+				<labels lb="1" mt="monument fotos" rb="0..*"/>
+				<extendedProperties virtualInheritance="0"/>
+				<style/>
+				<xrefs/>
+				<tags/>
+			</connector>
+			<connector xmi:idref="EAID_44E4F035_7E96_48df_B6CF_93C945FF97C3" name="betreft">
+				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
+					<model ea_localid="383" type="Class" name="Beschermde Status"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..1" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_FB13857C_C695_4b53_8060_BACFA0E16950">
+					<model ea_localid="918" type="Class" name="OPENBARE RUIMTE"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Navigable;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>
+				<model ea_localid="796"/>
+				<properties ea_type="Association" direction="Source -&gt; Destination"/>
+				<modifiers isRoot="false" isLeaf="false"/>
+				<parameterSubstitutions/>
+				<documentation/>
+				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
+				<labels lb="0..1" mt="betreft" rb="0..*"/>
+				<extendedProperties virtualInheritance="0"/>
+				<style/>
+				<xrefs/>
+				<tags/>
+			</connector>
+			<connector xmi:idref="EAID_55585CB9_E569_47ca_9EFE_B9D5CF46BCBD" name="monument bouwactiviteit">
+				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
+					<model ea_localid="383" type="Class" name="Beschermde Status"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_4AD539EC_A308_43da_B025_17A1647303F3">
+					<model ea_localid="384" type="Class" name="Bouwactiviteit"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Navigable;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>
+				<model ea_localid="795"/>
+				<properties ea_type="Association" direction="Source -&gt; Destination"/>
+				<modifiers isRoot="false" isLeaf="false"/>
+				<parameterSubstitutions/>
+				<documentation/>
+				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
+				<labels lb="0..*" mt="monument bouwactiviteit" rb="0..*"/>
+				<extendedProperties virtualInheritance="0"/>
+				<style/>
+				<xrefs/>
+				<tags/>
+			</connector>
+			<connector xmi:idref="EAID_59A9090E_CF7A_4e6f_91E1_592085B0DA94" name="betreft">
+				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
+					<model ea_localid="383" type="Class" name="Beschermde Status"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_9775E778_DBF8_4122_94CE_551466B62F46">
+					<model ea_localid="904" type="Class" name="KADASTRALE ONROERENDE ZAAK"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="true"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Navigable;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>
+				<model ea_localid="794"/>
+				<properties ea_type="Association" direction="Source -&gt; Destination"/>
+				<modifiers isRoot="false" isLeaf="false"/>
+				<parameterSubstitutions/>
+				<documentation/>
+				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
+				<labels mt="betreft"/>
+				<extendedProperties virtualInheritance="0"/>
+				<style/>
+				<xrefs/>
+				<tags/>
+			</connector>
+			<connector xmi:idref="EAID_D9634EAD_2869_40a1_B243_805897E4B1B3" name="monument bouwtype">
+				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
+					<model ea_localid="383" type="Class" name="Beschermde Status"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4">
+					<model ea_localid="386" type="Class" name="Bouwtype"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>
+				<model ea_localid="793"/>
+				<properties ea_type="Association" direction="Unspecified"/>
+				<modifiers isRoot="false" isLeaf="false"/>
+				<parameterSubstitutions/>
+				<documentation/>
+				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
+				<labels lb="0..*" mt="monument bouwtype" rb="0..*"/>
+				<extendedProperties virtualInheritance="0"/>
+				<style/>
+				<xrefs/>
+				<tags/>
+			</connector>
+			<connector xmi:idref="EAID_F7893BFE_1A66_4760_9124_B62A81F45997" name="betreft">
+				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
+					<model ea_localid="383" type="Class" name="Beschermde Status"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..1" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_26D1113F_F7B3_4bdd_9AAE_EA14CC9F3C3F">
+					<model ea_localid="928" type="Class" name="PAND"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Navigable;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>
+				<model ea_localid="792"/>
+				<properties ea_type="Association" direction="Source -&gt; Destination"/>
+				<modifiers isRoot="false" isLeaf="false"/>
+				<parameterSubstitutions/>
+				<documentation/>
+				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
+				<labels lb="0..1" mt="betreft" rb="0..*"/>
+				<extendedProperties virtualInheritance="0"/>
+				<style/>
+				<xrefs/>
+				<tags/>
+			</connector>
+			<connector xmi:idref="EAID_FD27EB67_1CFA_4f40_AE79_329DE9DE6754" name="monument functie">
+				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
+					<model ea_localid="383" type="Class" name="Beschermde Status"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D">
+					<model ea_localid="387" type="Class" name="Oorspronkelijke Functie"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Navigable;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>
+				<model ea_localid="791"/>
+				<properties ea_type="Association" direction="Source -&gt; Destination"/>
+				<modifiers isRoot="false" isLeaf="false"/>
+				<parameterSubstitutions/>
+				<documentation/>
+				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
+				<labels lb="0..*" mt="monument functie" rb="0..*"/>
+				<extendedProperties virtualInheritance="0"/>
+				<style/>
+				<xrefs/>
+				<tags/>
+			</connector>
+		</connectors>
+		<primitivetypes>
+			<packagedElement xmi:type="uml:Package" xmi:id="EAPrimitiveTypesPackage" name="EA_PrimitiveTypes_Package" visibility="public">
+				<packagedElement xmi:type="uml:Package" xmi:id="EAJavaTypesPackage" name="EA_Java_Types_Package" visibility="public">
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_int" name="int" visibility="public">
+						<generalization xmi:type="uml:Generalization" xmi:id="EAJava_int_General">
+							<general href="http://schema.omg.org/spec/UML/2.1/uml.xml#Integer"/>
+						</generalization>
+					</packagedElement>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN300" name="AN300" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN400" name="AN400" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN200" name="AN200" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_Date" name="Date" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN80" name="AN80" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN20" name="AN20" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_Text" name="Text" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_text" name="text" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN8" name="AN8" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_An200" name="An200" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_Boolean" name="Boolean" visibility="public">
+						<generalization xmi:type="uml:Generalization" xmi:id="EAJava_Boolean_General">
+							<general href="http://schema.omg.org/spec/UML/2.1/uml.xml#Boolean"/>
+						</generalization>
+					</packagedElement>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava__" name="1" visibility="public"/>
+				</packagedElement>
+			</packagedElement>
+		</primitivetypes>
+		<profiles>
+			<uml:Profile xmlns:uml="http://schema.omg.org/spec/UML/2.1/" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmi:version="2.1" xmi:id="thecustomprofile" nsPrefix="thecustomprofile" name="thecustomprofile" metamodelReference="mmref01">
+				<ownedComment xmi:type="uml:Comment" xmi:id="comment01" annotatedElement="thecustomprofile">
+					<body> Version:1.0</body>
+				</ownedComment>
+				<packageImport xmi:id="mmref01">
+					<importedPackage href="http://schema.omg.org/spec/UML/2.1/"/>
+				</packageImport>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="domein-gemma" name="domein-gemma">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="domein-gemma-base_Class" name="base_Class" association="Class_domein-gemma">
+						<type href="http://schema.omg.org/spec/UML/2.1/Class"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="domein-gemma-domein-gemma" name="domein-gemma">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Class_domein-gemma" name="A_Class_domein-gemma" memberEnd="extension_domein-gemma domein-gemma-base_Class">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_domein-gemma" name="extension_domein-gemma" type="domein-gemma" isComposite="true" lower="0" upper="1" memberEnd="extension_domein-gemma domein-gemma-base_Class"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="archimate-type" name="archimate-type">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="archimate-type-base_Class" name="base_Class" association="Class_archimate-type">
+						<type href="http://schema.omg.org/spec/UML/2.1/Class"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="archimate-type-archimate-type" name="archimate-type">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Class_archimate-type" name="A_Class_archimate-type" memberEnd="extension_archimate-type archimate-type-base_Class">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_archimate-type" name="extension_archimate-type" type="archimate-type" isComposite="true" lower="0" upper="1" memberEnd="extension_archimate-type archimate-type-base_Class"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="bron" name="bron">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="bron-base_Class" name="base_Class" association="Class_bron">
+						<type href="http://schema.omg.org/spec/UML/2.1/Class"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="bron-bron" name="bron">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Class_bron" name="A_Class_bron" memberEnd="extension_bron bron-base_Class">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_bron" name="extension_bron" type="bron" isComposite="true" lower="0" upper="1" memberEnd="extension_bron bron-base_Class"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="datum-tijd-export" name="datum-tijd-export">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="datum-tijd-export-base_Class" name="base_Class" association="Class_datum-tijd-export">
+						<type href="http://schema.omg.org/spec/UML/2.1/Class"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="datum-tijd-export-datum-tijd-export" name="datum-tijd-export">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Class_datum-tijd-export" name="A_Class_datum-tijd-export" memberEnd="extension_datum-tijd-export datum-tijd-export-base_Class">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_datum-tijd-export" name="extension_datum-tijd-export" type="datum-tijd-export" isComposite="true" lower="0" upper="1" memberEnd="extension_datum-tijd-export datum-tijd-export-base_Class"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="gemma-guid" name="gemma-guid">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="gemma-guid-base_Class" name="base_Class" association="Class_gemma-guid">
+						<type href="http://schema.omg.org/spec/UML/2.1/Class"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="gemma-guid-gemma-guid" name="gemma-guid">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Class_gemma-guid" name="A_Class_gemma-guid" memberEnd="extension_gemma-guid gemma-guid-base_Class">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_gemma-guid" name="extension_gemma-guid" type="gemma-guid" isComposite="true" lower="0" upper="1" memberEnd="extension_gemma-guid gemma-guid-base_Class"/>
+				</packagedElement>
+			</uml:Profile>
+		</profiles>
+		<diagrams>
+			<diagram xmi:id="EAID_7429E175_1CBE_4336_BF92_6C5029395E69">
+				<model package="EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652" localID="35" owner="EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652"/>
+				<properties name="Diagram Monumenten" type="Logical"/>
+				<project author="Arjen Brienen" version="1.0" created="2019-07-03 00:00:00" modified="2019-10-16 16:24:23"/>
+				<style1 value="ShowPrivate=1;ShowProtected=1;ShowPublic=1;HideRelationships=0;Locked=0;Border=1;HighlightForeign=1;PackageContents=1;SequenceNotes=0;ScalePrintImage=0;PPgs.cx=1;PPgs.cy=1;DocSize.cx=791;DocSize.cy=1134;ShowDetails=0;Orientation=P;Zoom=100;ShowTags=0;OpParams=1;VisibleAttributeDetail=0;ShowOpRetType=1;ShowIcons=1;CollabNums=0;HideProps=0;ShowReqs=0;ShowCons=0;PaperSize=9;HideParents=0;UseAlias=0;HideAtts=1;HideOps=1;HideStereo=0;HideElemStereo=0;ShowTests=0;ShowMaint=0;ConnectorNotation=UML 2.1;ExplicitNavigability=0;ShowShape=1;AllDockable=0;AdvancedElementProps=1;AdvancedFeatureProps=1;AdvancedConnectorProps=1;m_bElementClassifier=1;SPT=1;ShowNotes=0;SuppressBrackets=0;SuppConnectorLabels=0;PrintPageHeadFoot=0;ShowAsList=0;"/>
+				<style2 value="SaveTag=2250881A;ExcludeRTF=0;DocAll=0;HideQuals=0;AttPkg=1;ShowTests=0;ShowMaint=0;SuppressFOC=1;MatrixActive=0;SwimlanesActive=1;KanbanActive=0;MatrixLineWidth=1;MatrixLineClr=0;MatrixLocked=0;TConnectorNotation=UML 2.1;TExplicitNavigability=0;AdvancedElementProps=1;AdvancedFeatureProps=1;AdvancedConnectorProps=1;m_bElementClassifier=1;SPT=1;MDGDgm=;STBLDgm=;ShowNotes=0;VisibleAttributeDetail=0;ShowOpRetType=1;SuppressBrackets=0;SuppConnectorLabels=0;PrintPageHeadFoot=0;ShowAsList=0;SuppressedCompartments=;Theme=:119;"/>
+				<swimlanes value="locked=false;orientation=0;width=0;inbar=false;names=false;color=-1;bold=false;fcol=0;tcol=-1;ofCol=-1;ufCol=-1;hl=0;ufh=0;hh=0;cls=0;bw=0;hli=0;bro=0;SwimlaneFont=lfh:-21,lfw:0,lfi:0,lfu:0,lfs:0,lfface:Calibri,lfe:0,lfo:0,lfchar:1,lfop:0,lfcp:0,lfq:0,lfpf=0,lfWidth=0;"/>
+				<matrixitems value="locked=false;matrixactive=false;swimlanesactive=true;kanbanactive=false;width=1;clrLine=0;"/>
+				<extendedProperties/>
+				<xrefs/>
+				<elements>
+					<element geometry="Left=90;Top=30;Right=210;Bottom=90;" subject="EAID_78218601_F6B3_40b0_90AE_3513B4919064" seqno="1" style="DUID=740C889F;"/>
+					<element geometry="Left=648;Top=528;Right=768;Bottom=588;" subject="EAID_EBF38EE2_DAF0_4704_ADA6_705868BA7C05" seqno="2" style="DUID=7F76508F;"/>
+					<element geometry="Left=280;Top=30;Right=389;Bottom=110;" subject="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" seqno="3" style="DUID=5EE10493;"/>
+					<element geometry="Left=126;Top=180;Right=226;Bottom=287;" subject="EAID_9775E778_DBF8_4122_94CE_551466B62F46" seqno="4" style="DUID=0E0961A5;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;"/>
+					<element geometry="Left=326;Top=359;Right=426;Bottom=439;" subject="EAID_752621CC_D5CA_4f4c_A937_AF6C84E6ADED" seqno="5" style="DUID=06807BCA;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;"/>
+					<element geometry="Left=540;Top=30;Right=640;Bottom=110;" subject="EAID_FB13857C_C695_4b53_8060_BACFA0E16950" seqno="6" style="DUID=973BE7D4;"/>
+					<element geometry="Left=540;Top=180;Right=640;Bottom=287;" subject="EAID_31A87864_6CE0_4e93_A493_ECD0FBDD4461" seqno="7" style="DUID=FC1F7D8E;"/>
+					<element geometry="Left=126;Top=359;Right=226;Bottom=439;" subject="EAID_3E9E08B7_574E_43dc_8D93_251BFA8F8D75" seqno="8" style="DUID=6C964D59;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_1FC4D245_AD8E_44cb_ACFB_E6B5CB971001" style="Mode=3;EOID=5EE10493;SOID=740C889F;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=4;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_D07FFC12_AA8D_421a_A795_28E66B5E6C9C" style="Mode=3;EOID=0E0961A5;SOID=7F76508F;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=3;$LLB=;LLT=;LMT=CX=28:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_59A9090E_CF7A_4e6f_91E1_592085B0DA94" style="Mode=3;EOID=0E0961A5;SOID=5EE10493;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=CX=17:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LLT=;LMT=CX=28:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LMB=;LRT=;LRB=CX=17:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;IRHS=;ILHS=;Path=;" subject="EAID_44E4F035_7E96_48df_B6CF_93C945FF97C3" style="Mode=3;EOID=973BE7D4;SOID=5EE10493;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SCTR=1;SCME=1;SX=0;SY=0;EX=0;EY=0;EDGE=2;SCTR.LEFT=225;SCTR.TOP=-205;SCTR.RIGHT=256;SCTR.BOTTOM=-190;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=226:-205$256:-205$256:-190$226:-190$;" subject="EAID_EBEE5BED_D39A_4e50_ACD7_4924DF1DF463" style="Mode=3;EOID=0E0961A5;SOID=0E0961A5;Color=-1;LWidth=0;Hidden=1;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;Path=226:-205$256:-205$256:-190$226:-190$;" subject="EAID_7912F892_8D2F_464d_BE9D_E90D1CEEA7DE" style=";Hidden=0;"/>
+					<element geometry="EDGE=4;$LLB=;LLT=;LMT=CX=74:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LMB=CX=63:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_CBFBC098_828D_42e9_8450_3A17680001B6" style="Mode=3;EOID=6C964D59;SOID=06807BCA;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="EDGE=1;$LLB=CX=17:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LLT=;LMT=CX=30:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LMB=CX=58:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LRT=;LRB=CX=6:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;IRHS=;ILHS=;Path=;" subject="EAID_85187FF7_4357_4128_8E54_8EE077AD6C43" style="Mode=3;EOID=973BE7D4;SOID=FC1F7D8E;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SCTR=1;SCME=1;SX=0;SY=0;EX=0;EY=0;EDGE=2;SCTR.LEFT=225;SCTR.TOP=-384;SCTR.RIGHT=256;SCTR.BOTTOM=-369;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=226:-384$256:-384$256:-369$226:-369$;" subject="EAID_9A56AD9F_136A_485a_93B1_7137FCC39416" style="Mode=3;EOID=6C964D59;SOID=6C964D59;Color=-1;LWidth=0;Hidden=1;"/>
+				</elements>
+			</diagram>
+			<diagram xmi:id="EAID_58EA4966_DBC2_4359_94C4_ABC774DBE5E2">
+				<model package="EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652" localID="36" owner="EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652"/>
+				<properties name="Diagram Monumenten Detail" type="Logical"/>
+				<project author="Arjen Brienen" version="1.0" created="2019-07-03 00:00:00" modified="2019-10-15 13:58:20"/>
+				<style1 value="ShowPrivate=1;ShowProtected=1;ShowPublic=1;HideRelationships=0;Locked=0;Border=1;HighlightForeign=1;PackageContents=1;SequenceNotes=0;ScalePrintImage=0;PPgs.cx=1;PPgs.cy=1;DocSize.cx=791;DocSize.cy=1134;ShowDetails=0;Orientation=P;Zoom=100;ShowTags=0;OpParams=1;VisibleAttributeDetail=0;ShowOpRetType=1;ShowIcons=1;CollabNums=0;HideProps=0;ShowReqs=0;ShowCons=0;PaperSize=9;HideParents=0;UseAlias=0;HideAtts=1;HideOps=1;HideStereo=0;HideElemStereo=0;ShowTests=0;ShowMaint=0;ConnectorNotation=UML 2.1;ExplicitNavigability=0;ShowShape=1;AllDockable=0;AdvancedElementProps=1;AdvancedFeatureProps=1;AdvancedConnectorProps=1;m_bElementClassifier=1;SPT=1;ShowNotes=0;SuppressBrackets=0;SuppConnectorLabels=0;PrintPageHeadFoot=0;ShowAsList=0;"/>
+				<style2 value="SaveTag=AE2AFF38;ExcludeRTF=0;DocAll=0;HideQuals=0;AttPkg=1;ShowTests=0;ShowMaint=0;SuppressFOC=1;MatrixActive=0;SwimlanesActive=1;KanbanActive=0;MatrixLineWidth=1;MatrixLineClr=0;MatrixLocked=0;TConnectorNotation=UML 2.1;TExplicitNavigability=0;AdvancedElementProps=1;AdvancedFeatureProps=1;AdvancedConnectorProps=1;m_bElementClassifier=1;SPT=1;MDGDgm=;STBLDgm=;ShowNotes=0;VisibleAttributeDetail=0;ShowOpRetType=1;SuppressBrackets=0;SuppConnectorLabels=0;PrintPageHeadFoot=0;ShowAsList=0;SuppressedCompartments=;Theme=:119;"/>
+				<swimlanes value="locked=false;orientation=0;width=0;inbar=false;names=false;color=-1;bold=false;fcol=0;tcol=-1;ofCol=-1;ufCol=-1;hl=0;ufh=0;hh=0;cls=0;bw=0;hli=0;bro=0;SwimlaneFont=lfh:-21,lfw:0,lfi:0,lfu:0,lfs:0,lfface:Calibri,lfe:0,lfo:0,lfchar:1,lfop:0,lfcp:0,lfq:0,lfpf=0,lfWidth=0;"/>
+				<matrixitems value="locked=false;matrixactive=false;swimlanesactive=true;kanbanactive=false;width=1;clrLine=0;"/>
+				<extendedProperties/>
+				<xrefs/>
+				<elements>
+					<element geometry="Left=230;Top=40;Right=330;Bottom=120;" subject="EAID_5641C50A_C0FA_4e71_B07B_26C7B1CE94ED" seqno="1" style="DUID=9DA09784;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;"/>
+					<element geometry="Left=450;Top=40;Right=550;Bottom=120;" subject="EAID_7FE4B466_B051_4068_9ED1_6E60C3B2DBAD" seqno="2" style="DUID=2D03A238;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;"/>
+					<element geometry="Left=30;Top=40;Right=130;Bottom=120;" subject="EAID_4AD539EC_A308_43da_B025_17A1647303F3" seqno="3" style="DUID=DC2C05F0;"/>
+					<element geometry="Left=450;Top=240;Right=550;Bottom=320;" subject="EAID_54944273_F312_44b2_A78D_43488F915429" seqno="4" style="DUID=C9231E63;"/>
+					<element geometry="Left=450;Top=420;Right=550;Bottom=500;" subject="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4" seqno="5" style="DUID=385838AF;"/>
+					<element geometry="Left=230;Top=420;Right=330;Bottom=500;" subject="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA" seqno="6" style="DUID=24411578;"/>
+					<element geometry="Left=30;Top=420;Right=130;Bottom=500;" subject="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D" seqno="7" style="DUID=6123C570;"/>
+					<element geometry="Left=30;Top=240;Right=130;Bottom=310;" subject="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8" seqno="8" style="DUID=351317DC;"/>
+					<element geometry="Left=230;Top=240;Right=330;Bottom=320;" subject="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" seqno="9" style="DUID=F1DCA26F;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=1;$LLB=CX=16:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LLT=;LMT=CX=55:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LMB=CX=24:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LRT=;LRB=CX=16:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;IRHS=;ILHS=;Path=;" subject="EAID_1ED1613A_DE5F_4ee2_8356_4BB729911C69" style="Mode=3;EOID=9DA09784;SOID=F1DCA26F;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=3;$LLB=CX=16:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LLT=;LMT=CX=46:CY=26:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LMB=;LRT=;LRB=CX=16:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;IRHS=;ILHS=;Path=;" subject="EAID_FD27EB67_1CFA_4f40_AE79_329DE9DE6754" style="Mode=3;EOID=6123C570;SOID=F1DCA26F;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=3;$LLB=CX=16:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LLT=;LMT=CX=46:CY=26:OX=44:OY=6:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LMB=;LRT=;LRB=CX=16:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;IRHS=;ILHS=;Path=;" subject="EAID_D9634EAD_2869_40a1_B243_805897E4B1B3" style="Mode=3;EOID=385838AF;SOID=F1DCA26F;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=1;$LLB=CX=16:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LLT=;LMT=CX=56:CY=26:OX=56:OY=9:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LMB=;LRT=;LRB=CX=16:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;IRHS=;ILHS=;Path=;" subject="EAID_55585CB9_E569_47ca_9EFE_B9D5CF46BCBD" style="Mode=3;EOID=DC2C05F0;SOID=F1DCA26F;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=1;$LLB=CX=5:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LLT=;LMT=CX=66:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LMB=;LRT=;LRB=CX=16:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;IRHS=;ILHS=;Path=;" subject="EAID_1F08C810_A491_4e07_B859_C3D4EDEBA557" style="Mode=3;EOID=2D03A238;SOID=F1DCA26F;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=3;$LLB=CX=16:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LLT=;LMT=CX=46:CY=26:OX=45:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LMB=;LRT=;LRB=CX=16:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;IRHS=;ILHS=;Path=;" subject="EAID_144ADF26_C2E9_4080_8F4F_32F9B255E4AE" style="Mode=3;EOID=24411578;SOID=F1DCA26F;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=CX=16:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LLT=;LMT=CX=46:CY=26:OX=44:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LMB=;LRT=;LRB=CX=16:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;IRHS=;ILHS=;Path=;" subject="EAID_8E18F665_2A86_44fd_AD55_3E435A282BDF" style="Mode=3;EOID=C9231E63;SOID=F1DCA26F;Color=-1;LWidth=0;Hidden=0;"/>
+				</elements>
+			</diagram>
+		</diagrams>
+	</xmi:Extension>
+</xmi:XMI>

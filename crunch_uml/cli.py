@@ -31,6 +31,7 @@ def main(args=None):
         help='geeft inputtype aan, voorlopig is alleen "xmi" ondersteund.',
         default='xmi',
     )
+    parser.add_argument('-db_create', '--database_create_new', action='store_true', help='maak altijd een nieuwe database aan')
     args = parser.parse_args(args)
 
     # Bepaal het logniveau op basis van commandline argumenten
