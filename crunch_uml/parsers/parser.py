@@ -1,6 +1,11 @@
+#!/usr/bin/env python
+#  type: ignore
+
 import logging
 from abc import ABC, abstractmethod
+
 from lxml import etree
+
 from crunch_uml import const, db
 
 logger = logging.getLogger()
@@ -8,6 +13,19 @@ logger = logging.getLogger()
 
 def fixtag(tag):
     return tag.replace('-', '_')
+
+
+def copy_values(node, obj):
+    '''
+    Copies all values from attributes of node to obj,
+    if obj has an attribute with the same name.
+    Fix for '-' symbol to '_'
+    '''
+    if node is not None:
+        for key in node.keys():  # Dynamic set values of package
+            if hasattr(obj, fixtag(key)):
+                setattr(obj, fixtag(key), node.get(key))
+
 
 class Parser(ABC):
     @abstractmethod
@@ -33,7 +51,7 @@ class XMIParser(Parser):
                 logger.info(f'Package {package.name} ingelezen met id {package.id}')
                 logger.debug(f'Package {package.name} met inhoud {vars(package)}')
 
-                database.save_package(package)
+                database.save(package)
                 for childnode in node:
                     self.phase1_process_packages_classes(childnode, ns, database, package.id)
             else:
@@ -42,7 +60,7 @@ class XMIParser(Parser):
         elif tp == 'uml:Class':
             clazz = db.Class(id=node.get('{' + ns['xmi'] + '}id'), name=node.get('name'), package_id=parent_package_id)
             logger.debug(f'Class {clazz.name} met id {clazz.id} ingelezen met inhoud: {clazz}')
-            database.save_class(clazz)
+            database.save(clazz)
 
             for childnode in node:
                 sub_tp = childnode.get('{' + ns['xmi'] + '}type')
@@ -53,14 +71,14 @@ class XMIParser(Parser):
                     logger.debug(
                         f'Attribute {attribute.name} met id {attribute.id} ingelezen met inhoud: {vars(attribute)}'
                     )
-                    database.add_attribute(attribute)
+                    database.save(attribute)
 
         elif tp == 'uml:Enumeration':
             enum = db.Enumeratie(
                 id=node.get('{' + ns['xmi'] + '}id'), name=node.get('name'), package_id=parent_package_id
             )
             logger.debug(f'Enumeratie {enum.name} met id {enum.id} ingelezen met inhoud: {enum}')
-            database.add_enumeratie(enum)
+            database.save(enum)
 
             for childnode in node:
                 sub_tp = childnode.get('{' + ns['xmi'] + '}type')
@@ -72,7 +90,7 @@ class XMIParser(Parser):
                         f'EnumerationLiteral {enumliteral.name} met id {enumliteral.id} ingelezen met inhoud:'
                         f' {vars(enumliteral)}'
                     )
-                    database.add_enumeratieliteral(enumliteral)
+                    database.save(enumliteral)
 
         else:
             for childnode in node:
@@ -119,16 +137,14 @@ class XMIParser(Parser):
             logger.warning('No content was read from XMI-file')
 
 
-
 class EAXMIParser(XMIParser):
-
     def phase3_process_extra(self, node, ns, database: db.Database):
         '''
         third and last phase of parsing XMI-documents. Parsing extra propriatary data: addons to allready found data.
         Starts at <xmi:Extension extender="Enterprise Architect" extenderID="6.5">
         '''
         logger.info('Entering third phase parsing: extras')
-        extension = node.xpath('//xmi:Extension', namespaces=ns)[0] # type: ignore
+        extension = node.xpath('//xmi:Extension', namespaces=ns)[0]  # type: ignore
 
         '''
         First find all package modifiers that look like:
@@ -148,17 +164,14 @@ class EAXMIParser(XMIParser):
 			</element>
         and set value
         '''
-        packagerefs = extension.xpath("//element[@xmi:type='uml:Package' and @xmi:idref]", namespaces=ns) # type: ignore
+        packagerefs = extension.xpath(".//element[@xmi:type='uml:Package' and @xmi:idref]", namespaces=ns)  # type: ignore
         for packageref in packagerefs:
             idref = packageref.get('{' + ns['xmi'] + '}idref')
             package = database.get_package(idref)
             project = packageref.xpath('./project')[0]
-            if project is not None:
-                for key in project.keys(): # Dynamic set values of package
-                    if hasattr(package, key):
-                        setattr(package, key, project.get(key))
+            copy_values(project, package)
 
-            database.save_package(package)
+            database.save(package)
 
         '''
         Second find all class modifiers, like:
@@ -181,7 +194,7 @@ class EAXMIParser(XMIParser):
 				<xrefs/>
 				<extendedProperties tagged="0" package_name="Model Monumenten"/>
         '''
-        clazzrefs = extension.xpath("//element[@xmi:type='uml:Class' and @xmi:idref]", namespaces=ns) # type: ignore
+        clazzrefs = extension.xpath(".//element[@xmi:type='uml:Class' and @xmi:idref]", namespaces=ns)  # type: ignore
         for clazzref in clazzrefs:
             idref = clazzref.get('{' + ns['xmi'] + '}idref')
             clazz = database.get_class(idref)
@@ -190,14 +203,42 @@ class EAXMIParser(XMIParser):
             if properties is not None:
                 clazz.descr = properties.get('documentation')
             project = clazzref.xpath('./project')[0]
-            if project is not None:
-                for key in project.keys(): # Dynamic set values of clazz
-                    if hasattr(clazz, key):
-                        setattr(clazz, key, project.get(key))
-            
+            copy_values(project, clazz)
+
             tags = clazzref.xpath('./tags/tag')
             for tag in tags:
                 if hasattr(clazz, fixtag(tag.get('name'))):
                     setattr(clazz, fixtag(tag.get('name')), tag.get('value'))
 
-            database.save_class(clazz)
+            database.save(clazz)
+
+        '''
+        Third find all attributes, like
+            <attribute xmi:idref="EAID_B2AE8AFC_C1D5_4d83_BFD3_EBF1663F3468" name="rijksmonument" scope="Public">
+                <initial/>
+                <documentation/>
+                <model ea_localid="3233" ea_guid="{B2AE8AFC-C1D5-4d83-BFD3-EBF1663F3468}"/>
+                <properties type="1" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+                <coords ordered="0" scale="0"/>
+                <containment containment="Not Specified" position="0"/>
+                <stereotype stereotype="enum"/>
+                <bounds lower="1" upper="1"/>
+                <options/>
+                <style/>
+                <styleex value="IsLiteral=1;volatile=0;"/>
+                <tags/>
+                <xrefs/>
+            </attribute>
+        '''
+        attrrefs = extension.xpath(".//attribute[@xmi:idref]", namespaces=ns)  # type: ignore
+        for attrref in attrrefs:
+            idref = attrrefs.get('{' + ns['xmi'] + '}idref')
+            attr = database.get_class(idref)
+
+            properties = attrref.xpath('./properties')[0]
+            copy_values(properties, attr)
+            documentation = attrref.xpath('./properties')[0]
+            if documentation is not None:
+                attr.descr = documentation.get('documentation')
+            stereotype = attrref.xpath('./stereotype')[0]
+            copy_values(stereotype, attr)

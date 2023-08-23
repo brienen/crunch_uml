@@ -1,5 +1,5 @@
 import sqlalchemy
-from sqlalchemy import Column, ForeignKey, String, Text, create_engine, Float
+from sqlalchemy import Column, Float, ForeignKey, String, Text, create_engine
 from sqlalchemy.orm import relationship, sessionmaker
 
 import crunch_uml.const as const
@@ -13,6 +13,7 @@ class UML_Generic:
     name = Column(String)
     descr = Column(Text)
 
+
 class UMLBase(UML_Generic):
     author = Column(String)
     version = Column(String)
@@ -25,23 +26,24 @@ class UMLBase(UML_Generic):
     visibility = Column(String)
     alias = Column(String)
 
+
 class UMLTags:
     archimate_type = Column(String)
     bron = Column(String)
     datum_tijd_export = Column(String)
     domein_dcat = Column(String)
     domein_gemma = Column(String)
-    gemma_guid = Column(String) 
-    synoniemen = Column(String) 
-    toelichting = Column(String) 
+    gemma_guid = Column(String)
+    synoniemen = Column(String)
+    toelichting = Column(String)
 
 
 class Package(Base, UMLBase):  # type: ignore
     __tablename__ = 'packages'
 
     parent_package_id = Column(String, ForeignKey('packages.id', deferrable=True), index=True)
-    parent_package = relationship("Package", back_populates="subpackages")
-    subpackages = relationship("Class", back_populates="parent_package")
+    parent_package = relationship("Package", back_populates="subpackages", remote_side="Package.id")
+    subpackages = relationship("Package", back_populates="parent_package")
     classes = relationship("Class", back_populates="package")
     enumerations = relationship("Enumeratie", back_populates="package")
 
@@ -94,17 +96,14 @@ class Database:
             Base.metadata.create_all(bind=cls._instance.engine)
         return cls._instance
 
-    def save_package(self, package):
-        self.session.merge(package)
+    def save(self, obj):
+        self.session.merge(obj)
 
-    def count_packages(self):
+    def count_package(self):
         return self.session.query(Package).count()
 
     def get_package(self, id):
         return self.session.get(Package, id)
-
-    def save_class(self, clazz):
-        self.session.add(clazz)
 
     def get_class(self, id):
         return self.session.get(Class, id)
@@ -112,20 +111,11 @@ class Database:
     def count_class(self):
         return self.session.query(Class).count()
 
-    def add_attribute(self, attr):
-        self.session.add(attr)
-
     def count_attribute(self):
         return self.session.query(Attribute).count()
 
-    def add_enumeratie(self, enum):
-        self.session.add(enum)
-
     def count_enumeratie(self):
         return self.session.query(Enumeratie).count()
-
-    def add_enumeratieliteral(self, enumlit):
-        self.session.add(enumlit)
 
     def count_enumeratieliteral(self):
         return self.session.query(EnumerationLiteral).count()

@@ -7,7 +7,7 @@ def test_import_onderwijs_empty():
     cli.main(test_args)
 
     database = db.Database(const.DATABASE_URL, db_create=True)
-    assert database.count_packages() == 0
+    assert database.count_package() == 0
     assert database.count_enumeratie() == 0
     assert database.count_class() == 0
     assert database.count_attribute() == 0

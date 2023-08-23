@@ -4,7 +4,7 @@ import sys
 
 import crunch_uml.const as const
 from crunch_uml.db import Database
-from crunch_uml.parsers.parser import XMIParser, EAXMIParser
+from crunch_uml.parsers.parser import EAXMIParser, XMIParser  # type: ignore
 
 # Configureer logging
 logging.basicConfig(
@@ -25,12 +25,17 @@ def main(args=None):
     parser.add_argument(
         '-t',
         '--inputtype',
-        action='store_true',
-        help='geeft inputtype aan, voorlopig is alleen "xmi" ondersteund.',
+        type=str,
+        # action='store_true',
+        help='geeft inputtype aan, (xmi, eaxmi).',
         default='xmi',
     )
     parser.add_argument(
-        '-db_create', '--database_create_new', action='store_true', help='maak altijd een nieuwe database aan'
+        '-db_create',
+        '--database_create_new',
+        action='store_true',
+        help='maak altijd een nieuwe database aan',
+        default=True,
     )
     args = parser.parse_args(args)
 
@@ -40,14 +45,14 @@ def main(args=None):
     elif args.verbose:
         logger.setLevel(logging.INFO)
 
-    database = Database(const.DATABASE_URL, db_create=True)
+    database = Database(const.DATABASE_URL, db_create=args.database_create_new)
     try:
         if args.inputtype == 'eaxmi':
             parser = XMIParser()
         elif args.inputtype == 'xmi':
             parser = EAXMIParser()
         else:
-            raise (f"Parser error: unknown inputtype {args.inputtype}, use 'xmi'")
+            raise (f"Parser error: unknown inputtype {args.inputtype}, use 'xmi' or 'eaxmi'")
 
         parser.parse(args, database)
     except Exception as ex:
