@@ -12,7 +12,7 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                "-f", "./test/data/RelationTest.xml",
+                "-f", "./test/data/GGM_Onderwijs_XMI.2.1.xml",
                 "-d"
             ]
         }

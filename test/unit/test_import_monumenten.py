@@ -8,7 +8,7 @@ def test_import_monumenten():
     database = db.Database(const.DATABASE_URL, db_create=False)
     assert database.count_package() == 3
     assert database.count_enumeratie() == 1
-    assert database.count_class() == 6
+    assert database.count_class() == 10
     assert database.count_attribute() == 40
     assert database.count_enumeratieliteral() == 2
 

@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-#  type: ignore
-
 import logging
+import uuid
 from abc import ABC, abstractmethod
 
 from lxml import etree
@@ -135,23 +133,43 @@ class XMIParser(Parser):
                 for memberend in memberends:
                     id = memberend.get('{' + ns['xmi'] + '}idref')
                     endpoints = node.xpath(f".//*[@xmi:id='{id}']", namespaces=ns)
-                    for endpoint in endpoints:
-                        getval = lambda x, endpoint: (
-                            endpoint.xpath(f'./{x}')[0].get('value') if len(endpoint.xpath(f'./{x}')) else None
+                    if len(endpoints) < 1:
+                        clsid = str(uuid.uuid4())
+                        msg = (
+                            f"Association '{association.name}' with {association.id} only has information on one edge:"
+                            f" generating bugus edge with uudi {clsid}."
                         )
+                        logger.warning(msg)
+
+                        clazz = db.Class(id=clsid, name='<Orphan Class>', descr=msg)
+                        database.save(clazz)
+                        if 'src' in id:
+                            association.src_class_id = clsid  # type: ignore
+                        else:
+                            association.dst_class_id = clsid  # type: ignore
+
+                    elif len(endpoints) == 1:
+                        endpoint = endpoints[0]
+                        getval = lambda x, endpoint: (  # noqa
+                            endpoint.xpath(f'./{x}')[0].get('value') if len(endpoint.xpath(f'./{x}')) else None  # noqa
+                        )  # noqa
                         clsid = endpoint.xpath('./type')[0].get('{' + ns['xmi'] + '}idref')
                         cls = database.get_class(clsid)
                         if cls is None:
                             clazz = db.Class(id=clsid, name='<Orphan Class>')
                             database.save(clazz)
                         if 'src' in id:
-                            association.src_class_id = clsid
+                            association.src_class_id = clsid  # type: ignore
                             association.src_mult_start = getval('lowerValue', endpoint)
                             association.src_mult_end = getval('upperValue', endpoint)
                         else:
-                            association.dst_class_id = clsid
+                            association.dst_class_id = clsid  # type: ignore
                             association.dst_mult_start = getval('lowerValue', endpoint)
                             association.dst_mult_end = getval('upperValue', endpoint)
+                    else:
+                        err = f"Association {association.name} with {association.id} has more than wto endpoints. panic"
+                        logger.error(err)
+                        raise Exception(err)
 
                 database.save(association)
         except Exception as ex:
@@ -196,26 +214,33 @@ class EAXMIParser(XMIParser):
         Starts at <xmi:Extension extender="Enterprise Architect" extenderID="6.5">
         '''
         logger.info('Entering third phase parsing for EAParser: extras')
-        extension = node.xpath('//xmi:Extension', namespaces=ns)[0]  # type: ignore
+        extensions = node.xpath('//xmi:Extension', namespaces=ns)
+        if len(extensions) < 1:
+            logger.warning(
+                "Trying to parse input as EA XMI, no 'Extensions' node was found. Appears to strict XMI file."
+            )
+            return
+        extension = extensions[0]  # type: ignore
 
         '''
         First find all package modifiers that look like:
-        	<element xmi:idref="EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652" xmi:type="uml:Package" name="Diagram" scope="public">
-				<model package2="EAID_5B6708DC_CE09_4284_8DCE_DD1B744BB652" package="EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E" tpos="0" ea_localid="41" ea_eleType="package"/>
-				<properties isSpecification="false" sType="Package" nType="0" scope="public"/>
-				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 14:46:15" modified="2019-07-03 14:46:15" complexity="1" status="Proposed"/>
-				<code gentype="Java"/>
-				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
-				<tags/>
-				<xrefs/>
-				<extendedProperties tagged="0" package_name="Erfgoed: Monumenten "/>
-				<packageproperties version="1.0" tpos="0"/>
-				<paths/>
-				<times created="2019-07-03 14:46:15" modified="2022-12-12 16:28:22" lastloaddate="2019-07-06 17:08:07" lastsavedate="2019-07-06 17:08:07"/>
-				<flags iscontrolled="0" isprotected="0" batchsave="0" batchload="0" usedtd="0" logxml="0"/>
-			</element>
+            <element xmi:idref="EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652" xmi:type="uml:Package" name="Diagram" scope="public">
+                <model package2="EAID_5B6708DC_CE09_4284_8DCE_DD1B744BB652" package="EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E" tpos="0" ea_localid="41" ea_eleType="package"/>
+                <properties isSpecification="false" sType="Package" nType="0" scope="public"/>
+                <project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 14:46:15" modified="2019-07-03 14:46:15" complexity="1" status="Proposed"/>
+                <code gentype="Java"/>
+                <style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+                <tags/>
+                <xrefs/>
+                <extendedProperties tagged="0" package_name="Erfgoed: Monumenten "/>
+                <packageproperties version="1.0" tpos="0"/>
+                <paths/>
+                <times created="2019-07-03 14:46:15" modified="2022-12-12 16:28:22" lastloaddate="2019-07-06 17:08:07" lastsavedate="2019-07-06 17:08:07"/>
+                <flags iscontrolled="0" isprotected="0" batchsave="0" batchload="0" usedtd="0" logxml="0"/>
+            </element>
         and set value
         '''
+
         packagerefs = extension.xpath(".//element[@xmi:type='uml:Package' and @xmi:idref]", namespaces=ns)  # type: ignore
         for packageref in packagerefs:
             idref = packageref.get('{' + ns['xmi'] + '}idref')
@@ -227,25 +252,26 @@ class EAXMIParser(XMIParser):
 
         '''
         Second find all class modifiers, like:
-        	<element xmi:idref="EAID_54944273_F312_44b2_A78D_43488F915429" xmi:type="uml:Class" name="Ambacht" scope="public">
-				<model package="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" tpos="0" ea_localid="382" ea_eleType="element"/>
-				<properties documentation="Beroep waarbij een handwerker met gereedschap eindproducten maakt." isSpecification="false" sType="Class" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
-				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 15:42:28" modified="2022-12-12 16:28:22" complexity="1" status="Proposed"/>
-				<code gentype="Java"/>
-				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
-				<tags>
-					<tag xmi:id="EAID_E0C65F37_A2DA_4E79_BDF0_CC3F4607167C" name="archimate-type" value="Business object" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
-					<tag xmi:id="EAID_65401341_DD83_4620_A236_CEC4681C9708" name="bron" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
-					<tag xmi:id="EAID_C5257D00_86DC_4657_9CBC_1EC6C03C74C9" name="datum-tijd-export" value="28062023-11:06:06" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
-					<tag xmi:id="EAID_6ED287EA_0F4E_4177_AD1E_3AAF7842374A" name="domein-dcat" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
-					<tag xmi:id="EAID_5F5875A4_4C61_4BC6_958F_BD7A49149B10" name="domein-gemma" value="nan" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
-					<tag xmi:id="EAID_8CEA0788_DDCB_4399_AB94_971F87A49504" name="gemma-guid" value="id-54944273-f312-44b2-a78d-43488f915429" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
-					<tag xmi:id="EAID_B3E0FB89_EA91_4663_8492_3C550E53D598" name="synoniemen" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
-					<tag xmi:id="EAID_DCA255D6_C1C9_4222_82C1_5AE4D1347690" name="toelichting" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
-				</tags>
-				<xrefs/>
-				<extendedProperties tagged="0" package_name="Model Monumenten"/>
+            <element xmi:idref="EAID_54944273_F312_44b2_A78D_43488F915429" xmi:type="uml:Class" name="Ambacht" scope="public">
+                <model package="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" tpos="0" ea_localid="382" ea_eleType="element"/>
+                <properties documentation="Beroep waarbij een handwerker met gereedschap eindproducten maakt." isSpecification="false" sType="Class" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+                <project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 15:42:28" modified="2022-12-12 16:28:22" complexity="1" status="Proposed"/>
+                <code gentype="Java"/>
+                <style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+                <tags>
+                    <tag xmi:id="EAID_E0C65F37_A2DA_4E79_BDF0_CC3F4607167C" name="archimate-type" value="Business object" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+                    <tag xmi:id="EAID_65401341_DD83_4620_A236_CEC4681C9708" name="bron" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+                    <tag xmi:id="EAID_C5257D00_86DC_4657_9CBC_1EC6C03C74C9" name="datum-tijd-export" value="28062023-11:06:06" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+                    <tag xmi:id="EAID_6ED287EA_0F4E_4177_AD1E_3AAF7842374A" name="domein-dcat" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+                    <tag xmi:id="EAID_5F5875A4_4C61_4BC6_958F_BD7A49149B10" name="domein-gemma" value="nan" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+                    <tag xmi:id="EAID_8CEA0788_DDCB_4399_AB94_971F87A49504" name="gemma-guid" value="id-54944273-f312-44b2-a78d-43488f915429" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+                    <tag xmi:id="EAID_B3E0FB89_EA91_4663_8492_3C550E53D598" name="synoniemen" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+                    <tag xmi:id="EAID_DCA255D6_C1C9_4222_82C1_5AE4D1347690" name="toelichting" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+                </tags>
+                <xrefs/>
+                <extendedProperties tagged="0" package_name="Model Monumenten"/>
         '''
+
         clazzrefs = extension.xpath(".//element[@xmi:type='uml:Class' and @xmi:idref]", namespaces=ns)  # type: ignore
         for clazzref in clazzrefs:
             idref = clazzref.get('{' + ns['xmi'] + '}idref')
@@ -282,6 +308,7 @@ class EAXMIParser(XMIParser):
                 <xrefs/>
             </attribute>
         '''
+
         attrrefs = extension.xpath(".//attribute[@xmi:idref]", namespaces=ns)  # type: ignore
         for attrref in attrrefs:
             idref = attrref.get('{' + ns['xmi'] + '}idref')

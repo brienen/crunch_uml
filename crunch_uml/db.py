@@ -1,5 +1,5 @@
 import sqlalchemy
-from sqlalchemy import Column, Float, ForeignKey, String, Text, create_engine
+from sqlalchemy import Column, ForeignKey, String, Text, create_engine
 from sqlalchemy.orm import relationship, sessionmaker
 
 import crunch_uml.const as const
@@ -139,6 +139,9 @@ class Database:
     def get_attribute(self, id):
         return self.session.get(Attribute, id)
 
+    def get_association(self, id):
+        return self.session.get(Association, id)
+
     def count_class(self):
         return self.session.query(Class).count()
 
@@ -151,6 +154,9 @@ class Database:
     def count_enumeratieliteral(self):
         return self.session.query(EnumerationLiteral).count()
 
+    def count_association(self):
+        return self.session.query(Association).count()
+
     def commit(self):
         self.session.commit()
 
@@ -159,3 +165,6 @@ class Database:
 
     def close(self):
         self.session.close()
+
+    def get_session(self):
+        return self.session
