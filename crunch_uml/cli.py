@@ -55,10 +55,13 @@ def main(args=None):
             raise (f"Parser error: unknown inputtype {args.inputtype}, use 'xmi' or 'eaxmi'")
 
         parser.parse(args, database)
+        database.commit()
+        logger.info("Succes! parsed all data and saved it in database")
     except Exception as ex:
         logger.error(f"Error while parsing file and writing data tot database with message: {ex}")
+        database.rollback()
+        raise
     finally:
-        database.commit()
         database.close()
 
 

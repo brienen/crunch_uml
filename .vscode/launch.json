@@ -12,7 +12,7 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                "-f", "./test/data/GGM_Monumenten_EA2.1.xml",
+                "-f", "./test/data/RelationTest.xml",
                 "-d"
             ]
         }

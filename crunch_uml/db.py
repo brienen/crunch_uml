@@ -51,24 +51,35 @@ class Package(Base, UMLBase):  # type: ignore
 class Class(Base, UMLBase, UMLTags):  # type: ignore
     __tablename__ = 'classes'
 
-    package_id = Column(String, ForeignKey('packages.id', deferrable=True), index=True, nullable=False)
+    package_id = Column(String, ForeignKey('packages.id', deferrable=True), index=True)
     package = relationship("Package", back_populates="classes")
-    attributes = relationship("Attribute", back_populates="clazz")
+    attributes = relationship("Attribute", back_populates="clazz", lazy='joined', foreign_keys='Attribute.clazz_id')
+    inkomende_associaties = relationship(
+        "Association", back_populates="dst_class", foreign_keys='Association.dst_class_id'
+    )
+    uitgaande_associaties = relationship(
+        "Association", back_populates="src_class", foreign_keys='Association.src_class_id'
+    )
 
 
 class Attribute(Base, UML_Generic):  # type: ignore
     __tablename__ = 'attributes'
 
     clazz_id = Column(String, ForeignKey('classes.id', deferrable=True), index=True, nullable=False)
-    clazz = relationship("Class", back_populates="attributes")
+    clazz = relationship("Class", back_populates="attributes", foreign_keys='Attribute.clazz_id')
+    primitive = Column(String)
+    enumeration_id = Column(String, ForeignKey('enumeraties.id', deferrable=True), index=True)
+    enumeration = relationship("Enumeratie", lazy='joined')
+    type_class_id = Column(String, ForeignKey('classes.id', deferrable=True), index=True)
+    type_class = relationship("Class", foreign_keys='Attribute.type_class_id')
 
 
 class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
     __tablename__ = 'enumeraties'
 
-    package_id = Column(String, ForeignKey('packages.id', deferrable=True), index=True)
+    package_id = Column(String, ForeignKey('packages.id', deferrable=True), index=True, nullable=False)
     package = relationship("Package", back_populates="enumerations")
-    literals = relationship("EnumerationLiteral", back_populates="enumeratie")
+    literals = relationship("EnumerationLiteral", back_populates="enumeratie", lazy='joined')
 
 
 class EnumerationLiteral(Base, UML_Generic):  # type: ignore
@@ -76,6 +87,23 @@ class EnumerationLiteral(Base, UML_Generic):  # type: ignore
 
     enumeratie_id = Column(String, ForeignKey('enumeraties.id', deferrable=True), index=True, nullable=False)
     enumeratie = relationship("Enumeratie", back_populates='literals')
+
+
+class Association(Base, UML_Generic):  # type: ignore
+    __tablename__ = 'associaties'
+
+    src_class_id = Column(
+        String, ForeignKey('classes.id', deferrable=True, name='fk_src_class'), index=True, nullable=False
+    )
+    src_class = relationship("Class", back_populates="uitgaande_associaties", foreign_keys='Association.src_class_id')
+    src_mult_start = Column(String)
+    src_mult_end = Column(String)
+    dst_class_id = Column(
+        String, ForeignKey('classes.id', deferrable=True, name='fk_dst_class'), index=True, nullable=False
+    )
+    dst_class = relationship("Class", back_populates="inkomende_associaties", foreign_keys='Association.dst_class_id')
+    dst_mult_start = Column(String)
+    dst_mult_end = Column(String)
 
 
 class Database:
@@ -108,6 +136,9 @@ class Database:
     def get_class(self, id):
         return self.session.get(Class, id)
 
+    def get_attribute(self, id):
+        return self.session.get(Attribute, id)
+
     def count_class(self):
         return self.session.query(Class).count()
 
@@ -122,6 +153,9 @@ class Database:
 
     def commit(self):
         self.session.commit()
+
+    def rollback(self):
+        self.session.rollback()
 
     def close(self):
         self.session.close()

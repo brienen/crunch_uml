@@ -102,9 +102,61 @@ class XMIParser(Parser):
         second phase of parsing XMI-documents. Parsing and connecting:
         - Assosiations
         - Generalizations
+
+        Associations have this form:
+        <packagedElement xmi:type="uml:Association" xmi:id="EAID_333AC8C9_7443_4a49_A875_297B65FC944C" name="heeft">
+            <memberEnd xmi:idref="EAID_dst3AC8C9_7443_4a49_A875_297B65FC944C"/>
+            <memberEnd xmi:idref="EAID_src3AC8C9_7443_4a49_A875_297B65FC944C"/>
+            <ownedEnd xmi:type="uml:Property" xmi:id="EAID_src3AC8C9_7443_4a49_A875_297B65FC944C" association="EAID_333AC8C9_7443_4a49_A875_297B65FC944C">
+                <type xmi:idref="EAID_266057AF_58BD_42e1_B4D5_16EB266B9B7A"/>
+                <lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000005__7443_4a49_A875_297B65FC944C" value="1"/>
+                <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000006__7443_4a49_A875_297B65FC944C" value="1"/>
+            </ownedEnd>
+            <ownedEnd xmi:type="uml:Property" xmi:id="EAID_dst3AC8C9_7443_4a49_A875_297B65FC944C" association="EAID_333AC8C9_7443_4a49_A875_297B65FC944C">
+                <type xmi:idref="EAID_CFFD5F20_5FA9_4d93_AD34_6867D64A58B9"/>
+                <lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000021__7443_4a49_A875_297B65FC944C" value="0"/>
+                <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000022__7443_4a49_A875_297B65FC944C" value="*"/>
+            </ownedEnd>
+        </packagedElement>
         '''
         logger.info('Entering second phase parsing: connectors')
-        pass
+        try:
+            associations_xmi = node.xpath(".//packagedElement[@xmi:type='uml:Association']", namespaces=ns)  # type: ignore
+
+            for association_xp in associations_xmi:
+                logger.debug(
+                    f"Parsing association {association_xp.get('name')} with id"
+                    f" {association_xp.get('{' + ns['xmi'] + '}id')})"
+                )
+                association = db.Association(
+                    id=association_xp.get('{' + ns['xmi'] + '}id'), name=association_xp.get('name')
+                )
+                memberends = association_xp.xpath("./memberEnd", namespaces=ns)
+                for memberend in memberends:
+                    id = memberend.get('{' + ns['xmi'] + '}idref')
+                    endpoints = node.xpath(f".//*[@xmi:id='{id}']", namespaces=ns)
+                    for endpoint in endpoints:
+                        getval = lambda x, endpoint: (
+                            endpoint.xpath(f'./{x}')[0].get('value') if len(endpoint.xpath(f'./{x}')) else None
+                        )
+                        clsid = endpoint.xpath('./type')[0].get('{' + ns['xmi'] + '}idref')
+                        cls = database.get_class(clsid)
+                        if cls is None:
+                            clazz = db.Class(id=clsid, name='<Orphan Class>')
+                            database.save(clazz)
+                        if 'src' in id:
+                            association.src_class_id = clsid
+                            association.src_mult_start = getval('lowerValue', endpoint)
+                            association.src_mult_end = getval('upperValue', endpoint)
+                        else:
+                            association.dst_class_id = clsid
+                            association.dst_mult_start = getval('lowerValue', endpoint)
+                            association.dst_mult_end = getval('upperValue', endpoint)
+
+                database.save(association)
+        except Exception as ex:
+            logger.error(f"Error in phase 2 of parsing with message: {ex}")
+            raise ex
 
     def phase3_process_extra(self, node, ns, database: db.Database):
         '''
@@ -143,7 +195,7 @@ class EAXMIParser(XMIParser):
         third and last phase of parsing XMI-documents. Parsing extra propriatary data: addons to allready found data.
         Starts at <xmi:Extension extender="Enterprise Architect" extenderID="6.5">
         '''
-        logger.info('Entering third phase parsing: extras')
+        logger.info('Entering third phase parsing for EAParser: extras')
         extension = node.xpath('//xmi:Extension', namespaces=ns)[0]  # type: ignore
 
         '''
@@ -232,13 +284,15 @@ class EAXMIParser(XMIParser):
         '''
         attrrefs = extension.xpath(".//attribute[@xmi:idref]", namespaces=ns)  # type: ignore
         for attrref in attrrefs:
-            idref = attrrefs.get('{' + ns['xmi'] + '}idref')
-            attr = database.get_class(idref)
+            idref = attrref.get('{' + ns['xmi'] + '}idref')
+            attr = database.get_attribute(idref)
+            if attr is not None:
+                properties = attrref.xpath('./properties')[0]
+                copy_values(properties, attr)
+                documentation = attrref.xpath('./properties')[0]
+                if documentation is not None:
+                    attr.descr = documentation.get('documentation')
+                stereotype = attrref.xpath('./stereotype')[0]
+                copy_values(stereotype, attr)
 
-            properties = attrref.xpath('./properties')[0]
-            copy_values(properties, attr)
-            documentation = attrref.xpath('./properties')[0]
-            if documentation is not None:
-                attr.descr = documentation.get('documentation')
-            stereotype = attrref.xpath('./stereotype')[0]
-            copy_values(stereotype, attr)
+                database.save(attr)
