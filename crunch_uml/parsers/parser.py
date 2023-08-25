@@ -120,7 +120,6 @@ class XMIParser(Parser):
         logger.info('Entering second phase parsing: connectors')
         try:
             associations_xmi = node.xpath(".//packagedElement[@xmi:type='uml:Association']", namespaces=ns)  # type: ignore
-
             for association_xp in associations_xmi:
                 logger.debug(
                     f"Parsing association {association_xp.get('name')} with id"
@@ -137,7 +136,7 @@ class XMIParser(Parser):
                         clsid = str(uuid.uuid4())
                         msg = (
                             f"Association '{association.name}' with {association.id} only has information on one edge:"
-                            f" generating bugus edge with uudi {clsid}."
+                            f" generating placeholder edge with uudi {clsid}."
                         )
                         logger.warning(msg)
 
@@ -175,6 +174,42 @@ class XMIParser(Parser):
         except Exception as ex:
             logger.error(f"Error in phase 2 of parsing with message: {ex}")
             raise ex
+
+        '''
+        Next look for all properties that ar ebound to a asscociation. They look lik eso:
+        <ownedAttribute xmi:type="uml:Property" xmi:id="EAID_dstC391C5_3370_4bd4_A64E_C08369C7E2A6" name="wijst naar B" visibility="public" association="EAID_8FC391C5_3370_4bd4_A64E_C08369C7E2A6" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+            <type xmi:idref="EAID_48A02EC8_683B_414f_B8A7_7518B789C8F5"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000007__3370_4bd4_A64E_C08369C7E2A6" value="0"/>
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000008__3370_4bd4_A64E_C08369C7E2A6" value="-1"/>
+        </ownedAttribute>
+
+        '''
+        properties = node.xpath(".//ownedAttribute[@xmi:type='uml:Property' and @association]", namespaces=ns)  # type: ignore
+        for property in properties:
+            id = property.get('{' + ns['xmi'] + '}id')
+            attribute = database.get_attribute(id)
+
+            clsrefs = property.xpath('./type[@xmi:idref]', namespaces=ns)
+            if len(clsrefs) == 1:
+                clsid = clsrefs[0].get('{' + ns['xmi'] + '}idref')
+                cls = database.get_class(clsid)
+                if cls is None:
+                    next
+                attribute.type_class_id = cls.id
+            database.save(attribute)
+
+        # Last of all set enumerations
+        enums = database.get_all_enumerations()
+        for enum in enums:
+            enumverws = node.xpath(".//type[@xmi:idref='" + enum.id + "']", namespaces=ns)
+            for enumverw in enumverws:
+                property = enumverw.getparent()
+                if property.tag == 'ownedAttribute' and property.get('{' + ns['xmi'] + '}type') == 'uml:Property':
+                    id = property.get('{' + ns['xmi'] + '}id')
+                    attribute = database.get_attribute(id)
+                    if attribute is not None:
+                        attribute.enumeration_id = enum.id
+                        database.save(attribute)
 
     def phase3_process_extra(self, node, ns, database: db.Database):
         '''

@@ -142,6 +142,9 @@ class Database:
     def get_association(self, id):
         return self.session.get(Association, id)
 
+    def get_all_enumerations(self):
+        return self.session.query(Enumeratie).all()
+
     def count_class(self):
         return self.session.query(Class).count()
 

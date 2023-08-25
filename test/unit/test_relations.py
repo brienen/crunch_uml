@@ -18,3 +18,8 @@ def test_relations():
     assoc = database.get_association('EAID_8FC391C5_3370_4bd4_A64E_C08369C7E2A6')
     assert assoc.src_class.name == 'Class A'
     assert assoc.dst_class.name == 'Class B'
+
+    attr = database.get_attribute('EAID_18BD2EDE_1337_4817_9DE6_8191EF0B0763')
+    assert attr.enumeration_id == 'EAID_ED3BE54D_FD1B_46d3_AECA_621A7FD7D667'
+    attr = database.get_attribute('EAID_dstC391C5_3370_4bd4_A64E_C08369C7E2A6')
+    assert attr.type_class_id == 'EAID_48A02EC8_683B_414f_B8A7_7518B789C8F5'
