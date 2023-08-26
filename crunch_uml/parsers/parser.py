@@ -12,7 +12,6 @@ logger = logging.getLogger()
 def fixtag(tag):
     return tag.replace('-', '_')
 
-
 def copy_values(node, obj):
     '''
     Copies all values from attributes of node to obj,
@@ -20,9 +19,15 @@ def copy_values(node, obj):
     Fix for '-' symbol to '_'
     '''
     if node is not None:
-        for key in node.keys():  # Dynamic set values of package
-            if hasattr(obj, fixtag(key)):
-                setattr(obj, fixtag(key), node.get(key))
+        if isinstance(node, list):
+            for item in node:
+                for key in item.keys():  # Dynamic set values of package
+                    if hasattr(obj, fixtag(key)):
+                        setattr(obj, fixtag(key), item.get(key))
+        else:
+            for key in node.keys():  # Dynamic set values of package
+                if hasattr(obj, fixtag(key)):
+                    setattr(obj, fixtag(key), node.get(key))
 
 
 class Parser(ABC):
@@ -171,6 +176,27 @@ class XMIParser(Parser):
                         raise Exception(err)
 
                 database.save(association)
+
+            '''
+            Process all generalisations like so
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_69DD8935_F54B_42dd_BD6E_B9D43C179992" name="Class E" visibility="public">
+				<generalization xmi:type="uml:Generalization" xmi:id="EAID_7C4B53BC_DCF3_47a5_8D44_E0F23E9FA511" general="EAID_5BD99AAE_7857_495b_BA1A_80E1AAF525CE" isSubstitutable="true"/>
+			</packagedElement>
+            '''
+            generalisations_xmi = node.xpath(".//generalization[@xmi:type='uml:Generalization']", namespaces=ns)  # type: ignore
+            for generalisation_xmi in generalisations_xmi:
+                id = generalisation_xmi.get('{' + ns['xmi'] + '}id')
+                superclass = generalisation_xmi.get('general')
+                subclass = generalisation_xmi.getparent().get('{' + ns['xmi'] + '}id')
+                generalization = db.Generalization(
+                    id=id, superclass_id=superclass, subclass_id=subclass
+                )
+                database.save(generalization)
+
+
+
+
+        
         except Exception as ex:
             logger.error(f"Error in phase 2 of parsing with message: {ex}")
             raise ex
@@ -275,7 +301,6 @@ class EAXMIParser(XMIParser):
             </element>
         and set value
         '''
-
         packagerefs = extension.xpath(".//element[@xmi:type='uml:Package' and @xmi:idref]", namespaces=ns)  # type: ignore
         for packageref in packagerefs:
             idref = packageref.get('{' + ns['xmi'] + '}idref')
@@ -315,8 +340,10 @@ class EAXMIParser(XMIParser):
             properties = clazzref.xpath('./properties')[0]
             if properties is not None:
                 clazz.descr = properties.get('documentation')
-            project = clazzref.xpath('./project')[0]
+            project = clazzref.xpath('./project')
             copy_values(project, clazz)
+            stereotype = clazzref.xpath('./stereotype')
+            copy_values(stereotype, clazz)
 
             tags = clazzref.xpath('./tags/tag')
             for tag in tags:
@@ -349,12 +376,28 @@ class EAXMIParser(XMIParser):
             idref = attrref.get('{' + ns['xmi'] + '}idref')
             attr = database.get_attribute(idref)
             if attr is not None:
-                properties = attrref.xpath('./properties')[0]
+                properties = attrref.xpath('./properties')
                 copy_values(properties, attr)
                 documentation = attrref.xpath('./properties')[0]
                 if documentation is not None:
                     attr.descr = documentation.get('documentation')
-                stereotype = attrref.xpath('./stereotype')[0]
+                stereotype = attrref.xpath('./stereotype')
                 copy_values(stereotype, attr)
 
                 database.save(attr)
+
+        connectorrefs = extension.xpath(".//connector[@xmi:idref and properties/@ea_type='Association']", namespaces=ns)  # type: ignore
+        for connectorref in connectorrefs:
+            idref = connectorref.get('{' + ns['xmi'] + '}idref')
+            #sourceref = connectorref.xpath('./source/@xmi:idref', namespaces=ns)[0]
+            #targetref = connectorref.xpath('./target/@xmi:idref', namespaces=ns)[0]
+            association = database.get_association(idref)
+            if association is not None:
+                #association.src_class = sourceref
+                #association.dst_class = targetref
+                
+                documentation = connectorref.xpath('./documentation')
+                if len(documentation) == 1:
+                    association.descr = documentation[0].get('value')
+                
+                database.save(association)

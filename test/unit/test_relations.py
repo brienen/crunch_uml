@@ -8,9 +8,11 @@ def test_relations():
     database = db.Database(const.DATABASE_URL, db_create=False)
     assert database.count_package() == 1
     assert database.count_enumeratie() == 1
-    assert database.count_class() == 6
+    assert database.count_class() == 7
     assert database.count_attribute() == 5
     assert database.count_enumeratieliteral() == 1
+    assert database.count_association() == 3
+    assert database.count_generalizations() == 1
 
     assoc = database.get_association('EAID_226EA15E_18E2_488d_8844_07DCFBA8A6E2')
     assert assoc.name == 'assoc to Orphan'
@@ -23,3 +25,7 @@ def test_relations():
     assert attr.enumeration_id == 'EAID_ED3BE54D_FD1B_46d3_AECA_621A7FD7D667'
     attr = database.get_attribute('EAID_dstC391C5_3370_4bd4_A64E_C08369C7E2A6')
     assert attr.type_class_id == 'EAID_48A02EC8_683B_414f_B8A7_7518B789C8F5'
+
+    gener = database.get_generalization('EAID_7C4B53BC_DCF3_47a5_8D44_E0F23E9FA511')
+    assert gener.superclass.name == 'Class F'
+    assert gener.subclass.name == 'Class E'
