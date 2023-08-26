@@ -2,7 +2,7 @@ from crunch_uml import cli, const, db
 
 
 def test_import_onderwijs():
-    test_args = ["-f", "./test/data/GGM_Onderwijs_XMI.2.1.xml"]
+    test_args = ["-if", "./test/data/GGM_Onderwijs_XMI.2.1.xml", "-it", "xmi"]
     cli.main(test_args)
 
     database = db.Database(const.DATABASE_URL, db_create=False)

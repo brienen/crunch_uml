@@ -9,7 +9,9 @@ import crunch_uml.renderers.renderer as renderers
 from crunch_uml.db import Database
 from crunch_uml.parsers.eaxmiparser import EAXMIParser  # noqa: F401
 from crunch_uml.parsers.xmiparser import XMIParser  # noqa: F401
+from crunch_uml.parsers.xlsxparser import XLSXParser  # noqa: F401
 from crunch_uml.renderers.xlsxrenderer import XLSXRenderer  # noqa: F401
+from crunch_uml.renderers.pandasrenderer import JSONRenderer  # noqa: F401
 
 # Configureer logging
 logging.basicConfig(
@@ -40,17 +42,25 @@ def main(args=None):
     database = Database(const.DATABASE_URL, db_create=args.database_create_new)
     try:
         # First open database, select parser and parse into database
-        parser = parsers.ParserRegistry.getinstance(args.inputtype)
-        parser.parse(args, database)
-        database.commit()
-        logger.info("Succes! parsed all data and saved it in database")
+        if args.inputtype is not None:
+            logger.info(f"Starting parsing with inputtype {args.inputtype}")
+            parser = parsers.ParserRegistry.getinstance(args.inputtype)
+            parser.parse(args, database)
+            database.commit()
+            logger.info("Succes! parsed all data and saved it in database")
+        else:
+            logger.info("No inputtype provided parsing is skipped, continue")
 
         # Secondly perform checking (implentation later)
 
         # Thridy render to output
-        renderer = renderers.RendererRegistry.getinstance(args.outputtype)
-        renderer.render(args, database)
-        logger.info(f"Succes! rendered output from database wtih renderer {renderer}")
+        if args.outputtype is not None:
+            logger.info(f"Starting rendering with outputtype {args.outputtype}")
+            renderer = renderers.RendererRegistry.getinstance(args.outputtype)
+            renderer.render(args, database)
+            logger.info(f"Succes! rendered output from database wtih renderer {renderer}")
+        else:
+            logger.info("No outputtype provided rendering is skipped")
 
     except Exception as ex:
         logger.error(f"Error while parsing file and writing data tot database with message: {ex}")

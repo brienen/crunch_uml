@@ -213,18 +213,18 @@ class XMIParser(Parser):
         pass
 
     def parse(self, args, database: db.Database):
-        logger.info(f'Parsing file with name {args.file}')
+        logger.info(f'Parsing file with name {args.inputfile}')
         logger.debug('Parsing with XMIParser')
 
         # Parseer het XML-bestand
-        tree = etree.parse(args.file)
+        tree = etree.parse(args.inputfile)
         root = tree.getroot()
         ns = root.nsmap
         if 'xmi' not in ns.keys():
-            logger.warning(f'missing namespace "xmi" in file {args.file}: trying "{const.NS_XMI}"')
+            logger.warning(f'missing namespace "xmi" in file {args.inputfile}: trying "{const.NS_XMI}"')
             ns['xmi'] = const.NS_XMI
         if 'uml' not in ns.keys():
-            logger.warning(f'missing namespace "uml" in file {args.file}: trying "{const.NS_UML}"')
+            logger.warning(f'missing namespace "uml" in file {args.inputfile}: trying "{const.NS_UML}"')
             ns['xmi'] = const.NS_UML
 
         if root is not None:

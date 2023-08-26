@@ -12,14 +12,13 @@ class ParserRegistry(Registry):
 
 
 def add_args(argumentparser):
-    argumentparser.add_argument('-f', '--file', type=str, help="Path to the XMI file", required=True)
+    argumentparser.add_argument('-if', '--inputfile', type=str, help="Path to the XMI file")
     argumentparser.add_argument(
-        '-t',
+        '-it',
         '--inputtype',
         type=str,
         # action='store_true',
         help=f'geeft inputtype aan: {ParserRegistry.entries()}.',
-        default='xmi',
     )
 
 

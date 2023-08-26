@@ -11,6 +11,7 @@ logger = logging.getLogger()
 @RendererRegistry.register("xlsx")
 class XLSXRenderer(Renderer):
     def render(self, args, database: db.Database):
+        # sourcery skip: use-named-expression
         wb = Workbook()
         wb.remove(wb.active)  # type: ignore # Remove default sheet
 
@@ -23,7 +24,11 @@ class XLSXRenderer(Renderer):
             ws = wb.create_sheet(title=table_name)
 
             # Headers
-            columns = [c.name for c in table.columns]
+            #columns = [c.name for c in table.columns]
+            # Sort columns: 'id' first, then others alphabetically
+            columns = ['id'] if 'id' in table.columns else []
+            columns.extend(sorted([c.name for c in table.columns if c.name != 'id']))
+
             for col_num, column in enumerate(columns, 1):
                 ws.cell(row=1, column=col_num, value=column)
 
@@ -43,4 +48,4 @@ class XLSXRenderer(Renderer):
                     for col_num, column in enumerate(columns, 1):
                         ws.cell(row=row_num, column=col_num, value=getattr(record, column))
 
-        wb.save(args.output_file)
+        wb.save(args.outputfile)

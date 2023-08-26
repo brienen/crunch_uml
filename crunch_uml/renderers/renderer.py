@@ -12,7 +12,7 @@ class RendererRegistry(Registry):
 
 
 def add_args(argumentparser):
-    argumentparser.add_argument('-of', '--output_file', type=str, help="Path to the outputfile file")
+    argumentparser.add_argument('-of', '--outputfile', type=str, help="Path to the outputfile file")
     argumentparser.add_argument(
         '-ot',
         '--outputtype',

@@ -2,7 +2,7 @@ from crunch_uml import cli, const, db
 
 
 def test_relations():
-    test_args = ["-f", "./test/data/RelationTest.xml"]
+    test_args = ["-if", "./test/data/RelationTest.xml", "-it", "xmi"]
     cli.main(test_args)
 
     database = db.Database(const.DATABASE_URL, db_create=False)

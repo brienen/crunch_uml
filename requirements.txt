@@ -3,3 +3,4 @@ lxml==4.9.3
 lxml-stubs
 openpyxl
 types-openpyxl
+pandas
