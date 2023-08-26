@@ -5,10 +5,11 @@ import sys
 import crunch_uml.const as const
 import crunch_uml.db as db
 import crunch_uml.parsers.parser as parsers
+import crunch_uml.renderers.renderer as renderers
 from crunch_uml.db import Database
 from crunch_uml.parsers.eaxmiparser import EAXMIParser  # noqa: F401
 from crunch_uml.parsers.xmiparser import XMIParser  # noqa: F401
-import crunch_uml.renderers.renderer as renderers
+from crunch_uml.renderers.xlsxrenderer import XLSXRenderer  # noqa: F401
 
 # Configureer logging
 logging.basicConfig(
@@ -36,11 +37,10 @@ def main(args=None):
     elif args.verbose:
         logger.setLevel(logging.INFO)
 
-    
     database = Database(const.DATABASE_URL, db_create=args.database_create_new)
     try:
-        # First open database, select parser and parse into database  
-        parser = parsers.ParserRegistry.getinstance(args.inputtype)        
+        # First open database, select parser and parse into database
+        parser = parsers.ParserRegistry.getinstance(args.inputtype)
         parser.parse(args, database)
         database.commit()
         logger.info("Succes! parsed all data and saved it in database")
@@ -49,8 +49,8 @@ def main(args=None):
 
         # Thridy render to output
         renderer = renderers.RendererRegistry.getinstance(args.outputtype)
-        #renderer.render(args, database)
-        logger.info("Succes! rendered output from database")
+        renderer.render(args, database)
+        logger.info(f"Succes! rendered output from database wtih renderer {renderer}")
 
     except Exception as ex:
         logger.error(f"Error while parsing file and writing data tot database with message: {ex}")
@@ -58,8 +58,6 @@ def main(args=None):
         raise
     finally:
         database.close()
-
-    
 
 
 if __name__ == '__main__':

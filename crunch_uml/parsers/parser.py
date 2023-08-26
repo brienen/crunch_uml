@@ -6,8 +6,10 @@ from crunch_uml.registry import Registry
 
 logger = logging.getLogger()
 
+
 class ParserRegistry(Registry):
-    pass
+    _registry = {}  # type: ignore
+
 
 def add_args(argumentparser):
     argumentparser.add_argument('-f', '--file', type=str, help="Path to the XMI file", required=True)
