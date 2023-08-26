@@ -8,6 +8,7 @@ import crunch_uml.parsers.parser as parsers
 from crunch_uml.db import Database
 from crunch_uml.parsers.eaxmiparser import EAXMIParser  # noqa: F401
 from crunch_uml.parsers.xmiparser import XMIParser  # noqa: F401
+import crunch_uml.renderers.renderer as renderers
 
 # Configureer logging
 logging.basicConfig(
@@ -26,6 +27,7 @@ def main(args=None):
     argumentparser.add_argument('-d', '--debug', action='store_true', help='zet logniveau op DEBUG')
     db.add_args(argumentparser)
     parsers.add_args(argumentparser)
+    renderers.add_args(argumentparser)
     args = argumentparser.parse_args(args)
 
     # Bepaal het logniveau op basis van commandline argumenten
@@ -34,25 +36,30 @@ def main(args=None):
     elif args.verbose:
         logger.setLevel(logging.INFO)
 
+    
     database = Database(const.DATABASE_URL, db_create=args.database_create_new)
     try:
-        parser = parsers.ParserRegistry.getinstance(args.inputtype)
-        # if args.inputtype == 'eaxmi':
-        #    parser = XMIParser()
-        # elif args.inputtype == 'xmi':
-        #    parser = EAXMIParser()
-        # else:
-        #    raise (f"Parser error: unknown inputtype {args.inputtype}, use 'xmi' or 'eaxmi'")
-
+        # First open database, select parser and parse into database  
+        parser = parsers.ParserRegistry.getinstance(args.inputtype)        
         parser.parse(args, database)
         database.commit()
         logger.info("Succes! parsed all data and saved it in database")
+
+        # Secondly perform checking (implentation later)
+
+        # Thridy render to output
+        renderer = renderers.RendererRegistry.getinstance(args.outputtype)
+        #renderer.render(args, database)
+        logger.info("Succes! rendered output from database")
+
     except Exception as ex:
         logger.error(f"Error while parsing file and writing data tot database with message: {ex}")
         database.rollback()
         raise
     finally:
         database.close()
+
+    
 
 
 if __name__ == '__main__':
