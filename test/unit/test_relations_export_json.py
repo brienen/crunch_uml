@@ -1,18 +1,15 @@
-from crunch_uml import cli, const, db
-import os
 import json
+import os
+
+from crunch_uml import cli
+
 
 def test_relations_export_json():
     outputfile = "./test.json"
 
-    test_args = [
-                "-it", "eaxmi",
-                "-if", "./test/data/RelationTest.xml",
-                "-ot", "json",
-                "-of", outputfile
-            ]
+    test_args = ["-it", "eaxmi", "-if", "./test/data/RelationTest.xml", "-ot", "json", "-of", outputfile]
     cli.main(test_args)
-    assert os.path.exists(outputfile) 
+    assert os.path.exists(outputfile)
 
     # Load the data from the created JSON file
     with open(outputfile, 'r') as f:
@@ -22,7 +19,15 @@ def test_relations_export_json():
     os.remove(outputfile)
 
     # Assert data
-    expectedkeys = ['classes','attributes', 'packages', 'enumeraties', 'enumeratieliterals', 'associaties', 'generalizations']
+    expectedkeys = [
+        'classes',
+        'attributes',
+        'packages',
+        'enumeraties',
+        'enumeratieliterals',
+        'associaties',
+        'generalizations',
+    ]
     for expectedkey in expectedkeys:
         assert expectedkey in data.keys()
 
@@ -33,4 +38,3 @@ def test_relations_export_json():
     assert len(data['enumeratieliterals']) == 1
     assert len(data['associaties']) == 3
     assert len(data['generalizations']) == 1
-

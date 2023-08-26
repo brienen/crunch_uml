@@ -10,10 +10,20 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Export JSON",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                "-f", "./test/data/RelationTest.xml",
-                "-d"
+                "-it", "eaxmi",
+                "-if", "./test/data/RelationTest.xml",
+                "-ot", "json",
+                "-of", "./test.json"
             ]
         }
     ]

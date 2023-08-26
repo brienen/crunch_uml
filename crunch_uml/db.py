@@ -1,6 +1,5 @@
-import sqlalchemy
 from sqlalchemy import Column, ForeignKey, String, Text, create_engine
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
 import crunch_uml.const as const
 
@@ -21,7 +20,20 @@ def add_args(argumentparser):
     )
 
 
-Base = sqlalchemy.orm.declarative_base()  # type: ignore
+class BaseModel:
+    @classmethod
+    def model_lookup_by_table_name(cls, table_name):
+        registry_instance = getattr(cls, "registry")
+        for mapper_ in registry_instance.mappers:
+            model = mapper_.class_
+            model_class_name = model.__tablename__
+            if model_class_name == table_name:
+                return model
+        return None
+
+
+Base = declarative_base(cls=BaseModel)
+# Base = sqlalchemy.orm.declarative_base()  # type: ignore
 
 
 # Model definitions

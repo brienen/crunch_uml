@@ -5,7 +5,7 @@ class Registry:
     def register(cls, name=None):  # sourcery skip: or-if-exp-identity
         def inner(registered_class):
             class_name = name if name else registered_class.__name__
-            #if class_name in cls._registry:
+            # if class_name in cls._registry:
             #    raise ValueError(f"Class name {class_name} already registered!")
             cls._registry[class_name] = registered_class
             return registered_class

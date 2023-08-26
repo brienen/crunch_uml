@@ -1,0 +1,51 @@
+{
+    "packages": [
+        {
+            "parent_package_id": null,
+            "author": "arjen",
+            "version": "2.0",
+            "phase": "1.0",
+            "status": "Proposed",
+            "created": "2023-08-25 14:14:41",
+            "modified": "2019-01-23 13:38:10",
+            "stereotype": null,
+            "uri": null,
+            "visibility": null,
+            "alias": null,
+            "id": "EAPK_462FC604_0147_42e2_89E3_9690F853BD60",
+            "name": "Starter Class Diagram",
+            "descr": "Hier voeg ik dan ook heel veel testdata toe"
+        }
+    ],
+    "classes": [
+        {
+            "package_id": "EAPK_462FC604_0147_42e2_89E3_9690F853BD60",
+            "author": "arjen",
+            "version": "1.0",
+            "phase": "2.0",
+            "status": "Proposed",
+            "created": "2023-08-25 14:15:04",
+            "modified": "2023-08-25 14:15:10",
+            "stereotype": null,
+            "uri": "Mijn Uri",
+            "visibility": "Onzichtbaar",
+            "alias": "Testdata",
+            "id": "EAID_1733CB71_0B11_41c5_B05B_63E7CB2FAC3E",
+            "name": "Class A",
+            "descr": "Hier voeg ik dan ook heel veel testdata toe",
+            "archimate_type": "archimate_type",
+            "bron": "bron",
+            "datum_tijd_export": "datum_tijd_export",
+            "domein_dcat": "domein_dcat",
+            "domein_gemma": "domein_gemma",
+            "gemma_guid": "gemma_guid",
+            "synoniemen": "synoniemen",
+            "toelichting": "toelichting"
+        },
+        {
+            "package_id": "EAPK_462FC604_0147_42e2_89E3_9690F853BD60",
+            "author": "Arie Bombarie",
+            "version": "2.0"
+        }
+    ]
+}

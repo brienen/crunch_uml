@@ -8,10 +8,12 @@ import crunch_uml.parsers.parser as parsers
 import crunch_uml.renderers.renderer as renderers
 from crunch_uml.db import Database
 from crunch_uml.parsers.eaxmiparser import EAXMIParser  # noqa: F401
-from crunch_uml.parsers.xmiparser import XMIParser  # noqa: F401
+from crunch_uml.parsers.jsonparser import JSONParser  # noqa: F401
 from crunch_uml.parsers.xlsxparser import XLSXParser  # noqa: F401
-from crunch_uml.renderers.xlsxrenderer import XLSXRenderer  # noqa: F401
+from crunch_uml.parsers.xmiparser import XMIParser  # noqa: F401
+from crunch_uml.renderers.pandasrenderer import CSVRenderer  # noqa: F401
 from crunch_uml.renderers.pandasrenderer import JSONRenderer  # noqa: F401
+from crunch_uml.renderers.xlsxrenderer import XLSXRenderer  # noqa: F401
 
 # Configureer logging
 logging.basicConfig(

@@ -24,7 +24,7 @@ class XLSXRenderer(Renderer):
             ws = wb.create_sheet(title=table_name)
 
             # Headers
-            #columns = [c.name for c in table.columns]
+            # columns = [c.name for c in table.columns]
             # Sort columns: 'id' first, then others alphabetically
             columns = ['id'] if 'id' in table.columns else []
             columns.extend(sorted([c.name for c in table.columns if c.name != 'id']))
