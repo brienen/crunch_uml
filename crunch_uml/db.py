@@ -4,6 +4,23 @@ from sqlalchemy.orm import relationship, sessionmaker
 
 import crunch_uml.const as const
 
+
+def add_args(argumentparser):
+    argumentparser.add_argument(
+        '-db_noorph',
+        '--database_no_orphans',
+        action='store_true',
+        help='Do not create orphan classes when relations point to classes that ar enot found in the imported file.',
+    )
+    argumentparser.add_argument(
+        '-db_create',
+        '--database_create_new',
+        action='store_true',
+        help='maak altijd een nieuwe database aan',
+        default=True,
+    )
+
+
 Base = sqlalchemy.orm.declarative_base()  # type: ignore
 
 
@@ -63,9 +80,7 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
     superclasses = relationship(
         "Generalization", back_populates="superclass", foreign_keys='Generalization.superclass_id'
     )
-    subclasses = relationship(
-        "Generalization", back_populates="subclass", foreign_keys='Generalization.subclass_id'
-    )
+    subclasses = relationship("Generalization", back_populates="subclass", foreign_keys='Generalization.subclass_id')
 
 
 class Attribute(Base, UML_Generic):  # type: ignore
@@ -115,6 +130,7 @@ class Association(Base, UML_Generic):  # type: ignore
     dst_multiplicity = Column(String)
     dst_documentation = Column(Text)
 
+
 class Generalization(Base, UML_Generic):  # type: ignore
     __tablename__ = 'generalizations'
 
@@ -126,8 +142,6 @@ class Generalization(Base, UML_Generic):  # type: ignore
         String, ForeignKey('classes.id', deferrable=True, name='fk_sub_class'), index=True, nullable=False
     )
     subclass = relationship("Class", back_populates="subclasses", foreign_keys='Generalization.subclass_id')
-
-
 
 
 class Database:
