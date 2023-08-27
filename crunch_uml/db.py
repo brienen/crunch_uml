@@ -44,8 +44,6 @@ class BaseModel:
 
 
 Base = declarative_base(cls=BaseModel)
-# Base = sqlalchemy.orm.declarative_base()  # type: ignore
-
 
 # Model definitions
 class UML_Generic:
@@ -53,9 +51,14 @@ class UML_Generic:
     name = Column(String)
     descr = Column(Text)
 
+    # Return all attributes, but without relations 
     def to_dict(self):
-        return {column.key: getattr(self, column.key) for column in inspect(self.__class__).attrs}
+        return {column.key: getattr(self, column.key) for column in inspect(self.__class__).attrs if not isinstance(column, RelationshipProperty)}
     
+    # Return all attributes, relations only
+    def to_dict_rel(self):
+        return {column.key: getattr(self, column.key) for column in inspect(self.__class__).attrs if isinstance(column, RelationshipProperty)}
+
     def __repr__(self):
         clsname = type(self).__name__.split('.')[-1]
         return f'{clsname}: "{self.name}"'
