@@ -1,0 +1,45 @@
+{
+    "packages": [
+        {
+            "parent_package_id": null,
+            "author": "Arjen Brienen",
+            "version": "1.0",
+            "phase": "1.0",
+            "status": "Proposed",
+            "created": "2019-07-03 14:46:07",
+            "modified": "2019-07-03 14:46:07",
+            "stereotype": null,
+            "uri": null,
+            "visibility": null,
+            "alias": null,
+            "id": "EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E",
+            "name": "Erfgoed: Monumenten ",
+            "descr": "Hallo Test"
+        }
+    ],
+    "classes": [
+        {
+            "package_id": "EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466",
+            "author": "Arjen Brienen",
+            "version": "1.0",
+            "phase": "1.0",
+            "status": "Proposed",
+            "created": "2019-07-03 15:42:28",
+            "modified": "2022-12-12 16:28:22",
+            "stereotype": null,
+            "uri": null,
+            "visibility": null,
+            "alias": null,
+            "id": "EAID_54944273_F312_44b2_A78D_43488F915429",
+            "name": "Ambacht",
+            "descr": "Beroep waarbij een handwerker met gereedschap eindproducten maakt.",
+            "archimate_type": "Business object",
+            "bron": null,
+            "datum_tijd_export": "28062023-11:06:06",
+            "domein_dcat": null,
+            "domein_gemma": "nan",
+            "gemma_guid": "id-54944273-f312-44b2-a78d-43488f915429",
+            "synoniemen": null,
+            "toelichting": "Hallo Test"
+        }   ]
+}

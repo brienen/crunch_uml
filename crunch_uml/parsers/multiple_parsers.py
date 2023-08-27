@@ -1,5 +1,7 @@
 import json
 import logging
+import pandas as pd
+import os
 
 from crunch_uml import db
 from crunch_uml.parsers.parser import Parser, ParserRegistry
@@ -55,3 +57,55 @@ class JSONParser(Parser):
             logger.error(msg)
             raise Exception(msg) from ex
         logger.info(f"Ended parsing JSON file {args.inputfile} with success")
+
+
+@ParserRegistry.register("xlsx")
+class XLXSParser(Parser):
+    def parse(self, args, database: db.Database):
+        # sourcery skip: raise-specific-error
+        logger.info(f"Starting parsing Excel file {args.inputfile}")
+
+        try:
+            # Lees het Excel-bestand
+            xls = pd.ExcelFile(args.inputfile)
+
+            # Loop door elk tabblad in het Excel-bestand
+            for sheet_name in xls.sheet_names:
+                # Lees de gegevens van het huidige tabblad als een lijst van woordenboeken
+                records = xls.parse(sheet_name).to_dict(orient='records')
+
+                for record in records:
+                    store_data(sheet_name, record, database)
+
+        except Exception as ex:
+            msg = f"Error while parsing the Excel file {args.inputfile}: {str(ex)}"
+            logger.error(msg)
+            raise Exception(msg) from ex
+
+        logger.info(f"Ended parsing Excel file {args.inputfile} with success")
+
+
+@ParserRegistry.register("csv")
+class CSVParser(Parser):
+    def parse(self, args, database: db.Database):
+        logger.info(f"Starting parsing CSV file {args.inputfile}")
+
+        try:
+            # Haal de entiteitsnaam uit de bestandsnaam (verwijder het .csv-deel)
+            entity_name = os.path.splitext(os.path.basename(args.inputfile))[0]
+
+            # Lees het CSV-bestand in een dataframe
+            df = pd.read_csv(args.inputfile)
+
+            # Converteer het dataframe naar een lijst van woordenboeken (records)
+            records = df.to_dict(orient='records')
+
+            for record in records:
+                store_data(entity_name, record, database)
+
+        except Exception as ex:
+            msg = f"Error while parsing the CSV file {args.inputfile}: {str(ex)}"
+            logger.error(msg)
+            raise Exception(msg) from ex
+
+        logger.info(f"Ended parsing CSV file {args.inputfile} with success")

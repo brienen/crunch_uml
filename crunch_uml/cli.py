@@ -8,8 +8,7 @@ import crunch_uml.parsers.parser as parsers
 import crunch_uml.renderers.renderer as renderers
 from crunch_uml.db import Database
 from crunch_uml.parsers.eaxmiparser import EAXMIParser  # noqa: F401
-from crunch_uml.parsers.jsonparser import JSONParser  # noqa: F401
-from crunch_uml.parsers.xlsxparser import XLSXParser  # noqa: F401
+from crunch_uml.parsers.multiple_parsers import JSONParser, XLXSParser, CSVParser # noqa: F401
 from crunch_uml.parsers.xmiparser import XMIParser  # noqa: F401
 from crunch_uml.renderers.pandasrenderer import CSVRenderer  # noqa: F401
 from crunch_uml.renderers.pandasrenderer import JSONRenderer  # noqa: F401
@@ -65,7 +64,7 @@ def main(args=None):
             logger.info("No outputtype provided rendering is skipped")
 
     except Exception as ex:
-        logger.error(f"Error while parsing file and writing data tot database with message: {ex}")
+        logger.error(f"Error while parsing file, writing data to database or rendering fle with message: {ex}. Aborting and descarding all changes to datbase.")
         database.rollback()
         raise
     finally:

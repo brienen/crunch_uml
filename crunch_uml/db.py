@@ -16,7 +16,7 @@ def add_args(argumentparser):
         '--database_create_new',
         action='store_true',
         help='maak altijd een nieuwe database aan',
-        default=True,
+        default=False,
     )
 
 

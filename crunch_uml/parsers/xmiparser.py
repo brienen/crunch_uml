@@ -115,7 +115,7 @@ class XMIParser(Parser):
                         clsid = str(uuid.uuid4())
                         msg = (
                             f"Association '{association.name}' with {association.id} only has information on one edge:"
-                            f" generating placeholder edge with uudi {clsid}."
+                            f" generating placeholder class with uudi {clsid}."
                         )
                         logger.warning(msg)
 
