@@ -38,6 +38,7 @@ def getPackages(args, database):
 class Jinja2Renderer(Renderer):
     templatedir = None
     template = None
+    enforce_output_root_packagen_ids = False
 
     def getTemplateAndDir(self, args):  # sourcery skip: raise-specific-error
         # get templatedir to be used
@@ -77,6 +78,12 @@ class Jinja2Renderer(Renderer):
         file_loader = FileSystemLoader(templatedir)
         env = Environment(loader=file_loader)
 
+        # Check to see if a list of Package ids is provided
+        if self.enforce_output_root_packagen_ids and args.output_root_packagen_ids is None:
+            msg = "Usage of parameter --output_root_packagen_ids is enforced for this renderer. Not provided, exiting."
+            logger.error(msg)
+            raise Exception(msg) 
+
         # Get list of packages that are to be rendered
         packages = getPackages(args, database)
         if len(packages) is None:
@@ -98,4 +105,5 @@ class Jinja2Renderer(Renderer):
 @RendererRegistry.register("ggm_md")
 class GGM_MDRenderer(Jinja2Renderer):
     template = 'ggm_markdown.j2'
+    enforce_output_root_packagen_ids = True # Enforce list of Package ids
 
