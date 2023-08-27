@@ -1,6 +1,7 @@
 import argparse
 import logging
 import sys
+import os
 
 import crunch_uml.const as const
 import crunch_uml.db as db
@@ -39,6 +40,10 @@ def main(args=None):
         logger.setLevel(logging.DEBUG)
     elif args.verbose:
         logger.setLevel(logging.INFO)
+
+    if args.inputfile is not None and not os.path.exists(args.inputfile):
+        logger.error(f"Inputfile with {args.inputfile} does not exist, stopping.")
+        return
 
     database = Database(const.DATABASE_URL, db_create=args.database_create_new)
     try:
