@@ -44,6 +44,19 @@
             ]
         },
         {
+            "name": "Import GGM",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-it", "eaxmi",
+                "-if", "./test/data/Gemeentelijk Gegevensmodel.xml",
+                "-db_create"
+            ]
+        },
+        {
             "name": "Import GGM Monumenten",
             "type": "python",
             "request": "launch",
@@ -67,6 +80,15 @@
                 "-of", "./test/output/GGM.md",
                 "--output_root_packagen_ids", "EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E, EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E"
             ]
+        },
+        {
+            "name": "Import Only Test Alle relaties",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["-if", "./test/data/AlleRelatieSitiuaties.xml", "-it", "xmi", "-db_create"]
         }
     ]
 }

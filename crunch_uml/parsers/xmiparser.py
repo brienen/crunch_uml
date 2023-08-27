@@ -131,21 +131,36 @@ class XMIParser(Parser):
                         getval = lambda x, endpoint: (  # noqa
                             endpoint.xpath(f'./{x}')[0].get('value') if len(endpoint.xpath(f'./{x}')) else None  # noqa
                         )  # noqa
-                        clsid = endpoint.xpath('./type')[0].get('{' + ns['xmi'] + '}idref')
-                        cls = database.get_class(clsid)
-                        if cls is None:
-                            clazz = db.Class(id=clsid, name='<Orphan Class>')
-                            database.save(clazz)
-                        if 'src' in id:
-                            association.src_class_id = clsid  # type: ignore
-                            association.src_mult_start = getval('lowerValue', endpoint)
-                            association.src_mult_end = getval('upperValue', endpoint)
+                        typenode = endpoint.xpath('./type')
+                        if len(typenode) == 0:
+                            clsid = str(uuid.uuid4())
+                            msg = (
+                                f"Association '{association.name}' with {association.id} only has information on one edge:"
+                                f" generating placeholder class with uudi {clsid}."
+                            )
+                            logger.warning(msg)
+                            cls = db.Class(id=clsid, name='<Orphan Class>', descr=msg)
+                            database.save(cls)
+                            if 'src' in id:
+                                association.src_class_id = clsid  # type: ignore
+                            else:
+                                association.dst_class_id = clsid  # type: ignore
                         else:
-                            association.dst_class_id = clsid  # type: ignore
-                            association.dst_mult_start = getval('lowerValue', endpoint)
-                            association.dst_mult_end = getval('upperValue', endpoint)
+                            clsid = endpoint.xpath('./type')[0].get('{' + ns['xmi'] + '}idref')
+                            cls = database.get_class(clsid)
+                            if cls is None:
+                                clazz = db.Class(id=clsid, name='<Orphan Class>')
+                                database.save(clazz)
+                            if 'src' in id:
+                                association.src_class_id = clsid  # type: ignore
+                                association.src_mult_start = getval('lowerValue', endpoint)
+                                association.src_mult_end = getval('upperValue', endpoint)
+                            else:
+                                association.dst_class_id = clsid  # type: ignore
+                                association.dst_mult_start = getval('lowerValue', endpoint)
+                                association.dst_mult_end = getval('upperValue', endpoint)
                     else:
-                        err = f"Association {association.name} with {association.id} has more than wto endpoints. panic"
+                        err = f"Association {association.name} with {association.id} has more than two endpoints. panic"
                         logger.error(err)
                         raise Exception(err)
 
