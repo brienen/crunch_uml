@@ -33,14 +33,7 @@ class XLSXRenderer(Renderer):
                 ws.cell(row=1, column=col_num, value=column)
 
             # Model class associated with the table
-            model = next(
-                (
-                    cls
-                    for cls in base.registry._class_registry.values()
-                    if hasattr(cls, '__table__') and cls.__table__ == table
-                ),
-                None,
-            )
+            model = base.model_lookup_by_table_name(table_name)
 
             if model:  # Ensure there's an associated model class
                 # Data

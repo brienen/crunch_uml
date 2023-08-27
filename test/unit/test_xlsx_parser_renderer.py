@@ -1,13 +1,15 @@
 import os
+
 import pandas as pd
 
 from crunch_uml import cli, const, db
+
 
 def are_excel_files_equal(file1_path, file2_path):
     # Laad de Excel-bestanden
     xls1 = pd.ExcelFile(file1_path)
     xls2 = pd.ExcelFile(file2_path)
-    
+
     # Krijg de namen van alle tabbladen in elk bestand
     file1_sheets = xls1.sheet_names
     file2_sheets = xls2.sheet_names
@@ -20,14 +22,13 @@ def are_excel_files_equal(file1_path, file2_path):
     for sheet in file1_sheets:
         df1 = xls1.parse(sheet)
         df2 = xls2.parse(sheet)
-        
+
         # Pandas heeft een handige methode 'equals' om dataframes te vergelijken
         if not df1.equals(df2):
             return False
 
     # Als alle tabbladen hetzelfde zijn
     return True
-
 
 
 def test_xlsx_parser_renderer():
@@ -81,5 +82,3 @@ def test_json_parser_and_changes():
 
     # Zoek alle voorkomens van het type Generalization waar descr de waarde "Test" heeft
     assert database.get_session().query(db.Generalization).filter(db.Generalization.descr == "Test Descr").count() == 4
-
-

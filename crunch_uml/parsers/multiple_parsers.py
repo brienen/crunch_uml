@@ -1,7 +1,8 @@
 import json
 import logging
-import pandas as pd
 import os
+
+import pandas as pd
 
 from crunch_uml import db
 from crunch_uml.parsers.parser import Parser, ParserRegistry

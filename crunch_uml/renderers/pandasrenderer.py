@@ -25,18 +25,11 @@ class JSONRenderer(Renderer):
 
         for table_name, table in models.items():
             # Model class associated with the table
-            model = next(
-                (
-                    cls
-                    for cls in base.registry._class_registry.values()
-                    if hasattr(cls, '__table__') and cls.__table__ == table
-                ),
-                None,
-            )
+            model = base.model_lookup_by_table_name(table_name)
+
             # Retrieve data
             records = session.query(model).all()
             df = pd.DataFrame([object_as_dict(record) for record in records])
-
             all_data[table_name] = df.to_dict(orient='records')
 
         with open(args.outputfile, "w") as json_file:
@@ -55,14 +48,8 @@ class CSVRenderer(Renderer):
 
         for table_name, table in models.items():
             # Model class associated with the table
-            model = next(
-                (
-                    cls
-                    for cls in base.registry._class_registry.values()
-                    if hasattr(cls, '__table__') and cls.__table__ == table
-                ),
-                None,
-            )
+            model = base.model_lookup_by_table_name(table_name)
+
             # Retrieve data
             records = session.query(model).all()
             df = pd.DataFrame([object_as_dict(record) for record in records])

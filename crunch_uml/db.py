@@ -5,18 +5,28 @@ import crunch_uml.const as const
 
 
 def add_args(argumentparser):
-    argumentparser.add_argument(
-        '-db_noorph',
-        '--database_no_orphans',
-        action='store_true',
-        help='Do not create orphan classes when relations point to classes that ar enot found in the imported file.',
-    )
+    # argumentparser.add_argument(
+    #    '-db_noorph',
+    #    '--database_no_orphans',
+    #    action='store_true',
+    #    help='Do not create orphan classes when relations point to classes that are not found in the imported file.',
+    # )
     argumentparser.add_argument(
         '-db_create',
         '--database_create_new',
         action='store_true',
-        help='maak altijd een nieuwe database aan',
+        help='Create a new database and discard existing one.',
         default=False,
+    )
+    argumentparser.add_argument(
+        '-db_url',
+        '--database_url',
+        type=str,
+        help=(
+            "URL of the crunch_uml database. Can be any SQLAlchemy (https://docs.sqlalchemy.org/en/20/dialects/)"
+            f" supported database. Default is {const.DATABASE_URL}"
+        ),
+        default=const.DATABASE_URL,
     )
 
 

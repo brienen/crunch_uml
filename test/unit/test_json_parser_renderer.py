@@ -72,9 +72,6 @@ def test_json_parser_and_changes():
     package = database.get_package('EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E')
     assert package.descr == 'Hallo Test'
 
-    # Check if other things are unchanged 
+    # Check if other things are unchanged
     clazz = database.get_class('EAID_9775E778_DBF8_4122_94CE_551466B62F46')
     assert clazz.name == '<Orphan Class>'
-
-
-
