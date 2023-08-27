@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, String, Text, create_engine
+from sqlalchemy import Column, ForeignKey, String, Text, create_engine, inspect
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker, class_mapper
 from sqlalchemy.orm.relationships import RelationshipProperty
 
@@ -54,23 +54,11 @@ class UML_Generic:
     descr = Column(Text)
 
     def to_dict(self):
-        return {column.key: getattr(self, column.key)
-                for column in class_mapper(self.__class__).mapped_table.c}
+        return {column.key: getattr(self, column.key) for column in inspect(self.__class__).attrs}
     
     def __repr__(self):
         clsname = type(self).__name__.split('.')[-1]
         return f'{clsname}: "{self.name}"'
-
-    def to_dict_inclrel(self):  # sourcery skip: dict-comprehension
-        data = {}
-        for column in self.__table__.columns:
-            data[column.name] = getattr(self, column.name)
-
-        for attr, value in self.__dict__.items():
-            if isinstance(getattr(type(self), attr, None), RelationshipProperty):
-                data[attr] = value
-
-        return data
 
 
 class UMLBase(UML_Generic):

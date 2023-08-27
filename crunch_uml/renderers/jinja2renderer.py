@@ -22,6 +22,9 @@ def getPackages(args, database):
     #        logger.warning(f"Could not find any packages to render with list {args.output_root_package_names}")
     if args.output_root_packagen_ids is not None:
         packageids = args.output_root_packagen_ids.split(',')
+
+        # Strip whitespaces
+        packageids = [elem.strip() for elem in packageids] 
         lst = database.get_session().query(Package).filter(Package.id.in_(packageids)).all()
         if len(lst) == 0:
             logger.warning(f"Could not find any packages to render with list {args.output_root_packagen_ids}")

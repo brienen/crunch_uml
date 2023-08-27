@@ -28,7 +28,7 @@
             ]
         },
         {
-            "name": "Export GGM MD",
+            "name": "Import Onderwijs Export MD",
             "type": "python",
             "request": "launch",
             "program": "./crunch_uml/cli.py",
@@ -36,11 +36,36 @@
             "justMyCode": true,
             "args": [
                 "-it", "eaxmi",
-                "-if", "./test/data/GGM_Monumenten_EA2.1.xml",
+                "-if", "./test/data/GGM_Onderwijs_XMI.2.1.xml",
                 "-ot", "ggm_md",
-                "-of", "./test/output/Monumenten.md",
+                "-of", "./test/output/GGM.md",
                 "-db_create",
-                "--output_root_packagen_ids", "EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466"
+                "--output_root_packagen_ids", "EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E"
+            ]
+        },
+        {
+            "name": "Import GGM Monumenten",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-it", "eaxmi",
+                "-if", "./test/data/GGM_Monumenten_EA2.1.xml"
+            ]
+        },
+        {
+            "name": "Export Only GGM",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-ot", "ggm_md",
+                "-of", "./test/output/GGM.md",
+                "--output_root_packagen_ids", "EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E, EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E"
             ]
         }
     ]
