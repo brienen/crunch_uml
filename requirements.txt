@@ -4,3 +4,4 @@ lxml-stubs
 openpyxl
 types-openpyxl
 pandas
+jinja2

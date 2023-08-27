@@ -1,5 +1,6 @@
 from sqlalchemy import Column, ForeignKey, String, Text, create_engine
-from sqlalchemy.orm import declarative_base, relationship, sessionmaker
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker, class_mapper
+from sqlalchemy.orm.relationships import RelationshipProperty
 
 import crunch_uml.const as const
 
@@ -51,6 +52,25 @@ class UML_Generic:
     id = Column(String, primary_key=True)  # Store the XMI id separately
     name = Column(String)
     descr = Column(Text)
+
+    def to_dict(self):
+        return {column.key: getattr(self, column.key)
+                for column in class_mapper(self.__class__).mapped_table.c}
+    
+    def __repr__(self):
+        clsname = type(self).__name__.split('.')[-1]
+        return f'{clsname}: "{self.name}"'
+
+    def to_dict_inclrel(self):  # sourcery skip: dict-comprehension
+        data = {}
+        for column in self.__table__.columns:
+            data[column.name] = getattr(self, column.name)
+
+        for attr, value in self.__dict__.items():
+            if isinstance(getattr(type(self), attr, None), RelationshipProperty):
+                data[attr] = value
+
+        return data
 
 
 class UMLBase(UML_Generic):
@@ -115,6 +135,16 @@ class Attribute(Base, UML_Generic):  # type: ignore
     enumeration = relationship("Enumeratie", lazy='joined')
     type_class_id = Column(String, ForeignKey('classes.id', deferrable=True), index=True)
     type_class = relationship("Class", foreign_keys='Attribute.type_class_id')
+
+    def getDatatype(self):
+        if self.primitive is not None:
+            return self.primitive
+        elif self.enumeration is not None:
+            return self.enumeration
+        elif self.type_class is not None:
+            return self.type_class
+        else:
+            return None
 
 
 class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore

@@ -12,14 +12,17 @@ class RendererRegistry(Registry):
 
 
 def add_args(argumentparser):
-    argumentparser.add_argument('-of', '--outputfile', type=str, help="Path to the outputfile file")
+    argumentparser.add_argument('-of', '--outputfile', type=str, help="Outputfile")
     argumentparser.add_argument(
         '-ot',
         '--outputtype',
         type=str,
-        # action='store_true',
         help=f'geeft outtype aan: {RendererRegistry.entries()}.',
     )
+    #argumentparser.add_argument('-orpn', '--output_root_package_names', type=str, help='List of package names separated by comma')
+    argumentparser.add_argument('-orpi', '--output_root_packagen_ids', type=str, help='List of package ids separated by comma')
+    argumentparser.add_argument('-ojtd', '--output_jinja2_templatedir', type=str, help='Jinja2 template directory')
+    argumentparser.add_argument('-ojt', '--output_jinja2_template', type=str, help='Jinja2 template')
 
 
 class Renderer(ABC):

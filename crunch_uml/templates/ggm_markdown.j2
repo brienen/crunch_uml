@@ -1,0 +1,38 @@
+# {{ package.name }}
+{{ package.descr|default("", true) }}
+
+Het model '{{ package.name }}' kent de volgende objecttypen:
+{% for class in package.classes %}* **{{ class.name }}**: {{ class.descr|default("<Geen Definities>", true)  }}
+{% endfor %}
+
+Het model '{{ package.name }}' heeft de volgende kenmerken:
+| Kenmerk | Waarde |
+| :--- | :------ |
+{% for name, value in package.to_dict().items() %}| {{ name }} | {{ value|default("", true) }} |
+{% endfor %}
+
+{% for class in package.classes %}
+## Objecttype: {{ class.name }}
+{{ class.descr }}
+
+Het objecttype {{ class.name }} kent de volgende attributen:
+{% for attribute in class.attributes %}{% if attribute.name is not none %}* **{{ attribute.name }}**: {{ attribute.descr|default("<Geen Definities>", true)  }}{% endif %}
+{% endfor %}
+
+Het objecttype {{ class.name }} heeft de volgende kenmerken:
+
+| Kenmerk | Waarde |
+| :--- | :------ |
+{% for name, value in class.to_dict().items() %}| {{ name }} | {{ value|default("", true) }} |
+{% endfor %}
+
+### Attributen 
+
+Het objecttype {{ class.name }} heeft de volgende attributen:
+
+| Attribute | Datatype | Description |
+| :--- | :--- | :--- |
+{% for attribute in class.attributes %}{% if attribute.name is not none %}| {{ attribute.name }} | {{ attribute.getDatatype()|default("", true) }} | {{ attribute.descr|default("", true) }} |{% endif %}
+{% endfor %}
+
+{% endfor %}

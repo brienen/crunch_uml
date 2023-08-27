@@ -23,7 +23,24 @@
                 "-it", "eaxmi",
                 "-if", "./test/data/RelationTest.xml",
                 "-ot", "json",
-                "-of", "./test.json"
+                "-of", "./test/output/RelationTest.json",
+                "-db_create"
+            ]
+        },
+        {
+            "name": "Export GGM MD",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-it", "eaxmi",
+                "-if", "./test/data/GGM_Monumenten_EA2.1.xml",
+                "-ot", "ggm_md",
+                "-of", "./test/output/Monumenten.md",
+                "-db_create",
+                "--output_root_packagen_ids", "EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466"
             ]
         }
     ]
