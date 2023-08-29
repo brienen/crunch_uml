@@ -20,7 +20,8 @@ def add_args(argumentparser):
         help=f'geeft outtype aan: {RendererRegistry.entries()}.',
     )
     #argumentparser.add_argument('-orpn', '--output_root_package_names', type=str, help='List of package names separated by comma')
-    argumentparser.add_argument('-orpi', '--output_root_packagen_ids', type=str, help='List of package ids separated by comma')
+    argumentparser.add_argument('-opi', '--output_package_ids', type=str, help='List of package ids separated by comma')
+    argumentparser.add_argument('-oxpi', '--output_exclude_package_ids', type=str, help='List of package ids to be excluded from output separated by comma')
     argumentparser.add_argument('-ojtd', '--output_jinja2_templatedir', type=str, help='Jinja2 template directory')
     argumentparser.add_argument('-ojt', '--output_jinja2_template', type=str, help='Jinja2 template')
 

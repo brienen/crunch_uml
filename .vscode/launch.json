@@ -40,7 +40,7 @@
                 "-ot", "ggm_md",
                 "-of", "./test/output/GGM.md",
                 "-db_create",
-                "--output_root_packagen_ids", "EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E"
+                "--output_package_ids", "EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E"
             ]
         },
         {
@@ -53,7 +53,8 @@
             "args": [
                 "-it", "eaxmi",
                 "-if", "./test/data/Gemeentelijk Gegevensmodel.xml",
-                "-db_create"
+                "-db_create",
+                "--skip_xmi_relations"
             ]
         },
         {
@@ -78,7 +79,7 @@
             "args": [
                 "-ot", "ggm_md",
                 "-of", "./test/output/GGM.md",
-                "--output_root_packagen_ids", "EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E, EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E"
+                "--output_package_ids", "EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E, EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E"
             ]
         },
         {

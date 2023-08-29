@@ -20,6 +20,7 @@ def add_args(argumentparser):
         # action='store_true',
         help=f'geeft inputtype aan: {ParserRegistry.entries()}.',
     )
+    argumentparser.add_argument('--skip_xmi_relations', default=False, action='store_true', help="Skip parsing relations for XMI files only)")
 
 
 def fixtag(tag):

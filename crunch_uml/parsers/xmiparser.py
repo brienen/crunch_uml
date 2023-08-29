@@ -245,7 +245,8 @@ class XMIParser(Parser):
         if root is not None:
             model = root.xpath('//uml:Model[@xmi:type="uml:Model"][1]', namespaces=ns)[0]  # type: ignore
             self.phase1_process_packages_classes(model, ns, database)
-            self.phase2_process_connectors(model, ns, database)
+            if not args.skip_xmi_relations:
+                self.phase2_process_connectors(model, ns, database)
             self.phase3_process_extra(root, ns, database)
         else:
             logger.warning('No content was read from XMI-file')

@@ -12,33 +12,31 @@ from crunch_uml.db import Package
 logger = logging.getLogger()
 
 
-def getPackages(args, database):
-    lst = []
-    # Get a list of package from args
-    #if args.output_root_package_names is not None:
-    #    packagenames = args.output_root_package_names.split(',')
-    #    lst = database.get_session().query(Package).filter(Package.name.in_(packagenames)).all()
-    #    if len(lst) == 0:
-    #        logger.warning(f"Could not find any packages to render with list {args.output_root_package_names}")
-    if args.output_root_packagen_ids is not None:
-        packageids = args.output_root_packagen_ids.split(',')
-
-        # Strip whitespaces
-        packageids = [elem.strip() for elem in packageids] 
-        lst = database.get_session().query(Package).filter(Package.id.in_(packageids)).all()
-        if len(lst) == 0:
-            logger.warning(f"Could not find any packages to render with list {args.output_root_packagen_ids}")
-    else:
-        lst = database.get_session().query(Package).filter(Package.parent_package_id.is_(None)).all()
-        if len(lst) == 0:
-            logger.warning("Could not find any root packages to render")
-    return lst
 
 @RendererRegistry.register("jinja2")
 class Jinja2Renderer(Renderer):
     templatedir = None
     template = None
-    enforce_output_root_packagen_ids = False
+    enforce_output_package_ids = False
+
+
+    def getPackages(self, args, database):
+        lst = []
+        if args.output_package_ids is not None:
+
+            # Get package_ids to include
+            packageids = args.output_package_ids.split(',')
+            packageids = [elem.strip() for elem in packageids] 
+
+            lst = database.get_session().query(Package).filter(Package.id.in_(packageids)).all()
+            if len(lst) == 0:
+                logger.warning(f"Could not find any packages to render with list {args.output_package_ids}")
+        else:
+            lst = database.get_session().query(Package).filter(Package.parent_package_id.is_(None)).all()
+            if len(lst) == 0:
+                logger.warning("Could not find any root packages to render")
+        return lst
+
 
     def getTemplateAndDir(self, args):  # sourcery skip: raise-specific-error
         # get templatedir to be used
@@ -79,13 +77,13 @@ class Jinja2Renderer(Renderer):
         env = Environment(loader=file_loader)
 
         # Check to see if a list of Package ids is provided
-        if self.enforce_output_root_packagen_ids and args.output_root_packagen_ids is None:
-            msg = "Usage of parameter --output_root_packagen_ids is enforced for this renderer. Not provided, exiting."
+        if self.enforce_output_package_ids and args.output_package_ids is None:
+            msg = "Usage of parameter --output_package_ids is enforced for this renderer. Not provided, exiting."
             logger.error(msg)
             raise Exception(msg) 
 
         # Get list of packages that are to be rendered
-        packages = getPackages(args, database)
+        packages = self.getPackages(args, database)
         if len(packages) is None:
             msg = "Cannot render output: packages do not exist"
             logger.error(msg)
@@ -105,5 +103,5 @@ class Jinja2Renderer(Renderer):
 @RendererRegistry.register("ggm_md")
 class GGM_MDRenderer(Jinja2Renderer):
     template = 'ggm_markdown.j2'
-    enforce_output_root_packagen_ids = True # Enforce list of Package ids
+    enforce_output_package_ids = True # Enforce list of Package ids
 

@@ -14,7 +14,7 @@ def test_markdown_monumenten_onderwijs():
 
     test_args = ["-ot", "ggm_md",
                 "-of", f"{dir}GGM.md",
-                "--output_root_packagen_ids", "EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466,EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E"]
+                "--output_package_ids", "EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466,EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E"]
     cli.main(test_args)
 
     monfilename = f'{dir}GGM_Model Monumenten.md'

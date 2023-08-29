@@ -77,20 +77,21 @@ class EAXMIParser(XMIParser):
             idref = clazzref.get('{' + ns['xmi'] + '}idref')
             clazz = database.get_class(idref)
 
-            properties = clazzref.xpath('./properties')[0]
-            if properties is not None:
-                clazz.descr = properties.get('documentation')
-            project = clazzref.xpath('./project')
-            copy_values(project, clazz)
-            stereotype = clazzref.xpath('./stereotype')
-            copy_values(stereotype, clazz)
+            if clazz is not None:
+                properties = clazzref.xpath('./properties')[0]
+                if properties is not None:
+                    clazz.descr = properties.get('documentation')
+                project = clazzref.xpath('./project')
+                copy_values(project, clazz)
+                stereotype = clazzref.xpath('./stereotype')
+                copy_values(stereotype, clazz)
 
-            tags = clazzref.xpath('./tags/tag')
-            for tag in tags:
-                if hasattr(clazz, fixtag(tag.get('name'))):
-                    setattr(clazz, fixtag(tag.get('name')), tag.get('value'))
+                tags = clazzref.xpath('./tags/tag')
+                for tag in tags:
+                    if hasattr(clazz, fixtag(tag.get('name'))):
+                        setattr(clazz, fixtag(tag.get('name')), tag.get('value'))
 
-            database.save(clazz)
+                database.save(clazz)
 
         '''
         Third find all attributes, like
