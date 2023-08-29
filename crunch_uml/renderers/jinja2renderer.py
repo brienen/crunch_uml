@@ -7,7 +7,7 @@ import os
 from crunch_uml import db, const
 from crunch_uml.renderers.renderer import Renderer, RendererRegistry
 from jinja2 import Environment, FileSystemLoader
-from crunch_uml.db import Package
+from crunch_uml.db import Package, Class
 
 logger = logging.getLogger()
 
@@ -15,6 +15,10 @@ logger = logging.getLogger()
 
 @RendererRegistry.register("jinja2")
 class Jinja2Renderer(Renderer):
+    '''
+    Renders all model packages using jinja2 and a template.
+    A model package is a package with at least 1 class inside
+    '''
     templatedir = None
     template = None
     enforce_output_package_ids = False
@@ -22,19 +26,43 @@ class Jinja2Renderer(Renderer):
 
     def getPackages(self, args, database):
         lst = []
+        if args.output_exclude_package_ids is not None:
+            # Get package_ids to include
+            excl_packageids = args.output_exclude_package_ids.split(',')
+            excl_packageids = [elem.strip() for elem in packageids] 
         if args.output_package_ids is not None:
-
             # Get package_ids to include
             packageids = args.output_package_ids.split(',')
             packageids = [elem.strip() for elem in packageids] 
 
-            lst = database.get_session().query(Package).filter(Package.id.in_(packageids)).all()
-            if len(lst) == 0:
-                logger.warning(f"Could not find any packages to render with list {args.output_package_ids}")
+            # subtract exclude list  
+            if args.output_exclude_package_ids:
+                packageids = [pid for pid in packageids if pid not in excl_packageids]
+
+        # Now find packages
+        lst = []
+        if args.output_package_ids is not None: 
+            # If list of p[ackage ids is supplied return query
+            lst = (database.get_session().query(Package)
+                    .join(Class)
+                    .filter(Package.id.in_(packageids))
+                    .distinct()
+                    .all())
+        elif args.output_exclude_package_ids is not None:
+            # If only list of excluded model supplied return query
+            lst = (database.get_session().query(Package)
+                    .join(Class)
+                    .filter(Package.id.notin_(excl_packageids))
+                    .distinct()
+                    .all())
         else:
-            lst = database.get_session().query(Package).filter(Package.parent_package_id.is_(None)).all()
-            if len(lst) == 0:
-                logger.warning("Could not find any root packages to render")
+            # If nothing is supplied return all model packages
+            lst = (database.get_session().query(Package)
+                    .join(Class)
+                    .distinct()
+                    .all())
+        if len(lst) == 0:
+            logger.warning("Could not find any model packages to render ")
         return lst
 
 
@@ -64,6 +92,7 @@ class Jinja2Renderer(Renderer):
         logger.debug(f"Rendering with template {template}")
         return template, templatedir
 
+
     def render(self, args, database: db.Database):
         # setup output filename
         filename, extension = os.path.splitext(args.outputfile)
@@ -76,11 +105,11 @@ class Jinja2Renderer(Renderer):
         file_loader = FileSystemLoader(templatedir)
         env = Environment(loader=file_loader)
 
-        # Check to see if a list of Package ids is provided
-        if self.enforce_output_package_ids and args.output_package_ids is None:
-            msg = "Usage of parameter --output_package_ids is enforced for this renderer. Not provided, exiting."
-            logger.error(msg)
-            raise Exception(msg) 
+        ## Check to see if a list of Package ids is provided
+        #if self.enforce_output_package_ids and args.output_package_ids is None:
+        #    msg = "Usage of parameter --output_package_ids is enforced for this renderer. Not provided, exiting."
+        #    logger.error(msg)
+        #    raise Exception(msg) 
 
         # Get list of packages that are to be rendered
         packages = self.getPackages(args, database)

@@ -78,8 +78,7 @@
             "justMyCode": true,
             "args": [
                 "-ot", "ggm_md",
-                "-of", "./test/output/GGM.md",
-                "--output_package_ids", "EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E, EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E"
+                "-of", "./test/output/def.md"
             ]
         },
         {
