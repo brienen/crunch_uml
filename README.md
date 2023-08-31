@@ -15,41 +15,39 @@ Crunch_UML is a parser for XMI files originating from UML tools such as Enterpri
 
 - Parses entities such as `Package`, `Class`, and `Relation` from an XMI file.
 - Uses SQLAlchemy for database access and manipulation.
-- Configurable logging support.
-- Supports setting the logging level via command line parameters.
-- Singleton Database Design for centralized database manipulation.
+- Imports different input formats
+- Saves all imported data to SQLAlchemy database
+- Supports Upserts to be able to import different datasets, changes to datasets etc.  
+- Exports to different output formats: Excel, JSON, CSV, Jinja2 templating, Markdown
 
 ## Install
 
-```bash
-# Install tool
-pip3 install crunch_uml
-
-# Install locally
-make install
-```
+1. Download the repository and goto root directory
+2. Install packages from requirements.txt
 
 ## Usage
 
-Usage instructions go here.
+You can use the utility with different parameters:
 
 ```bash
-python main.py -f <path_to_xmi_file> [--verbose] [--debug]
+python ./crunch_uml/cli.py [--opties]
 ```
 
-Arguments:
-- `-f, --file` : Specify the XMI file to be parsed.
-- `--verbose` : Set the logging level to INFO.
-- `--debug` : Set the logging level to DEBUG.
+- `-h, --help`: Toont dit hulpmenu en stopt de uitvoering.
+- `-v, --verbose`: Zet logniveau op INFO.
+- `-d, --debug`: Zet logniveau op DEBUG.
+- `-db_create, --database_create_new`: Maak een nieuwe database en verwijder de bestaande.
+- `-db_url DATABASE_URL, --database_url DATABASE_URL`: URL van de crunch_uml-database. Kan elke door [SQLAlchemy](https://docs.sqlalchemy.org/en/20/dialects/) ondersteunde database zijn. Standaard is `sqlite:///crunch_uml.db`.
+- `-if INPUTFILE, --inputfile INPUTFILE`: Pad naar het XMI-bestand.
+- `-it INPUTTYPE, --inputtype INPUTTYPE`: Geeft inputtype aan. Mogelijke waarden: `['xmi', 'eaxmi', 'json', 'xlsx', 'csv']`.
+- `--skip_xmi_relations`: Sla het parsen van relaties over (alleen voor XMI-bestanden).
+- `-of OUTPUTFILE, --outputfile OUTPUTFILE`: Output-bestand.
+- `-ot OUTPUTTYPE, --outputtype OUTPUTTYPE`: Geeft outputtype aan. Mogelijke waarden: `['json', 'csv', 'xlsx', 'jinja2', 'ggm_md']`.
+- `-opi OUTPUT_PACKAGE_IDS, --output_package_ids OUTPUT_PACKAGE_IDS`: Lijst van package ID's gescheiden door komma's.
+- `-oxpi OUTPUT_EXCLUDE_PACKAGE_IDS, --output_exclude_package_ids OUTPUT_EXCLUDE_PACKAGE_IDS`: Lijst van package ID's die uit de uitvoer moeten worden uitgesloten, gescheiden door komma's.
+- `-ojtd OUTPUT_JINJA2_TEMPLATEDIR, --output_jinja2_templatedir OUTPUT_JINJA2_TEMPLATEDIR`: Jinja2 template directory.
+- `-ojt OUTPUT_JINJA2_TEMPLATE, --output_jinja2_template OUTPUT_JINJA2_TEMPLATE`: Jinja2 template.
 
-## Modules
-
-- `main.py` : Main script for parsing and handling command line arguments.
-- `db.py` : Contains the singleton database class and related functions for managing database operations.
-
-## Logging
-
-Logging is implemented with Python's built-in `logging` module. By default, logs are sent to `stderr`. Use `--verbose` for INFO logs and `--debug` for DEBUG logs.
 
 ## Development
 
@@ -61,7 +59,10 @@ make help
 ## Future Improvements
 
 - Expansion to other database backends such as PostgreSQL or MySQL.
-- Provide more granular control over logging, for example specifying log files.
+- Export XMI, Turtle (Linked Data)
+- Develop more Jinja2 templates
+- Perform checking
+- Direct access to repositories (import and export)
 
 ---
 
