@@ -63,7 +63,8 @@
             "justMyCode": true,
             "args": [
                 "-it", "eaxmi",
-                "-if", "./test/data/GGM_Monumenten_EA2.1.xml"
+                "-if", "./test/data/GGM_Monumenten_EA2.1.xml",
+                "-db_create"
             ]
         },
         {

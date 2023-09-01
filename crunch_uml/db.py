@@ -50,6 +50,11 @@ class UML_Generic:
     id = Column(String, primary_key=True)  # Store the XMI id separately
     name = Column(String)
     definitie = Column(Text)
+    bron = Column(String)
+    toelichting = Column(String)
+    created = Column(String)
+    modified = Column(String)
+    stereotype = Column(String)
 
     # Return all attributes, but without relations 
     def to_dict(self):
@@ -69,9 +74,6 @@ class UMLBase(UML_Generic):
     version = Column(String)
     phase = Column(String)
     status = Column(String)
-    created = Column(String)
-    modified = Column(String)
-    stereotype = Column(String)
     uri = Column(String)
     visibility = Column(String)
     alias = Column(String)
@@ -79,13 +81,11 @@ class UMLBase(UML_Generic):
 
 class UMLTags:
     archimate_type = Column(String)
-    bron = Column(String)
     datum_tijd_export = Column(String)
     domein_dcat = Column(String)
     domein_gemma = Column(String)
     gemma_guid = Column(String)
     synoniemen = Column(String)
-    toelichting = Column(String)
 
 
 class Package(Base, UMLBase):  # type: ignore
@@ -114,7 +114,9 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
         "Generalization", back_populates="superclass", foreign_keys='Generalization.superclass_id'
     )
     subclasses = relationship("Generalization", back_populates="subclass", foreign_keys='Generalization.subclass_id')
-
+    indicatie_formele_historie = Column(String)
+    authentiek = Column(String)
+    nullable = Column(String)
 
 class Attribute(Base, UML_Generic):  # type: ignore
     __tablename__ = 'attributes'
