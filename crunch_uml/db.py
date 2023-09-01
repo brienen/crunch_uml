@@ -1,18 +1,19 @@
 from sqlalchemy import Column, ForeignKey, String, Text, create_engine, inspect
-from sqlalchemy.orm import declarative_base, relationship, sessionmaker, class_mapper
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy.orm.relationships import RelationshipProperty
 
 import crunch_uml.const as const
 
 
-def add_args(argumentparser):
+def add_args(argumentparser, subparser_dict):
     # argumentparser.add_argument(
     #    '-db_noorph',
     #    '--database_no_orphans',
     #    action='store_true',
     #    help='Do not create orphan classes when relations point to classes that are not found in the imported file.',
     # )
-    argumentparser.add_argument(
+    import_subparser = subparser_dict.get(const.CMD_IMPORT)
+    import_subparser.add_argument(
         '-db_create',
         '--database_create_new',
         action='store_true',
@@ -45,6 +46,12 @@ class BaseModel:
 
 Base = declarative_base(cls=BaseModel)
 
+
+# Get list of tables defined in schema
+def getTables():
+    return list(Base.metadata.tables.keys())
+
+
 # Model definitions
 class UML_Generic:
     id = Column(String, primary_key=True)  # Store the XMI id separately
@@ -56,13 +63,21 @@ class UML_Generic:
     modified = Column(String)
     stereotype = Column(String)
 
-    # Return all attributes, but without relations 
+    # Return all attributes, but without relations
     def to_dict(self):
-        return {column.key: getattr(self, column.key) for column in inspect(self.__class__).attrs if not isinstance(column, RelationshipProperty)}
-    
+        return {
+            column.key: getattr(self, column.key)
+            for column in inspect(self.__class__).attrs
+            if not isinstance(column, RelationshipProperty)
+        }
+
     # Return all attributes, relations only
     def to_dict_rel(self):
-        return {column.key: getattr(self, column.key) for column in inspect(self.__class__).attrs if isinstance(column, RelationshipProperty)}
+        return {
+            column.key: getattr(self, column.key)
+            for column in inspect(self.__class__).attrs
+            if isinstance(column, RelationshipProperty)
+        }
 
     def __repr__(self):
         clsname = type(self).__name__.split('.')[-1]
@@ -117,6 +132,7 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
     indicatie_formele_historie = Column(String)
     authentiek = Column(String)
     nullable = Column(String)
+
 
 class Attribute(Base, UML_Generic):  # type: ignore
     __tablename__ = 'attributes'
@@ -192,7 +208,7 @@ class Generalization(Base, UML_Generic):  # type: ignore
 class Database:
     _instance = None
 
-    def __new__(cls, db_url=const.DATABASE_URL, db_create=True, db_upsert=False):
+    def __new__(cls, db_url=const.DATABASE_URL, db_create=False, db_upsert=False):
         if cls._instance is None:
             cls._instance = super(Database, cls).__new__(cls)
             # Setting up the database

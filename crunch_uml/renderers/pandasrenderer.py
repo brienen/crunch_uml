@@ -14,7 +14,9 @@ def object_as_dict(obj):
     return {c.key: getattr(obj, c.key) for c in sqlalchemy.inspect(obj).mapper.column_attrs}
 
 
-@RendererRegistry.register("json")
+@RendererRegistry.register(
+    "json", descr='Renders JSON document where each element corresponds to one of the tables in te datamodel.'
+)
 class JSONRenderer(Renderer):
     def render(self, args, database: db.Database):
         # Retrieve all models dynamically
@@ -38,7 +40,9 @@ class JSONRenderer(Renderer):
             json.dump(all_data, json_file, default=str)
 
 
-@RendererRegistry.register("csv")
+@RendererRegistry.register(
+    "csv", descr='Renders multiple CSV files where each file corresponds to one of the tables in the datamodel.'
+)
 class CSVRenderer(Renderer):
     def render(self, args, database: db.Database):
         # Retrieve all models dynamically

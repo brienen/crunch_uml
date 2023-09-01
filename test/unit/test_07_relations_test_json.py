@@ -7,7 +7,12 @@ from crunch_uml import cli
 def test_relations_export_json():
     outputfile = "./test/data/test.json"
 
-    test_args = ["-it", "eaxmi", "-if", "./test/data/RelationTest.xml", "-ot", "json", "-of", outputfile, "-db_create"]
+    # Import Data
+    test_args = ["import", "-f", "./test/data/RelationTest.xml", "-t", "eaxmi", "-db_create"]
+    cli.main(test_args)
+
+    # Export to out file
+    test_args = ["export", "-f", outputfile, "-t", "json"]
     cli.main(test_args)
     assert os.path.exists(outputfile)
 

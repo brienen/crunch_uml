@@ -7,7 +7,9 @@ from crunch_uml.parsers.xmiparser import XMIParser
 logger = logging.getLogger()
 
 
-@ParserRegistry.register("eaxmi")
+@ParserRegistry.register(
+    "eaxmi", descr='XMI-Parser that parses EA (Enterprise Architect) specific extensions. Tested on XMI v2.1 spec '
+)
 class EAXMIParser(XMIParser):
     def phase3_process_extra(self, node, ns, database: db.Database):
         '''

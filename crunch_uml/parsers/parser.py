@@ -1,7 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
 
-from crunch_uml import db
+from crunch_uml import const, db
 from crunch_uml.registry import Registry
 
 logger = logging.getLogger()
@@ -9,18 +9,28 @@ logger = logging.getLogger()
 
 class ParserRegistry(Registry):
     _registry = {}  # type: ignore
+    _descr_registry = {}  # type: ignore
 
 
-def add_args(argumentparser):
-    argumentparser.add_argument('-if', '--inputfile', type=str, help="Path to the XMI file")
-    argumentparser.add_argument(
-        '-it',
+def add_args(argumentparser, subparser_dict):
+    import_subparser = subparser_dict.get(const.CMD_IMPORT)
+    import_subparser.add_argument('-f', '--inputfile', type=str, help="Path to the XMI file", required=True)
+    import_subparser.add_argument(
+        '-t',
         '--inputtype',
         type=str,
-        # action='store_true',
+        required=True,
         help=f'geeft inputtype aan: {ParserRegistry.entries()}.',
     )
-    argumentparser.add_argument('--skip_xmi_relations', default=False, action='store_true', help="Skip parsing relations for XMI files only)")
+    import_subparser.add_argument(
+        '--skip_xmi_relations', default=False, action='store_true', help="Skip parsing relations for XMI files only)"
+    )
+
+    # Set the epilog help text
+    entries = ParserRegistry.entries()
+    items = [f'"{item}": {ParserRegistry.getDescription(item)}' for item in entries]
+    epilog = 'More informaation on the export types that are supported:\n\n' + '\n'.join(items)
+    import_subparser.epilog = epilog
 
 
 def fixtag(tag):

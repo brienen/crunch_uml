@@ -1,6 +1,6 @@
 import logging
-import uuid
 import re
+import uuid
 
 from lxml import etree
 
@@ -10,13 +10,15 @@ from crunch_uml.parsers.parser import Parser, ParserRegistry
 logger = logging.getLogger()
 
 
-
 def remove_EADatatype(input_string):
     pattern = r"^EA[\d\w]+_"
     return re.sub(pattern, '', input_string)
 
 
-@ParserRegistry.register("xmi")
+@ParserRegistry.register(
+    "xmi",
+    descr='XMI-Parser for strict XMI files. No extensions (like EA extensions) are parsed. Tested on XMI v2.1 spec ',
+)
 class XMIParser(Parser):
     # Recursieve functie om de parsetree te doorlopen
     def phase1_process_packages_classes(self, node, ns, database: db.Database, parent_package_id=None):
@@ -55,7 +57,9 @@ class XMIParser(Parser):
                     datatypes = childnode.xpath('./type')
                     if len(datatypes) != 0:
                         datatype = datatypes[0].get('{' + ns['xmi'] + '}idref')
-                        if datatype is not None and not datatype.startswith('EAID_'): # Remove references to other classes
+                        if datatype is not None and not datatype.startswith(
+                            'EAID_'
+                        ):  # Remove references to other classes
                             attribute.primitive = remove_EADatatype(datatype)
                     logger.debug(
                         f'Attribute {attribute.name} met id {attribute.id} ingelezen met inhoud: {vars(attribute)}'
@@ -147,8 +151,8 @@ class XMIParser(Parser):
                         if len(typenode) == 0:
                             clsid = str(uuid.uuid4())
                             msg = (
-                                f"Association '{association.name}' with {association.id} only has information on one edge:"
-                                f" generating placeholder class with uudi {clsid}."
+                                f"Association '{association.name}' with {association.id} only has information on one"
+                                f" edge: generating placeholder class with uudi {clsid}."
                             )
                             logger.warning(msg)
                             cls = db.Class(id=clsid, name='<Orphan Class>', definitie=msg)

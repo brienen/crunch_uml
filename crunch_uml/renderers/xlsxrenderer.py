@@ -8,7 +8,9 @@ from crunch_uml.renderers.renderer import Renderer, RendererRegistry
 logger = logging.getLogger()
 
 
-@RendererRegistry.register("xlsx")
+@RendererRegistry.register(
+    "xlsx", descr='Renders Excel sheet where each tab corresponds to one of the tables in te datamodel.'
+)
 class XLSXRenderer(Renderer):
     def render(self, args, database: db.Database):
         # sourcery skip: use-named-expression

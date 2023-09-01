@@ -31,16 +31,14 @@ def are_excel_files_equal(file1_path, file2_path):
     return True
 
 
-def test_xlsx_parser_renderer():
-    inputfile = "./test/data/Onderwijs.xlsx"
-    outputfile = "./test/output/Onderwijs.xlsx"
+def test_xlsx_parser_renderer():  # sourcery skip: extract-duplicate-method
+    inputfile = "./test/output/Onderwijs_input.xlsx"
+    outputfile = "./test/output/Onderwijs_output.xlsx"
 
-    # import inputfile into clean database and export contents to outputfile
-    test_args = ["-it", "xlsx", "-if", inputfile, "-ot", "xlsx", "-of", outputfile, "-db_create"]
+    # import monumenten into clean database
+    test_args = ["import", "-t", "xmi", "-f", "./test/data/GGM_Onderwijs_XMI.2.1.xml", "-db_create"]
     cli.main(test_args)
-    assert os.path.exists(outputfile)
 
-    # Check if content is correctly loaded
     database = db.Database(const.DATABASE_URL, db_create=False)
     assert database.count_package() == 3
     assert database.count_enumeratie() == 1
@@ -49,6 +47,29 @@ def test_xlsx_parser_renderer():
     assert database.count_enumeratieliteral() == 5
     assert database.count_association() == 24
 
+    # export to xlsx
+    test_args = ["export", "-f", inputfile, "-t", "xlsx"]
+    cli.main(test_args)
+    assert os.path.exists(inputfile)
+
+    # import xlsx to clean database
+    test_args = ["import", "-f", inputfile, "-t", "xlsx", "-db_create"]
+    cli.main(test_args)
+
+    # Check if data is correctly read
+    database = db.Database(const.DATABASE_URL, db_create=False)
+    assert database.count_package() == 3
+    assert database.count_enumeratie() == 1
+    assert database.count_class() == 27
+    assert database.count_attribute() == 16
+    assert database.count_enumeratieliteral() == 5
+    assert database.count_association() == 24
+
+    # export to output xlsx
+    test_args = ["export", "-f", outputfile, "-t", "xlsx"]
+    cli.main(test_args)
+    assert os.path.exists(outputfile)
+
     # Check if the contents of the files are equal
     assert are_excel_files_equal(inputfile, outputfile)
 
@@ -56,16 +77,26 @@ def test_xlsx_parser_renderer():
     os.remove(outputfile)
 
 
-def test_json_parser_and_changes():
+def test_xlsx_parser_and_changes():  # sourcery skip: extract-duplicate-method
     inputfile = "./test/data/Onderwijs.xlsx"
+    inputfile = "./test/output/Onderwijs_input.xlsx"
     changefile = "./test/data/Onderwijs_changes.xlsx"
 
     # import inputfile into clean database
-    test_args = ["-it", "xlsx", "-if", inputfile, "-db_create"]
+    # import xlsx to clean database
+    test_args = ["import", "-f", inputfile, "-t", "xlsx", "-db_create"]
     cli.main(test_args)
 
+    database = db.Database(const.DATABASE_URL, db_create=False)
+    assert database.count_package() == 3
+    assert database.count_enumeratie() == 1
+    assert database.count_class() == 27
+    assert database.count_attribute() == 16
+    assert database.count_enumeratieliteral() == 5
+    assert database.count_association() == 24
+
     # import changes into database
-    test_args = ["-it", "xlsx", "-if", changefile]
+    test_args = ["import", "-t", "xlsx", "-f", changefile]
     cli.main(test_args)
 
     # Check if content is correctly loaded
@@ -81,4 +112,6 @@ def test_json_parser_and_changes():
     assert database.get_session().query(db.Attribute).filter(db.Attribute.definitie == "Test Descr").count() == 15
 
     # Zoek alle voorkomens van het type Generalization waar definitie de waarde "Test" heeft
-    assert database.get_session().query(db.Generalization).filter(db.Generalization.definitie == "Test Descr").count() == 4
+    assert (
+        database.get_session().query(db.Generalization).filter(db.Generalization.definitie == "Test Descr").count() == 4
+    )

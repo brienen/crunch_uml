@@ -13,31 +13,41 @@
             "justMyCode": true
         },
         {
-            "name": "Export XLSX",
+            "name": "Import Onderwijs",
             "type": "python",
             "request": "launch",
             "program": "./crunch_uml/cli.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": [
-                "-ot", "xlsx",
-                "-of", "./test/output/ggm.xlsx"
+            "args": ["import",
+                "-t", "eaxmi",
+                "-f", "./test/data/GGM_Onderwijs_XMI.2.1.xml",
+                "-db_create"
             ]
         },
         {
-            "name": "Import Onderwijs Export MD",
+            "name": "Import Monumenten",
             "type": "python",
             "request": "launch",
             "program": "./crunch_uml/cli.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": [
-                "-it", "eaxmi",
-                "-if", "./test/data/GGM_Onderwijs_XMI.2.1.xml",
-                "-ot", "ggm_md",
-                "-of", "./test/output/GGM.md",
-                "-db_create",
-                "--output_package_ids", "EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E"
+            "args": ["import",
+                "-t", "eaxmi",
+                "-f", "./test/data/GGM_Monumenten_EA2.1.xml",
+                "-db_create"
+            ]
+        },
+        {
+            "name": "Add Monumenten",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["import",
+                "-t", "eaxmi",
+                "-f", "./test/data/GGM_Monumenten_EA2.1.xml"
             ]
         },
         {
@@ -47,9 +57,9 @@
             "program": "./crunch_uml/cli.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": [
-                "-it", "eaxmi",
-                "-if", "./test/data/Gemeentelijk Gegevensmodel.xml",
+            "args": ["import",
+                "-t", "eaxmi",
+                "-f", "./test/data/Gemeentelijk Gegevensmodel.xml",
                 "-db_create",
                 "--skip_xmi_relations"
             ]
@@ -68,25 +78,52 @@
             ]
         },
         {
-            "name": "Export Only GGM",
+            "name": "Import Alle relatiesituaties",
             "type": "python",
             "request": "launch",
             "program": "./crunch_uml/cli.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": [
-                "-ot", "ggm_md",
-                "-of", "./test/output/def.md"
+            "args": ["import",
+                "-f", "./test/data/AlleRelatieSitiuaties.xml", 
+                "-t", "xmi", 
+                "-db_create"]
+        },
+        {
+            "name": "Export XLSX",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["export",
+                "-t", "xlsx",
+                "-f", "./test/output/ggm.xlsx"
             ]
         },
         {
-            "name": "Import Only Test Alle relaties",
+            "name": "Export JSON",
             "type": "python",
             "request": "launch",
             "program": "./crunch_uml/cli.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["-if", "./test/data/AlleRelatieSitiuaties.xml", "-it", "xmi", "-db_create"]
+            "args": ["export",
+                "-t", "json",
+                "-f", "./test/output/export.json"
+            ]
+        },
+        {
+            "name": "Export Markdown",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["export",
+                "-t", "ggm_md",
+                "-f", "./test/output/def.md"
+            ]
         }
     ]
 }

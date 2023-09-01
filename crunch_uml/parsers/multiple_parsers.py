@@ -40,7 +40,9 @@ def store_data(entity_name, data, database):
         logger.warning(f"Could not save entity with table '{entity_name}' to database: no imakd present: {data}.")
 
 
-@ParserRegistry.register("json")
+@ParserRegistry.register(
+    "json", descr='Generic parser that parses JSON-files, and looks for table and column definitions.'
+)
 class JSONParser(Parser):
     def parse(self, args, database: db.Database):
         logger.info(f"Starting parsing JSON file {args.inputfile}")
@@ -60,7 +62,13 @@ class JSONParser(Parser):
         logger.info(f"Ended parsing JSON file {args.inputfile} with success")
 
 
-@ParserRegistry.register("xlsx")
+@ParserRegistry.register(
+    "xlsx",
+    descr=(
+        'Generic parser that parses Excel files, and excpect one or more worksheets that correspond with the names of'
+        ' one or more of the tables.'
+    ),
+)
 class XLXSParser(Parser):
     def parse(self, args, database: db.Database):
         # sourcery skip: raise-specific-error
@@ -86,7 +94,9 @@ class XLXSParser(Parser):
         logger.info(f"Ended parsing Excel file {args.inputfile} with success")
 
 
-@ParserRegistry.register("csv")
+@ParserRegistry.register(
+    "csv", descr='Generic parser that parses one CSV file, and excpect its name to be in the list of tables.'
+)
 class CSVParser(Parser):
     def parse(self, args, database: db.Database):
         logger.info(f"Starting parsing CSV file {args.inputfile}")

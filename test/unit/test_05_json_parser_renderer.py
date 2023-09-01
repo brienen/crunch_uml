@@ -23,13 +23,13 @@ def are_json_files_equal(file1_path, file2_path):
 
 
 def test_json_parser_renderer():
-    inputfile = "./test/data/Monumenten.json"
-    outputfile = "./test/output/Monumenten.json"
+    # sourcery skip: extract-duplicate-method, move-assign-in-block
+    inputfile = "./test/output/Monumenten_import.json"
+    outputfile = "./test/output/Monumenten_export.json"
 
-    # import inputfile into clean database and export contents to outputfile
-    test_args = ["-it", "json", "-if", inputfile, "-ot", "json", "-of", outputfile, "-db_create"]
+    # import monumenten into clean database
+    test_args = ["import", "-f", "./test/data/GGM_Monumenten_EA2.1.xml", "-t", "eaxmi", "-db_create"]
     cli.main(test_args)
-    assert os.path.exists(outputfile)
 
     # Check if content is correctly loaded
     database = db.Database(const.DATABASE_URL, db_create=False)
@@ -39,6 +39,28 @@ def test_json_parser_renderer():
     assert database.count_attribute() == 40
     assert database.count_enumeratieliteral() == 2
 
+    # export to json
+    test_args = ["export", "-f", inputfile, "-t", "json"]
+    cli.main(test_args)
+    assert os.path.exists(inputfile)
+
+    # import json to clean database
+    test_args = ["import", "-f", inputfile, "-t", "json", "-db_create"]
+    cli.main(test_args)
+
+    # Check if content is correctly loaded
+    database = db.Database(const.DATABASE_URL, db_create=False)
+    assert database.count_package() == 3
+    assert database.count_enumeratie() == 1
+    assert database.count_class() == 10
+    assert database.count_attribute() == 40
+    assert database.count_enumeratieliteral() == 2
+
+    # export to json
+    test_args = ["export", "-f", outputfile, "-t", "json"]
+    cli.main(test_args)
+    assert os.path.exists(outputfile)
+
     # Check if the contents of the files are equal
     assert are_json_files_equal(inputfile, outputfile)
 
@@ -47,15 +69,15 @@ def test_json_parser_renderer():
 
 
 def test_json_parser_and_changes():
-    inputfile = "./test/data/Monumenten.json"
+    inputfile = "./test/output/Monumenten_import.json"
     changefile = "./test/data/Monumenten_changes.json"
 
     # import inputfile into clean database
-    test_args = ["-it", "json", "-if", inputfile, "-db_create"]
+    test_args = ["import", "-f", inputfile, "-t", "json", "-db_create"]
     cli.main(test_args)
 
     # import changes into database
-    test_args = ["-it", "json", "-if", changefile]
+    test_args = ["import", "-t", "json", "-f", changefile]
     cli.main(test_args)
 
     # Check if content is correctly loaded
@@ -75,3 +97,6 @@ def test_json_parser_and_changes():
     # Check if other things are unchanged
     clazz = database.get_class('EAID_9775E778_DBF8_4122_94CE_551466B62F46')
     assert clazz.name == '<Orphan Class>'
+
+    # Cleanup
+    os.remove(inputfile)
