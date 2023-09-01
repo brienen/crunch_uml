@@ -80,7 +80,7 @@ class EAXMIParser(XMIParser):
             if clazz is not None:
                 properties = clazzref.xpath('./properties')[0]
                 if properties is not None:
-                    clazz.descr = properties.get('documentation')
+                    clazz.definitie = properties.get('documentation')
                 project = clazzref.xpath('./project')
                 copy_values(project, clazz)
                 stereotype = clazzref.xpath('./stereotype')
@@ -121,7 +121,7 @@ class EAXMIParser(XMIParser):
                 copy_values(properties, attr)
                 documentation = attrref.xpath('./properties')[0]
                 if documentation is not None:
-                    attr.descr = documentation.get('documentation')
+                    attr.definitie = documentation.get('documentation')
                 stereotype = attrref.xpath('./stereotype')
                 copy_values(stereotype, attr)
 
@@ -139,6 +139,6 @@ class EAXMIParser(XMIParser):
 
                 documentation = connectorref.xpath('./documentation')
                 if len(documentation) == 1:
-                    association.descr = documentation[0].get('value')
+                    association.definitie = documentation[0].get('value')
 
                 database.save(association)

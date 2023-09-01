@@ -1,15 +1,15 @@
 # {{ package.name }}
-{{ package.descr|default("", true) }}
+{{ package.definitie|default("", true) }}
 
 Het model '{{ package.name }}' kent de volgende objecttypen:
 
-{% for class in package.classes %}* **{{ class.name }}**: {{ class.descr|default("<Geen Definities>", true)  }}
+{% for class in package.classes %}* **{{ class.name }}**: {{ class.definitie|default("<Geen Definities>", true)  }}
 {% endfor %}
 
 {% if package.enumerations|length > 0 %}
 Het model '{{ package.name }}' kent de volgende enumeraties:
 
-{% for enumeratie in package.enumerations %}* **{{ enumeratie.name }}**: {{ enumeratie.descr|default("<Geen Definities>", true)  }}
+{% for enumeratie in package.enumerations %}* **{{ enumeratie.name }}**: {{ enumeratie.definitie|default("<Geen Definities>", true)  }}
 {% endfor %}
 {% endif %}
 
@@ -27,11 +27,11 @@ Het model '{{ package.name }}' heeft de volgende kenmerken:
 {# Classes #}
 {% for class in package.classes %}
 ### {{ class.name }}
-{{ class.descr }}
+{{ class.definitie }}
 
 Het objecttype {{ class.name }} kent de volgende attributen:
 
-{% for attribute in class.attributes %}{% if attribute.name is not none %}* **{{ attribute.name }}**: {{ attribute.descr|default("<Geen Definities>", true)  }}{% endif %}
+{% for attribute in class.attributes %}{% if attribute.name is not none %}* **{{ attribute.name }}**: {{ attribute.definitie|default("<Geen Definities>", true)  }}{% endif %}
 {% endfor %}
 
 Het objecttype {{ class.name }} heeft de volgende kenmerken:
@@ -47,7 +47,7 @@ Het objecttype {{ class.name }} heeft de volgende attributen:
 
 | Attribute | Datatype | Description |
 | :--- | :--- | :--- |
-{% for attribute in class.attributes %}{% if attribute.name is not none %}| {{ attribute.name }} | {{ attribute.getDatatype()|default("", true) }} | {{ attribute.descr|default("", true) }} |{% endif %}
+{% for attribute in class.attributes %}{% if attribute.name is not none %}| {{ attribute.name }} | {{ attribute.getDatatype()|default("", true) }} | {{ attribute.definitie|default("", true) }} |{% endif %}
 {% endfor %}
 
 {% endfor %}
@@ -59,11 +59,11 @@ Het objecttype {{ class.name }} heeft de volgende attributen:
 
 {% for enumeration in package.enumerations %}
 ## Enumeratie: {{ enumeration.name }}
-{{ enumeration.descr|default("", true) }}
+{{ enumeration.definitie|default("", true) }}
 
 Het enumeratie {{ enumeration.name }} kent de volgende waarden:
 
-{% for literal in enumeration.literals %}{% if literal.name is not none %}* **{{ literal.name }}**: {{ literal.descr|default("<Geen Definities>", true)  }}{% endif %}
+{% for literal in enumeration.literals %}{% if literal.name is not none %}* **{{ literal.name }}**: {{ literal.definitie|default("<Geen Definities>", true)  }}{% endif %}
 {% endfor %}
 
 ### Kenmerken en waarden

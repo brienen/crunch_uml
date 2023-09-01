@@ -14,7 +14,7 @@
             "alias": null,
             "id": "EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E",
             "name": "Erfgoed: Monumenten ",
-            "descr": "Hallo Test"
+            "definitie": "Hallo Test"
         }
     ],
     "classes": [
@@ -32,7 +32,7 @@
             "alias": null,
             "id": "EAID_54944273_F312_44b2_A78D_43488F915429",
             "name": "Ambacht",
-            "descr": "Beroep waarbij een handwerker met gereedschap eindproducten maakt.",
+            "definitie": "Beroep waarbij een handwerker met gereedschap eindproducten maakt.",
             "archimate_type": "Business object",
             "bron": null,
             "datum_tijd_export": "28062023-11:06:06",

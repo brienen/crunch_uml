@@ -77,8 +77,8 @@ def test_json_parser_and_changes():
     assert database.count_enumeratieliteral() == 5
     assert database.count_association() == 24
 
-    # Zoek alle voorkomens van het type Package waar descr de waarde "Test" heeft
-    assert database.get_session().query(db.Attribute).filter(db.Attribute.descr == "Test Descr").count() == 15
+    # Zoek alle voorkomens van het type Package waar definitie de waarde "Test" heeft
+    assert database.get_session().query(db.Attribute).filter(db.Attribute.definitie == "Test Descr").count() == 15
 
-    # Zoek alle voorkomens van het type Generalization waar descr de waarde "Test" heeft
-    assert database.get_session().query(db.Generalization).filter(db.Generalization.descr == "Test Descr").count() == 4
+    # Zoek alle voorkomens van het type Generalization waar definitie de waarde "Test" heeft
+    assert database.get_session().query(db.Generalization).filter(db.Generalization.definitie == "Test Descr").count() == 4

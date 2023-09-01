@@ -131,7 +131,7 @@ class XMIParser(Parser):
                         )
                         logger.warning(msg)
 
-                        clazz = db.Class(id=clsid, name='<Orphan Class>', descr=msg)
+                        clazz = db.Class(id=clsid, name='<Orphan Class>', definitie=msg)
                         database.save(clazz)
                         if 'src' in id:
                             association.src_class_id = clsid  # type: ignore
@@ -151,7 +151,7 @@ class XMIParser(Parser):
                                 f" generating placeholder class with uudi {clsid}."
                             )
                             logger.warning(msg)
-                            cls = db.Class(id=clsid, name='<Orphan Class>', descr=msg)
+                            cls = db.Class(id=clsid, name='<Orphan Class>', definitie=msg)
                             database.save(cls)
                             if 'src' in id:
                                 association.src_class_id = clsid  # type: ignore

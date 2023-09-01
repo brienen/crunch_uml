@@ -49,7 +49,7 @@ Base = declarative_base(cls=BaseModel)
 class UML_Generic:
     id = Column(String, primary_key=True)  # Store the XMI id separately
     name = Column(String)
-    descr = Column(Text)
+    definitie = Column(Text)
 
     # Return all attributes, but without relations 
     def to_dict(self):

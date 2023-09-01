@@ -15,4 +15,4 @@ def test_import_monumenten():
     clazz = database.get_class('EAID_4AD539EC_A308_43da_B025_17A1647303F3')
     assert clazz.archimate_type == 'Business object'
     assert clazz.gemma_guid == 'id-4ad539ec-a308-43da-b025-17a1647303f3'
-    assert clazz.descr == 'Het bouwen van een bouwwerk.'
+    assert clazz.definitie == 'Het bouwen van een bouwwerk.'
