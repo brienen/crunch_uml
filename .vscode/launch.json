@@ -13,18 +13,15 @@
             "justMyCode": true
         },
         {
-            "name": "Export JSON",
+            "name": "Export XLSX",
             "type": "python",
             "request": "launch",
             "program": "./crunch_uml/cli.py",
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                "-it", "eaxmi",
-                "-if", "./test/data/RelationTest.xml",
-                "-ot", "json",
-                "-of", "./test/output/RelationTest.json",
-                "-db_create"
+                "-ot", "xlsx",
+                "-of", "./test/output/ggm.xlsx"
             ]
         },
         {

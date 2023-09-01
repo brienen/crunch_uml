@@ -13,6 +13,8 @@ Het model '{{ package.name }}' kent de volgende enumeraties:
 {% endfor %}
 {% endif %}
 
+## Kenmerken
+
 Het model '{{ package.name }}' heeft de volgende kenmerken:
 
 | Kenmerk | Waarde |
@@ -20,9 +22,11 @@ Het model '{{ package.name }}' heeft de volgende kenmerken:
 {% for name, value in package.to_dict().items() %}| {{ name }} | {{ value|default("", true) }} |
 {% endfor %}
 
+## Objecttypen
+
 {# Classes #}
 {% for class in package.classes %}
-## Objecttype: {{ class.name }}
+### {{ class.name }}
 {{ class.descr }}
 
 Het objecttype {{ class.name }} kent de volgende attributen:
@@ -37,7 +41,7 @@ Het objecttype {{ class.name }} heeft de volgende kenmerken:
 {% for name, value in class.to_dict().items() %}| {{ name }} | {{ value|default("", true) }} |
 {% endfor %}
 
-### Attributen 
+#### Attributen 
 
 Het objecttype {{ class.name }} heeft de volgende attributen:
 
@@ -50,6 +54,9 @@ Het objecttype {{ class.name }} heeft de volgende attributen:
 
 {# Enumerations #}
 {% if package.enumerations|length > 0 %}
+
+## Enumeraties
+
 {% for enumeration in package.enumerations %}
 ## Enumeratie: {{ enumeration.name }}
 {{ enumeration.descr|default("", true) }}
@@ -58,6 +65,8 @@ Het enumeratie {{ enumeration.name }} kent de volgende waarden:
 
 {% for literal in enumeration.literals %}{% if literal.name is not none %}* **{{ literal.name }}**: {{ literal.descr|default("<Geen Definities>", true)  }}{% endif %}
 {% endfor %}
+
+### Kenmerken en waarden
 
 De enumeratie {{ enumeration.name }} heeft de volgende kenmerken:
 

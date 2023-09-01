@@ -1,5 +1,6 @@
 import logging
 import uuid
+import re
 
 from lxml import etree
 
@@ -7,6 +8,12 @@ from crunch_uml import const, db
 from crunch_uml.parsers.parser import Parser, ParserRegistry
 
 logger = logging.getLogger()
+
+
+
+def remove_EADatatype(input_string):
+    pattern = r"^EA[\d\w]+_"
+    return re.sub(pattern, '', input_string)
 
 
 @ParserRegistry.register("xmi")
@@ -45,6 +52,11 @@ class XMIParser(Parser):
                     attribute = db.Attribute(
                         id=childnode.get('{' + ns['xmi'] + '}id'), name=childnode.get('name'), clazz_id=clazz.id
                     )
+                    datatypes = childnode.xpath('./type')
+                    if len(datatypes) != 0:
+                        datatype = datatypes[0].get('{' + ns['xmi'] + '}idref')
+                        if datatype is not None and not datatype.startswith('EAID_'): # Remove references to other classes
+                            attribute.primitive = remove_EADatatype(datatype)
                     logger.debug(
                         f'Attribute {attribute.name} met id {attribute.id} ingelezen met inhoud: {vars(attribute)}'
                     )
