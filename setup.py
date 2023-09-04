@@ -18,7 +18,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='crunch_uml',
-    version='0.1.0',
+    version='0.1.1',
     description='Reads UML Class model from multiple formats (including XMI) and renders them to other formats (including Markdown).',
     long_description=long_description,
     long_description_content_type="text/markdown",
