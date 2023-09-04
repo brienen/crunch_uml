@@ -25,7 +25,7 @@ setuptools.setup(
     url='http://github.com/brienen/crunch_uml',
     author='Arjen Brienen',
     license='MIT',
-    packages=setuptools.get_packages(
+    packages=setuptools.find_packages(
         exclude=[
             'examples',
             'test',
