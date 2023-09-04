@@ -10,11 +10,11 @@ with open('README.md', 'r') as fh:
 #required = [item for item in required if not item.startswith('#')]
 #REQUIREMENTS = required
 
-required = None
-with open('dev_requirements.txt') as f:
-    required = f.read().splitlines()
-required = [item for item in required if not item.startswith('#')]
-DEV_REQUIREMENTS = required
+#required = None
+#with open('dev_requirements.txt') as f:
+#    required = f.read().splitlines()
+#required = [item for item in required if not item.startswith('#')]
+#DEV_REQUIREMENTS = required
 
 setuptools.setup(
     name='crunch_uml',
@@ -54,7 +54,15 @@ setuptools.setup(
         'jinja2>=3.1.2,<4'
         ],
     extras_require={
-        'dev': DEV_REQUIREMENTS,
+        'dev': [
+            'black == 23.*',
+            'build == 0.10.*',
+            'flake8 == 6.*',
+            'isort == 5.*',
+            'mypy == 1.2',
+            'pytest == 7.*',
+            'pytest-cov == 4.*',
+            'twine == 4.*'],
     },
     entry_points={
         'console_scripts': [
