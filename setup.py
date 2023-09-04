@@ -19,7 +19,7 @@ DEV_REQUIREMENTS = required
 setuptools.setup(
     name='crunch_uml',
     version='0.1.0',
-    description='XMI-Parser that renders to multiple formats.',
+    description='Reads UML Class model from multiple formats (including XMI) and renders them to other formats (including Markdown).',
     long_description=long_description,
     long_description_content_type="text/markdown",
     url='http://github.com/brienen/crunch_uml',
@@ -41,7 +41,16 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=REQUIREMENTS,
+    #install_requires=REQUIREMENTS,
+    install_requires=[
+        'SQLAlchemy==2.0.20',
+        'lxml==4.9.3',
+        'lxml-stubs',
+        'openpyxl',
+        'types-openpyxl',
+        'pandas',
+        'jinja2'
+        ],
     extras_require={
         'dev': DEV_REQUIREMENTS,
     },

@@ -30,6 +30,7 @@ def add_args(argumentparser, subparser_dict):
     entries = ParserRegistry.entries()
     items = [f'"{item}": {ParserRegistry.getDescription(item)}' for item in entries]
     epilog = 'More informaation on the export types that are supported:\n\n' + '\n'.join(items)
+    epilog = f"{epilog}\n\nThe following tables are suported: {db.getTables()}"
     import_subparser.epilog = epilog
 
 
