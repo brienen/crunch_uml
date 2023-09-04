@@ -44,14 +44,14 @@ setuptools.setup(
     ],
     #install_requires=REQUIREMENTS,
     install_requires=[
-        'SQLAlchemy==2.0.20',
-        'lxml==4.9.3',
+        'SQLAlchemy>=2.0.20,<3',
+        'lxml>=4.9.3,<5',
         'lxml-stubs',
-        'openpyxl',
+        'openpyxl>=3.0.10,<4',
         'types-openpyxl',
-        'pandas',
+        'pandas>=1.5,<2',
         'pandas-stubs',
-        'jinja2'
+        'jinja2>=3.1.2,<4'
         ],
     extras_require={
         'dev': DEV_REQUIREMENTS,
