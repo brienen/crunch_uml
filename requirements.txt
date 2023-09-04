@@ -1,7 +1,0 @@
-SQLAlchemy==2.0.20
-lxml==4.9.3
-lxml-stubs
-openpyxl
-types-openpyxl
-pandas
-jinja2
