@@ -5,10 +5,10 @@ long_description = None
 with open('README.md', 'r') as fh:
     long_description = fh.read()
 
-with open('requirements.txt') as f:
-    required = f.read().splitlines()
-required = [item for item in required if not item.startswith('#')]
-REQUIREMENTS = required
+#with open('requirements.txt') as f:
+#    required = f.read().splitlines()
+#required = [item for item in required if not item.startswith('#')]
+#REQUIREMENTS = required
 
 required = None
 with open('dev_requirements.txt') as f:
