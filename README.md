@@ -50,7 +50,8 @@ python ./crunch_uml/cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] {import,export}
 - `import`: Import data to the Crunch UML database.
   - `-h, --help`: Show this help message and exit.
   - `-db_create, --database_create_new`: Create a new database and discard the existing one.
-  - `-f INPUTFILE, --inputfile INPUTFILE`: Path to the XMI file.
+  - `-f INPUTFILE, --inputfile INPUTFILE`: Path to import file.
+  - `-url URL`: URL for import
   - `-t INPUTTYPE, --inputtype INPUTTYPE`: Specifies input type from the following: ['xmi', 'eaxmi', 'json', 'xlsx', 'csv'].
   - `--skip_xmi_relations`: Skip parsing relations for XMI files only.
   

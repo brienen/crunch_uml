@@ -1,6 +1,7 @@
 import logging
 import re
 import uuid
+import requests
 
 from lxml import etree
 
@@ -244,12 +245,22 @@ class XMIParser(Parser):
         pass
 
     def parse(self, args, database: db.Database):
-        logger.info(f'Parsing file with name {args.inputfile}')
         logger.debug('Parsing with XMIParser')
 
-        # Parseer het XML-bestand
-        tree = etree.parse(args.inputfile)
-        root = tree.getroot()
+        if args.inputfile is not None:
+            # Parseer het XML-bestand
+            logger.info(f'Parsing file with name {args.inputfile}')
+            tree = etree.parse(args.inputfile)
+            root = tree.getroot()
+        elif args.url is not None:
+            # Haal de inhoud van de URL op
+            logger.info(f'Parsing url: {args.url}')
+            response = requests.get(args.url)
+            response.raise_for_status()  # controleer of het verzoek succesvol was
+
+            # Gebruik lxml.etree om de inhoud te parsen
+            root = etree.fromstring(response.content)
+        
         ns = root.nsmap
         if 'xmi' not in ns.keys():
             logger.warning(f'missing namespace "xmi" in file {args.inputfile}: trying "{const.NS_XMI}"')

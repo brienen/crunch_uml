@@ -1,8 +1,9 @@
 import logging
 from abc import ABC, abstractmethod
 
-from crunch_uml import const, db
+from crunch_uml import const, db, util
 from crunch_uml.registry import Registry
+
 
 logger = logging.getLogger()
 
@@ -14,12 +15,17 @@ class ParserRegistry(Registry):
 
 def add_args(argumentparser, subparser_dict):
     import_subparser = subparser_dict.get(const.CMD_IMPORT)
-    import_subparser.add_argument('-f', '--inputfile', type=str, help="Path to the XMI file", required=True)
+
+    # Creëer een mutually exclusive group en add options
+    group = import_subparser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-f', '--inputfile', type=str, help="Path to import file")
+    group.add_argument('-url', type=util.valid_url, help="URL to import file")
+        
     import_subparser.add_argument(
         '-t',
         '--inputtype',
         type=str,
-        required=True,
+        choices=ParserRegistry.entries(),
         help=f'geeft inputtype aan: {ParserRegistry.entries()}.',
     )
     import_subparser.add_argument(

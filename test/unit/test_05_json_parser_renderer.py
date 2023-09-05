@@ -70,14 +70,14 @@ def test_json_parser_renderer():
 
 def test_json_parser_and_changes():
     inputfile = "./test/output/Monumenten_import.json"
-    changefile = "./test/data/Monumenten_changes.json"
+    change_url = "https://raw.githubusercontent.com/brienen/crunch_uml/main/test/data/Monumenten_changes.json"
 
     # import inputfile into clean database
     test_args = ["import", "-f", inputfile, "-t", "json", "-db_create"]
     cli.main(test_args)
 
     # import changes into database
-    test_args = ["import", "-t", "json", "-f", changefile]
+    test_args = ["import", "-t", "json", "-url", change_url]
     cli.main(test_args)
 
     # Check if content is correctly loaded

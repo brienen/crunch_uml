@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import requests
 
 import pandas as pd
 
@@ -48,13 +49,20 @@ class JSONParser(Parser):
         logger.info(f"Starting parsing JSON file {args.inputfile}")
         # sourcery skip: raise-specific-error
         try:
-            with open(args.inputfile, 'r') as f:
-                parsed_data = json.load(f)
+            if args.inputfile is not None:
+                with open(args.inputfile, 'r') as f:
+                    parsed_data = json.load(f)
+            elif args.url is not None:
+                response = requests.get(args.url)
+                response.raise_for_status()  # Zorg dat we een fout krijgen als de download mislukt
+                parsed_data = response.json()  #
 
+            tables = db.getTables()
             # Ga ervan uit dat het JSON-bestand een structuur heeft zoals eerder beschreven
             for entity_name, records in parsed_data.items():
-                for record in records:
-                    store_data(entity_name, record, database)
+                if entity_name in tables:
+                    for record in records:
+                        store_data(entity_name, record, database)
         except json.JSONDecodeError as ex:
             msg = f"File with name {args.inputfile} is not a valid JSON-file, aborting with message {ex.msg}"
             logger.error(msg)
@@ -76,15 +84,17 @@ class XLXSParser(Parser):
 
         try:
             # Lees het Excel-bestand
-            xls = pd.ExcelFile(args.inputfile)
+            xls = pd.ExcelFile(args.inputfile if args.inputfile is not None else args.url)
 
+            tables = db.getTables()
             # Loop door elk tabblad in het Excel-bestand
             for sheet_name in xls.sheet_names:
-                # Lees de gegevens van het huidige tabblad als een lijst van woordenboeken
-                records = xls.parse(sheet_name).to_dict(orient='records')
+                if sheet_name in tables:
+                    # Lees de gegevens van het huidige tabblad als een lijst van woordenboeken
+                    records = xls.parse(sheet_name).to_dict(orient='records')
 
-                for record in records:
-                    store_data(sheet_name, record, database)
+                    for record in records:
+                        store_data(sheet_name, record, database)
 
         except Exception as ex:
             msg = f"Error while parsing the Excel file {args.inputfile}: {str(ex)}"
@@ -105,14 +115,19 @@ class CSVParser(Parser):
             # Haal de entiteitsnaam uit de bestandsnaam (verwijder het .csv-deel)
             entity_name = os.path.splitext(os.path.basename(args.inputfile))[0]
 
-            # Lees het CSV-bestand in een dataframe
-            df = pd.read_csv(args.inputfile)
+            tables = db.getTables()
+            if entity_name in tables:
+                # Lees het CSV-bestand in een dataframe
+                df = pd.read_csv(args.inputfile if args.inputfile is not None else args.url)
 
-            # Converteer het dataframe naar een lijst van woordenboeken (records)
-            records = df.to_dict(orient='records')
+                # Converteer het dataframe naar een lijst van woordenboeken (records)
+                records = df.to_dict(orient='records')
 
-            for record in records:
-                store_data(entity_name, record, database)
+                for record in records:
+                    store_data(entity_name, record, database)
+
+            else:
+                logger.warning(f"Could not import file: no entity found with name {entity_name}")
 
         except Exception as ex:
             msg = f"Error while parsing the CSV file {args.inputfile}: {str(ex)}"

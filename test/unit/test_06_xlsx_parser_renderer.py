@@ -80,7 +80,7 @@ def test_xlsx_parser_renderer():  # sourcery skip: extract-duplicate-method
 def test_xlsx_parser_and_changes():  # sourcery skip: extract-duplicate-method
     inputfile = "./test/data/Onderwijs.xlsx"
     inputfile = "./test/output/Onderwijs_input.xlsx"
-    changefile = "./test/data/Onderwijs_changes.xlsx"
+    change_url = "https://github.com/brienen/crunch_uml/raw/main/test/data/Onderwijs_changes.xlsx"
 
     # import inputfile into clean database
     # import xlsx to clean database
@@ -96,7 +96,7 @@ def test_xlsx_parser_and_changes():  # sourcery skip: extract-duplicate-method
     assert database.count_association() == 24
 
     # import changes into database
-    test_args = ["import", "-t", "xlsx", "-f", changefile]
+    test_args = ["import", "-t", "xlsx", "-url", change_url]
     cli.main(test_args)
 
     # Check if content is correctly loaded

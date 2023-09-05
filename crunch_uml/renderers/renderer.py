@@ -26,7 +26,7 @@ def add_args(argumentparser, subparser_dict):
         '-t',
         '--outputtype',
         required=True,
-        type=str,
+        choices=RendererRegistry.entries(),
         help=f'geeft outtype aan: {RendererRegistry.entries()}.',
     )
     # argumentparser.add_argument('-orpn', '--output_root_package_names', type=str, help='List of package names separated by comma')

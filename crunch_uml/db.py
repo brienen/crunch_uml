@@ -51,6 +51,21 @@ Base = declarative_base(cls=BaseModel)
 def getTables():
     return list(Base.metadata.tables.keys())
 
+# Get list of column names
+def getColumnNames(tablename):
+    """
+    Geeft een lijst met kolomnamen terug voor een gegeven tabelnaam.
+    """
+    # Controleer of de tabelnaam bestaat in de Base's metadata
+    if tablename not in Base.metadata.tables:
+        raise ValueError(f"Tabelnaam '{tablename}' niet gevonden in de metadata.")
+    
+    # Verkrijg de tabel-object
+    table = Base.metadata.tables[tablename]
+    
+    # Haal de kolomnamen op en retourneer ze
+    return [column.name for column in table.columns]
+
 
 # Model definitions
 class UML_Generic:
