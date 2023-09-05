@@ -4,8 +4,6 @@
 
 Crunch_UML is a parser for XMI files originating from UML tools such as Enterprise Architect. The tool reads the XMI and stores entities and relationships in an SQLite database for further analysis or use.
 
-**Crunch_UML is stillunder heavy development and does not have any releases.**
-
 [![Build Status](https://github.com/brienen/crunch_uml/workflows/build/badge.svg)](https://github.com/brienen/crunch_uml/actions)
 [![Coverage Status](https://coveralls.io/repos/github/brienen/crunch_uml/badge.svg?branch=main)](https://coveralls.io/github/brienen/crunch_uml?branch=main)
 [![PyPi](https://img.shields.io/pypi/v/crunch_uml)](https://pypi.org/project/crunch_uml)
@@ -20,25 +18,34 @@ Crunch_UML is a parser for XMI files originating from UML tools such as Enterpri
 - Supports Upserts to be able to import different datasets, changes to datasets etc.  
 - Exports to different output formats: Excel, JSON, CSV, Jinja2 templating, Markdown
 
-## Install
+## Install and Usage
 
-1. Download the repository and goto root directory
-2. Install packages from requirements.txt
-
-## Usage
+Install using pip:
 
 ```bash
-cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] {import,export} ...
+pip install crunch-uml
 ```
 
-### General Options:
+and start the program like so:
+
+```bash
+crunch_uml [-h] [-v] [-d] [-db_url DATABASE_URL] {import,export} ...
+```
+
+or download repository, install packages as they are described in setup.py, got to the root of the downloaded files and start the program like so:  
+
+```bash
+python ./crunch_uml/cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] {import,export} ...
+```
+
+## General Options:
 
 - `-h, --help`: Show this help message and exit.
 - `-v, --verbose`: Set log level to INFO.
 - `-d, --debug`: Set log level to DEBUG.
 - `-db_url DATABASE_URL, --database_url DATABASE_URL`: URL of the crunch_uml database. Supports any SQLAlchemy (https://docs.sqlalchemy.org/en/20/dialects/) compatible database. The default is `sqlite:///crunch_uml.db`.
 
-### Commands:
+## Commands:
 
 - `import`: Import data to the Crunch UML database.
   - `-h, --help`: Show this help message and exit.
@@ -87,7 +94,3 @@ make help
 - Develop more Jinja2 templates
 - Perform checking
 - Direct access to repositories (import and export)
-
----
-
-You can use this foundation and expand upon it as you continue to develop your program and add new features.
