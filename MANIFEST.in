@@ -1,7 +1,5 @@
-include requirements.txt
-include dev_requirements.txt
 include test/data/*
 include test/output/.gitkeep
-include crunch_uml/parsers
-include crunch_uml/renderers
-include crunch_uml/templates
+recursive-include crunch_uml/templates *
+recursive-include crunch_uml/parsers *
+recursive-include crunch_uml/renderers *
