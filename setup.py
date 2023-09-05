@@ -5,20 +5,9 @@ long_description = None
 with open('README.md', 'r') as fh:
     long_description = fh.read()
 
-#with open('requirements.txt') as f:
-#    required = f.read().splitlines()
-#required = [item for item in required if not item.startswith('#')]
-#REQUIREMENTS = required
-
-#required = None
-#with open('dev_requirements.txt') as f:
-#    required = f.read().splitlines()
-#required = [item for item in required if not item.startswith('#')]
-#DEV_REQUIREMENTS = required
-
 setuptools.setup(
     name='crunch_uml',
-    version='0.1.1',
+    version='0.1.3',
     description='Reads UML Class model from multiple formats (including XMI) and renders them to other formats (including Markdown).',
     long_description=long_description,
     long_description_content_type="text/markdown",
