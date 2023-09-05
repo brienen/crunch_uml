@@ -55,11 +55,11 @@ python ./crunch_uml/cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] {import,export}
   - `--skip_xmi_relations`: Skip parsing relations for XMI files only.
   
   **Supported Input Types**:
-    - `xmi"`: XMI Parser for strict XMI files. No extensions, like EA extensions, are parsed. Tested on XMI v2.1 spec.
-    - `eaxmi"`: XMI Parser that processes EA (Enterprise Architect) specific extensions. Tested on XMI v2.1 spec.
-    - `json"`: Generic parser that reads JSON files and looks for table and column definitions.
-    - `xlsx"`: Generic parser that reads Excel files, expecting one or more worksheets that correspond with the names of one or more tables.
-    - `csv"`: Generic parser that reads a single CSV file, expecting its name to be in the list of tables.
+    - `xmi`: XMI Parser for strict XMI files. No extensions, like EA extensions, are parsed. Tested on XMI v2.1 spec.
+    - `eaxmi`: XMI Parser that processes EA (Enterprise Architect) specific extensions. Tested on XMI v2.1 spec.
+    - `json`: Generic parser that reads JSON files and looks for table and column definitions.
+    - `xlsx`: Generic parser that reads Excel files, expecting one or more worksheets that correspond with the names of one or more tables.
+    - `csv`: Generic parser that reads a single CSV file, expecting its name to be in the list of tables.
   
   The following tables are supported: ['packages', 'classes', 'attributes', 'enumerations', 'enumerationliterals', 'associations', 'generalizations'].
 
@@ -73,11 +73,11 @@ python ./crunch_uml/cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] {import,export}
   - `-jt OUTPUT_JINJA2_TEMPLATE, --output_jinja2_template OUTPUT_JINJA2_TEMPLATE`: Specific Jinja2 template file.
   
   **Supported Export Types**:
-    - `jinja2"`: Renderer using Jinja2 to render one file per model in the database, where a model refers to a package with at least one Class. Requires "output_jinja2_template" and "output_jinja2_templatedir".
-    - `ggm_md"`: Renderer that produces a basic markdown file per model in the database, where a model refers to a package containing at least one Class.
-    - `json"`: Produces a JSON document where each element relates to a table in the data model.
-    - `csv"`: Produces multiple CSV files, each corresponding to a table in the data model.
-    - `xlsx"`: Produces an Excel sheet with tabs corresponding to tables in the data model.
+    - `jinja2`: Renderer using Jinja2 to render one file per model in the database, where a model refers to a package with at least one Class. Requires "output_jinja2_template" and "output_jinja2_templatedir".
+    - `ggm_md`: Renderer that produces a basic markdown file per model in the database, where a model refers to a package containing at least one Class.
+    - `json`: Produces a JSON document where each element relates to a table in the data model.
+    - `csv`: Produces multiple CSV files, each corresponding to a table in the data model.
+    - `xlsx`: Produces an Excel sheet with tabs corresponding to tables in the data model.
 
 
 ## Development
