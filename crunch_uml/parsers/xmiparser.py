@@ -1,8 +1,8 @@
 import logging
 import re
 import uuid
-import requests
 
+import requests
 from lxml import etree
 
 from crunch_uml import const, db
@@ -260,7 +260,7 @@ class XMIParser(Parser):
 
             # Gebruik lxml.etree om de inhoud te parsen
             root = etree.fromstring(response.content)
-        
+
         ns = root.nsmap
         if 'xmi' not in ns.keys():
             logger.warning(f'missing namespace "xmi" in file {args.inputfile}: trying "{const.NS_XMI}"')

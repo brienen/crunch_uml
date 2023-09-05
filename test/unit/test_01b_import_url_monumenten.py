@@ -2,7 +2,14 @@ from crunch_uml import cli, const, db
 
 
 def test_import_monumenten():
-    test_args = ["import", "-url", "https://raw.githubusercontent.com/brienen/crunch_uml/main/test/data/GGM_Monumenten_EA2.1.xml", "-t", "eaxmi", "-db_create"]
+    test_args = [
+        "import",
+        "-url",
+        "https://raw.githubusercontent.com/brienen/crunch_uml/main/test/data/GGM_Monumenten_EA2.1.xml",
+        "-t",
+        "eaxmi",
+        "-db_create",
+    ]
     cli.main(test_args)
 
     database = db.Database(const.DATABASE_URL, db_create=False)

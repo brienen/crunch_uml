@@ -40,7 +40,8 @@ setuptools.setup(
         'types-openpyxl',
         'pandas>=1.5,<2',
         'pandas-stubs',
-        'jinja2>=3.1.2,<4'
+        'jinja2>=3.1.2,<4',
+        'types-requests'
         ],
     extras_require={
         'dev': [
