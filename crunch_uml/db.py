@@ -220,6 +220,10 @@ class Generalization(Base, UML_Generic):  # type: ignore
     )
     subclass = relationship("Class", back_populates="subclasses", foreign_keys='Generalization.subclass_id')
 
+    def __repr__(self):
+        clsname = type(self).__name__.split('.')[-1]
+        return f'{clsname}: {self.subclass} isSubClassOf {self.superclass}'
+
 
 class Database:
     _instance = None

@@ -79,6 +79,8 @@ python ./crunch_uml/cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] {import,export}
     - `json`: Produces a JSON document where each element relates to a table in the data model.
     - `csv`: Produces multiple CSV files, each corresponding to a table in the data model.
     - `xlsx`: Produces an Excel sheet with tabs corresponding to tables in the data model.
+    - `ttl`: Renderer that renders Linked Data ontology in turtle from the supplied models, where a model is a package that includes at least one Class. Needs parameter "output_lod_url".
+    - `rdf`: Renderer that renders Linked Data ontology in RDF from the supplied models, where a model is a package that includes at least one Class.  Needs parameter "output_lod_url".
 
 
 ## Development

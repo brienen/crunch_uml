@@ -4,8 +4,7 @@ import os
 from jinja2 import Environment, FileSystemLoader
 
 from crunch_uml import const, db
-from crunch_uml.db import Class, Package
-from crunch_uml.renderers.renderer import Renderer, RendererRegistry
+from crunch_uml.renderers.renderer import ModelRenderer, RendererRegistry
 
 logger = logging.getLogger()
 
@@ -16,7 +15,7 @@ logger = logging.getLogger()
     + 'where a model is a package that includes at least one Class. '
     + ' Needs parameter "output_jinja2_template" and "output_jinja2_templatedir".',
 )
-class Jinja2Renderer(Renderer):
+class Jinja2Renderer(ModelRenderer):
     '''
     Renders all model packages using jinja2 and a template.
     A model package is a package with at least 1 class inside
@@ -25,43 +24,6 @@ class Jinja2Renderer(Renderer):
     templatedir = None
     template = None
     enforce_output_package_ids = False
-
-    def getPackages(self, args, database):
-        lst = []
-        if args.output_exclude_package_ids is not None:
-            # Get package_ids to include
-            excl_packageids = args.output_exclude_package_ids.split(',')
-            excl_packageids = [elem.strip() for elem in excl_packageids]
-        if args.output_package_ids is not None:
-            # Get package_ids to include
-            packageids = args.output_package_ids.split(',')
-            packageids = [elem.strip() for elem in packageids]
-
-            # subtract exclude list
-            if args.output_exclude_package_ids:
-                packageids = [pid for pid in packageids if pid not in excl_packageids]
-
-        # Now find packages
-        lst = []
-        if args.output_package_ids is not None:
-            # If list of p[ackage ids is supplied return query
-            lst = database.get_session().query(Package).join(Class).filter(Package.id.in_(packageids)).distinct().all()
-        elif args.output_exclude_package_ids is not None:
-            # If only list of excluded model supplied return query
-            lst = (
-                database.get_session()
-                .query(Package)
-                .join(Class)
-                .filter(Package.id.notin_(excl_packageids))
-                .distinct()
-                .all()
-            )
-        else:
-            # If nothing is supplied return all model packages
-            lst = database.get_session().query(Package).join(Class).distinct().all()
-        if len(lst) == 0:
-            logger.warning("Could not find any model packages to render ")
-        return lst
 
     def getTemplateAndDir(self, args):  # sourcery skip: raise-specific-error
         # get templatedir to be used
@@ -108,14 +70,14 @@ class Jinja2Renderer(Renderer):
         #    raise Exception(msg)
 
         # Get list of packages that are to be rendered
-        packages = self.getPackages(args, database)
-        if len(packages) is None:
+        models = self.getModels(args, database)
+        if len(models) is None:
             msg = "Cannot render output: packages do not exist"
             logger.error(msg)
             raise Exception(msg)
 
         # Render all packages that are named
-        for index, package in enumerate(packages):
+        for index, package in enumerate(models):
             # Render output
             template = env.get_template(template)
             output = template.render(package=package, args=args)

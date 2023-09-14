@@ -8,3 +8,5 @@ CMD_IMPORT = 'import'
 CMD_EXPORT = 'export'
 # CMD_CHECK = 'check'
 # CMD_FIX = 'fix'
+
+DEFAULT_LOD_NS = 'http://example.org/myns/'

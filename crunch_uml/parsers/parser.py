@@ -1,7 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
 
-from crunch_uml import const, db, util
+from crunch_uml import const, db
 from crunch_uml.registry import Registry
 
 logger = logging.getLogger()
@@ -18,7 +18,7 @@ def add_args(argumentparser, subparser_dict):
     # Creëer een mutually exclusive group en add options
     group = import_subparser.add_mutually_exclusive_group(required=True)
     group.add_argument('-f', '--inputfile', type=str, help="Path to import file")
-    group.add_argument('-url', type=util.valid_url, help="URL to import file")
+    group.add_argument('-url', type=str, help="URL to import file")
 
     import_subparser.add_argument(
         '-t',

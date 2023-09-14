@@ -90,6 +90,18 @@
                 "-db_create"]
         },
         {
+            "name": "Import Erfgoed",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["import",
+                "-f", "./test/data/GGM_Erfgoed.xml", 
+                "-t", "eaxmi", 
+                "-db_create"]
+        },
+        {
             "name": "Export XLSX",
             "type": "python",
             "request": "launch",
@@ -123,6 +135,19 @@
             "args": ["export",
                 "-t", "ggm_md",
                 "-f", "./test/output/def.md"
+            ]
+        },
+        {
+            "name": "Export Turtle",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["export",
+                "-t", "ttl",
+                "-f", "./test/output/output.ttl",
+                "--linked_data_namespace", "https://www.gemeentelijkgegevensmodel.nl/"
             ]
         }
     ]
