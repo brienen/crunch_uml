@@ -6,6 +6,7 @@ import pandas as pd
 import requests
 
 from crunch_uml import db
+from crunch_uml.excpetions import CrunchException
 from crunch_uml.parsers.parser import Parser, ParserRegistry
 
 logger = logging.getLogger()
@@ -66,7 +67,7 @@ class JSONParser(Parser):
         except json.JSONDecodeError as ex:
             msg = f"File with name {args.inputfile} is not a valid JSON-file, aborting with message {ex.msg}"
             logger.error(msg)
-            raise Exception(msg) from ex
+            raise CrunchException(msg) from ex
         logger.info(f"Ended parsing JSON file {args.inputfile} with success")
 
 
@@ -99,7 +100,7 @@ class XLXSParser(Parser):
         except Exception as ex:
             msg = f"Error while parsing the Excel file {args.inputfile}: {str(ex)}"
             logger.error(msg)
-            raise Exception(msg) from ex
+            raise CrunchException(msg) from ex
 
         logger.info(f"Ended parsing Excel file {args.inputfile} with success")
 
@@ -132,6 +133,6 @@ class CSVParser(Parser):
         except Exception as ex:
             msg = f"Error while parsing the CSV file {args.inputfile}: {str(ex)}"
             logger.error(msg)
-            raise Exception(msg) from ex
+            raise CrunchException(msg) from ex
 
         logger.info(f"Ended parsing CSV file {args.inputfile} with success")

@@ -6,6 +6,7 @@ import requests
 from lxml import etree
 
 from crunch_uml import const, db
+from crunch_uml.excpetions import CrunchException
 from crunch_uml.parsers.parser import Parser, ParserRegistry
 
 logger = logging.getLogger()
@@ -128,7 +129,7 @@ class XMIParser(Parser):
                 for memberend in memberends:
                     id = memberend.get('{' + ns['xmi'] + '}idref')
                     endpoints = node.xpath(f".//*[@xmi:id='{id}']", namespaces=ns)
-                    if len(endpoints) < 1:
+                    if len(endpoints) == 0:
                         clsid = str(uuid.uuid4())
                         msg = (
                             f"Association '{association.name}' with {association.id} only has information on one edge:"
@@ -143,7 +144,12 @@ class XMIParser(Parser):
                         else:
                             association.dst_class_id = clsid  # type: ignore
 
-                    elif len(endpoints) == 1:
+                    elif len(endpoints) > 0:
+                        if len(endpoints) > 1:
+                            logger.warning(
+                                f"Association {association.name} with {association.id} has more than two endpoints."
+                            )
+
                         endpoint = endpoints[0]
                         getval = lambda x, endpoint: (  # noqa
                             endpoint.xpath(f'./{x}')[0].get('value') if len(endpoint.xpath(f'./{x}')) else None  # noqa
@@ -179,7 +185,7 @@ class XMIParser(Parser):
                     else:
                         err = f"Association {association.name} with {association.id} has more than two endpoints. panic"
                         logger.error(err)
-                        raise Exception(err)
+                        raise CrunchException(err)
 
                 database.save(association)
 
@@ -270,6 +276,8 @@ class XMIParser(Parser):
             ns['xmi'] = const.NS_UML
 
         if root is not None:
+            self.checkSupport(root, ns)
+
             model = root.xpath('//uml:Model[@xmi:type="uml:Model"][1]', namespaces=ns)[0]  # type: ignore
             self.phase1_process_packages_classes(model, ns, database)
             if not args.skip_xmi_relations:
@@ -277,3 +285,12 @@ class XMIParser(Parser):
             self.phase3_process_extra(root, ns, database)
         else:
             logger.warning('No content was read from XMI-file')
+
+    def checkSupport(self, root, ns):
+        innerclasses = root.xpath("//nestedClassifier", namespaces=ns)
+        if len(innerclasses) > 0:
+            id = innerclasses[0].get('{' + ns['xmi'] + '}id')
+            name = innerclasses[0].get('name')
+            msg = f"Error innerclasses not supported, found innerclass with id {id} and name {name}."
+            logger.error(msg)
+            raise CrunchException(msg)

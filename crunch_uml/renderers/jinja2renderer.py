@@ -4,6 +4,7 @@ import os
 from jinja2 import Environment, FileSystemLoader
 
 from crunch_uml import const, db
+from crunch_uml.excpetions import CrunchException
 from crunch_uml.renderers.renderer import ModelRenderer, RendererRegistry
 
 logger = logging.getLogger()
@@ -36,7 +37,7 @@ class Jinja2Renderer(ModelRenderer):
         if not os.path.isdir(templatedir):
             msg = f"Template directory with value {templatedir} does not exist, exiting"
             logger.error(msg)
-            raise Exception(msg)
+            raise CrunchException(msg)
         logger.debug(f"Rendering with templatedir {templatedir}")
 
         # get template to be used
@@ -47,7 +48,7 @@ class Jinja2Renderer(ModelRenderer):
         else:
             msg = "No template provided voor Jinja2, exiting"
             logger.error(msg)
-            raise Exception(msg)
+            raise CrunchException(msg)
         logger.debug(f"Rendering with template {template}")
         return template, templatedir
 
@@ -67,14 +68,14 @@ class Jinja2Renderer(ModelRenderer):
         # if self.enforce_output_package_ids and args.output_package_ids is None:
         #    msg = "Usage of parameter --output_package_ids is enforced for this renderer. Not provided, exiting."
         #    logger.error(msg)
-        #    raise Exception(msg)
+        #    raise CrunchException(msg)
 
         # Get list of packages that are to be rendered
         models = self.getModels(args, database)
         if len(models) is None:
             msg = "Cannot render output: packages do not exist"
             logger.error(msg)
-            raise Exception(msg)
+            raise CrunchException(msg)
 
         # Render all packages that are named
         for index, package in enumerate(models):

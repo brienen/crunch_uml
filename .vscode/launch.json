@@ -60,8 +60,8 @@
             "args": ["import",
                 "-t", "eaxmi",
                 "-f", "./test/data/Gemeentelijk Gegevensmodel.xml",
-                "-db_create",
-                "--skip_xmi_relations"
+                "-db_create" //,
+                //"--skip_xmi_relations"
             ]
         },
         {
@@ -96,7 +96,7 @@
             "program": "./crunch_uml/cli.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["import",
+            "args": ["-d", "import",
                 "-f", "./test/data/GGM_Erfgoed.xml", 
                 "-t", "eaxmi", 
                 "-db_create"]

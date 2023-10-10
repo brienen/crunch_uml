@@ -6,6 +6,7 @@ from rdflib import Graph, Literal, Namespace
 from rdflib.namespace import OWL, RDF, RDFS, XSD
 
 from crunch_uml import const, db, util
+from crunch_uml.excpetions import CrunchException
 from crunch_uml.renderers.renderer import ModelRenderer, RendererRegistry
 
 logger = logging.getLogger()
@@ -41,7 +42,7 @@ class LodRenderer(ModelRenderer):
         if len(models) is None:
             msg = "Cannot render output: packages does not exist"
             logger.error(msg)
-            raise Exception(msg)
+            raise CrunchException(msg)
 
         class_dict = {}  # used to find all classes by guid
         # First add all classes

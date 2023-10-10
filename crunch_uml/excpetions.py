@@ -1,0 +1,2 @@
+class CrunchException(Exception):
+    pass
