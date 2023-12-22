@@ -1,0 +1,84 @@
+from __future__ import annotations
+from typing import List
+from enum import Enum
+from sqlalchemy import Integer, String, Date, Boolean, Text, Enum as SAEnum, Column, Table, ForeignKey
+from sqlalchemy.orm import DeclarativeBase, relationship, mapped_column, Mapped
+
+
+class Base(DeclarativeBase):
+    id = mapped_column(Integer, primary_key=True)
+
+
+{# Enumeraries #}
+# Enumeraries
+{% for enumeration in package.enumerations %}
+class {{ enumeration.name | pascal_case  }}(Enum):
+{% for literal in enumeration.literals %}{% if literal.name is not none %}  {{ literal.name | pythonize }} = {{ loop.index }}{% endif %}
+{% endfor %}{% endfor %}
+
+
+{# Koppeltabellen #}
+# Koppeltabellen
+{% for class in package.classes %}
+    {%- for associatie in class.uitgaande_associaties %}
+        {%- if not associatie.hasOrphan() %}
+            {%- if associatie.getType(class) == 'n-m' %}
+koppel_{{ associatie.name | snake_case }}_{{ associatie.id}} = Table(
+    "koppel_{{ associatie.name | snake_case }}_{{ associatie.id}}",
+    Base.metadata,
+    Column("left_id", ForeignKey("{{ associatie.src_class.name | snake_case }}.id"), primary_key=True),
+    Column("right_id", ForeignKey("{{ associatie.dst_class.name | snake_case }}.id"), primary_key=True),
+)
+            {%- endif %}
+        {%- endif %}
+    {%- endfor %}
+{%- endfor %}
+
+
+{# Classes #}
+# Classes
+{% for class in package.classes -%}
+class {{ class.name | pascal_case  }}(Base):
+    '''
+    {{- class.definitie|default("<Geen Definities>", true)  }}
+    '''
+    __tablename__ = "{{ class.name | snake_case }}"
+    {% for attribute in class.attributes -%}
+        {%- if attribute.name is not none %}
+    {{ attribute.name | snake_case }} = mapped_column({{ attribute.getDatatype() | sqla_datatype }})
+        {%- endif %}
+    {%- endfor %}
+    {%- for associatie in class.uitgaande_associaties -%}
+        {%- if not associatie.hasOrphan() %}
+        {#- Source: {{ associatie.getType(class) }} {{ associatie.id }} Source_mult: {{ associatie.src_mult_end }} Dest_mult: {{ associatie.dst_mult_end }} #}
+            {%- if associatie.getType(class) == 'n-1' %}
+    {{ associatie.dst_class.name | snake_case }}_id: Mapped[int] = mapped_column(ForeignKey("{{ associatie.dst_class.name | snake_case }}.id"), index=True)
+    {{ associatie.dst_class.name | snake_case }}: Mapped[{{ associatie.dst_class.name | pascal_case }}] = relationship(back_populates="{{ class.name | snake_case | meervoud}}")
+            {%- elif associatie.getType(class) == '1-1' %}
+    {{ associatie.dst_class.name | snake_case }}: Mapped[{{ associatie.dst_class.name | pascal_case }}] = relationship(back_populates="{{ class.name | snake_case }}")
+            {%- elif associatie.getType(class) == '1-n' %}
+    {{ associatie.dst_class.name | snake_case | meervoud}}: Mapped[List[{{ associatie.dst_class.name | pascal_case }}]] = relationship(back_populates="{{ class.name | snake_case }}")
+            {%- elif associatie.getType(class) == 'n-m' %}
+    {{ associatie.dst_class.name | snake_case | meervoud}}: Mapped[List[{{ associatie.dst_class.name | pascal_case }}]] = relationship(secondary=koppel_{{ associatie.name | snake_case }}_{{ associatie.id}})
+            {%- endif %}
+        {%- endif %}
+    {%- endfor %}
+    {%- for associatie in class.inkomende_associaties -%}
+        {%- if not associatie.hasOrphan() %}
+        {#- Dest: {{ associatie.getType(class) }} {{ associatie.id }} Source_mult: {{ associatie.src_mult_end }} Dest_mult: {{ associatie.dst_mult_end }} #}
+            {%- if associatie.getType(class) in ['1-1'] %}
+    {{ associatie.src_class.name | snake_case }}_id: Mapped[int] = mapped_column(ForeignKey("{{ associatie.src_class.name | snake_case }}.id"), index=True)
+    {{ associatie.src_class.name | snake_case }}: Mapped[{{ associatie.src_class.name | pascal_case }}] = relationship(back_populates="{{ class.name | snake_case }}")
+            {%- elif associatie.getType(class) in ['1-n'] %}
+    {{ associatie.src_class.name | snake_case }}_id: Mapped[int] = mapped_column(ForeignKey("{{ associatie.src_class.name | snake_case }}.id"), index=True)
+    {{ associatie.src_class.name | snake_case }}: Mapped[{{ associatie.src_class.name | pascal_case }}] = relationship(back_populates="{{ class.name | snake_case | meervoud}}")
+            {%- elif associatie.getType(class) == 'n-1' %}
+    {{ associatie.src_class.name | snake_case | meervoud}}: Mapped[List[{{ associatie.src_class.name | pascal_case }}]] = relationship(back_populates="{{ class.name | snake_case }}")
+            {%- elif associatie.getType(class) == 'n-m' %}
+    {{ associatie.src_class.name | snake_case | meervoud}}: Mapped[List[{{ associatie.src_class.name | pascal_case }}]] = relationship(secondary=koppel_{{ associatie.name | snake_case }}_{{ associatie.id}})
+            {%- endif %}
+        {%- endif %}
+    {%- endfor %} 
+
+{% endfor %}
+

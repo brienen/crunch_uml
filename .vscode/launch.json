@@ -59,7 +59,7 @@
             "justMyCode": true,
             "args": ["import",
                 "-t", "eaxmi",
-                "-f", "./test/data/Gemeentelijk Gegevensmodel.xml",
+                "-f", "/Users/arjen/Downloads/GGM v2.xml",
                 "-db_create" //,
                 //"--skip_xmi_relations"
             ]
@@ -148,6 +148,18 @@
                 "-t", "ttl",
                 "-f", "./test/output/output.ttl",
                 "--linked_data_namespace", "https://www.gemeentelijkgegevensmodel.nl/"
+            ]
+        },
+        {
+            "name": "Export SQLA",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["export",
+                "-t", "sqla",
+                "-f", "./test/output/test.py"
             ]
         }
     ]

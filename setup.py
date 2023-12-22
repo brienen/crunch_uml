@@ -42,7 +42,8 @@ setuptools.setup(
         'pandas-stubs',
         'jinja2>=3.1.2,<4',
         'types-requests',
-        'rdflib>=7.0.0,<8'
+        'rdflib>=7.0.0,<8',
+        'inflection>=0.5.1,<6'
         ],
     extras_require={
         'dev': [

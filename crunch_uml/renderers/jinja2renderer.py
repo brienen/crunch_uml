@@ -1,5 +1,7 @@
 import logging
 import os
+import inflection
+
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -52,6 +54,14 @@ class Jinja2Renderer(ModelRenderer):
         logger.debug(f"Rendering with template {template}")
         return template, templatedir
 
+    def addFilters(self, env):
+        # Voeg het inflection filter toe
+        env.filters['snake_case'] = lambda s: inflection.underscore(s.replace(" ", "")) if isinstance(s, str) else ''
+        env.filters['pascal_case'] = lambda s: inflection.camelize(s.replace(" ", "")) if isinstance(s, str) else ''
+        env.filters['camel_case'] = lambda s: inflection.camelize(s.replace(" ", ""), False) if isinstance(s, str) else ''
+        env.filters['pythonize'] = lambda s: s.replace(" ", "").replace("-", "_") if isinstance(s, str) else ''
+    
+
     def render(self, args, database: db.Database):
         # setup output filename
         filename, extension = os.path.splitext(args.outputfile)
@@ -63,6 +73,7 @@ class Jinja2Renderer(ModelRenderer):
         # Settup environment for rendering using Jinja2
         file_loader = FileSystemLoader(templatedir)
         env = Environment(loader=file_loader)
+        self.addFilters(env)
 
         # Check to see if a list of Package ids is provided
         # if self.enforce_output_package_ids and args.output_package_ids is None:
