@@ -211,17 +211,6 @@ class Association(Base, UML_Generic):  # type: ignore
     def hasOrphan(self):
         return self.dst_class.package_id is None or self.src_class.package_id is None 
 
-    #def getType(self, clazz):
-    #    if clazz == self.src_class:
-    #        if self.src_mult_end == '1':
-    #            return '1-1' if self.dst_mult_end == '1' else '1-n'
-    #        else:
-    #            return 'n-1' if self.dst_mult_end == '1' else 'n-m'
-    #    else:
-    ##        if self.dst_mult_end == '1':
-    #            return '1-1' if self.src_mult_end == '1' else '1-n'
-    #        else:
-    #            return 'n-1' if self.src_mult_end == '1' else 'n-m'
     def getType(self, clazz):
         if self.src_mult_end == '1':
             return '1-1' if self.dst_mult_end == '1' else '1-n'

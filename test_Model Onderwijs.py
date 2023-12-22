@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List
+from typing import List, Optional
 from enum import Enum
 from sqlalchemy import Integer, String, Date, Boolean, Text, Enum as SAEnum, Column, Table, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, relationship, mapped_column, Mapped
@@ -46,9 +46,9 @@ class Inschrijving(Base):
     __tablename__ = "inschrijving"
     
     datum = mapped_column(String)
-    school_id: Mapped[int] = mapped_column(ForeignKey("school.id"))
+    school_id: Mapped[int] = mapped_column(ForeignKey("school.id"), index=True, nullable=False)
     school: Mapped[School] = relationship(back_populates="inschrijvingen")
-    leerling_id: Mapped[int] = mapped_column(ForeignKey("leerling.id"))
+    leerling_id: Mapped[int] = mapped_column(ForeignKey("leerling.id"), index=True, nullable=False)
     leerling: Mapped[Leerling] = relationship(back_populates="inschrijvingen") 
 
 class Leerjaar(Base):
@@ -76,7 +76,7 @@ class Locatie(Base):
     __tablename__ = "locatie"
     
     adres = mapped_column(String)
-    school_id: Mapped[int] = mapped_column(ForeignKey("school.id"))
+    school_id: Mapped[Optional[int]] = mapped_column(ForeignKey("school.id"), index=True, nullable=True)
     school: Mapped[School] = relationship(back_populates="locaties") 
 
 class Loopbaanstap(Base):
@@ -87,7 +87,7 @@ class Loopbaanstap(Base):
     klas = mapped_column(Integer)
     onderwijstype = mapped_column(SAEnum(Onderwijstype))
     schooljaar = mapped_column(String)
-    onderwijsloopbaan_id: Mapped[int] = mapped_column(ForeignKey("onderwijsloopbaan.id"))
+    onderwijsloopbaan_id: Mapped[int] = mapped_column(ForeignKey("onderwijsloopbaan.id"), index=True, nullable=False)
     onderwijsloopbaan: Mapped[Onderwijsloopbaan] = relationship(back_populates="loopbaanstapen") 
 
 class Onderwijsloopbaan(Base):
@@ -96,7 +96,7 @@ class Onderwijsloopbaan(Base):
     __tablename__ = "onderwijsloopbaan"
     
     loopbaanstapen: Mapped[List[Loopbaanstap]] = relationship(back_populates="onderwijsloopbaan")
-    leerling_id: Mapped[int] = mapped_column(ForeignKey("leerling.id"))
+    leerling_id: Mapped[int] = mapped_column(ForeignKey("leerling.id"), index=True, nullable=False)
     leerling: Mapped[Leerling] = relationship(back_populates="onderwijsloopbaanen")
     schoolen: Mapped[List[School]] = relationship(secondary=koppel_kent_EAID_FA07FA3D_3EC3_450e_8FE0_766875D7CC5F) 
 
@@ -139,7 +139,7 @@ class Startkwalificatie(Base):
     __tablename__ = "startkwalificatie"
     
     datumbehaald = mapped_column(String)
-    leerling_id: Mapped[int] = mapped_column(ForeignKey("leerling.id"))
+    leerling_id: Mapped[int] = mapped_column(ForeignKey("leerling.id"), index=True, nullable=False)
     leerling: Mapped[Leerling] = relationship(back_populates="startkwalificatie") 
 
 class Uitschrijving(Base):
@@ -149,9 +149,9 @@ class Uitschrijving(Base):
     
     datum = mapped_column(String)
     diplomabehaald = mapped_column(Boolean)
-    leerling_id: Mapped[int] = mapped_column(ForeignKey("leerling.id"))
+    leerling_id: Mapped[int] = mapped_column(ForeignKey("leerling.id"), index=True, nullable=False)
     leerling: Mapped[Leerling] = relationship(back_populates="uitschrijvingen")
-    school_id: Mapped[int] = mapped_column(ForeignKey("school.id"))
+    school_id: Mapped[int] = mapped_column(ForeignKey("school.id"), index=True, nullable=False)
     school: Mapped[School] = relationship(back_populates="uitschrijvingen") 
 
 
