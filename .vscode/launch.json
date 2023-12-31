@@ -59,7 +59,7 @@
             "justMyCode": true,
             "args": ["import",
                 "-t", "eaxmi",
-                "-f", "/Users/arjen/Downloads/GGM v2.xml",
+                "-f", "/Users/arjen/Dropbox/Development/Gemeentelijk-Gegevensmodel/Gemeentelijk Gegevensmodel XMI2.1.xml",
                 "-db_create" //,
                 //"--skip_xmi_relations"
             ]
@@ -159,7 +159,7 @@
             "justMyCode": true,
             "args": ["export",
                 "-t", "sqla",
-                "-f", "./test/output/test.py"
+                "-f", "../ggm_alembic/app/model.py"
             ]
         }
     ]

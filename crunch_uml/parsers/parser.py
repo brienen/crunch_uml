@@ -40,7 +40,7 @@ def add_args(argumentparser, subparser_dict):
 
 
 def fixtag(tag):
-    return tag.replace('-', '_')
+    return tag.replace('-', '_').replace(' ', '_').lower()
 
 
 def copy_values(node, obj):

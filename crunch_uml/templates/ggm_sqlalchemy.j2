@@ -13,7 +13,7 @@ class Base(DeclarativeBase):
 # Enumeraries
 {% for enumeration in package.enumerations %}
 class {{ enumeration.name | pascal_case  }}(Enum):
-{% for literal in enumeration.literals %}{% if literal.name is not none %}  {{ literal.name | pythonize }} = {{ loop.index }}{% endif %}
+{% for literal in enumeration.literals %}{% if literal.name is not none %}  {{ literal.name | pascal_case }} = {{ loop.index }}{% endif %}
 {% endfor %}{% endfor %}
 
 
@@ -42,7 +42,7 @@ class {{ class.name | pascal_case  }}(Base):
     '''
     {{- class.definitie|default("<Geen Definities>", true)  }}
     '''
-    __tablename__ = "{{ class.name | snake_case }}"
+    __tablename__ = "{{ package.getPackageLst(package) | lower }}__{{ class.name | snake_case }}"
     {% for attribute in class.attributes -%}
         {%- if attribute.name is not none %}
     {{ attribute.name | snake_case }} = mapped_column({{ attribute.getDatatype() | sqla_datatype }})

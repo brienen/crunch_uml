@@ -50,6 +50,11 @@ class EAXMIParser(XMIParser):
             project = packageref.xpath('./project')[0]
             copy_values(project, package)
 
+            tags = packageref.xpath('./tags/tag')
+            for tag in tags:
+                if hasattr(package, fixtag(tag.get('name'))):
+                    setattr(package, fixtag(tag.get('name')), tag.get('value'))
+
             database.save(package)
 
         '''

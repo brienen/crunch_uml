@@ -128,6 +128,7 @@ class Package(Base, UMLBase):  # type: ignore
     subpackages = relationship("Package", back_populates="parent_package")
     classes = relationship("Class", back_populates="package")
     enumerations = relationship("Enumeratie", back_populates="package")
+    modelnaam_kort = Column(String)
 
 
 class Class(Base, UMLBase, UMLTags):  # type: ignore
