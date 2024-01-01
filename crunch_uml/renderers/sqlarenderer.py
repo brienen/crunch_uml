@@ -72,6 +72,20 @@ def getPackageLst(self, package: db.Package):
 
 
 
+# SQLA methods to be used while rendering templates
+def nameSnakeCase(self):
+    return pythonize(inflection.underscore(self.name.replace(" ", ""))) if isinstance(self.name, str) else ''
+
+def namePascalCase(self):
+    return pythonize(inflection.camelize(self.name.replace(" ", ""))) if isinstance(self.name, str) else ''
+
+def tablename(self): # "{{ package.getPackageLst(package) | lower }}__{{ class.name | snake_case }}"
+    return f"{getPackageLst(self.package, self.package).lower()}__{nameSnakeCase(self)}"
+
+def koppeltabelname(self): # "koppel_{{ associatie.name | snake_case }}_{{ associatie.id}}"
+    return f"koppel_{self.getSQLAName()}_{self.id}"
+
+
 @RendererRegistry.register(
     "sqla",
     descr='Renderer that renders SQLAlchemy 2.0 files. It uses Jinja2 and renders one file per model filled with classes of that model, '
@@ -101,5 +115,23 @@ class SQLARenderer(Jinja2Renderer):
     def render(self, args, database: db.Database):
         # place to set up custom code
         db.Package.getPackageLst = getPackageLst
+        db.UML_Generic.getSQLAName = nameSnakeCase
+        db.Class.getSQLAName = namePascalCase
+        db.Class.getSQLAAttrName = nameSnakeCase
+        db.Class.getSQLATableName = tablename
+        db.Enumeratie.getSQLAName = namePascalCase
+        db.Enumeratie.getSQLAAttrName = nameSnakeCase
+        db.EnumerationLiteral.getSQLAName = namePascalCase
+        db.Association.getSQLAKoppelName = koppeltabelname
+
         super().render(args, database)
+
         del db.Package.getPackageLst
+        del db.UML_Generic.getSQLAName
+        del db.Class.getSQLAName
+        del db.Class.getSQLAAttrName
+        del db.Class.getSQLATableName
+        del db.Enumeratie.getSQLAName
+        del db.Enumeratie.getSQLAAttrName
+        del db.EnumerationLiteral.getSQLAName
+        del db.Association.getSQLAKoppelName

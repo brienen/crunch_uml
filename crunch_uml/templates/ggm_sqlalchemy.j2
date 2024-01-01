@@ -12,8 +12,8 @@ class Base(DeclarativeBase):
 {# Enumeraries #}
 # Enumeraries
 {% for enumeration in package.enumerations %}
-class {{ enumeration.name | pascal_case  }}(Enum):
-{% for literal in enumeration.literals %}{% if literal.name is not none %}  {{ literal.name | pascal_case }} = {{ loop.index }}{% endif %}
+class {{ enumeration.getSQLAName() }}(Enum):
+{% for literal in enumeration.literals %}{% if literal.name is not none %}  {{ literal.getSQLAName() }} = {{ loop.index }}{% endif %}
 {% endfor %}{% endfor %}
 
 
@@ -23,11 +23,11 @@ class {{ enumeration.name | pascal_case  }}(Enum):
     {%- for associatie in class.uitgaande_associaties %}
         {%- if not associatie.hasOrphan() %}
             {%- if associatie.getType(class) == 'n-m' %}
-koppel_{{ associatie.name | snake_case }}_{{ associatie.id}} = Table(
-    "koppel_{{ associatie.name | snake_case }}_{{ associatie.id}}",
+{{ associatie.getSQLAKoppelName() }} = Table(
+    "{{ associatie.getSQLAKoppelName() }}",
     Base.metadata,
-    Column("left_id", ForeignKey("{{ associatie.src_class.name | snake_case }}.id"), primary_key=True),
-    Column("right_id", ForeignKey("{{ associatie.dst_class.name | snake_case }}.id"), primary_key=True),
+    Column("left_id", ForeignKey("{{ associatie.src_class.getSQLATableName() }}.id"), primary_key=True),
+    Column("right_id", ForeignKey("{{ associatie.dst_class.getSQLATableName() }}.id"), primary_key=True),
 )
             {%- endif %}
         {%- endif %}
@@ -38,28 +38,28 @@ koppel_{{ associatie.name | snake_case }}_{{ associatie.id}} = Table(
 {# Classes #}
 # Classes
 {% for class in package.classes -%}
-class {{ class.name | pascal_case  }}(Base):
+class {{ class.getSQLAName()  }}(Base):
     '''
     {{- class.definitie|default("<Geen Definities>", true)  }}
     '''
-    __tablename__ = "{{ package.getPackageLst(package) | lower }}__{{ class.name | snake_case }}"
+    __tablename__ = "{{ class.getSQLATableName() }}"
     {% for attribute in class.attributes -%}
         {%- if attribute.name is not none %}
-    {{ attribute.name | snake_case }} = mapped_column({{ attribute.getDatatype() | sqla_datatype }})
+    {{ attribute.getSQLAName() }} = mapped_column({{ attribute.getDatatype() | sqla_datatype }})
         {%- endif %}
     {%- endfor %}
     {%- for associatie in class.uitgaande_associaties -%}
         {%- if not associatie.hasOrphan() %}
         {#- Source: {{ associatie.getType(class) }} {{ associatie.id }} Source_mult: {{ associatie.src_mult_end }} Dest_mult: {{ associatie.dst_mult_end }} #}
             {%- if associatie.getType(class) == 'n-1' %}
-    {{ associatie.dst_class.name | snake_case }}_id: Mapped[{{ 'int' if associatie.src_mult_start != '1' else 'Optional[int]' }}] = mapped_column(ForeignKey("{{ associatie.dst_class.name | snake_case }}.id"), index=True, nullable={{ associatie.src_mult_start == '1' }})
-    {{ associatie.dst_class.name | snake_case }}: Mapped[{{ associatie.dst_class.name | pascal_case }}] = relationship(back_populates="{{ class.name | snake_case | meervoud}}")
+    {{ associatie.dst_class.getSQLAAttrName() }}_id: Mapped[{{ 'int' if associatie.src_mult_start != '1' else 'Optional[int]' }}] = mapped_column(ForeignKey("{{ associatie.dst_class.getSQLATableName() }}.id"), index=True, nullable={{ associatie.src_mult_start == '1' }})
+    {{ associatie.dst_class.getSQLAAttrName() }}: Mapped[{{ associatie.dst_class.getSQLAName() }}] = relationship(back_populates="{{ class.getSQLAAttrName() | meervoud}}")
             {%- elif associatie.getType(class) == '1-1' %}
-    {{ associatie.dst_class.name | snake_case }}: Mapped[{{ associatie.dst_class.name | pascal_case }}] = relationship(back_populates="{{ class.name | snake_case }}")
+    {{ associatie.dst_class.getSQLAAttrName() }}: Mapped[{{ associatie.dst_class.getSQLAName() }}] = relationship(back_populates="{{ class.getSQLAAttrName() }}")
             {%- elif associatie.getType(class) == '1-n' %}
-    {{ associatie.dst_class.name | snake_case | meervoud}}: Mapped[List[{{ associatie.dst_class.name | pascal_case }}]] = relationship(back_populates="{{ class.name | snake_case }}")
+    {{ associatie.dst_class.getSQLAAttrName() | meervoud}}: Mapped[List[{{ associatie.dst_class.getSQLAName() }}]] = relationship(back_populates="{{ class.getSQLAAttrName() }}")
             {%- elif associatie.getType(class) == 'n-m' %}
-    {{ associatie.dst_class.name | snake_case | meervoud}}: Mapped[List[{{ associatie.dst_class.name | pascal_case }}]] = relationship(secondary=koppel_{{ associatie.name | snake_case }}_{{ associatie.id}})
+    {{ associatie.dst_class.getSQLAAttrName() | meervoud}}: Mapped[List[{{ associatie.dst_class.getSQLAName() }}]] = relationship(secondary={{ associatie.getSQLAKoppelName() }})
             {%- endif %}
         {%- endif %}
     {%- endfor %}
@@ -67,15 +67,15 @@ class {{ class.name | pascal_case  }}(Base):
         {%- if not associatie.hasOrphan() %}
         {#- Dest: {{ associatie.getType(class) }} {{ associatie.id }} Source_mult: {{ associatie.src_mult_end }} Dest_mult: {{ associatie.dst_mult_end }} #}
             {%- if associatie.getType(class) in ['1-1'] %}
-    {{ associatie.src_class.name | snake_case }}_id: Mapped[{{ 'int' if associatie.dst_mult_start != '1' else 'Optional[int]' }}] = mapped_column(ForeignKey("{{ associatie.src_class.name | snake_case }}.id"), index=True, nullable={{ associatie.dst_mult_start == '1' }})
-    {{ associatie.src_class.name | snake_case }}: Mapped[{{ associatie.src_class.name | pascal_case }}] = relationship(back_populates="{{ class.name | snake_case }}")
+    {{ associatie.src_class.getSQLAAttrName() }}_id: Mapped[{{ 'int' if associatie.dst_mult_start != '1' else 'Optional[int]' }}] = mapped_column(ForeignKey("{{ associatie.src_class.getSQLATableName() }}.id"), index=True, nullable={{ associatie.dst_mult_start == '1' }})
+    {{ associatie.src_class.getSQLAAttrName() }}: Mapped[{{ associatie.src_class.getSQLAName() }}] = relationship(back_populates="{{ class.getSQLAAttrName() }}")
             {%- elif associatie.getType(class) in ['1-n'] %}
-    {{ associatie.src_class.name | snake_case }}_id: Mapped[{{ 'int' if associatie.dst_mult_start != '1' else 'Optional[int]' }}] = mapped_column(ForeignKey("{{ associatie.src_class.name | snake_case }}.id"), index=True, nullable={{ associatie.dst_mult_start == '1' }})
-    {{ associatie.src_class.name | snake_case }}: Mapped[{{ associatie.src_class.name | pascal_case }}] = relationship(back_populates="{{ class.name | snake_case | meervoud}}")
+    {{ associatie.src_class.getSQLAAttrName() }}_id: Mapped[{{ 'int' if associatie.dst_mult_start != '1' else 'Optional[int]' }}] = mapped_column(ForeignKey("{{ associatie.src_class.getSQLATableName() }}.id"), index=True, nullable={{ associatie.dst_mult_start == '1' }})
+    {{ associatie.src_class.getSQLAAttrName() }}: Mapped[{{ associatie.src_class.getSQLAName() }}] = relationship(back_populates="{{ class.getSQLAAttrName() | meervoud}}")
             {%- elif associatie.getType(class) == 'n-1' %}
-    {{ associatie.src_class.name | snake_case | meervoud}}: Mapped[List[{{ associatie.src_class.name | pascal_case }}]] = relationship(back_populates="{{ class.name | snake_case }}")
+    {{ associatie.src_class.getSQLAAttrName() | meervoud}}: Mapped[List[{{ associatie.src_class.getSQLAName() }}]] = relationship(back_populates="{{ class.getSQLAAttrName() }}")
             {%- elif associatie.getType(class) == 'n-m' %}
-    {{ associatie.src_class.name | snake_case | meervoud}}: Mapped[List[{{ associatie.src_class.name | pascal_case }}]] = relationship(secondary=koppel_{{ associatie.name | snake_case }}_{{ associatie.id}})
+    {{ associatie.src_class.getSQLAAttrName() | meervoud}}: Mapped[List[{{ associatie.src_class.getSQLAName() }}]] = relationship(secondary={{ associatie.getSQLAKoppelName() }})
             {%- endif %}
         {%- endif %}
     {%- endfor %} 
