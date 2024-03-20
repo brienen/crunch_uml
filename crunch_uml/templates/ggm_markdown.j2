@@ -1,3 +1,6 @@
+{% set generieke_kenmerken = ['name', 'toelichting', 'synoniemen', 'uri', 'bron', 'author', 'version', 'created', 'modified', 'id'] %}
+{% set package_kenmerken = generieke_kenmerken + [] %}
+{% set object_kenmerken = generieke_kenmerken + ['domein-iv3', 'domein-dcat', 'GEMMA-naam', 'GEMMA-type', 'GEMMA-url'] %}
 # {{ package.name }}
 {{ package.definitie|default("", true) }}
 
@@ -6,44 +9,29 @@ Het model '{{ package.name }}' kent de volgende objecttypen:
 {% for class in package.classes %}* **{{ class.name }}**: {{ class.definitie|default("<Geen Definities>", true)  }}
 {% endfor %}
 
-{% if package.enumerations|length > 0 %}
-Het model '{{ package.name }}' kent de volgende enumeraties:
-
-{% for enumeratie in package.enumerations %}* **{{ enumeratie.name }}**: {{ enumeratie.definitie|default("<Geen Definities>", true)  }}
-{% endfor %}
-{% endif %}
-
-## Kenmerken
-
 Het model '{{ package.name }}' heeft de volgende kenmerken:
 
 | Kenmerk | Waarde |
 | :--- | :------ |
-{% for name, value in package.to_dict().items() %}| {{ name }} | {{ value|default("", true) }} |
+{% for kenmerk in package_kenmerken %}| {{ kenmerk }} | {{ package.to_dict().get(kenmerk,'')|default("", true) }} |
 {% endfor %}
 
-## Objecttypen
+## Objecttypen {{ package.name }}
 
 {# Classes #}
 {% for class in package.classes %}
-### {{ class.name }}
-{{ class.definitie }}
+### Objecttype {{ class.name }}
+> **Definitie {{ class.name }}:** 
+>
+> {{ class.definitie }}
 
-Het objecttype {{ class.name }} kent de volgende attributen:
-
-{% for attribute in class.attributes %}{% if attribute.name is not none %}* **{{ attribute.name }}**: {{ attribute.definitie|default("<Geen Definities>", true)  }}{% endif %}
-{% endfor %}
-
-Het objecttype {{ class.name }} heeft de volgende kenmerken:
-
-| Kenmerk | Waarde |
+| Eigenschap | Waarde |
 | :--- | :------ |
-{% for name, value in class.to_dict().items() %}| {{ name }} | {{ value|default("", true) }} |
+{% for kenmerk in object_kenmerken %}| {{ kenmerk }} | {{ class.to_dict().get(kenmerk,'')|default("", true) }} |
 {% endfor %}
+{# % for name, value in class.to_dict().items() %}| {{ name }} | {{ value|default("", true) }} | #}
 
-#### Attributen 
-
-Het objecttype {{ class.name }} heeft de volgende attributen:
+#### Attributen van objecttype {{ class.name }}
 
 | Attribute | Datatype | Description |
 | :--- | :--- | :--- |
@@ -58,7 +46,7 @@ Het objecttype {{ class.name }} heeft de volgende attributen:
 ## Enumeraties
 
 {% for enumeration in package.enumerations %}
-## Enumeratie: {{ enumeration.name }}
+## Enumeratie {{ enumeration.name }}
 {{ enumeration.definitie|default("", true) }}
 
 Het enumeratie {{ enumeration.name }} kent de volgende waarden:
@@ -72,7 +60,7 @@ De enumeratie {{ enumeration.name }} heeft de volgende kenmerken:
 
 | Kenmerk | Waarde |
 | :--- | :------ |
-{% for name, value in enumeration.to_dict().items() %}| {{ name }} | {{ value|default("", true) }} |
+{% for kenmerk in object_kenmerken %}| {{ kenmerk }} | {{ enumeration.to_dict().get(kenmerk,'') }} |
 {% endfor %}
 
 {% endfor %}
