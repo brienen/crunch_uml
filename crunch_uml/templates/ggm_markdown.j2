@@ -1,8 +1,10 @@
-{% set generieke_kenmerken = ['name', 'toelichting', 'synoniemen', 'uri', 'bron', 'author', 'version', 'created', 'modified', 'id'] %}
-{% set package_kenmerken = generieke_kenmerken + [] %}
-{% set object_kenmerken = generieke_kenmerken + ['domein-iv3', 'domein-dcat', 'GEMMA-naam', 'GEMMA-type', 'GEMMA-url'] %}
+{%- set generieke_kenmerken = ['name', 'toelichting', 'synoniemen', 'uri', 'bron', 'author', 'version', 'created', 'modified', 'id'] -%}
+{%- set package_kenmerken = generieke_kenmerken + [] -%}
+{%- set object_kenmerken = generieke_kenmerken + ['domein-iv3', 'domein-dcat', 'GEMMA-naam', 'GEMMA-type', 'GEMMA-url'] -%}
 # {{ package.name }}
-{{ package.definitie|default("", true) }}
+> **Definitie {{ package.name }}:** 
+>
+> {{ package.definitie|default("Geen definitie", true) }}
 
 Het model '{{ package.name }}' kent de volgende objecttypen:
 
@@ -17,7 +19,6 @@ Het model '{{ package.name }}' heeft de volgende kenmerken:
 {% endfor %}
 
 ## Objecttypen {{ package.name }}
-
 {# Classes #}
 {% for class in package.classes %}
 ### Objecttype {{ class.name }}
@@ -29,9 +30,8 @@ Het model '{{ package.name }}' heeft de volgende kenmerken:
 | :--- | :------ |
 {% for kenmerk in object_kenmerken %}| {{ kenmerk }} | {{ class.to_dict().get(kenmerk,'')|default("", true) }} |
 {% endfor %}
-{# % for name, value in class.to_dict().items() %}| {{ name }} | {{ value|default("", true) }} | #}
 
-#### Attributen van objecttype {{ class.name }}
+Attributen van objecttype {{ class.name }}
 
 | Attribute | Datatype | Description |
 | :--- | :--- | :--- |
@@ -39,22 +39,19 @@ Het model '{{ package.name }}' heeft de volgende kenmerken:
 {% endfor %}
 
 {% endfor %}
-
 {# Enumerations #}
 {% if package.enumerations|length > 0 %}
 
 ## Enumeraties
 
 {% for enumeration in package.enumerations %}
-## Enumeratie {{ enumeration.name }}
+### Enumeratie {{ enumeration.name }}
 {{ enumeration.definitie|default("", true) }}
 
 Het enumeratie {{ enumeration.name }} kent de volgende waarden:
 
 {% for literal in enumeration.literals %}{% if literal.name is not none %}* **{{ literal.name }}**: {{ literal.definitie|default("<Geen Definities>", true)  }}{% endif %}
 {% endfor %}
-
-### Kenmerken en waarden
 
 De enumeratie {{ enumeration.name }} heeft de volgende kenmerken:
 
