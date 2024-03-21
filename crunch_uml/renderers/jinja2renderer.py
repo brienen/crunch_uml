@@ -1,8 +1,7 @@
 import logging
 import os
+
 import inflection
-
-
 from jinja2 import Environment, FileSystemLoader
 
 from crunch_uml import const, db
@@ -58,13 +57,17 @@ class Jinja2Renderer(ModelRenderer):
         # Voeg het inflection filter toe
         env.filters['snake_case'] = lambda s: inflection.underscore(s.replace(" ", "")) if isinstance(s, str) else ''
         env.filters['pascal_case'] = lambda s: inflection.camelize(s.replace(" ", "")) if isinstance(s, str) else ''
-        env.filters['camel_case'] = lambda s: inflection.camelize(s.replace(" ", ""), False) if isinstance(s, str) else ''
+        env.filters['camel_case'] = lambda s: (
+            inflection.camelize(s.replace(" ", ""), False) if isinstance(s, str) else ''
+        )
         env.filters['pythonize'] = lambda s: s.replace(" ", "").replace("-", "_") if isinstance(s, str) else ''
-  
-    
+        env.filters['md_newline'] = lambda s: (
+            s.replace('\n', '\n> ').replace('\r\n', '\r\n> ') if isinstance(s, str) else ''
+        )
+        env.filters['del_newline'] = lambda s: s.replace('\n', ' ').replace('\r\n', ' ') if isinstance(s, str) else ''
+
     def getFilename(self, inputfilename, extension, package):
         return f"{inputfilename}_{package.name}{extension}"
-
 
     def render(self, args, database: db.Database):
         # setup output filename

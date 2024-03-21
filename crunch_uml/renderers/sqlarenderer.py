@@ -1,13 +1,15 @@
+# mypy: ignore-errors
 import logging
 import re
+
 import inflection
 
-from crunch_uml import const, db
-from crunch_uml.excpetions import CrunchException
-from crunch_uml.renderers.renderer import RendererRegistry
+from crunch_uml import db
 from crunch_uml.renderers.jinja2renderer import Jinja2Renderer
+from crunch_uml.renderers.renderer import RendererRegistry
 
 logger = logging.getLogger()
+
 
 def pythonize(input_string):
     """
@@ -66,56 +68,116 @@ def getPackageLst(self, package: db.Package):
     if package.parent_package is None or getPackageLst(self, package.parent_package) == '':
         return package.modelnaam_kort if package.modelnaam_kort is not None else ''
     else:
-        return (f"{getPackageLst(self, package.parent_package)}_{package.modelnaam_kort}" 
-                if package.modelnaam_kort is not None 
-                else getPackageLst(self, package.parent_package))
+        return (
+            f"{getPackageLst(self, package.parent_package)}_{package.modelnaam_kort}"
+            if package.modelnaam_kort is not None
+            else getPackageLst(self, package.parent_package)
+        )
 
+
+def getPackageImports(self: db.Package):
+    imports = {}  # No error!
+    for clazz in self.classes:
+        for attr in clazz.attributes:
+            if attr.type_class and attr.type_class.package and attr.type_class.package != self:
+                if attr.type_class.package not in imports:
+                    imports[attr.type_class.package] = set()
+                imports[attr.type_class.package].add(attr.type_class)
+            if attr.enumeration and attr.enumeration.package and attr.enumeration.package != self:
+                if attr.enumeration.package not in imports:
+                    imports[attr.enumeration.package] = set()
+                imports[attr.enumeration.package].add(attr.enumeration)
+        for associatie in clazz.uitgaande_associaties:
+            if not associatie.hasOrphan() and associatie.dst_class.package and associatie.dst_class.package != self:
+                if associatie.dst_class.package not in imports:
+                    imports[associatie.dst_class.package] = set()
+                imports[associatie.dst_class.package].add(associatie.dst_class)
+        for associatie in clazz.inkomende_associaties:
+            if not associatie.hasOrphan() and associatie.src_class.package and associatie.src_class.package != self:
+                if associatie.src_class.package not in imports:
+                    imports[associatie.src_class.package] = set()
+                imports[associatie.src_class.package].add(associatie.src_class)
+    return imports
 
 
 # SQLA methods to be used while rendering templates
 def nameSnakeCase(self):
     return pythonize(inflection.underscore(self.name.replace(" ", ""))) if isinstance(self.name, str) else ''
 
+
 def namePascalCase(self):
     return pythonize(inflection.camelize(self.name.replace(" ", ""))) if isinstance(self.name, str) else ''
 
-def tablename(self): # "{{ package.getPackageLst(package) | lower }}__{{ class.name | snake_case }}"
+
+def tablename(self):  # "{{ package.getPackageLst(package) | lower }}__{{ class.name | snake_case }}"
     return f"{getPackageLst(self.package, self.package).lower()}__{nameSnakeCase(self)}"
 
-def koppeltabelname(self): # "koppel_{{ associatie.name | snake_case }}_{{ associatie.id}}"
-    return f"koppel_{self.getSQLAName()}_{self.id}"
+
+def koppeltabelname(self):  # "koppel_{{ associatie.name | snake_case }}_{{ associatie.id}}"
+    return (
+        f"{getPackageLst(self.src_class.package, self.src_class.package).lower()}__koppel_{self.getSQLAName()}_{self.id}"
+    )
+
+
+def packagename(self: db.Package):
+    return f"model_{namePascalCase(self)}"
+
+
+def getFilename(inputfilename: str, extension: str, package: db.Package):
+    # Verwijder de substring case-insensitief
+    packagename = re.sub(re.escape('model'), "", package.name, flags=re.IGNORECASE)  # No error!
+    packagename = pythonize(inflection.underscore(packagename.replace(" ", ""))) if isinstance(packagename, str) else ''
+    return f"{inputfilename}_{packagename}{extension}"
 
 
 @RendererRegistry.register(
     "sqla",
-    descr='Renderer that renders SQLAlchemy 2.0 files. It uses Jinja2 and renders one file per model filled with classes of that model, '
-    + 'where a model is a package that includes at least one Class. '
+    descr=(
+        'Renderer that renders SQLAlchemy 2.0 files. It uses Jinja2 and renders one file per model filled with classes'
+        ' of that model, '
+    )
+    + 'where a model is a package that includes at least one Class. ',
 )
 class SQLARenderer(Jinja2Renderer):
     '''
     Renders all model packages using jinja2 and a template.
     A model package is a package with at least 1 class inside
     '''
+
     template = 'ggm_sqlalchemy.j2'  # type: ignore
     enforce_output_package_ids = True  # Enforce list of Package ids
-
 
     def addFilters(self, env):
         # Voeg het inflection filter toe
         super().addFilters(env)
         env.filters['sqla_datatype'] = getSQLADatatype
         env.filters['meervoud'] = getMeervoud
-        env.filters['snake_case'] = lambda s: pythonize(inflection.underscore(s.replace(" ", ""))) if isinstance(s, str) else ''
-        env.filters['pascal_case'] = lambda s: pythonize(inflection.camelize(s.replace(" ", ""))) if isinstance(s, str) else ''
-        env.filters['camel_case'] = lambda s: pythonize(inflection.camelize(s.replace(" ", "")), False) if isinstance(s, str) else ''
-        env.filters['pythonize'] = lambda s: pythonize(s.replace(" ", "").replace("-", "_")) if isinstance(s, str) else ''
+        env.filters['snake_case'] = lambda s: (
+            pythonize(inflection.underscore(s.replace(" ", ""))) if isinstance(s, str) else ''
+        )
+        env.filters['pascal_case'] = lambda s: (
+            pythonize(inflection.camelize(s.replace(" ", ""))) if isinstance(s, str) else ''
+        )
+        env.filters['camel_case'] = lambda s: (
+            pythonize(inflection.camelize(s.replace(" ", "")), False) if isinstance(s, str) else ''
+        )
+        env.filters['pythonize'] = lambda s: (
+            pythonize(s.replace(" ", "").replace("-", "_")) if isinstance(s, str) else ''
+        )
 
+    def getFilename(self, inputfilename, extension, package):
+        return getFilename(inputfilename, extension, package)
 
+    def getModels(self, args, database):
+        models = super().getModels(args, database)
+        return [model for model in models if model.modelnaam_kort is not None]
 
     def render(self, args, database: db.Database):
         # place to set up custom code
+        db.UML_Generic.getSQLAName = nameSnakeCase  # No error!
         db.Package.getPackageLst = getPackageLst
-        db.UML_Generic.getSQLAName = nameSnakeCase
+        db.Package.getPackageImports = getPackageImports
+        db.Package.getSQLAName = lambda x: getFilename('model', '', x)
         db.Class.getSQLAName = namePascalCase
         db.Class.getSQLAAttrName = nameSnakeCase
         db.Class.getSQLATableName = tablename
@@ -126,8 +188,10 @@ class SQLARenderer(Jinja2Renderer):
 
         super().render(args, database)
 
+        del db.UML_Generic.getSQLAName  # No error!
         del db.Package.getPackageLst
-        del db.UML_Generic.getSQLAName
+        del db.Package.getPackageImports
+        del db.Package.getSQLAName
         del db.Class.getSQLAName
         del db.Class.getSQLAAttrName
         del db.Class.getSQLATableName

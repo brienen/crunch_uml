@@ -2,51 +2,53 @@
 {%- set package_kenmerken = generieke_kenmerken + [] -%}
 {%- set object_kenmerken = generieke_kenmerken + ['domein-iv3', 'domein-dcat', 'GEMMA-naam', 'GEMMA-type', 'GEMMA-url'] -%}
 # {{ package.name }}
+## Inleiding
 > **Definitie {{ package.name }}:** 
 >
-> {{ package.definitie|default("Geen definitie", true) }}
+> {{ package.definitie|default("Geen definitie", true)|md_newline() }}
 
 Het model '{{ package.name }}' kent de volgende objecttypen:
 
-{% for class in package.classes %}* **{{ class.name }}**: {{ class.definitie|default("<Geen Definities>", true)  }}
+{% for class in package.classes %}* **{{ class.name }}**: {{ class.definitie|default("<Geen Definities>", true)|del_newline()  }}
 {% endfor %}
 
 Het model '{{ package.name }}' heeft de volgende kenmerken:
 
 | Kenmerk | Waarde |
 | :--- | :------ |
-{% for kenmerk in package_kenmerken %}| {{ kenmerk }} | {{ package.to_dict().get(kenmerk,'')|default("", true) }} |
+{% for kenmerk in package_kenmerken %}| {{ kenmerk }} | {{ package.to_dict().get(kenmerk,'')|default("", true)|del_newline() }} |
 {% endfor %}
 
 ## Objecttypen {{ package.name }}
 {# Classes #}
 {% for class in package.classes %}
-### Objecttype {{ class.name }}
+### {{ class.name }}
 > **Definitie {{ class.name }}:** 
 >
-> {{ class.definitie }}
+> {{ class.definitie|default("Geen Definitie", true)|md_newline() }}
 
 | Eigenschap | Waarde |
 | :--- | :------ |
-{% for kenmerk in object_kenmerken %}| {{ kenmerk }} | {{ class.to_dict().get(kenmerk,'')|default("", true) }} |
+{% for kenmerk in object_kenmerken %}| {{ kenmerk }} | {{ class.to_dict().get(kenmerk,'')|default("", true)|del_newline() }} |
 {% endfor %}
 
 Attributen van objecttype {{ class.name }}
 
 | Attribute | Datatype | Description |
 | :--- | :--- | :--- |
-{% for attribute in class.attributes %}{% if attribute.name is not none %}| {{ attribute.name }} | {{ attribute.getDatatype()|default("", true) }} | {{ attribute.definitie|default("", true) }} |{% endif %}
+{% for attribute in class.attributes %}| {{ attribute.name }} | {{ attribute.getDatatype()|default("", true) }} | {{ attribute.definitie|default("", true) }} |
 {% endfor %}
+
 
 {% endfor %}
 {# Enumerations #}
 {% if package.enumerations|length > 0 %}
 
-## Enumeraties
+## Enumeraties {{ package.name }}
 
 {% for enumeration in package.enumerations %}
-### Enumeratie {{ enumeration.name }}
-{{ enumeration.definitie|default("", true) }}
+### {{ enumeration.name }}
+{{ enumeration.definitie|default("Geen Definitie", true)|md_newline() }}
 
 Het enumeratie {{ enumeration.name }} kent de volgende waarden:
 

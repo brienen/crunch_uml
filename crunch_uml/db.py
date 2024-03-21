@@ -1,7 +1,6 @@
 from sqlalchemy import Column, ForeignKey, String, Text, create_engine, inspect
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy.orm.relationships import RelationshipProperty
-from enum import Enum
 
 import crunch_uml.const as const
 
@@ -210,14 +209,13 @@ class Association(Base, UML_Generic):  # type: ignore
     dst_documentation = Column(Text)
 
     def hasOrphan(self):
-        return self.dst_class.package_id is None or self.src_class.package_id is None 
+        return self.dst_class.package_id is None or self.src_class.package_id is None
 
     def getType(self, clazz):
         if self.src_mult_end == '1':
             return '1-1' if self.dst_mult_end == '1' else '1-n'
         else:
             return 'n-1' if self.dst_mult_end == '1' else 'n-m'
-
 
 
 class Generalization(Base, UML_Generic):  # type: ignore
