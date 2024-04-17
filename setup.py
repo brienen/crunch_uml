@@ -43,7 +43,8 @@ setuptools.setup(
         'jinja2>=3.1.2,<4',
         'types-requests',
         'rdflib>=7.0.0,<8',
-        'inflection>=0.5.1,<6'
+        'inflection>=0.5.1,<6',
+        'validators>=0.28.0,<1'
         ],
     extras_require={
         'dev': [

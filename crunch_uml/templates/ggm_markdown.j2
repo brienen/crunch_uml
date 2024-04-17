@@ -29,7 +29,7 @@ Het model '{{ package.name }}' heeft de volgende kenmerken:
 
 | Eigenschap | Waarde |
 | :--- | :------ |
-{% for kenmerk in object_kenmerken %}| {{ kenmerk }} | {{ class.to_dict().get(kenmerk,'')|default("", true)|del_newline() }} |
+{% for kenmerk in object_kenmerken %}| {{ kenmerk }} | {{ class.to_dict().get(kenmerk,'')|default("", true)|del_newline()|set_url() }} |
 {% endfor %}
 
 Attributen van objecttype {{ class.name }}

@@ -2,6 +2,7 @@ import logging
 import os
 
 import inflection
+import validators
 from jinja2 import Environment, FileSystemLoader
 
 from crunch_uml import const, db
@@ -65,6 +66,7 @@ class Jinja2Renderer(ModelRenderer):
             s.replace('\n', '\n> ').replace('\r\n', '\r\n> ') if isinstance(s, str) else ''
         )
         env.filters['del_newline'] = lambda s: s.replace('\n', ' ').replace('\r\n', ' ') if isinstance(s, str) else ''
+        env.filters['set_url'] = lambda s: f"[{s}]({s})" if validators.url(s) else s
 
     def getFilename(self, inputfilename, extension, package):
         return f"{inputfilename}_{package.name}{extension}"
