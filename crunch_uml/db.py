@@ -113,10 +113,14 @@ class UMLBase(UML_Generic):
 class UMLTags:
     archimate_type = Column(String)
     datum_tijd_export = Column(String)
-    domein_dcat = Column(String)
-    domein_gemma = Column(String)
-    gemma_guid = Column(String)
     synoniemen = Column(String)
+    domein_dcat = Column(String)
+    domein_iv3 = Column(String)
+    gemma_naam = Column(String)
+    gemma_type = Column(String)
+    gemma_url = Column(String)
+    gemma_definitie = Column(String)
+    gemma_toelichting = Column(String)
 
 
 class Package(Base, UMLBase):  # type: ignore

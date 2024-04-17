@@ -220,6 +220,8 @@ class XMIParser(Parser):
         for property in properties:
             id = property.get('{' + ns['xmi'] + '}id')
             attribute = database.get_attribute(id)
+            if not attribute:
+                continue
 
             clsrefs = property.xpath('./type[@xmi:idref]', namespaces=ns)
             if len(clsrefs) == 1:

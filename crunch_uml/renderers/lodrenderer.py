@@ -1,6 +1,6 @@
 import logging
 import os
-from urllib.parse import urljoin, urlunparse
+from urllib.parse import urljoin, urlunparse, quote
 
 from rdflib import Graph, Literal, Namespace
 from rdflib.namespace import OWL, RDF, RDFS, XSD
@@ -48,7 +48,7 @@ class LodRenderer(ModelRenderer):
         # First add all classes
         for model in models:
             modelname = util.remove_substring(model.name, 'model')
-            ns = Namespace(urljoin(str(args.linked_data_namespace), f"/{modelname}/"))
+            ns = Namespace(urljoin(str(args.linked_data_namespace), f"/{quote(modelname)}/"))
 
             for cls in model.classes:
                 # Werk eerst de dict bij
