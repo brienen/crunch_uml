@@ -20,6 +20,6 @@ def test_import_monumenten():
     assert database.count_enumeratieliteral() == 2
 
     clazz = database.get_class('EAID_4AD539EC_A308_43da_B025_17A1647303F3')
-    assert clazz.archimate_type == 'Business object'
-    assert clazz.gemma_guid == 'id-4ad539ec-a308-43da-b025-17a1647303f3'
+    assert clazz.gemma_type == 'business-object'
+    assert clazz.gemma_url == 'https://gemmaonline.nl/index.php/GEMMA2/0.9/id-2b2319c1-d5b9-43c6-87cb-43bb194c65c6'
     assert clazz.definitie == 'Het bouwen van een bouwwerk.'
