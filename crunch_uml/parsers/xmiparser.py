@@ -6,6 +6,7 @@ import requests
 from lxml import etree
 
 from crunch_uml import const, db
+import crunch_uml.schema as sch
 from crunch_uml.excpetions import CrunchException
 from crunch_uml.parsers.parser import Parser, ParserRegistry
 
@@ -23,7 +24,7 @@ def remove_EADatatype(input_string):
 )
 class XMIParser(Parser):
     # Recursieve functie om de parsetree te doorlopen
-    def phase1_process_packages_classes(self, node, ns, database: db.Database, parent_package_id=None):
+    def phase1_process_packages_classes(self, node, ns, schema: sch.Schema, parent_package_id=None):
         '''
         First phase of parsing XMI-documents. Parsing recursively:
         - Packages
@@ -39,16 +40,16 @@ class XMIParser(Parser):
                 logger.info(f'Package {package.name} ingelezen met id {package.id}')
                 logger.debug(f'Package {package.name} met inhoud {vars(package)}')
 
-                database.save(package)
+                schema.save(package)
                 for childnode in node:
-                    self.phase1_process_packages_classes(childnode, ns, database, package.id)
+                    self.phase1_process_packages_classes(childnode, ns, schema, package.id)
             else:
                 logger.debug(f'Package with {name} does not have id value: discarded')
 
         elif tp == 'uml:Class':
             clazz = db.Class(id=node.get('{' + ns['xmi'] + '}id'), name=node.get('name'), package_id=parent_package_id)
             logger.debug(f'Class {clazz.name} met id {clazz.id} ingelezen met inhoud: {clazz}')
-            database.save(clazz)
+            schema.save(clazz)
 
             for childnode in node:
                 sub_tp = childnode.get('{' + ns['xmi'] + '}type')
@@ -66,14 +67,14 @@ class XMIParser(Parser):
                     logger.debug(
                         f'Attribute {attribute.name} met id {attribute.id} ingelezen met inhoud: {vars(attribute)}'
                     )
-                    database.save(attribute)
+                    schema.save(attribute)
 
         elif tp == 'uml:Enumeration':
             enum = db.Enumeratie(
                 id=node.get('{' + ns['xmi'] + '}id'), name=node.get('name'), package_id=parent_package_id
             )
             logger.debug(f'Enumeratie {enum.name} met id {enum.id} ingelezen met inhoud: {enum}')
-            database.save(enum)
+            schema.save(enum)
 
             for childnode in node:
                 sub_tp = childnode.get('{' + ns['xmi'] + '}type')
@@ -85,14 +86,14 @@ class XMIParser(Parser):
                         f'EnumerationLiteral {enumliteral.name} met id {enumliteral.id} ingelezen met inhoud:'
                         f' {vars(enumliteral)}'
                     )
-                    database.save(enumliteral)
+                    schema.save(enumliteral)
 
         else:
             for childnode in node:
                 logger.debug(f'Parsing something with tag {node.tag}, no handling implemented yet values: {node}')
-                self.phase1_process_packages_classes(childnode, ns, database, parent_package_id)
+                self.phase1_process_packages_classes(childnode, ns, schema, parent_package_id)
 
-    def phase2_process_connectors(self, node, ns, database: db.Database):
+    def phase2_process_connectors(self, node, ns, schema: sch.Schema):
         '''
         second phase of parsing XMI-documents. Parsing and connecting:
         - Assosiations
@@ -138,7 +139,7 @@ class XMIParser(Parser):
                         logger.warning(msg)
 
                         clazz = db.Class(id=clsid, name='<Orphan Class>', definitie=msg)
-                        database.save(clazz)
+                        schema.save(clazz)
                         if 'src' in id:
                             association.src_class_id = clsid  # type: ignore
                         else:
@@ -163,17 +164,17 @@ class XMIParser(Parser):
                             )
                             logger.warning(msg)
                             cls = db.Class(id=clsid, name='<Orphan Class>', definitie=msg)
-                            database.save(cls)
+                            schema.save(cls)
                             if 'src' in id:
                                 association.src_class_id = clsid  # type: ignore
                             else:
                                 association.dst_class_id = clsid  # type: ignore
                         else:
                             clsid = endpoint.xpath('./type')[0].get('{' + ns['xmi'] + '}idref')
-                            cls = database.get_class(clsid)
+                            cls = schema.get_class(clsid)
                             if cls is None:
                                 clazz = db.Class(id=clsid, name='<Orphan Class>')
-                                database.save(clazz)
+                                schema.save(clazz)
                             if 'src' in id:
                                 association.src_class_id = clsid  # type: ignore
                                 association.src_mult_start = getval('lowerValue', endpoint)
@@ -187,7 +188,7 @@ class XMIParser(Parser):
                         logger.error(err)
                         raise CrunchException(err)
 
-                database.save(association)
+                schema.save(association)
 
             '''
             Process all generalisations like so
@@ -201,7 +202,7 @@ class XMIParser(Parser):
                 superclass = generalisation_xmi.get('general')
                 subclass = generalisation_xmi.getparent().get('{' + ns['xmi'] + '}id')
                 generalization = db.Generalization(id=id, superclass_id=superclass, subclass_id=subclass)
-                database.save(generalization)
+                schema.save(generalization)
 
         except Exception as ex:
             logger.error(f"Error in phase 2 of parsing with message: {ex}")
@@ -219,40 +220,40 @@ class XMIParser(Parser):
         properties = node.xpath(".//ownedAttribute[@xmi:type='uml:Property' and @association]", namespaces=ns)  # type: ignore
         for property in properties:
             id = property.get('{' + ns['xmi'] + '}id')
-            attribute = database.get_attribute(id)
+            attribute = schema.get_attribute(id)
             if not attribute:
                 continue
 
             clsrefs = property.xpath('./type[@xmi:idref]', namespaces=ns)
             if len(clsrefs) == 1:
                 clsid = clsrefs[0].get('{' + ns['xmi'] + '}idref')
-                cls = database.get_class(clsid)
+                cls = schema.get_class(clsid)
                 if cls is None:
                     next
                 attribute.type_class_id = cls.id
-            database.save(attribute)
+            schema.save(attribute)
 
         # Last of all set enumerations
-        enums = database.get_all_enumerations()
+        enums = schema.get_all_enumerations()
         for enum in enums:
             enumverws = node.xpath(".//type[@xmi:idref='" + enum.id + "']", namespaces=ns)
             for enumverw in enumverws:
                 property = enumverw.getparent()
                 if property.tag == 'ownedAttribute' and property.get('{' + ns['xmi'] + '}type') == 'uml:Property':
                     id = property.get('{' + ns['xmi'] + '}id')
-                    attribute = database.get_attribute(id)
+                    attribute = schema.get_attribute(id)
                     if attribute is not None:
                         attribute.enumeration_id = enum.id
-                        database.save(attribute)
+                        schema.save(attribute)
 
-    def phase3_process_extra(self, node, ns, database: db.Database):
+    def phase3_process_extra(self, node, ns, schema: sch.Schema):
         '''
         third and last phase of parsing XMI-documents. Parsing extra propriatary data: addons to allready found data
         '''
         logger.info('Entering third phase parsing: extras')
         pass
 
-    def parse(self, args, database: db.Database):
+    def parse(self, args, schema: sch.Schema):
         logger.debug('Parsing with XMIParser')
 
         if args.inputfile is not None:
@@ -281,10 +282,10 @@ class XMIParser(Parser):
             self.checkSupport(root, ns)
 
             model = root.xpath('//uml:Model[@xmi:type="uml:Model"][1]', namespaces=ns)[0]  # type: ignore
-            self.phase1_process_packages_classes(model, ns, database)
+            self.phase1_process_packages_classes(model, ns, schema)
             if not args.skip_xmi_relations:
-                self.phase2_process_connectors(model, ns, database)
-            self.phase3_process_extra(root, ns, database)
+                self.phase2_process_connectors(model, ns, schema)
+            self.phase3_process_extra(root, ns, schema)
         else:
             logger.warning('No content was read from XMI-file')
 

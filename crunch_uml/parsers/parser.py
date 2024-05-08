@@ -2,6 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 
 from crunch_uml import const, db
+import crunch_uml.schema as sch 
 from crunch_uml.registry import Registry
 
 logger = logging.getLogger()
@@ -63,5 +64,5 @@ def copy_values(node, obj):
 
 class Parser(ABC):
     @abstractmethod
-    def parse(self, args, database: db.Database):
+    def parse(self, args, schema: sch.Schema):
         pass

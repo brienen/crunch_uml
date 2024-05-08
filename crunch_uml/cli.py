@@ -4,6 +4,7 @@ import os
 import sys
 
 import crunch_uml.db as db
+import crunch_uml.schema as sch
 import crunch_uml.parsers.parser as parsers
 import crunch_uml.renderers.renderer as renderers
 from crunch_uml import const
@@ -56,6 +57,7 @@ def main(args=None):
 
     # let sub modules add there own arguments
     db.add_args(argumentparser, subparser_dict)
+    sch.add_args(argumentparser, subparser_dict)
     parsers.add_args(argumentparser, subparser_dict)
     renderers.add_args(argumentparser, subparser_dict)
     args = argumentparser.parse_args(args)
@@ -74,11 +76,12 @@ def main(args=None):
 
         # Get daatbase and optionaly create new one
         database = Database(args.database_url, db_create=args.database_create_new)
+        schema = sch.Schema(database, schema_name=args.schema_name)
         try:
             # First open database, select parser and parse into database
             logger.info(f"Starting parsing with inputtype {args.inputtype}")
             parser = parsers.ParserRegistry.getinstance(args.inputtype)
-            parser.parse(args, database)
+            parser.parse(args, schema)
             database.commit()
             logger.info("Succes! parsed all data and saved it in database")
         except Exception as ex:

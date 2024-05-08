@@ -1,8 +1,13 @@
+import logging
+
 from sqlalchemy import Column, ForeignKey, String, Text, create_engine, inspect
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy.orm.relationships import RelationshipProperty
+from sqlalchemy.ext.declarative import declared_attr
 
 import crunch_uml.const as const
+
+logger = logging.getLogger()
 
 
 def add_args(argumentparser, subparser_dict):
@@ -69,6 +74,14 @@ def getColumnNames(tablename):
 
 
 # Model definitions
+class Schema(Base):
+    __tablename__ = 'schemas'
+
+    id = Column(String, primary_key=True)  # Use the schema name as ID
+    definitie = Column(Text)
+
+
+# Mixins
 class UML_Generic:
     id = Column(String, primary_key=True)  # Store the XMI id separately
     name = Column(String)
@@ -78,6 +91,11 @@ class UML_Generic:
     created = Column(String)
     modified = Column(String)
     stereotype = Column(String)
+
+    schema_id = Column(String, ForeignKey('schemas.id', deferrable=True), index=True)
+    @declared_attr
+    def schema(cls):
+        return relationship("Schema")
 
     # Return all attributes, but without relations
     def to_dict(self):
@@ -121,6 +139,7 @@ class UMLTags:
     gemma_url = Column(String)
     gemma_definitie = Column(String)
     gemma_toelichting = Column(String)
+
 
 
 class Package(Base, UMLBase):  # type: ignore
@@ -310,3 +329,12 @@ class Database:
 
     def get_session(self):
         return self.session
+
+    def get_schema(self, schema_name=const.DEFAULT_SCHEMA):
+        schema = self.session.get(Schema, schema_name)
+        if not schema:
+            schema = Schema(id=schema_name)
+            logger.info(f'Schema aangemaakt met id {schema.id}')
+            self.save(schema)
+
+        return schema

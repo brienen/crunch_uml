@@ -10,3 +10,4 @@ CMD_EXPORT = 'export'
 # CMD_FIX = 'fix'
 
 DEFAULT_LOD_NS = 'http://example.org/myns/'
+DEFAULT_SCHEMA = 'default'
