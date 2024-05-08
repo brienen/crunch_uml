@@ -84,6 +84,7 @@ class Schema(Base):
 # Mixins
 class UML_Generic:
     id = Column(String, primary_key=True)  # Store the XMI id separately
+    schema_id = Column(String, primary_key=True)
     name = Column(String)
     definitie = Column(Text)
     bron = Column(String)
@@ -92,10 +93,9 @@ class UML_Generic:
     modified = Column(String)
     stereotype = Column(String)
 
-    schema_id = Column(String, ForeignKey('schemas.id', deferrable=True), index=True)
-    @declared_attr
-    def schema(cls):
-        return relationship("Schema")
+    #@declared_attr
+    #def schema(cls):
+    #    return relationship("Schema")
 
     # Return all attributes, but without relations
     def to_dict(self):

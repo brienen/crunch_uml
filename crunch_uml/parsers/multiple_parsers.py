@@ -28,7 +28,7 @@ def store_data(entity_name, data, schema):
 
     # Als er een ID in de data aanwezig is, zoek dan naar een bestaand record
     if "id" in data:
-        if existing_entity := session.query(entity).filter_by(id=data["id"], schema_id=schema.schema.id).first():
+        if existing_entity := session.query(entity).filter_by(id=data["id"], schema_id=schema.schema_id).first():
             for key, value in data.items():
                 if value is not None and value != '':
                     setattr(existing_entity, key, value)
@@ -40,7 +40,7 @@ def store_data(entity_name, data, schema):
             new_entity = entity(**data)
             schema.save(new_entity)
     else:
-        logger.warning(f"Could not save entity with table '{entity_name}' to schema {schema.id}: no imakd present: {data}.")
+        logger.warning(f"Could not save entity with table '{entity_name}' to schema {schema.schema_id}: no imakd present: {data}.")
 
 
 @ParserRegistry.register(

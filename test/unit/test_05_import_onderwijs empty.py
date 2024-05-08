@@ -1,4 +1,5 @@
 from crunch_uml import cli, const, db
+import crunch_uml.schema as sch
 
 
 def test_import_onderwijs_empty():
@@ -6,8 +7,10 @@ def test_import_onderwijs_empty():
     cli.main(test_args)
 
     database = db.Database(const.DATABASE_URL, db_create=True)
-    assert database.count_package() == 0
-    assert database.count_enumeratie() == 0
-    assert database.count_class() == 0
-    assert database.count_attribute() == 0
-    assert database.count_enumeratieliteral() == 0
+    schema = sch.Schema(database)
+
+    assert schema.count_package() == 0
+    assert schema.count_enumeratie() == 0
+    assert schema.count_class() == 0
+    assert schema.count_attribute() == 0
+    assert schema.count_enumeratieliteral() == 0

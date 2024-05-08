@@ -3,6 +3,7 @@ import os
 import pandas as pd
 
 from crunch_uml import cli, const, db
+import crunch_uml.schema as sch
 
 
 def are_excel_files_equal(file1_path, file2_path):
@@ -40,12 +41,14 @@ def test_xlsx_parser_renderer():  # sourcery skip: extract-duplicate-method
     cli.main(test_args)
 
     database = db.Database(const.DATABASE_URL, db_create=False)
-    assert database.count_package() == 3
-    assert database.count_enumeratie() == 1
-    assert database.count_class() == 27
-    assert database.count_attribute() == 16
-    assert database.count_enumeratieliteral() == 5
-    assert database.count_association() == 24
+    schema = sch.Schema(database)
+
+    assert schema.count_package() == 3
+    assert schema.count_enumeratie() == 1
+    assert schema.count_class() == 27
+    assert schema.count_attribute() == 16
+    assert schema.count_enumeratieliteral() == 5
+    assert schema.count_association() == 24
 
     # export to xlsx
     test_args = ["export", "-f", inputfile, "-t", "xlsx"]
@@ -58,12 +61,14 @@ def test_xlsx_parser_renderer():  # sourcery skip: extract-duplicate-method
 
     # Check if data is correctly read
     database = db.Database(const.DATABASE_URL, db_create=False)
-    assert database.count_package() == 3
-    assert database.count_enumeratie() == 1
-    assert database.count_class() == 27
-    assert database.count_attribute() == 16
-    assert database.count_enumeratieliteral() == 5
-    assert database.count_association() == 24
+    schema = sch.Schema(database)
+
+    assert schema.count_package() == 3
+    assert schema.count_enumeratie() == 1
+    assert schema.count_class() == 27
+    assert schema.count_attribute() == 16
+    assert schema.count_enumeratieliteral() == 5
+    assert schema.count_association() == 24
 
     # export to output xlsx
     test_args = ["export", "-f", outputfile, "-t", "xlsx"]
@@ -88,12 +93,14 @@ def test_xlsx_parser_and_changes():  # sourcery skip: extract-duplicate-method
     cli.main(test_args)
 
     database = db.Database(const.DATABASE_URL, db_create=False)
-    assert database.count_package() == 3
-    assert database.count_enumeratie() == 1
-    assert database.count_class() == 27
-    assert database.count_attribute() == 16
-    assert database.count_enumeratieliteral() == 5
-    assert database.count_association() == 24
+    schema = sch.Schema(database)
+
+    assert schema.count_package() == 3
+    assert schema.count_enumeratie() == 1
+    assert schema.count_class() == 27
+    assert schema.count_attribute() == 16
+    assert schema.count_enumeratieliteral() == 5
+    assert schema.count_association() == 24
 
     # import changes into database
     test_args = ["import", "-t", "xlsx", "-url", change_url]
@@ -101,17 +108,18 @@ def test_xlsx_parser_and_changes():  # sourcery skip: extract-duplicate-method
 
     # Check if content is correctly loaded
     database = db.Database(const.DATABASE_URL, db_create=False)
-    assert database.count_package() == 3
-    assert database.count_enumeratie() == 1
-    assert database.count_class() == 27
-    assert database.count_attribute() == 16
-    assert database.count_enumeratieliteral() == 5
-    assert database.count_association() == 24
+    schema = sch.Schema(database)
+    assert schema.count_package() == 3
+    assert schema.count_enumeratie() == 1
+    assert schema.count_class() == 27
+    assert schema.count_attribute() == 16
+    assert schema.count_enumeratieliteral() == 5
+    assert schema.count_association() == 24
 
     # Zoek alle voorkomens van het type Package waar definitie de waarde "Test" heeft
-    assert database.get_session().query(db.Attribute).filter(db.Attribute.definitie == "Test Descr").count() == 15
+    assert schema.get_session().query(db.Attribute).filter(db.Attribute.definitie == "Test Descr", db.Attribute.schema_id == schema.schema_id).count() == 15
 
     # Zoek alle voorkomens van het type Generalization waar definitie de waarde "Test" heeft
     assert (
-        database.get_session().query(db.Generalization).filter(db.Generalization.definitie == "Test Descr").count() == 4
+        schema.get_session().query(db.Generalization).filter(db.Generalization.definitie == "Test Descr", db.Generalization.schema_id == schema.schema_id).count() == 4
     )

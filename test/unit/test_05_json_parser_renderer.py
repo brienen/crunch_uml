@@ -2,6 +2,7 @@ import json
 import os
 
 from crunch_uml import cli, const, db
+import crunch_uml.schema as sch
 
 
 def are_json_files_equal(file1_path, file2_path):
@@ -33,11 +34,13 @@ def test_json_parser_renderer():
 
     # Check if content is correctly loaded
     database = db.Database(const.DATABASE_URL, db_create=False)
-    assert database.count_package() == 3
-    assert database.count_enumeratie() == 1
-    assert database.count_class() == 10
-    assert database.count_attribute() == 40
-    assert database.count_enumeratieliteral() == 2
+    schema = sch.Schema(database)
+
+    assert schema.count_package() == 3
+    assert schema.count_enumeratie() == 1
+    assert schema.count_class() == 10
+    assert schema.count_attribute() == 40
+    assert schema.count_enumeratieliteral() == 2
 
     # export to json
     test_args = ["export", "-f", inputfile, "-t", "json"]
@@ -50,11 +53,13 @@ def test_json_parser_renderer():
 
     # Check if content is correctly loaded
     database = db.Database(const.DATABASE_URL, db_create=False)
-    assert database.count_package() == 3
-    assert database.count_enumeratie() == 1
-    assert database.count_class() == 10
-    assert database.count_attribute() == 40
-    assert database.count_enumeratieliteral() == 2
+    schema = sch.Schema(database)
+
+    assert schema.count_package() == 3
+    assert schema.count_enumeratie() == 1
+    assert schema.count_class() == 10
+    assert schema.count_attribute() == 40
+    assert schema.count_enumeratieliteral() == 2
 
     # export to json
     test_args = ["export", "-f", outputfile, "-t", "json"]
@@ -82,20 +87,22 @@ def test_json_parser_and_changes():
 
     # Check if content is correctly loaded
     database = db.Database(const.DATABASE_URL, db_create=False)
-    assert database.count_package() == 3
-    assert database.count_enumeratie() == 1
-    assert database.count_class() == 10
-    assert database.count_attribute() == 40
-    assert database.count_enumeratieliteral() == 2
+    schema = sch.Schema(database)
+
+    assert schema.count_package() == 3
+    assert schema.count_enumeratie() == 1
+    assert schema.count_class() == 10
+    assert schema.count_attribute() == 40
+    assert schema.count_enumeratieliteral() == 2
 
     # Check if changes are correctly loaded
-    clazz = database.get_class('EAID_54944273_F312_44b2_A78D_43488F915429')
+    clazz = schema.get_class('EAID_54944273_F312_44b2_A78D_43488F915429')
     assert clazz.toelichting == 'Hallo Test'
-    package = database.get_package('EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E')
+    package = schema.get_package('EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E')
     assert package.definitie == 'Hallo Test'
 
     # Check if other things are unchanged
-    clazz = database.get_class('EAID_9775E778_DBF8_4122_94CE_551466B62F46')
+    clazz = schema.get_class('EAID_9775E778_DBF8_4122_94CE_551466B62F46')
     assert clazz.name == '<Orphan Class>'
 
     # Cleanup
