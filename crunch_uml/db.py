@@ -1,6 +1,6 @@
 import logging
 
-from sqlalchemy import Column, ForeignKey, String, Text, create_engine, inspect
+from sqlalchemy import Column, ForeignKey, String, Text, create_engine, inspect, ForeignKeyConstraint
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy.orm.relationships import RelationshipProperty
 from sqlalchemy.ext.declarative import declared_attr
@@ -145,18 +145,26 @@ class UMLTags:
 class Package(Base, UMLBase):  # type: ignore
     __tablename__ = 'packages'
 
-    parent_package_id = Column(String, ForeignKey('packages.id', deferrable=True), index=True)
+    parent_package_id = Column(String, index=True)
     parent_package = relationship("Package", back_populates="subpackages", remote_side="Package.id")
     subpackages = relationship("Package", back_populates="parent_package")
     classes = relationship("Class", back_populates="package")
     enumerations = relationship("Enumeratie", back_populates="package")
     modelnaam_kort = Column(String)
 
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['parent_package_id', 'schema_id'],
+            ['packages.id', 'packages.schema_id'],
+            deferrable=True
+        ),
+    )
+
 
 class Class(Base, UMLBase, UMLTags):  # type: ignore
     __tablename__ = 'classes'
 
-    package_id = Column(String, ForeignKey('packages.id', deferrable=True), index=True)
+    package_id = Column(String, index=True)
     package = relationship("Package", back_populates="classes")
     attributes = relationship("Attribute", back_populates="clazz", lazy='joined', foreign_keys='Attribute.clazz_id')
     inkomende_associaties = relationship(
@@ -173,17 +181,44 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
     authentiek = Column(String)
     nullable = Column(String)
 
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['package_id', 'schema_id'],
+            ['packages.id', 'packages.schema_id'],
+            deferrable=True
+        ),
+    )
+
+
 
 class Attribute(Base, UML_Generic):  # type: ignore
     __tablename__ = 'attributes'
 
-    clazz_id = Column(String, ForeignKey('classes.id', deferrable=True), index=True, nullable=False)
+    clazz_id = Column(String, index=True, nullable=False)
     clazz = relationship("Class", back_populates="attributes", foreign_keys='Attribute.clazz_id')
     primitive = Column(String)
-    enumeration_id = Column(String, ForeignKey('enumeraties.id', deferrable=True), index=True)
+    enumeration_id = Column(String, index=True)
     enumeration = relationship("Enumeratie", lazy='joined')
-    type_class_id = Column(String, ForeignKey('classes.id', deferrable=True), index=True)
+    type_class_id = Column(String, index=True)
     type_class = relationship("Class", foreign_keys='Attribute.type_class_id')
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['clazz_id', 'schema_id'],
+            ['classes.id', 'classes.schema_id'],
+            deferrable=True
+        ),
+        ForeignKeyConstraint(
+            ['enumeration_id', 'schema_id'],
+            ['enumeraties.id', 'enumeraties.schema_id'],
+            deferrable=True
+        ),
+        ForeignKeyConstraint(
+            ['type_class_id', 'schema_id'],
+            ['classes.id', 'classes.schema_id'],
+            deferrable=True
+        ),
+    )
 
     def getDatatype(self):
         if self.primitive is not None:
@@ -199,37 +234,61 @@ class Attribute(Base, UML_Generic):  # type: ignore
 class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
     __tablename__ = 'enumeraties'
 
-    package_id = Column(String, ForeignKey('packages.id', deferrable=True), index=True, nullable=False)
+    package_id = Column(String, index=True, nullable=False)
     package = relationship("Package", back_populates="enumerations")
     literals = relationship("EnumerationLiteral", back_populates="enumeratie", lazy='joined')
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['package_id', 'schema_id'],
+            ['packages.id', 'packages.schema_id'],
+            deferrable=True
+        ),
+    )
 
 
 class EnumerationLiteral(Base, UML_Generic):  # type: ignore
     __tablename__ = 'enumeratieliterals'
 
-    enumeratie_id = Column(String, ForeignKey('enumeraties.id', deferrable=True), index=True, nullable=False)
+    enumeratie_id = Column(String, index=True, nullable=False)
     enumeratie = relationship("Enumeratie", back_populates='literals')
 
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['enumeratie_id', 'schema_id'],
+            ['enumeraties.id', 'enumeraties.schema_id'],
+            deferrable=True
+        ),
+    )
 
 class Association(Base, UML_Generic):  # type: ignore
     __tablename__ = 'associaties'
 
-    src_class_id = Column(
-        String, ForeignKey('classes.id', deferrable=True, name='fk_src_class'), index=True, nullable=False
-    )
+    src_class_id = Column(String, index=True, nullable=False)
     src_class = relationship("Class", back_populates="uitgaande_associaties", foreign_keys='Association.src_class_id')
     src_mult_start = Column(String)
     src_mult_end = Column(String)
     src_multiplicity = Column(String)
     src_documentation = Column(Text)
-    dst_class_id = Column(
-        String, ForeignKey('classes.id', deferrable=True, name='fk_dst_class'), index=True, nullable=False
-    )
+    dst_class_id = Column(String, index=True, nullable=False)
     dst_class = relationship("Class", back_populates="inkomende_associaties", foreign_keys='Association.dst_class_id')
     dst_mult_start = Column(String)
     dst_mult_end = Column(String)
     dst_multiplicity = Column(String)
     dst_documentation = Column(Text)
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['src_class_id', 'schema_id'],
+            ['classes.id', 'classes.schema_id'],
+            deferrable=True, name='fk_src_class'
+        ),
+        ForeignKeyConstraint(
+            ['dst_class_id', 'schema_id'],
+            ['classes.id', 'classes.schema_id'],
+            deferrable=True, name='fk_dst_class'
+        ),
+    )
 
     def hasOrphan(self):
         return self.dst_class.package_id is None or self.src_class.package_id is None
@@ -244,14 +303,24 @@ class Association(Base, UML_Generic):  # type: ignore
 class Generalization(Base, UML_Generic):  # type: ignore
     __tablename__ = 'generalizations'
 
-    superclass_id = Column(
-        String, ForeignKey('classes.id', deferrable=True, name='fk_super_class'), index=True, nullable=False
-    )
+    superclass_id = Column(String, index=True, nullable=False)
     superclass = relationship("Class", back_populates="superclasses", foreign_keys='Generalization.superclass_id')
-    subclass_id = Column(
-        String, ForeignKey('classes.id', deferrable=True, name='fk_sub_class'), index=True, nullable=False
-    )
+    subclass_id = Column(String, index=True, nullable=False)
     subclass = relationship("Class", back_populates="subclasses", foreign_keys='Generalization.subclass_id')
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['superclass_id', 'schema_id'],
+            ['classes.id', 'classes.schema_id'],
+            deferrable=True, name='fk_super_class'
+        ),
+        ForeignKeyConstraint(
+            ['subclass_id', 'schema_id'],
+            ['classes.id', 'classes.schema_id'],
+            deferrable=True, name='fk_sub_class'
+        ),
+    )
+
 
     def __repr__(self):
         clsname = type(self).__name__.split('.')[-1]

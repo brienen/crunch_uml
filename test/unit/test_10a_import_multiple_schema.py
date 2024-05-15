@@ -45,5 +45,19 @@ def test_import_monumenten():
     assert schema.count_enumeratieliteral() == 5
     assert schema.count_association() == 24
 
+    database = db.Database(const.DATABASE_URL, db_create=False)
+    assert database.count_package() == 6
+    assert database.count_enumeratie() == 2
+    assert database.count_class() == 37
+    assert database.count_attribute() == 56
+    assert database.count_enumeratieliteral() == 7
+
+    schema = sch.Schema(database, schema_name='dummy')
+    assert schema.count_package() == 0
+    assert schema.count_enumeratie() == 0
+    assert schema.count_class() == 0
+    assert schema.count_attribute() == 0
+    assert schema.count_enumeratieliteral() == 0
+    assert schema.count_association() == 0
 
 
