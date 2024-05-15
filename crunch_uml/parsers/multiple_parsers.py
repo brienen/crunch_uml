@@ -5,6 +5,7 @@ import os
 import pandas as pd
 import requests
 
+import crunch_uml.schema as sch
 from crunch_uml import db
 from crunch_uml.excpetions import CrunchException
 from crunch_uml.parsers.parser import Parser, ParserRegistry
@@ -12,11 +13,11 @@ from crunch_uml.parsers.parser import Parser, ParserRegistry
 logger = logging.getLogger()
 
 
-def store_data(entity_name, data, database):
+def store_data(entity_name, data, schema):
     # session = SessionLocal()
     # Retrieve all models dynamically
     base = db.Base
-    session = database.get_session()
+    session = schema.get_session()
 
     logger.debug(f"Parsing {len(data)} entities with name {entity_name}")
     # Model class associated with the table
@@ -27,26 +28,28 @@ def store_data(entity_name, data, database):
 
     # Als er een ID in de data aanwezig is, zoek dan naar een bestaand record
     if "id" in data:
-        if existing_entity := session.query(entity).filter_by(id=data["id"]).first():
+        if existing_entity := session.query(entity).filter_by(id=data["id"], schema_id=schema.schema_id).first():
             for key, value in data.items():
                 if value is not None and value != '':
                     setattr(existing_entity, key, value)
             logger.debug(f"Updated {entity_name} with ID {data['id']}.")
-            database.save(existing_entity)
+            schema.save(existing_entity)
         else:
             # ID was aanwezig, maar geen overeenkomstige record werd gevonden
             logger.debug(f"No {entity_name} found with ID {data['id']}, creating a new record.")
             new_entity = entity(**data)
-            database.save(new_entity)
+            schema.save(new_entity)
     else:
-        logger.warning(f"Could not save entity with table '{entity_name}' to database: no imakd present: {data}.")
+        logger.warning(
+            f"Could not save entity with table '{entity_name}' to schema {schema.schema_id}: no imakd present: {data}."
+        )
 
 
 @ParserRegistry.register(
     "json", descr='Generic parser that parses JSON-files, and looks for table and column definitions.'
 )
 class JSONParser(Parser):
-    def parse(self, args, database: db.Database):
+    def parse(self, args, schema: sch.Schema):
         logger.info(f"Starting parsing JSON file {args.inputfile}")
         # sourcery skip: raise-specific-error
         try:
@@ -61,9 +64,9 @@ class JSONParser(Parser):
             tables = db.getTables()
             # Ga ervan uit dat het JSON-bestand een structuur heeft zoals eerder beschreven
             for entity_name, records in parsed_data.items():
-                if entity_name in tables:
+                if entity_name in tables and entity_name != 'schemas':
                     for record in records:
-                        store_data(entity_name, record, database)
+                        store_data(entity_name, record, schema)
         except json.JSONDecodeError as ex:
             msg = f"File with name {args.inputfile} is not a valid JSON-file, aborting with message {ex.msg}"
             logger.error(msg)
@@ -79,7 +82,7 @@ class JSONParser(Parser):
     ),
 )
 class XLXSParser(Parser):
-    def parse(self, args, database: db.Database):
+    def parse(self, args, schema: sch.Schema):
         # sourcery skip: raise-specific-error
         logger.info(f"Starting parsing Excel file {args.inputfile}")
 
@@ -90,12 +93,12 @@ class XLXSParser(Parser):
             tables = db.getTables()
             # Loop door elk tabblad in het Excel-bestand
             for sheet_name in xls.sheet_names:
-                if sheet_name in tables:
+                if sheet_name in tables and sheet_name != 'schemas':
                     # Lees de gegevens van het huidige tabblad als een lijst van woordenboeken
                     records = xls.parse(sheet_name).to_dict(orient='records')
 
                     for record in records:
-                        store_data(sheet_name, record, database)
+                        store_data(sheet_name, record, schema)
 
         except Exception as ex:
             msg = f"Error while parsing the Excel file {args.inputfile}: {str(ex)}"
@@ -109,7 +112,7 @@ class XLXSParser(Parser):
     "csv", descr='Generic parser that parses one CSV file, and excpect its name to be in the list of tables.'
 )
 class CSVParser(Parser):
-    def parse(self, args, database: db.Database):
+    def parse(self, args, schema: sch.Schema):
         logger.info(f"Starting parsing CSV file {args.inputfile}")
 
         try:
@@ -117,7 +120,7 @@ class CSVParser(Parser):
             entity_name = os.path.splitext(os.path.basename(args.inputfile))[0]
 
             tables = db.getTables()
-            if entity_name in tables:
+            if entity_name in tables and entity_name != 'schemas':
                 # Lees het CSV-bestand in een dataframe
                 df = pd.read_csv(args.inputfile if args.inputfile is not None else args.url)
 
@@ -125,7 +128,7 @@ class CSVParser(Parser):
                 records = df.to_dict(orient='records')
 
                 for record in records:
-                    store_data(entity_name, record, database)
+                    store_data(entity_name, record, schema)
 
             else:
                 logger.warning(f"Could not import file: no entity found with name {entity_name}")

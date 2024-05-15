@@ -1,6 +1,6 @@
 import logging
 import os
-from urllib.parse import urljoin, urlunparse, quote
+from urllib.parse import quote, urljoin, urlunparse
 
 from rdflib import Graph, Literal, Namespace
 from rdflib.namespace import OWL, RDF, RDFS, XSD

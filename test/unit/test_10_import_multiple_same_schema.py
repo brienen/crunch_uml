@@ -3,11 +3,30 @@ from crunch_uml import cli, const, db
 
 
 def test_import_monumenten():
-    test_args = ["import", "-f", "./test/data/GGM_Monumenten_EA2.1.xml", "-t", "eaxmi", "-db_create"]
+    test_args = [
+        "-sch",
+        "monumenten 1",
+        "import",
+        "-url",
+        "https://raw.githubusercontent.com/brienen/crunch_uml/main/test/data/GGM_Monumenten_EA2.1.xml",
+        "-t",
+        "eaxmi",
+        "-db_create",
+    ]
+    cli.main(test_args)
+    test_args = [
+        "-sch",
+        "monumenten 2",
+        "import",
+        "-url",
+        "https://raw.githubusercontent.com/brienen/crunch_uml/main/test/data/GGM_Monumenten_EA2.1.xml",
+        "-t",
+        "eaxmi",
+    ]
     cli.main(test_args)
 
     database = db.Database(const.DATABASE_URL, db_create=False)
-    schema = sch.Schema(database)
+    schema = sch.Schema(database, schema_name='monumenten 1')
     assert schema.count_package() == 3
     assert schema.count_enumeratie() == 1
     assert schema.count_class() == 10

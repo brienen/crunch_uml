@@ -1,6 +1,6 @@
 import logging
 
-from crunch_uml import db
+import crunch_uml.schema as sch
 from crunch_uml.parsers.parser import ParserRegistry, copy_values, fixtag
 from crunch_uml.parsers.xmiparser import XMIParser
 
@@ -11,7 +11,7 @@ logger = logging.getLogger()
     "eaxmi", descr='XMI-Parser that parses EA (Enterprise Architect) specific extensions. Tested on XMI v2.1 spec '
 )
 class EAXMIParser(XMIParser):
-    def phase3_process_extra(self, node, ns, database: db.Database):
+    def phase3_process_extra(self, node, ns, schema: sch.Schema):
         '''
         third and last phase of parsing XMI-documents. Parsing extra propriatary data: addons to allready found data.
         Starts at <xmi:Extension extender="Enterprise Architect" extenderID="6.5">
@@ -46,7 +46,7 @@ class EAXMIParser(XMIParser):
         packagerefs = extension.xpath(".//element[@xmi:type='uml:Package' and @xmi:idref]", namespaces=ns)  # type: ignore
         for packageref in packagerefs:
             idref = packageref.get('{' + ns['xmi'] + '}idref')
-            package = database.get_package(idref)
+            package = schema.get_package(idref)
             project = packageref.xpath('./project')[0]
             copy_values(project, package)
 
@@ -55,7 +55,7 @@ class EAXMIParser(XMIParser):
                 if hasattr(package, fixtag(tag.get('name'))):
                     setattr(package, fixtag(tag.get('name')), tag.get('value'))
 
-            database.save(package)
+            schema.save(package)
 
         '''
         Second find all class modifiers, like:
@@ -82,7 +82,7 @@ class EAXMIParser(XMIParser):
         clazzrefs = extension.xpath(".//element[@xmi:type='uml:Class' and @xmi:idref]", namespaces=ns)  # type: ignore
         for clazzref in clazzrefs:
             idref = clazzref.get('{' + ns['xmi'] + '}idref')
-            clazz = database.get_class(idref)
+            clazz = schema.get_class(idref)
 
             if clazz is not None:
                 properties = clazzref.xpath('./properties')[0]
@@ -98,7 +98,7 @@ class EAXMIParser(XMIParser):
                     if hasattr(clazz, fixtag(tag.get('name'))):
                         setattr(clazz, fixtag(tag.get('name')), tag.get('value'))
 
-                database.save(clazz)
+                schema.save(clazz)
 
         '''
         Third find all attributes, like
@@ -122,7 +122,7 @@ class EAXMIParser(XMIParser):
         attrrefs = extension.xpath(".//attribute[@xmi:idref]", namespaces=ns)  # type: ignore
         for attrref in attrrefs:
             idref = attrref.get('{' + ns['xmi'] + '}idref')
-            attr = database.get_attribute(idref)
+            attr = schema.get_attribute(idref)
             if attr is not None:
                 properties = attrref.xpath('./properties')
                 copy_values(properties, attr)
@@ -132,14 +132,14 @@ class EAXMIParser(XMIParser):
                 stereotype = attrref.xpath('./stereotype')
                 copy_values(stereotype, attr)
 
-                database.save(attr)
+                schema.save(attr)
 
         connectorrefs = extension.xpath(".//connector[@xmi:idref and properties/@ea_type='Association']", namespaces=ns)  # type: ignore
         for connectorref in connectorrefs:
             idref = connectorref.get('{' + ns['xmi'] + '}idref')
             # sourceref = connectorref.xpath('./source/@xmi:idref', namespaces=ns)[0]
             # targetref = connectorref.xpath('./target/@xmi:idref', namespaces=ns)[0]
-            association = database.get_association(idref)
+            association = schema.get_association(idref)
             if association is not None:
                 # association.src_class = sourceref
                 # association.dst_class = targetref
@@ -148,4 +148,4 @@ class EAXMIParser(XMIParser):
                 if len(documentation) == 1:
                     association.definitie = documentation[0].get('value')
 
-                database.save(association)
+                schema.save(association)
