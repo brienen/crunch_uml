@@ -13,8 +13,9 @@ Crunch_UML is a parser for XMI files originating from UML tools such as Enterpri
 
 - Parses entities such as `Package`, `Class`, and `Relation` from an XMI file.
 - Uses SQLAlchemy for database access and manipulation.
-- Imports different input formats
+- Imports different input formats into the databases
 - Saves all imported data to SQLAlchemy database
+- Can use different schema's within the same database to hold different datamodels
 - Supports Upserts to be able to import different datasets, changes to datasets etc.  
 - Exports to different output formats: Excel, JSON, CSV, Jinja2 templating, Markdown
 
@@ -29,13 +30,13 @@ pip install crunch-uml
 and start the program like so:
 
 ```bash
-crunch_uml [-h] [-v] [-d] [-db_url DATABASE_URL] {import,export} ...
+crunch_uml [-h] [-v] [-d] [-db_url DATABASE_URL] [-sch] {import,export} ...
 ```
 
 or download repository, install packages as they are described in setup.py, got to the root of the downloaded files and start the program like so:  
 
 ```bash
-python ./crunch_uml/cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] {import,export} ...
+python ./crunch_uml/cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] [-sch] {import,export} ...
 ```
 
 ## General Options:
@@ -44,6 +45,7 @@ python ./crunch_uml/cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] {import,export}
 - `-v, --verbose`: Set log level to INFO.
 - `-d, --debug`: Set log level to DEBUG.
 - `-db_url DATABASE_URL, --database_url DATABASE_URL`: URL of the crunch_uml database. Supports any SQLAlchemy (https://docs.sqlalchemy.org/en/20/dialects/) compatible database. The default is `sqlite:///crunch_uml.db`.
+- `-sch SCHEMA, --schema_name SCHEMA`: Name of the schema that will be used. Different models can be loaded into different schema's in the samen database. For export one schema should used.
 
 ## Commands:
 
