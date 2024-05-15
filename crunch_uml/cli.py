@@ -4,9 +4,9 @@ import os
 import sys
 
 import crunch_uml.db as db
-import crunch_uml.schema as sch
 import crunch_uml.parsers.parser as parsers
 import crunch_uml.renderers.renderer as renderers
+import crunch_uml.schema as sch
 from crunch_uml import const
 from crunch_uml.db import Database
 from crunch_uml.parsers.eaxmiparser import EAXMIParser  # noqa: F401

@@ -7,7 +7,6 @@ from crunch_uml.excpetions import CrunchException
 logger = logging.getLogger()
 
 
-
 def add_args(argumentparser, subparser_dict):
     # argumentparser.add_argument(
     #    '-db_noorph',
@@ -15,23 +14,16 @@ def add_args(argumentparser, subparser_dict):
     #    action='store_true',
     #    help='Do not create orphan classes when relations point to classes that are not found in the imported file.',
     # )
-    import_subparser = subparser_dict.get(const.CMD_IMPORT)
     argumentparser.add_argument(
         '-sch',
         '--schema_name',
         type=str,
-        help=(
-            f"Default schema name, default is {const.DEFAULT_SCHEMA}"
-        ),
+        help=f"Default schema name, default is {const.DEFAULT_SCHEMA}",
         default=const.DEFAULT_SCHEMA,
     )
 
 
-
-
-
 class Schema:
-
     def __init__(self, database, schema_name=const.DEFAULT_SCHEMA):
         if not database:
             raise CrunchException(f'Cannot create schema {schema_name} with database with None value.')
@@ -83,4 +75,4 @@ class Schema:
         return self.database.session.query(db.Generalization).filter_by(schema_id=self.schema_id).count()
 
     def get_session(self):
-        return self.database.session 
+        return self.database.session

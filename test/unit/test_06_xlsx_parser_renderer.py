@@ -2,8 +2,8 @@ import os
 
 import pandas as pd
 
-from crunch_uml import cli, const, db
 import crunch_uml.schema as sch
+from crunch_uml import cli, const, db
 
 
 def are_excel_files_equal(file1_path, file2_path):
@@ -117,9 +117,19 @@ def test_xlsx_parser_and_changes():  # sourcery skip: extract-duplicate-method
     assert schema.count_association() == 24
 
     # Zoek alle voorkomens van het type Package waar definitie de waarde "Test" heeft
-    assert schema.get_session().query(db.Attribute).filter(db.Attribute.definitie == "Test Descr", db.Attribute.schema_id == schema.schema_id).count() == 15
+    assert (
+        schema.get_session()
+        .query(db.Attribute)
+        .filter(db.Attribute.definitie == "Test Descr", db.Attribute.schema_id == schema.schema_id)
+        .count()
+        == 15
+    )
 
     # Zoek alle voorkomens van het type Generalization waar definitie de waarde "Test" heeft
     assert (
-        schema.get_session().query(db.Generalization).filter(db.Generalization.definitie == "Test Descr", db.Generalization.schema_id == schema.schema_id).count() == 4
+        schema.get_session()
+        .query(db.Generalization)
+        .filter(db.Generalization.definitie == "Test Descr", db.Generalization.schema_id == schema.schema_id)
+        .count()
+        == 4
     )

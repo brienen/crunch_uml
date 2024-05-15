@@ -1,9 +1,15 @@
 import logging
 
-from sqlalchemy import Column, ForeignKey, String, Text, create_engine, inspect, ForeignKeyConstraint
+from sqlalchemy import (
+    Column,
+    ForeignKeyConstraint,
+    String,
+    Text,
+    create_engine,
+    inspect,
+)
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy.orm.relationships import RelationshipProperty
-from sqlalchemy.ext.declarative import declared_attr
 
 import crunch_uml.const as const
 
@@ -74,11 +80,11 @@ def getColumnNames(tablename):
 
 
 # Model definitions
-class Schema(Base):
-    __tablename__ = 'schemas'
+# class Schema(Base):
+#    __tablename__ = 'schemas'
 
-    id = Column(String, primary_key=True)  # Use the schema name as ID
-    definitie = Column(Text)
+#    id = Column(String, primary_key=True)  # Use the schema name as ID
+#    definitie = Column(Text)
 
 
 # Mixins
@@ -93,8 +99,8 @@ class UML_Generic:
     modified = Column(String)
     stereotype = Column(String)
 
-    #@declared_attr
-    #def schema(cls):
+    # @declared_attr
+    # def schema(cls):
     #    return relationship("Schema")
 
     # Return all attributes, but without relations
@@ -141,7 +147,6 @@ class UMLTags:
     gemma_toelichting = Column(String)
 
 
-
 class Package(Base, UMLBase):  # type: ignore
     __tablename__ = 'packages'
 
@@ -154,9 +159,7 @@ class Package(Base, UMLBase):  # type: ignore
 
     __table_args__ = (
         ForeignKeyConstraint(
-            ['parent_package_id', 'schema_id'],
-            ['packages.id', 'packages.schema_id'],
-            deferrable=True
+            ['parent_package_id', 'schema_id'], ['packages.id', 'packages.schema_id'], deferrable=True
         ),
     )
 
@@ -182,13 +185,8 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
     nullable = Column(String)
 
     __table_args__ = (
-        ForeignKeyConstraint(
-            ['package_id', 'schema_id'],
-            ['packages.id', 'packages.schema_id'],
-            deferrable=True
-        ),
+        ForeignKeyConstraint(['package_id', 'schema_id'], ['packages.id', 'packages.schema_id'], deferrable=True),
     )
-
 
 
 class Attribute(Base, UML_Generic):  # type: ignore
@@ -203,21 +201,11 @@ class Attribute(Base, UML_Generic):  # type: ignore
     type_class = relationship("Class", foreign_keys='Attribute.type_class_id')
 
     __table_args__ = (
+        ForeignKeyConstraint(['clazz_id', 'schema_id'], ['classes.id', 'classes.schema_id'], deferrable=True),
         ForeignKeyConstraint(
-            ['clazz_id', 'schema_id'],
-            ['classes.id', 'classes.schema_id'],
-            deferrable=True
+            ['enumeration_id', 'schema_id'], ['enumeraties.id', 'enumeraties.schema_id'], deferrable=True
         ),
-        ForeignKeyConstraint(
-            ['enumeration_id', 'schema_id'],
-            ['enumeraties.id', 'enumeraties.schema_id'],
-            deferrable=True
-        ),
-        ForeignKeyConstraint(
-            ['type_class_id', 'schema_id'],
-            ['classes.id', 'classes.schema_id'],
-            deferrable=True
-        ),
+        ForeignKeyConstraint(['type_class_id', 'schema_id'], ['classes.id', 'classes.schema_id'], deferrable=True),
     )
 
     def getDatatype(self):
@@ -239,11 +227,7 @@ class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
     literals = relationship("EnumerationLiteral", back_populates="enumeratie", lazy='joined')
 
     __table_args__ = (
-        ForeignKeyConstraint(
-            ['package_id', 'schema_id'],
-            ['packages.id', 'packages.schema_id'],
-            deferrable=True
-        ),
+        ForeignKeyConstraint(['package_id', 'schema_id'], ['packages.id', 'packages.schema_id'], deferrable=True),
     )
 
 
@@ -255,11 +239,10 @@ class EnumerationLiteral(Base, UML_Generic):  # type: ignore
 
     __table_args__ = (
         ForeignKeyConstraint(
-            ['enumeratie_id', 'schema_id'],
-            ['enumeraties.id', 'enumeraties.schema_id'],
-            deferrable=True
+            ['enumeratie_id', 'schema_id'], ['enumeraties.id', 'enumeraties.schema_id'], deferrable=True
         ),
     )
+
 
 class Association(Base, UML_Generic):  # type: ignore
     __tablename__ = 'associaties'
@@ -279,14 +262,10 @@ class Association(Base, UML_Generic):  # type: ignore
 
     __table_args__ = (
         ForeignKeyConstraint(
-            ['src_class_id', 'schema_id'],
-            ['classes.id', 'classes.schema_id'],
-            deferrable=True, name='fk_src_class'
+            ['src_class_id', 'schema_id'], ['classes.id', 'classes.schema_id'], deferrable=True, name='fk_src_class'
         ),
         ForeignKeyConstraint(
-            ['dst_class_id', 'schema_id'],
-            ['classes.id', 'classes.schema_id'],
-            deferrable=True, name='fk_dst_class'
+            ['dst_class_id', 'schema_id'], ['classes.id', 'classes.schema_id'], deferrable=True, name='fk_dst_class'
         ),
     )
 
@@ -310,17 +289,12 @@ class Generalization(Base, UML_Generic):  # type: ignore
 
     __table_args__ = (
         ForeignKeyConstraint(
-            ['superclass_id', 'schema_id'],
-            ['classes.id', 'classes.schema_id'],
-            deferrable=True, name='fk_super_class'
+            ['superclass_id', 'schema_id'], ['classes.id', 'classes.schema_id'], deferrable=True, name='fk_super_class'
         ),
         ForeignKeyConstraint(
-            ['subclass_id', 'schema_id'],
-            ['classes.id', 'classes.schema_id'],
-            deferrable=True, name='fk_sub_class'
+            ['subclass_id', 'schema_id'], ['classes.id', 'classes.schema_id'], deferrable=True, name='fk_sub_class'
         ),
     )
-
 
     def __repr__(self):
         clsname = type(self).__name__.split('.')[-1]
@@ -398,12 +372,3 @@ class Database:
 
     def get_session(self):
         return self.session
-
-    def get_schema(self, schema_name=const.DEFAULT_SCHEMA):
-        schema = self.session.get(Schema, schema_name)
-        if not schema:
-            schema = Schema(id=schema_name)
-            logger.info(f'Schema aangemaakt met id {schema.id}')
-            self.save(schema)
-
-        return schema

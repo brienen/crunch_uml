@@ -1,5 +1,5 @@
-from crunch_uml import cli, const, db
 import crunch_uml.schema as sch
+from crunch_uml import cli, const, db
 
 
 def test_import_onderwijs_empty():

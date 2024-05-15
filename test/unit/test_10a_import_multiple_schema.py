@@ -1,5 +1,5 @@
+import crunch_uml.schema as sch
 from crunch_uml import cli, const, db
-import crunch_uml.schema as sch 
 
 
 def test_import_monumenten():
@@ -11,17 +11,10 @@ def test_import_monumenten():
         "https://raw.githubusercontent.com/brienen/crunch_uml/main/test/data/GGM_Monumenten_EA2.1.xml",
         "-t",
         "eaxmi",
-        "-db_create"
+        "-db_create",
     ]
     cli.main(test_args)
-    test_args = [
-        "-sch",
-        "onderwijs",
-        "import", 
-        "-f", 
-        "./test/data/GGM_Onderwijs_XMI.2.1.xml", 
-        "-t", 
-        "xmi"]
+    test_args = ["-sch", "onderwijs", "import", "-f", "./test/data/GGM_Onderwijs_XMI.2.1.xml", "-t", "xmi"]
     cli.main(test_args)
 
     database = db.Database(const.DATABASE_URL, db_create=False)
@@ -59,5 +52,3 @@ def test_import_monumenten():
     assert schema.count_attribute() == 0
     assert schema.count_enumeratieliteral() == 0
     assert schema.count_association() == 0
-
-

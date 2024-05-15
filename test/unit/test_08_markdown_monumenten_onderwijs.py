@@ -2,7 +2,6 @@ import glob
 import os
 
 from crunch_uml import cli
-import crunch_uml.schema as sch
 
 
 def test_markdown_monumenten_onderwijs():

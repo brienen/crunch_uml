@@ -1,8 +1,8 @@
 import json
 import os
 
-from crunch_uml import cli, const, db
 import crunch_uml.schema as sch
+from crunch_uml import cli, const, db
 
 
 def are_json_files_equal(file1_path, file2_path):

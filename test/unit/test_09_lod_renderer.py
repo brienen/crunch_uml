@@ -2,8 +2,8 @@ import os
 
 from rdflib import Graph, exceptions
 
-from crunch_uml import cli, const, db
 import crunch_uml.schema as sch
+from crunch_uml import cli, const, db
 
 
 def count_occurences(word, file):
@@ -47,7 +47,7 @@ def test_lod_renderer():
     # Check if content is correctly loaded
     database = db.Database(const.DATABASE_URL, db_create=False)
     schema = sch.Schema(database)
-    
+
     assert schema.count_package() == 3
     assert schema.count_enumeratie() == 1
     assert schema.count_class() == 10

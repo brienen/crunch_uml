@@ -1,8 +1,8 @@
 import logging
 from abc import ABC, abstractmethod
 
+import crunch_uml.schema as sch
 from crunch_uml import const, db
-import crunch_uml.schema as sch 
 from crunch_uml.registry import Registry
 
 logger = logging.getLogger()

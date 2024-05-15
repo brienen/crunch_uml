@@ -1,5 +1,5 @@
-from crunch_uml import cli, const, db
 import crunch_uml.schema as sch
+from crunch_uml import cli, const, db
 
 
 def test_relations():
@@ -8,7 +8,7 @@ def test_relations():
 
     database = db.Database(const.DATABASE_URL, db_create=False)
     schema = sch.Schema(database)
-    
+
     assert schema.count_package() == 1
     assert schema.count_enumeratie() == 0
     assert schema.count_class() == 14

@@ -2,7 +2,6 @@ import json
 import os
 
 from crunch_uml import cli
-import crunch_uml.schema as sch
 
 
 def test_relations_export_json():

@@ -5,8 +5,8 @@ import uuid
 import requests
 from lxml import etree
 
-from crunch_uml import const, db
 import crunch_uml.schema as sch
+from crunch_uml import const, db
 from crunch_uml.excpetions import CrunchException
 from crunch_uml.parsers.parser import Parser, ParserRegistry
 

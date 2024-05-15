@@ -5,8 +5,8 @@ import os
 import pandas as pd
 import requests
 
-from crunch_uml import db
 import crunch_uml.schema as sch
+from crunch_uml import db
 from crunch_uml.excpetions import CrunchException
 from crunch_uml.parsers.parser import Parser, ParserRegistry
 
@@ -40,7 +40,9 @@ def store_data(entity_name, data, schema):
             new_entity = entity(**data)
             schema.save(new_entity)
     else:
-        logger.warning(f"Could not save entity with table '{entity_name}' to schema {schema.schema_id}: no imakd present: {data}.")
+        logger.warning(
+            f"Could not save entity with table '{entity_name}' to schema {schema.schema_id}: no imakd present: {data}."
+        )
 
 
 @ParserRegistry.register(
