@@ -152,9 +152,9 @@ class Package(Base, UMLBase):  # type: ignore
 
     parent_package_id = Column(String, index=True)
     parent_package = relationship("Package", back_populates="subpackages", remote_side="Package.id")
-    subpackages = relationship("Package", back_populates="parent_package")
-    classes = relationship("Class", back_populates="package")
-    enumerations = relationship("Enumeratie", back_populates="package")
+    subpackages = relationship("Package", back_populates="parent_package", cascade="all, delete-orphan")
+    classes = relationship("Class", back_populates="package", cascade="all, delete-orphan")
+    enumerations = relationship("Enumeratie", back_populates="package", cascade="all, delete-orphan")
     modelnaam_kort = Column(String)
 
     __table_args__ = (
@@ -169,17 +169,17 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
 
     package_id = Column(String, index=True)
     package = relationship("Package", back_populates="classes")
-    attributes = relationship("Attribute", back_populates="clazz", lazy='joined', foreign_keys='Attribute.clazz_id')
+    attributes = relationship("Attribute", back_populates="clazz", lazy='joined', foreign_keys='Attribute.clazz_id', cascade="all, delete-orphan")
     inkomende_associaties = relationship(
-        "Association", back_populates="dst_class", foreign_keys='Association.dst_class_id'
+        "Association", back_populates="dst_class", foreign_keys='Association.dst_class_id', cascade="all, delete-orphan"
     )
     uitgaande_associaties = relationship(
-        "Association", back_populates="src_class", foreign_keys='Association.src_class_id'
+        "Association", back_populates="src_class", foreign_keys='Association.src_class_id', cascade="all, delete-orphan"
     )
     superclasses = relationship(
-        "Generalization", back_populates="superclass", foreign_keys='Generalization.superclass_id'
+        "Generalization", back_populates="superclass", foreign_keys='Generalization.superclass_id', cascade="all, delete-orphan"
     )
-    subclasses = relationship("Generalization", back_populates="subclass", foreign_keys='Generalization.subclass_id')
+    subclasses = relationship("Generalization", back_populates="subclass", foreign_keys='Generalization.subclass_id', cascade="all, delete-orphan")
     indicatie_formele_historie = Column(String)
     authentiek = Column(String)
     nullable = Column(String)
@@ -224,7 +224,7 @@ class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
 
     package_id = Column(String, index=True, nullable=False)
     package = relationship("Package", back_populates="enumerations")
-    literals = relationship("EnumerationLiteral", back_populates="enumeratie", lazy='joined')
+    literals = relationship("EnumerationLiteral", back_populates="enumeratie", lazy='joined', cascade="all, delete-orphan")
 
     __table_args__ = (
         ForeignKeyConstraint(['package_id', 'schema_id'], ['packages.id', 'packages.schema_id'], deferrable=True),
@@ -330,6 +330,9 @@ class Database:
 
     def get_class(self, id):
         return self.session.get(Class, id)
+
+    def get_enumeration(self, id):
+        return self.session.get(Enumeratie, id)
 
     def get_attribute(self, id):
         return self.session.get(Attribute, id)

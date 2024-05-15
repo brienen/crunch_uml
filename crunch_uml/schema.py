@@ -44,6 +44,9 @@ class Schema:
     def get_class(self, id):
         return self.database.session.query(db.Class).filter_by(id=id, schema_id=self.schema_id).first()
 
+    def get_enumeration(self, id):
+        return self.database.session.query(db.Enumeratie).filter_by(id=id, schema_id=self.schema_id).first()
+
     def get_attribute(self, id):
         return self.database.session.query(db.Attribute).filter_by(id=id, schema_id=self.schema_id).first()
 
