@@ -44,3 +44,4 @@ def test_import_monumenten():
     assert schema.count_class() == 4
     assert schema.count_attribute() == 0
     assert schema.count_enumeratieliteral() == 0
+    session.close()  # Commit de transactie om de wijzigingen op te slaan

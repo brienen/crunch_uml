@@ -29,11 +29,36 @@ class Schema:
             raise CrunchException(f'Cannot create schema {schema_name} with database with None value.')
         self.database = database
         self.schema_id = schema_name
+        self.processed_objects = set()  # Houdt bij welke objecten al verwerkt zijn
 
-    def save(self, obj):
+    def save(self, obj, recursive=False, processed_objects={}):
+
+        # Voeg het object toe aan de set van verwerkte objecten
+        if obj in self.processed_objects:
+            return  # Voorkom recursieve lus door het object niet opnieuw te verwerken
+        self.processed_objects.add(obj)
+
+        # Save object
         if hasattr(obj, 'schema_id'):
             obj.schema_id = self.schema_id
-        self.database.session.merge(obj)
+        self.database.session.add(obj)
+        self.database.session.flush()
+
+        if recursive:
+            cls = obj.__class__
+            # Bewaar de relaties als die er zijn
+            if cls.__mapper__ and cls.__mapper__.relationships:
+                for attr, relation in cls.__mapper__.relationships.items():
+                    related_objects = getattr(obj, attr)
+
+                    # Controleer of de relatie een lijst is (uselist=True) of een enkel object
+                    if relation.uselist:
+                        for rel_obj in related_objects:
+                            self.save(rel_obj, recursive=True, processed_objects=processed_objects)
+                    else:
+                        if related_objects is not None:
+                            self.save(related_objects, recursive=True, processed_objects=processed_objects)
+
 
     def count_package(self):
         return self.database.session.query(db.Package).filter_by(schema_id=self.schema_id).count()
