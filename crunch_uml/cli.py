@@ -104,6 +104,23 @@ def main(args=None):
     else:
         logger.error("Unknown command: this should never happen!")
 
+    #database = db.Database(const.DATABASE_URL, db_create=False)
+    #schema = sch.Schema(database)
+    #clazz = schema.get_class('EAID_4AD539EC_A308_43da_B025_17A1647303F3')
+    #root = schema.get_package('EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E')
+    #kopie_schema = sch.Schema(database, 'kopie')
+    #kopie = root.get_copy()
+    #clazz_kopie = clazz.get_copy()
+    #kopie_schema.save(clazz_kopie, recursive=True)
+    #database.commit()
+    #clazz = schema.get_class('EAID_4AD539EC_A308_43da_B025_17A1647303F3')
+    #clazz_schema = sch.Schema(database, 'clazz')
+    #clazz_kopie = clazz.get_copy()
+    #clazz_schema.save(clazz_kopie, recursive=True)
+    #database.commit()
+
+
+
 
 if __name__ == '__main__':
     main()

@@ -438,6 +438,7 @@ class Database:
 
     def close(self):
         self.session.close()
+        self._instance = None
 
     def get_session(self):
         return self.session
