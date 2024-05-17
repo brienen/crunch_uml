@@ -124,6 +124,16 @@ class UML_Generic:
         return f'{clsname}: "{self.name}"'
 
 
+    def get_copy(self):
+        cls = self.__class__
+        # Maak een nieuwe instantie van de klasse
+        copy_instance = cls()
+        for attr, column in self.__table__.columns.items():
+            setattr(copy_instance, attr, getattr(self, attr))
+
+        return copy_instance
+
+
 class UMLBase(UML_Generic):
     author = Column(String)
     version = Column(String)
@@ -152,9 +162,9 @@ class Package(Base, UMLBase):  # type: ignore
 
     parent_package_id = Column(String, index=True)
     parent_package = relationship("Package", back_populates="subpackages", remote_side="Package.id")
-    subpackages = relationship("Package", back_populates="parent_package")
-    classes = relationship("Class", back_populates="package")
-    enumerations = relationship("Enumeratie", back_populates="package")
+    subpackages = relationship("Package", back_populates="parent_package", cascade="all, delete-orphan")
+    classes = relationship("Class", back_populates="package", cascade="all, delete-orphan")
+    enumerations = relationship("Enumeratie", back_populates="package", cascade="all, delete-orphan")
     modelnaam_kort = Column(String)
 
     __table_args__ = (
@@ -163,23 +173,56 @@ class Package(Base, UMLBase):  # type: ignore
         ),
     )
 
+    def get_classes_inscope(self):
+        clazzes = {clazz for clazz in self.classes}
+        for subpackage in self.subpackages:
+            clazzes.add(subpackage.get_classes_inscope())
+        return clazzes
+
+    def get_enumerations_inscope(self):
+        enums = {enum for enum in self.enumerations}
+        for subpackage in self.subpackages:
+            enums.add(subpackage.get_enumerations_inscope())
+        return enums
+
+    def get_copy(self):
+        # Roep de get_copy methode van de superklasse aan
+        copy_instance = super().get_copy()
+        
+        # Voer eventuele extra stappen uit voor de literals
+        for subpackage in self.subpackages:
+                subpackage_copy = subpackage.get_copy()
+                subpackage_copy.parent_package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
+                copy_instance.subpackages.append(subpackage_copy)        
+        for clazz in self.classes:
+                clazz_copy = clazz.get_copy()
+                clazz_copy.package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
+                copy_instance.classes.append(clazz_copy)    
+        for enum in self.enumerations:
+                enum_copy = enum.get_copy()
+                enum_copy.package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
+                copy_instance.enumerations.append(enum_copy)      
+        #classes_inscope = copy_instance.get_classes_inscope()
+
+        return copy_instance
+
 
 class Class(Base, UMLBase, UMLTags):  # type: ignore
     __tablename__ = 'classes'
 
     package_id = Column(String, index=True)
     package = relationship("Package", back_populates="classes")
-    attributes = relationship("Attribute", back_populates="clazz", lazy='joined', foreign_keys='Attribute.clazz_id')
+    attributes = relationship("Attribute", back_populates="clazz", lazy='joined', foreign_keys='Attribute.clazz_id', cascade="all, delete-orphan")
     inkomende_associaties = relationship(
-        "Association", back_populates="dst_class", foreign_keys='Association.dst_class_id'
+        "Association", back_populates="dst_class", foreign_keys='Association.dst_class_id', cascade="all, delete-orphan"
     )
     uitgaande_associaties = relationship(
-        "Association", back_populates="src_class", foreign_keys='Association.src_class_id'
+        "Association", back_populates="src_class", foreign_keys='Association.src_class_id', cascade="all, delete-orphan"
     )
     superclasses = relationship(
-        "Generalization", back_populates="superclass", foreign_keys='Generalization.superclass_id'
+        "Generalization", back_populates="superclass", foreign_keys='Generalization.superclass_id', cascade="all, delete-orphan"
     )
-    subclasses = relationship("Generalization", back_populates="subclass", foreign_keys='Generalization.subclass_id')
+    subclasses = relationship("Generalization", back_populates="subclass", foreign_keys='Generalization.subclass_id', cascade="all, delete-orphan")
     indicatie_formele_historie = Column(String)
     authentiek = Column(String)
     nullable = Column(String)
@@ -187,6 +230,17 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
     __table_args__ = (
         ForeignKeyConstraint(['package_id', 'schema_id'], ['packages.id', 'packages.schema_id'], deferrable=True),
     )
+
+    def get_copy(self):
+        # Roep de get_copy methode van de superklasse aan
+        copy_instance = super().get_copy()
+        
+        # Voer eventuele extra stappen uit voor de literals
+        for attribute in self.attributes:
+                attribute_copy = attribute.get_copy()
+                attribute_copy.clazz_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
+                copy_instance.attributes.append(attribute_copy)        
+        return copy_instance
 
 
 class Attribute(Base, UML_Generic):  # type: ignore
@@ -224,11 +278,22 @@ class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
 
     package_id = Column(String, index=True, nullable=False)
     package = relationship("Package", back_populates="enumerations")
-    literals = relationship("EnumerationLiteral", back_populates="enumeratie", lazy='joined')
+    literals = relationship("EnumerationLiteral", back_populates="enumeratie", lazy='joined', cascade="all, delete-orphan")
 
     __table_args__ = (
         ForeignKeyConstraint(['package_id', 'schema_id'], ['packages.id', 'packages.schema_id'], deferrable=True),
     )
+
+    def get_copy(self):
+        # Roep de get_copy methode van de superklasse aan
+        copy_instance = super().get_copy()
+        
+        # Voer eventuele extra stappen uit voor de literals
+        for literal in self.literals:
+                literal_copy = literal.get_copy()
+                literal_copy.enumeratie_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
+                copy_instance.literals.append(literal_copy)        
+        return copy_instance
 
 
 class EnumerationLiteral(Base, UML_Generic):  # type: ignore
@@ -321,6 +386,7 @@ class Database:
 
     def save(self, obj):
         self.session.merge(obj)
+        self.session.flush()
 
     def count_package(self):
         return self.session.query(Package).count()
@@ -330,6 +396,9 @@ class Database:
 
     def get_class(self, id):
         return self.session.get(Class, id)
+
+    def get_enumeration(self, id):
+        return self.session.get(Enumeratie, id)
 
     def get_attribute(self, id):
         return self.session.get(Attribute, id)
