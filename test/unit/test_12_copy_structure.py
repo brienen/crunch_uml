@@ -16,9 +16,32 @@ def test_import_monumenten():
 
     root = schema.get_package('EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E')
     kopie_schema = sch.Schema(database, 'kopie')
-    kopie = root.get_copy()
+    kopie2_schema = sch.Schema(database, 'kopie2')
+    kopie = root.get_copy(None)
     kopie_schema.save(kopie, recursive=True)
     database.commit()
+    #kopie = root.get_copy(None)
+    #kopie2_schema.save(kopie, recursive=True)
+    #database.commit()
+    assert kopie_schema.count_package() == 3
+    assert kopie_schema.count_enumeratie() == 1
+    assert kopie_schema.count_class() == 6
+    assert kopie_schema.count_attribute() == 40
+    assert kopie_schema.count_enumeratieliteral() == 2
+    database.close()
+
+    database = db.Database(const.DATABASE_URL, db_create=False)
+    schema = sch.Schema(database)
+    root = schema.get_package('EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E')
+    kopie_schema = sch.Schema(database, 'kopie2')
+    kopie = root.get_copy(None)
+    #kopie_schema.save(kopie, recursive=True)
+    database.commit()
+    #assert kopie_schema.count_package() == 3
+    #assert kopie_schema.count_enumeratie() == 1
+    #assert kopie_schema.count_class() == 6
+    #assert kopie_schema.count_attribute() == 40
+    #assert kopie_schema.count_enumeratieliteral() == 2
     database.close()
 
     #database = db.Database(const.DATABASE_URL, db_create=False)

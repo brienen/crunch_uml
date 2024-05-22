@@ -31,6 +31,7 @@ class Schema:
         self.schema_id = schema_name
         self.processed_objects = set()  # Houdt bij welke objecten al verwerkt zijn
 
+
     def save(self, obj, recursive=False, processed_objects={}):
 
         # Voeg het object toe aan de set van verwerkte objecten
