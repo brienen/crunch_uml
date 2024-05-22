@@ -218,7 +218,7 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
 
     package_id = Column(String, index=True)
     package = relationship("Package", back_populates="classes")
-    attributes = relationship("Attribute", back_populates="clazz", lazy='joined', foreign_keys='Attribute.clazz_id', cascade="all, delete-orphan")
+    attributes = relationship("Attribute", back_populates="clazz", lazy='joined', foreign_keys="[Attribute.clazz_id, Attribute.schema_id]", cascade="all, delete-orphan")
     inkomende_associaties = relationship(
         "Association", back_populates="dst_class", foreign_keys='Association.dst_class_id', cascade="all, delete-orphan"
     )
@@ -258,19 +258,19 @@ class Attribute(Base, UML_Generic):  # type: ignore
     __tablename__ = 'attributes'
 
     clazz_id = Column(String, index=True, nullable=False)
-    clazz = relationship("Class", back_populates="attributes", foreign_keys='Attribute.clazz_id')
+    clazz = relationship("Class", back_populates="attributes", foreign_keys="[Attribute.clazz_id, Attribute.schema_id]", )
     primitive = Column(String)
     enumeration_id = Column(String, index=True)
-    enumeration = relationship("Enumeratie", lazy='joined')
+    enumeration = relationship("Enumeratie", lazy='joined', overlaps="attributes,clazz")
     type_class_id = Column(String, index=True)
-    type_class = relationship("Class", foreign_keys='Attribute.type_class_id')
+    type_class = relationship("Class", foreign_keys="[Attribute.type_class_id, Attribute.schema_id]", overlaps="attributes,clazz,enumeration")
 
     __table_args__ = (
-        ForeignKeyConstraint(['clazz_id', 'schema_id'], ['classes.id', 'classes.schema_id'], deferrable=True),
+        ForeignKeyConstraint(['clazz_id', 'schema_id'], ['classes.id', 'classes.schema_id'], deferrable=True, name="FK_clazz_id"),
         ForeignKeyConstraint(
-            ['enumeration_id', 'schema_id'], ['enumeraties.id', 'enumeraties.schema_id'], deferrable=True
+            ['enumeration_id', 'schema_id'], ['enumeraties.id', 'enumeraties.schema_id'], deferrable=True, name="FK_enumeration_id"
         ),
-        ForeignKeyConstraint(['type_class_id', 'schema_id'], ['classes.id', 'classes.schema_id'], deferrable=True),
+        ForeignKeyConstraint(['type_class_id', 'schema_id'], ['classes.id', 'classes.schema_id'], deferrable=True, name="FK_type_class" ),
     )
 
     def get_copy(self, parent):
