@@ -105,3 +105,10 @@ class Schema:
 
     def get_session(self):
         return self.database.session
+    
+    def clean(self):
+        self.database.session.query(db.Package).filter_by(schema_id=self.schema_id).delete()
+        self.database.session.query(db.Class).filter_by(schema_id=self.schema_id).delete()
+        self.database.session.query(db.Enumeratie).filter_by(schema_id=self.schema_id).delete()
+        self.database.session.query(db.Association).filter_by(schema_id=self.schema_id).delete()
+        self.database.session.query(db.Generalization).filter_by(schema_id=self.schema_id).delete()

@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 import crunch_uml.schema as sch
 from crunch_uml import const, db
 from crunch_uml.registry import Registry
+from crunch_uml.excpetions import CrunchException
+
 
 logger = logging.getLogger()
 
@@ -22,6 +24,9 @@ def add_args(argumentparser, subparser_dict):
     transformation_subparser.add_argument(
         '-sch_to', '--schema_to', type=str, required=True, help="Schema in database to write the tranformed datamodel to."
     )
+    #transformation_subparser.add_argument(
+    #    '-sch_to_cln', '--schema_to_clean', type=str, default=True, help="Cleans the content of schema_to before transformation. Default is True"
+    #)
     transformation_subparser.add_argument(
         '-ttp',
         '--transformationtype',
@@ -49,6 +54,14 @@ def add_args(argumentparser, subparser_dict):
 
 
 class Transformer(ABC):
-    @abstractmethod
     def transform(self, args, database: db.Database):
-        pass
+        if not args.schema_to:
+            raise CrunchException("Error: cannot transform datamodel to schema with value of None, --schema_to needs to have value.")
+        if args.schema_to == args.schema_from:
+            raise CrunchException(f"Error: cannot transform datamodel to schema with the same name {args.schema_to}, --schema_to and --schema_from need to have different values.")
+
+        #if args.schema_to_clean:
+        #    schema_to = sch.Schema(database, args.schema_to)
+        #    schema_to.clean()
+            
+

@@ -17,10 +17,9 @@ logger = logging.getLogger()
 class CopyTransformer(Transformer):
     def transform(self, args, database: db.Database):
 
-        if not args.schema_to:
-            raise CrunchException("Error: cannot copy datamodel to schema with value of None, --schema_to needs to have value.")
-        if args.schema_to == args.schema_from:
-            raise CrunchException(f"Error: cannot copy datamodel to schema with the same name {args.schema_to}, --schema_to and --schema_from need to have different values.")
+        # First do logic of super type
+        super().transform(args, database)
+
         if not args.root_package:
             raise CrunchException(f"Error: cannot copy datamodel with root package of value None, --root_package needs to have value.")
 
