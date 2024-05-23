@@ -6,6 +6,7 @@ TEMPLATE_DIR = './crunch_uml/templates'
 
 CMD_IMPORT = 'import'
 CMD_EXPORT = 'export'
+CMD_TRANSFORM = 'transform'
 # CMD_CHECK = 'check'
 # CMD_FIX = 'fix'
 

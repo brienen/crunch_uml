@@ -75,9 +75,6 @@ def test_import_monumenten():
     assert kopie_schema.count_attribute() == 3
     assert kopie_schema.count_enumeratieliteral() == 0
 
-
-
-
     database.close()
 
 
