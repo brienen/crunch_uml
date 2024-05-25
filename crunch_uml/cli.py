@@ -6,8 +6,8 @@ import sys
 import crunch_uml.db as db
 import crunch_uml.parsers.parser as parsers
 import crunch_uml.renderers.renderer as renderers
-import crunch_uml.transformers.transformer as transformers
 import crunch_uml.schema as sch
+import crunch_uml.transformers.transformer as transformers
 from crunch_uml import const
 from crunch_uml.db import Database
 from crunch_uml.parsers.eaxmiparser import EAXMIParser  # noqa: F401
@@ -28,9 +28,7 @@ from crunch_uml.renderers.pandasrenderer import CSVRenderer  # noqa: F401
 from crunch_uml.renderers.pandasrenderer import JSONRenderer  # noqa: F401
 from crunch_uml.renderers.sqlarenderer import SQLARenderer  # noqa: F401
 from crunch_uml.renderers.xlsxrenderer import XLSXRenderer  # noqa: F401
-
 from crunch_uml.transformers.copytransformer import CopyTransformer  # noqa: F401
-
 
 # Configureer logging
 logging.basicConfig(
@@ -52,13 +50,19 @@ def main(args=None):
     subparsers = argumentparser.add_subparsers(dest="command", help="Beschikbare subcommando's.")
     subparser_dict = {
         const.CMD_IMPORT: subparsers.add_parser(
-            const.CMD_IMPORT, help='Import datamodel to Crunch UML database into a schema', formatter_class=argparse.RawTextHelpFormatter
+            const.CMD_IMPORT,
+            help='Import datamodel to Crunch UML database into a schema',
+            formatter_class=argparse.RawTextHelpFormatter,
         ),
         const.CMD_TRANSFORM: subparsers.add_parser(
-            const.CMD_TRANSFORM, help='Transform datamodel from one schema to another schema', formatter_class=argparse.RawTextHelpFormatter
+            const.CMD_TRANSFORM,
+            help='Transform datamodel from one schema to another schema',
+            formatter_class=argparse.RawTextHelpFormatter,
         ),
         const.CMD_EXPORT: subparsers.add_parser(
-            const.CMD_EXPORT, help='Export datamodel from a schema in the Crunch UML database to various formats', formatter_class=argparse.RawTextHelpFormatter
+            const.CMD_EXPORT,
+            help='Export datamodel from a schema in the Crunch UML database to various formats',
+            formatter_class=argparse.RawTextHelpFormatter,
         ),
     }
 
@@ -102,16 +106,18 @@ def main(args=None):
         finally:
             database.close()
 
-
     # Do transformation
     elif args.command == const.CMD_TRANSFORM:
         database = Database(args.database_url, db_create=False)
-        logger.info(f"Starting transformation ")
+        logger.info("Starting transformation ")
         try:
             transformer = transformers.TransformerRegistry.getinstance(args.transformationtype)
             transformer.transform(args, database)
             database.commit()
-            logger.info(f"Succes! transformed input with transformer {transformer} from schema {args.schema_from} to schema {args.schema_to}")
+            logger.info(
+                f"Succes! transformed input with transformer {transformer} from schema {args.schema_from} to schema"
+                f" {args.schema_to}"
+            )
         except Exception as ex:
             logger.error(
                 f"Error while performing transformation with message: {ex}. Exiting and"
@@ -122,7 +128,6 @@ def main(args=None):
         finally:
             database.close()
 
-
     # Render Output
     elif args.command == const.CMD_EXPORT:
         database = Database(args.database_url, db_create=False)
@@ -132,8 +137,6 @@ def main(args=None):
         logger.info(f"Succes! rendered output from database wtih renderer {renderer}")
     else:
         logger.error("Unknown command: this should never happen!")
-
-
 
 
 if __name__ == '__main__':

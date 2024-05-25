@@ -124,7 +124,6 @@ class UML_Generic:
         clsname = type(self).__name__.split('.')[-1]
         return f'{clsname}: "{self.name}"'
 
-
     def get_copy(self, parent):
         cls = self.__class__
         # Maak een nieuwe instantie van de klasse
@@ -186,29 +185,30 @@ class Package(Base, UMLBase):  # type: ignore
             enums.add(subpackage.get_enumerations_inscope())
 
     def get_copy(self, parent):
-
         if parent and not isinstance(parent, Package):
-            raise CrunchException(f"Error: wrong parent type for package while copying. Parent cannot be of type {type(parent)}")
-        
+            raise CrunchException(
+                f"Error: wrong parent type for package while copying. Parent cannot be of type {type(parent)}"
+            )
+
         # Roep de get_copy methode van de superklasse aan
         copy_instance = super().get_copy(parent)
         if parent:
             copy_instance.parent_package_id = parent.id
-        
+
         # Voer eventuele extra stappen uit voor de literals
         for subpackage in self.subpackages:
-                subpackage_copy = subpackage.get_copy(self)
-                subpackage_copy.parent_package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
-                copy_instance.subpackages.append(subpackage_copy)        
+            subpackage_copy = subpackage.get_copy(self)
+            subpackage_copy.parent_package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
+            copy_instance.subpackages.append(subpackage_copy)
         for clazz in self.classes:
-                clazz_copy = clazz.get_copy(self)
-                clazz_copy.package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
-                copy_instance.classes.append(clazz_copy)    
+            clazz_copy = clazz.get_copy(self)
+            clazz_copy.package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
+            copy_instance.classes.append(clazz_copy)
         for enum in self.enumerations:
-                enum_copy = enum.get_copy(self)
-                enum_copy.package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
-                copy_instance.enumerations.append(enum_copy)      
-        #classes_inscope = copy_instance.get_classes_inscope()
+            enum_copy = enum.get_copy(self)
+            enum_copy.package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
+            copy_instance.enumerations.append(enum_copy)
+        # classes_inscope = copy_instance.get_classes_inscope()
 
         return copy_instance
 
@@ -218,17 +218,41 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
 
     package_id = Column(String, index=True)
     package = relationship("Package", back_populates="classes")
-    attributes = relationship("Attribute", back_populates="clazz", lazy='joined', foreign_keys="[Attribute.clazz_id, Attribute.schema_id]", cascade="all, delete-orphan")
+    attributes = relationship(
+        "Attribute",
+        back_populates="clazz",
+        lazy='joined',
+        foreign_keys="[Attribute.clazz_id, Attribute.schema_id]",
+        cascade="all, delete-orphan",
+    )
     inkomende_associaties = relationship(
-        "Association", back_populates="dst_class", foreign_keys='Association.dst_class_id', cascade="all, delete-orphan"
+        "Association",
+        back_populates="dst_class",
+        foreign_keys="[Association.dst_class_id, Association.schema_id]",
+        cascade="all, delete-orphan",
+        overlaps="uitgaande_associaties",
     )
     uitgaande_associaties = relationship(
-        "Association", back_populates="src_class", foreign_keys='Association.src_class_id', cascade="all, delete-orphan"
+        "Association",
+        back_populates="src_class",
+        foreign_keys="[Association.src_class_id, Association.schema_id]",
+        cascade="all, delete-orphan",
+        overlaps="inkomende_associaties",
     )
     superclasses = relationship(
-        "Generalization", back_populates="superclass", foreign_keys='Generalization.superclass_id', cascade="all, delete-orphan"
+        "Generalization",
+        back_populates="subclass",
+        foreign_keys='[Generalization.subclass_id, Generalization.schema_id]',
+        cascade="all, delete-orphan",
+        overlaps="subclasses",
     )
-    subclasses = relationship("Generalization", back_populates="subclass", foreign_keys='Generalization.subclass_id', cascade="all, delete-orphan")
+    subclasses = relationship(
+        "Generalization",
+        back_populates="superclass",
+        foreign_keys='[Generalization.superclass_id, Generalization.schema_id]',
+        cascade="all, delete-orphan",
+        overlaps="superclasses",
+    )
     indicatie_formele_historie = Column(String)
     authentiek = Column(String)
     nullable = Column(String)
@@ -238,19 +262,35 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
     )
 
     def get_copy(self, parent):
-
         if not parent or not isinstance(parent, Package):
-            raise CrunchException(f"Error: wrong parent type for class while copying. Parent must be of type Parent and cannot be of type {type(parent)}")
+            raise CrunchException(
+                "Error: wrong parent type for class while copying. Parent must be of type Parent and cannot be of type"
+                f" {type(parent)}"
+            )
 
         # Roep de get_copy methode van de superklasse aan
         copy_instance = super().get_copy(parent)
         copy_instance.package = parent
-        
+
         # Voer eventuele extra stappen uit voor de literals
         for attribute in self.attributes:
-                attribute_copy = attribute.get_copy(self)
-                attribute_copy.clazz_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
-                copy_instance.attributes.append(attribute_copy)        
+            attribute_copy = attribute.get_copy(self)
+            attribute_copy.clazz_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
+            copy_instance.attributes.append(attribute_copy)
+
+        if self.package:
+            classes_in_scope = self.package.get_classes_inscope()
+            for assoc in self.uitgaande_associaties:
+                if assoc.dst_class in classes_in_scope:
+                    assoc_kopie = assoc.get_copy(self)
+                    assoc_kopie.src_class_id = copy_instance.id
+                    copy_instance.uitgaande_associaties.append(assoc_kopie)
+            for gener in self.subclasses:
+                if gener.subclass in classes_in_scope:
+                    gener_kopie = gener.get_copy(self)
+                    gener_kopie.superclass_id = copy_instance.id
+                    copy_instance.subclasses.append(gener_kopie)
+
         return copy_instance
 
 
@@ -258,30 +298,45 @@ class Attribute(Base, UML_Generic):  # type: ignore
     __tablename__ = 'attributes'
 
     clazz_id = Column(String, index=True, nullable=False)
-    clazz = relationship("Class", back_populates="attributes", foreign_keys="[Attribute.clazz_id, Attribute.schema_id]", )
+    clazz = relationship(
+        "Class",
+        back_populates="attributes",
+        foreign_keys="[Attribute.clazz_id, Attribute.schema_id]",
+    )
     primitive = Column(String)
     enumeration_id = Column(String, index=True)
     enumeration = relationship("Enumeratie", lazy='joined', overlaps="attributes,clazz")
     type_class_id = Column(String, index=True)
-    type_class = relationship("Class", foreign_keys="[Attribute.type_class_id, Attribute.schema_id]", overlaps="attributes,clazz,enumeration")
+    type_class = relationship(
+        "Class", foreign_keys="[Attribute.type_class_id, Attribute.schema_id]", overlaps="attributes,clazz,enumeration"
+    )
 
     __table_args__ = (
-        ForeignKeyConstraint(['clazz_id', 'schema_id'], ['classes.id', 'classes.schema_id'], deferrable=True, name="FK_clazz_id"),
         ForeignKeyConstraint(
-            ['enumeration_id', 'schema_id'], ['enumeraties.id', 'enumeraties.schema_id'], deferrable=True, name="FK_enumeration_id"
+            ['clazz_id', 'schema_id'], ['classes.id', 'classes.schema_id'], deferrable=True, name="FK_clazz_id"
         ),
-        ForeignKeyConstraint(['type_class_id', 'schema_id'], ['classes.id', 'classes.schema_id'], deferrable=True, name="FK_type_class" ),
+        ForeignKeyConstraint(
+            ['enumeration_id', 'schema_id'],
+            ['enumeraties.id', 'enumeraties.schema_id'],
+            deferrable=True,
+            name="FK_enumeration_id",
+        ),
+        ForeignKeyConstraint(
+            ['type_class_id', 'schema_id'], ['classes.id', 'classes.schema_id'], deferrable=True, name="FK_type_class"
+        ),
     )
 
     def get_copy(self, parent):
         if not parent or not isinstance(parent, Class):
-            raise CrunchException(f"Error: wrong parent type for attribute while copying. Parent must be of type Class and cannot be of type {type(parent)}")
+            raise CrunchException(
+                "Error: wrong parent type for attribute while copying. Parent must be of type Class and cannot be of"
+                f" type {type(parent)}"
+            )
 
         # Roep de get_copy methode van de superklasse aan
         copy_instance = super().get_copy(parent)
         copy_instance.clazz = parent
         return copy_instance
-
 
     def getDatatype(self):
         if self.primitive is not None:
@@ -299,7 +354,9 @@ class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
 
     package_id = Column(String, index=True, nullable=False)
     package = relationship("Package", back_populates="enumerations")
-    literals = relationship("EnumerationLiteral", back_populates="enumeratie", lazy='joined', cascade="all, delete-orphan")
+    literals = relationship(
+        "EnumerationLiteral", back_populates="enumeratie", lazy='joined', cascade="all, delete-orphan"
+    )
 
     __table_args__ = (
         ForeignKeyConstraint(['package_id', 'schema_id'], ['packages.id', 'packages.schema_id'], deferrable=True),
@@ -307,17 +364,20 @@ class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
 
     def get_copy(self, parent):
         if not parent or not isinstance(parent, Package):
-            raise CrunchException(f"Error: wrong parent type for enumeratie while copying. Parent must be of type Parent and cannot be of type {type(parent)}")
+            raise CrunchException(
+                "Error: wrong parent type for enumeratie while copying. Parent must be of type Parent and cannot be of"
+                f" type {type(parent)}"
+            )
 
         # Roep de get_copy methode van de superklasse aan
         copy_instance = super().get_copy(parent)
         copy_instance.package = parent
-        
+
         # Voer eventuele extra stappen uit voor de literals
         for literal in self.literals:
-                literal_copy = literal.get_copy(self)
-                literal_copy.enumeratie_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
-                copy_instance.literals.append(literal_copy)        
+            literal_copy = literal.get_copy(self)
+            literal_copy.enumeratie_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
+            copy_instance.literals.append(literal_copy)
         return copy_instance
 
 
@@ -332,9 +392,13 @@ class EnumerationLiteral(Base, UML_Generic):  # type: ignore
             ['enumeratie_id', 'schema_id'], ['enumeraties.id', 'enumeraties.schema_id'], deferrable=True
         ),
     )
+
     def get_copy(self, parent):
         if not parent or not isinstance(parent, Enumeratie):
-            raise CrunchException(f"Error: wrong parent type for EnumerationLiteral while copying. Parent must be of type Enumeratie and cannot be of type {type(parent)}")
+            raise CrunchException(
+                "Error: wrong parent type for EnumerationLiteral while copying. Parent must be of type Enumeratie and"
+                f" cannot be of type {type(parent)}"
+            )
 
         # Roep de get_copy methode van de superklasse aan
         copy_instance = super().get_copy(parent)
@@ -346,13 +410,23 @@ class Association(Base, UML_Generic):  # type: ignore
     __tablename__ = 'associaties'
 
     src_class_id = Column(String, index=True, nullable=False)
-    src_class = relationship("Class", back_populates="uitgaande_associaties", foreign_keys='Association.src_class_id')
+    src_class = relationship(
+        "Class",
+        back_populates="uitgaande_associaties",
+        foreign_keys="[Association.src_class_id, Association.schema_id]",
+        overlaps="inkomende_associaties",
+    )
     src_mult_start = Column(String)
     src_mult_end = Column(String)
     src_multiplicity = Column(String)
     src_documentation = Column(Text)
     dst_class_id = Column(String, index=True, nullable=False)
-    dst_class = relationship("Class", back_populates="inkomende_associaties", foreign_keys='Association.dst_class_id')
+    dst_class = relationship(
+        "Class",
+        back_populates="inkomende_associaties",
+        foreign_keys='[Association.dst_class_id, Association.schema_id]',
+        overlaps="src_class,uitgaande_associaties",
+    )
     dst_mult_start = Column(String)
     dst_mult_end = Column(String)
     dst_multiplicity = Column(String)
@@ -381,9 +455,19 @@ class Generalization(Base, UML_Generic):  # type: ignore
     __tablename__ = 'generalizations'
 
     superclass_id = Column(String, index=True, nullable=False)
-    superclass = relationship("Class", back_populates="superclasses", foreign_keys='Generalization.superclass_id')
+    superclass = relationship(
+        "Class",
+        back_populates="subclasses",
+        foreign_keys='[Generalization.superclass_id, Generalization.schema_id]',
+        overlaps="superclasses, subclass",
+    )
     subclass_id = Column(String, index=True, nullable=False)
-    subclass = relationship("Class", back_populates="subclasses", foreign_keys='Generalization.subclass_id')
+    subclass = relationship(
+        "Class",
+        back_populates="superclasses",
+        foreign_keys='[Generalization.subclass_id, Generalization.schema_id]',
+        overlaps="subclasses, superclass",
+    )
 
     __table_args__ = (
         ForeignKeyConstraint(

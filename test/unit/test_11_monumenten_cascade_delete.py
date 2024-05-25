@@ -34,7 +34,6 @@ def test_import_monumenten():
     assert schema.count_attribute() == 37
     assert schema.count_enumeratieliteral() == 0
 
-
     root = schema.get_package('EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E')
     session = schema.get_session()
     session.delete(root)  # Verwijder het object

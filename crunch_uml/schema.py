@@ -31,9 +31,7 @@ class Schema:
         self.schema_id = schema_name
         self.processed_objects = set()  # Houdt bij welke objecten al verwerkt zijn
 
-
     def save(self, obj, recursive=False, processed_objects={}):
-
         # Voeg het object toe aan de set van verwerkte objecten
         if obj in self.processed_objects:
             return  # Voorkom recursieve lus door het object niet opnieuw te verwerken
@@ -43,7 +41,7 @@ class Schema:
         if hasattr(obj, 'schema_id'):
             obj.schema_id = self.schema_id
         self.database.session.add(obj)
-        #self.database.session.flush()
+        # self.database.session.flush()
 
         if recursive:
             cls = obj.__class__
@@ -59,7 +57,6 @@ class Schema:
                     else:
                         if related_objects is not None:
                             self.save(related_objects, recursive=True, processed_objects=processed_objects)
-
 
     def count_package(self):
         return self.database.session.query(db.Package).filter_by(schema_id=self.schema_id).count()
@@ -105,7 +102,7 @@ class Schema:
 
     def get_session(self):
         return self.database.session
-    
+
     def clean(self):
         self.database.session.query(db.Package).filter_by(schema_id=self.schema_id).delete()
         self.database.session.query(db.Class).filter_by(schema_id=self.schema_id).delete()
