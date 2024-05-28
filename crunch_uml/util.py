@@ -1,6 +1,7 @@
 import argparse
 import re
 from urllib.parse import urlparse, urlunparse
+import uuid
 
 
 def valid_url(value):
@@ -13,3 +14,8 @@ def valid_url(value):
 def remove_substring(s, substring):
     pattern = re.compile(re.escape(substring), re.IGNORECASE)
     return pattern.sub('', s).strip()
+
+def getEAGuid():
+    uuid = uuid.uuid4()
+    uuid = uuid.replace("-", "_")
+    return 'EAID_' + uuid

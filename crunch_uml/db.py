@@ -13,6 +13,7 @@ from sqlalchemy.orm.relationships import RelationshipProperty
 
 import crunch_uml.const as const
 from crunch_uml.excpetions import CrunchException
+import crunch_uml.util as util
 
 logger = logging.getLogger()
 
@@ -124,7 +125,7 @@ class UML_Generic:
         clsname = type(self).__name__.split('.')[-1]
         return f'{clsname}: "{self.name}"'
 
-    def get_copy(self, parent):
+    def get_copy(self, parent, materialize_generalizations=False):
         cls = self.__class__
         # Maak een nieuwe instantie van de klasse
         copy_instance = cls()
@@ -184,7 +185,7 @@ class Package(Base, UMLBase):  # type: ignore
         for subpackage in self.subpackages:
             enums.add(subpackage.get_enumerations_inscope())
 
-    def get_copy(self, parent):
+    def get_copy(self, parent, materialize_generalizations=False):
         if parent and not isinstance(parent, Package):
             raise CrunchException(
                 f"Error: wrong parent type for package while copying. Parent cannot be of type {type(parent)}"
@@ -261,10 +262,29 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
         ForeignKeyConstraint(['package_id', 'schema_id'], ['packages.id', 'packages.schema_id'], deferrable=True),
     )
 
-    def get_copy(self, parent):
+    def copy_attributes(self, copy_instance, materialize_generalizations=False):
+        # Maak lijst van namen van al aanwezige attributen
+        copy_attr_lst = [attribute.name for attribute in copy_instance.attributes]
+
+        # Voer eventuele extra stappen uit voor de literals
+        for attribute in self.attributes:
+            if attribute.name not in copy_attr_lst: # only add attributes whos name not already present
+                attribute_copy = attribute.get_copy(self)
+                if self.name != copy_instance.name: # When copy from superclass the attribute should get new ID
+                    attribute_copy.id = util.getEAGuid()
+                attribute_copy.clazz_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
+                copy_instance.attributes.append(attribute_copy)
+
+        if materialize_generalizations:
+            for gener in self.superclasses:
+                gener.superclass.copy_attributes(copy_instance, materialize_generalizations)
+        return copy_instance    
+    
+
+    def get_copy(self, parent, materialize_generalizations=False):
         if not parent or not isinstance(parent, Package):
             raise CrunchException(
-                "Error: wrong parent type for class while copying. Parent must be of type Parent and cannot be of type"
+                "Error: wrong parent type for class while copying. Parent must be of type Package and cannot be of type"
                 f" {type(parent)}"
             )
 
@@ -272,11 +292,8 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
         copy_instance = super().get_copy(parent)
         copy_instance.package = parent
 
-        # Voer eventuele extra stappen uit voor de literals
-        for attribute in self.attributes:
-            attribute_copy = attribute.get_copy(self)
-            attribute_copy.clazz_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
-            copy_instance.attributes.append(attribute_copy)
+        # set attributes
+        copy_instance = self.copy_attributes(copy_instance, materialize_generalizations)
 
         if self.package:
             classes_in_scope = self.package.get_classes_inscope()
@@ -326,7 +343,7 @@ class Attribute(Base, UML_Generic):  # type: ignore
         ),
     )
 
-    def get_copy(self, parent):
+    def get_copy(self, parent, materialize_generalizations=False):
         if not parent or not isinstance(parent, Class):
             raise CrunchException(
                 "Error: wrong parent type for attribute while copying. Parent must be of type Class and cannot be of"
@@ -362,7 +379,7 @@ class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
         ForeignKeyConstraint(['package_id', 'schema_id'], ['packages.id', 'packages.schema_id'], deferrable=True),
     )
 
-    def get_copy(self, parent):
+    def get_copy(self, parent, materialize_generalizations=False):
         if not parent or not isinstance(parent, Package):
             raise CrunchException(
                 "Error: wrong parent type for enumeratie while copying. Parent must be of type Parent and cannot be of"
@@ -393,7 +410,7 @@ class EnumerationLiteral(Base, UML_Generic):  # type: ignore
         ),
     )
 
-    def get_copy(self, parent):
+    def get_copy(self, parent, materialize_generalizations=False):
         if not parent or not isinstance(parent, Enumeratie):
             raise CrunchException(
                 "Error: wrong parent type for EnumerationLiteral while copying. Parent must be of type Enumeratie and"

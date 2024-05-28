@@ -40,7 +40,7 @@ class Schema:
         # Save object
         if hasattr(obj, 'schema_id'):
             obj.schema_id = self.schema_id
-        self.database.session.add(obj)
+        self.database.save(obj)
         # self.database.session.flush()
 
         if recursive:

@@ -30,13 +30,13 @@ pip install crunch-uml
 and start the program like so:
 
 ```bash
-crunch_uml [-h] [-v] [-d] [-db_url DATABASE_URL] [-sch] {import,export} ...
+crunch_uml [-h] [-v] [-d] [-db_url DATABASE_URL] [-sch] {import,transform,export} ...
 ```
 
 or download repository, install packages as they are described in setup.py, got to the root of the downloaded files and start the program like so:  
 
 ```bash
-python ./crunch_uml/cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] [-sch] {import,export} ...
+python ./crunch_uml/cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] [-sch] {import,transform,export} ...
 ```
 
 ## General Options:
