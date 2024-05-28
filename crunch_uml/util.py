@@ -16,6 +16,6 @@ def remove_substring(s, substring):
     return pattern.sub('', s).strip()
 
 def getEAGuid():
-    uuid = uuid.uuid4()
-    uuid = uuid.replace("-", "_")
-    return 'EAID_' + uuid
+    str_uuid = uuid.uuid4()
+    str_uuid = str(str_uuid).replace("-", "_")
+    return 'EAID_' + str_uuid

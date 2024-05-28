@@ -182,9 +182,19 @@
             "program": "./crunch_uml/cli.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["transform", "-ttp", "copy", "-sch_to", "onderwijs", "-rt_pkg", "EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E"]
+            "args": ["transform", "-ttp", "copy", "-sch_to", "onderwijs", "-rt_pkg", "EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E", "-m_gen", "True"]
+        },
+        {
+            "name": "Python: pytest",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/pytest",  // Pas aan naar je lokale pytest pad
+            "args": [
+                "${workspaceFolder}/test/unit"  // Pas aan naar je testmap
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
         }
-
         
     ]
 }

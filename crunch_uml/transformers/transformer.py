@@ -46,6 +46,13 @@ def add_args(argumentparser, subparser_dict):
         type=str,
         help='provides the root package that needs to be transformed',
     )
+    transformation_subparser.add_argument(
+        '-m_gen',
+        '--materialize_generalizations',
+        type=str,
+        default="False",
+        help='Copies all attributes of parent classes to the child classes. All strings other than "True" are interpreted as False.',
+    )
     # Creëer een mutually exclusive group en add options
     group = transformation_subparser.add_mutually_exclusive_group(required=False)
     group.add_argument('-pf', '--plugin_file', type=str, help="Plugin file")

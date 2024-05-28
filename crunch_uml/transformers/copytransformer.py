@@ -18,6 +18,7 @@ class CopyTransformer(Transformer):
             raise CrunchException(
                 "Error: cannot copy datamodel with root package of value None, --root_package needs to have value."
             )
+        materialize_generalizations = True if args.materialize_generalizations == "True" else False
 
         # Retrieve all models dynamically
         schema_from = sch.Schema(database, args.schema_from)
@@ -31,5 +32,5 @@ class CopyTransformer(Transformer):
                 " package?"
             )
 
-        kopie = root_package.get_copy(None)
+        kopie = root_package.get_copy(None, materialize_generalizations=materialize_generalizations)
         schema_to.save(kopie, recursive=True)

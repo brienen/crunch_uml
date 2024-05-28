@@ -132,6 +132,7 @@ class UML_Generic:
         for attr, column in self.__table__.columns.items():
             setattr(copy_instance, attr, getattr(self, attr))
 
+        setattr(copy_instance, "kopie", True)
         return copy_instance
 
 
@@ -195,18 +196,21 @@ class Package(Base, UMLBase):  # type: ignore
         copy_instance = super().get_copy(parent)
         if parent:
             copy_instance.parent_package_id = parent.id
+            parent.subpackages.append(copy_instance)
+        else:
+            copy_instance.parent_package_id = None
 
         # Voer eventuele extra stappen uit voor de literals
         for subpackage in self.subpackages:
-            subpackage_copy = subpackage.get_copy(self)
+            subpackage_copy = subpackage.get_copy(copy_instance, materialize_generalizations=materialize_generalizations)
             subpackage_copy.parent_package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
             copy_instance.subpackages.append(subpackage_copy)
         for clazz in self.classes:
-            clazz_copy = clazz.get_copy(self)
+            clazz_copy = clazz.get_copy(copy_instance, materialize_generalizations=materialize_generalizations)
             clazz_copy.package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
             copy_instance.classes.append(clazz_copy)
         for enum in self.enumerations:
-            enum_copy = enum.get_copy(self)
+            enum_copy = enum.get_copy(copy_instance)
             enum_copy.package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
             copy_instance.enumerations.append(enum_copy)
         # classes_inscope = copy_instance.get_classes_inscope()
@@ -519,7 +523,7 @@ class Database:
         return cls._instance
 
     def save(self, obj):
-        self.session.merge(obj)
+        self.session.add(obj)
         self.session.flush()
 
     def count_package(self):
