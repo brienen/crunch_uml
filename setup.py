@@ -7,7 +7,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='crunch_uml',
-    version='0.2.7',
+    version='0.2.8',
     description='Reads UML Class model from multiple formats (including XMI) and renders them to other formats (including Markdown).',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -44,7 +44,8 @@ setuptools.setup(
         'types-requests',
         'rdflib>=7.0.0,<8',
         'inflection>=0.5.1,<6',
-        'validators>=0.28.0,<1'
+        'validators>=0.28.0,<1',
+        'requests>=2.32.3,<3'
         ],
     extras_require={
         'dev': [
