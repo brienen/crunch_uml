@@ -523,6 +523,10 @@ class Database:
         return cls._instance
 
     def save(self, obj):
+        self.session.merge(obj)
+        self.session.flush()
+
+    def add(self, obj):
         self.session.add(obj)
         self.session.flush()
 

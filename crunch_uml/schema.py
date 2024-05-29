@@ -31,7 +31,10 @@ class Schema:
         self.schema_id = schema_name
         self.processed_objects = set()  # Houdt bij welke objecten al verwerkt zijn
 
-    def save(self, obj, recursive=False, processed_objects={}):
+    def add(self, obj, recursive=False, processed_objects={}):
+        self.save(obj, recursive=recursive, processed_objects=processed_objects, add=True)
+
+    def save(self, obj, recursive=False, processed_objects={}, add=False):
         # Voeg het object toe aan de set van verwerkte objecten
         if obj in self.processed_objects:
             return  # Voorkom recursieve lus door het object niet opnieuw te verwerken
@@ -40,7 +43,10 @@ class Schema:
         # Save object
         if hasattr(obj, 'schema_id'):
             obj.schema_id = self.schema_id
-        self.database.save(obj)
+        if add:
+            self.database.add(obj)
+        else:
+            self.database.save(obj)
         # self.database.session.flush()
 
         if recursive:
@@ -53,10 +59,10 @@ class Schema:
                     # Controleer of de relatie een lijst is (uselist=True) of een enkel object
                     if relation.uselist:
                         for rel_obj in related_objects:
-                            self.save(rel_obj, recursive=True, processed_objects=processed_objects)
+                            self.save(rel_obj, recursive=True, processed_objects=processed_objects, add=add)
                     else:
                         if related_objects is not None:
-                            self.save(related_objects, recursive=True, processed_objects=processed_objects)
+                            self.save(related_objects, recursive=True, processed_objects=processed_objects, add=add)
 
     def count_package(self):
         return self.database.session.query(db.Package).filter_by(schema_id=self.schema_id).count()

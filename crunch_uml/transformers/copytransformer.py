@@ -33,4 +33,4 @@ class CopyTransformer(Transformer):
             )
 
         kopie = root_package.get_copy(None, materialize_generalizations=materialize_generalizations)
-        schema_to.save(kopie, recursive=True)
+        schema_to.add(kopie, recursive=True)
