@@ -1,5 +1,3 @@
 include test/data/*
 include test/output/.gitkeep
-recursive-include crunch_uml/templates *
-recursive-include crunch_uml/parsers *
-recursive-include crunch_uml/renderers *
+recursive-include crunch_uml *
