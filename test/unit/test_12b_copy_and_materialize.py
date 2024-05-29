@@ -27,6 +27,7 @@ def test_import_onderwijs():
 
     assert schema.count_package() == 1
     assert schema.count_class() == 1
-    assert schema.count_attribute() == 5
+    assert schema.count_attribute() == 7
     assert schema.count_association() == 0
     assert schema.count_generalizations() == 0
+    assert schema.count_enumeratie() == 2

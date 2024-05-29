@@ -1,4 +1,5 @@
 import logging
+import copy
 
 from sqlalchemy import (
     Column,
@@ -185,6 +186,7 @@ class Package(Base, UMLBase):  # type: ignore
         enums = {enum for enum in self.enumerations}
         for subpackage in self.subpackages:
             enums.add(subpackage.get_enumerations_inscope())
+        return enums
 
     def get_copy(self, parent, materialize_generalizations=False):
         if parent and not isinstance(parent, Package):
@@ -215,7 +217,6 @@ class Package(Base, UMLBase):  # type: ignore
             enum_copy = enum.get_copy(copy_instance)
             enum_copy.package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
             copy_instance.enumerations.append(enum_copy)
-        # classes_inscope = copy_instance.get_classes_inscope()
 
         return copy_instance
 
@@ -278,6 +279,16 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
                 attribute_copy = attribute.get_copy(self)
                 if self.name != copy_instance.name:  # When copy from superclass the attribute should get new ID
                     attribute_copy.id = util.getEAGuid()
+                
+                # copy enumeration if necesary
+                if attribute.enumeration and (not attribute.enumeration in self.package.get_enumerations_inscope() or self.name != copy_instance.name):
+                    copy_enum = attribute.enumeration.get_copy(copy_instance.package)
+                    copy_enum.id = util.getEAGuid() # to avoid doubles give new ID
+                    for literal in copy_enum.literals:
+                        literal.id = util.getEAGuid() 
+                    attribute_copy.enumeration_id = copy_enum.id
+
+                # set class
                 attribute_copy.clazz_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
                 copy_instance.attributes.append(attribute_copy)
 
