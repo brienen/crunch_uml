@@ -12,8 +12,8 @@ from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy.orm.relationships import RelationshipProperty
 
 import crunch_uml.const as const
-from crunch_uml.excpetions import CrunchException
 import crunch_uml.util as util
+from crunch_uml.excpetions import CrunchException
 
 logger = logging.getLogger()
 
@@ -202,7 +202,9 @@ class Package(Base, UMLBase):  # type: ignore
 
         # Voer eventuele extra stappen uit voor de literals
         for subpackage in self.subpackages:
-            subpackage_copy = subpackage.get_copy(copy_instance, materialize_generalizations=materialize_generalizations)
+            subpackage_copy = subpackage.get_copy(
+                copy_instance, materialize_generalizations=materialize_generalizations
+            )
             subpackage_copy.parent_package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
             copy_instance.subpackages.append(subpackage_copy)
         for clazz in self.classes:
@@ -272,9 +274,9 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
 
         # Voer eventuele extra stappen uit voor de literals
         for attribute in self.attributes:
-            if attribute.name not in copy_attr_lst: # only add attributes whos name not already present
+            if attribute.name not in copy_attr_lst:  # only add attributes whos name not already present
                 attribute_copy = attribute.get_copy(self)
-                if self.name != copy_instance.name: # When copy from superclass the attribute should get new ID
+                if self.name != copy_instance.name:  # When copy from superclass the attribute should get new ID
                     attribute_copy.id = util.getEAGuid()
                 attribute_copy.clazz_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
                 copy_instance.attributes.append(attribute_copy)
@@ -282,8 +284,7 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
         if materialize_generalizations:
             for gener in self.superclasses:
                 gener.superclass.copy_attributes(copy_instance, materialize_generalizations)
-        return copy_instance    
-    
+        return copy_instance
 
     def get_copy(self, parent, materialize_generalizations=False):
         if not parent or not isinstance(parent, Package):

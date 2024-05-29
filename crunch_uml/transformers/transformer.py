@@ -51,7 +51,10 @@ def add_args(argumentparser, subparser_dict):
         '--materialize_generalizations',
         type=str,
         default="False",
-        help='Copies all attributes of parent classes to the child classes. All strings other than "True" are interpreted as False.',
+        help=(
+            'Copies all attributes of parent classes to the child classes. All strings other than "True" are'
+            ' interpreted as False.'
+        ),
     )
     # Creëer een mutually exclusive group en add options
     group = transformation_subparser.add_mutually_exclusive_group(required=False)

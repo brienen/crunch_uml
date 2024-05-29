@@ -18,7 +18,7 @@ def test_import_onderwijs():
         "-rt_pkg",
         "EAPK_D476DA83_2028_40aa_B96F_342F2C3BDFD2",
         "-m_gen",
-        "True"
+        "True",
     ]
     cli.main(test_args)
 
