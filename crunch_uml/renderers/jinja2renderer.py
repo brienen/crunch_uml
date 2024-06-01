@@ -5,9 +5,10 @@ import inflection
 import validators
 from jinja2 import Environment, FileSystemLoader
 
-from crunch_uml import const, db
+from crunch_uml import const
 from crunch_uml.excpetions import CrunchException
 from crunch_uml.renderers.renderer import ModelRenderer, RendererRegistry
+import crunch_uml.schema as sch
 
 logger = logging.getLogger()
 
@@ -71,7 +72,7 @@ class Jinja2Renderer(ModelRenderer):
     def getFilename(self, inputfilename, extension, package):
         return f"{inputfilename}_{package.name}{extension}"
 
-    def render(self, args, database: db.Database):
+    def render(self, args, schema:sch.Schema):
         # setup output filename
         filename, extension = os.path.splitext(args.outputfile)
 
@@ -91,7 +92,7 @@ class Jinja2Renderer(ModelRenderer):
         #    raise CrunchException(msg)
 
         # Get list of packages that are to be rendered
-        models = self.getModels(args, database)
+        models = self.getModels(args, schema)
         if len(models) is None:
             msg = "Cannot render output: packages do not exist"
             logger.error(msg)
@@ -119,4 +120,12 @@ class Jinja2Renderer(ModelRenderer):
 )
 class GGM_MDRenderer(Jinja2Renderer):
     template = 'ggm_markdown.j2'  # type: ignore
+    enforce_output_package_ids = True  # Enforce list of Package ids
+
+@RendererRegistry.register(
+    "json_schema",
+    descr='Renderer renders a JSON schema from a single package. ',
+)
+class JSON_SchemaRenderer(Jinja2Renderer):
+    template = 'json_schema.j2'  # type: ignore
     enforce_output_package_ids = True  # Enforce list of Package ids

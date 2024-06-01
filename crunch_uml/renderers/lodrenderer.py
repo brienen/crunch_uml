@@ -5,9 +5,10 @@ from urllib.parse import quote, urljoin, urlunparse
 from rdflib import Graph, Literal, Namespace
 from rdflib.namespace import OWL, RDF, RDFS, XSD
 
-from crunch_uml import const, db, util
+from crunch_uml import const, util
 from crunch_uml.excpetions import CrunchException
 from crunch_uml.renderers.renderer import ModelRenderer, RendererRegistry
+import crunch_uml.schema as sch
 
 logger = logging.getLogger()
 
@@ -21,7 +22,7 @@ class LodRenderer(ModelRenderer):
     def writeToFile(self, graph, args):
         pass
 
-    def render(self, args, database: db.Database):
+    def render(self, args, zchema: sch.Schema):
         if args.linked_data_namespace is None:
             logger.warning(
                 f'No namespace provided via parameter "linked_data_namespace", using default {const.DEFAULT_LOD_NS}'
@@ -38,7 +39,7 @@ class LodRenderer(ModelRenderer):
         g = Graph()
 
         # Get list of packages that are to be rendered
-        models = self.getModels(args, database)
+        models = self.getModels(args, zchema)
         if len(models) is None:
             msg = "Cannot render output: packages does not exist"
             logger.error(msg)

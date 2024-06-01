@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 from crunch_uml import const, db, util
 from crunch_uml.db import Class, Package
 from crunch_uml.registry import Registry
+from crunch_uml.excpetions import CrunchException
+import crunch_uml.schema as sch
 
 logger = logging.getLogger()
 
@@ -28,11 +30,14 @@ def add_args(argumentparser, subparser_dict):
         '--outputtype',
         required=True,
         choices=RendererRegistry.entries(),
-        help=f'geeft outtype aan: {RendererRegistry.entries()}.',
+        help=f'geeft outputtype aan: {RendererRegistry.entries()}.',
     )
     # argumentparser.add_argument('-orpn', '--output_root_package_names', type=str, help='List of package names separated by comma')
     output_subparser.add_argument(
         '-pi', '--output_package_ids', type=str, help='List of package ids separated by comma'
+    )
+    output_subparser.add_argument(
+        '-ci', '--output_class_id', type=str, help='ID of class to be rendered.'
     )
     output_subparser.add_argument(
         '-xpi',
@@ -65,7 +70,7 @@ class ModelRenderer(Renderer):
     A model package is a package with at least 1 class inside
     '''
 
-    def getModels(self, args, database):
+    def getModels(self, args, schema):
         lst = []
         if args.output_exclude_package_ids is not None:
             # Get package_ids to include
@@ -84,20 +89,41 @@ class ModelRenderer(Renderer):
         lst = []
         if args.output_package_ids is not None:
             # If list of p[ackage ids is supplied return query
-            lst = database.get_session().query(Package).join(Class).filter(Package.id.in_(packageids)).distinct().all()
+            lst = schema.get_session().query(Package).join(Class).filter(Package.id.in_(packageids), Package.schema_id==schema.schema_id).distinct().all()
         elif args.output_exclude_package_ids is not None:
             # If only list of excluded model supplied return query
             lst = (
-                database.get_session()
+                schema.get_session()
                 .query(Package)
                 .join(Class)
-                .filter(Package.id.notin_(excl_packageids))
+                .filter(Package.id.notin_(excl_packageids), schema_id=schema.schema_id)
                 .distinct()
                 .all()
             )
         else:
             # If nothing is supplied return all model packages
-            lst = database.get_session().query(Package).join(Class).distinct().all()
+            lst = schema.get_session().query(Package).join(Class).filter(Package.schema_id==schema.schema_id).distinct().all()
         if len(lst) == 0:
             logger.warning("Could not find any model packages to render ")
         return lst
+
+
+class ClassRenderer():
+    '''
+    Mixin that Renders a single class (and possible all connected classes)
+    '''
+
+    def getClass(self, args, schema: sch):
+        lst = []
+        if args.output_exclude_package_ids is not None:
+            logger.warning("Parameter --output_exclude_package_ids not valid for class renderer.")
+        if args.output_package_ids is not None:
+            logger.warning("Parameter --output_package_ids not valid for class renderer.")
+        if args.output_class_id is None:
+            raise CrunchException("Error: no --output_class_id in arguments. --output_class_id is compulsary for ClassRenderer.")
+
+        clazz = schema.get_class(args.output_class_id)
+        if not clazz:
+            logger.warning(f"Rendering not possible: could not find any class with ID {args.output_class_id} ")
+        return clazz
+

@@ -39,6 +39,19 @@
             ]
         },
         {
+            "name": "Import Schuldhulpverlening",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["import",
+                "-t", "eaxmi",
+                "-f", "../GGM-Sociaal-Domein/Model Schuldhulpverlening.xml",
+                "-db_create"
+            ]
+        },
+        {
             "name": "Add Monumenten",
             "type": "python",
             "request": "launch",
@@ -134,7 +147,19 @@
             "justMyCode": true,
             "args": ["export",
                 "-t", "ggm_md",
-                "-f", "./test/output/def.md"
+                "-f", "./test/output/def.json"
+            ]
+        },
+        {
+            "name": "Export JSON Schema",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["export",
+                "-t", "json_schema",
+                "-f", "./test/output/schema.json"
             ]
         },
         {

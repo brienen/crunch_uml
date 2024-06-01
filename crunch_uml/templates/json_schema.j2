@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/product.schema.json",
+  "title": "{{ package.name }}",
+  "description": "{{ package.definitie }}",
+  "type": "object",
+  "properties": {
+{%- for class in package.classes %}
+    "{{ class.name }}": {
+        "type": "object",
+        "properties": {
+{%- set attributen = class.attributes|rejectattr('name','none')|list %}
+{%- for attribute in attributen %}
+            "{{ attribute.name }}": {
+                "description": "{{ attribute.definities }}",
+                "type": "{{ attribute.getDatatype() }}"
+            }{% if not loop.last %},{% endif %}
+{%- endfor %}
+        }
+    }{% if not loop.last %},{% endif %}
+{%- endfor %}
+  }
+}

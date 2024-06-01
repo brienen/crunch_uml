@@ -7,6 +7,7 @@ import inflection
 from crunch_uml import db
 from crunch_uml.renderers.jinja2renderer import Jinja2Renderer
 from crunch_uml.renderers.renderer import RendererRegistry
+import crunch_uml.schema as sch
 
 logger = logging.getLogger()
 
@@ -168,11 +169,11 @@ class SQLARenderer(Jinja2Renderer):
     def getFilename(self, inputfilename, extension, package):
         return getFilename(inputfilename, extension, package)
 
-    def getModels(self, args, database):
-        models = super().getModels(args, database)
+    def getModels(self, args, schema):
+        models = super().getModels(args, schema)
         return [model for model in models if model.modelnaam_kort is not None]
 
-    def render(self, args, database: db.Database):
+    def render(self, args, schema:sch.Schema):
         # place to set up custom code
         db.UML_Generic.getSQLAName = nameSnakeCase  # No error!
         db.Package.getPackageLst = getPackageLst
@@ -186,7 +187,7 @@ class SQLARenderer(Jinja2Renderer):
         db.EnumerationLiteral.getSQLAName = namePascalCase
         db.Association.getSQLAKoppelName = koppeltabelname
 
-        super().render(args, database)
+        super().render(args, schema)
 
         del db.UML_Generic.getSQLAName  # No error!
         del db.Package.getPackageLst

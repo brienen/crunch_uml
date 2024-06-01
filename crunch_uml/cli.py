@@ -17,7 +17,7 @@ from crunch_uml.parsers.multiple_parsers import (  # noqa: F401
     XLXSParser,
 )
 from crunch_uml.parsers.xmiparser import XMIParser  # noqa: F401
-from crunch_uml.renderers.jinja2renderer import GGM_MDRenderer  # noqa: F401
+from crunch_uml.renderers.jinja2renderer import GGM_MDRenderer, JSON_SchemaRenderer  # noqa: F401
 from crunch_uml.renderers.jinja2renderer import Jinja2Renderer  # noqa: F401
 from crunch_uml.renderers.lodrenderer import (  # noqa: F401
     JSONLDRenderer,
@@ -131,9 +131,10 @@ def main(args=None):
     # Render Output
     elif args.command == const.CMD_EXPORT:
         database = Database(args.database_url, db_create=False)
+        schema = sch.Schema(database, schema_name=args.schema_name)
         logger.info(f"Starting rendering with outputtype {args.outputtype}")
         renderer = renderers.RendererRegistry.getinstance(args.outputtype)
-        renderer.render(args, database)
+        renderer.render(args, schema)
         logger.info(f"Succes! rendered output from database wtih renderer {renderer}")
     else:
         logger.error("Unknown command: this should never happen!")
