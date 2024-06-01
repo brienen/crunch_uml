@@ -5,10 +5,10 @@ from urllib.parse import quote, urljoin, urlunparse
 from rdflib import Graph, Literal, Namespace
 from rdflib.namespace import OWL, RDF, RDFS, XSD
 
+import crunch_uml.schema as sch
 from crunch_uml import const, util
 from crunch_uml.excpetions import CrunchException
 from crunch_uml.renderers.renderer import ModelRenderer, RendererRegistry
-import crunch_uml.schema as sch
 
 logger = logging.getLogger()
 

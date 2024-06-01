@@ -3,9 +3,9 @@ import logging
 import pandas as pd
 import sqlalchemy
 
+import crunch_uml.schema as sch
 from crunch_uml import db
 from crunch_uml.renderers.renderer import Renderer, RendererRegistry
-import crunch_uml.schema as sch
 
 logger = logging.getLogger()
 
@@ -19,7 +19,7 @@ def object_as_dict(obj):
     "json", descr='Renders JSON document where each element corresponds to one of the tables in te datamodel.'
 )
 class JSONRenderer(Renderer):
-    def render(self, args, schema:sch.Schema):
+    def render(self, args, schema: sch.Schema):
         # Retrieve all models dynamically
         base = db.Base
         models = base.metadata.tables
@@ -31,7 +31,7 @@ class JSONRenderer(Renderer):
             model = base.model_lookup_by_table_name(table_name)
 
             # Retrieve data
-            records = session.query(model).filter(model.schema_id==schema.schema_id).all()
+            records = session.query(model).filter(model.schema_id == schema.schema_id).all()
             df = pd.DataFrame([object_as_dict(record) for record in records])
             all_data[table_name] = df.to_dict(orient='records')
 
@@ -45,7 +45,7 @@ class JSONRenderer(Renderer):
     "csv", descr='Renders multiple CSV files where each file corresponds to one of the tables in the datamodel.'
 )
 class CSVRenderer(Renderer):
-    def render(self, args, schema:sch.Schema):
+    def render(self, args, schema: sch.Schema):
         # Retrieve all models dynamically
         base = db.Base
         models = base.metadata.tables
@@ -56,6 +56,6 @@ class CSVRenderer(Renderer):
             model = base.model_lookup_by_table_name(table_name)
 
             # Retrieve data
-            records = session.query(model).filter(model.schema_id==schema.schema_id).all()
+            records = session.query(model).filter(model.schema_id == schema.schema_id).all()
             df = pd.DataFrame([object_as_dict(record) for record in records])
             df.to_csv(f"{args.outputfile}{table_name}.csv", index=False)

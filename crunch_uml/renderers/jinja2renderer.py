@@ -5,10 +5,10 @@ import inflection
 import validators
 from jinja2 import Environment, FileSystemLoader
 
+import crunch_uml.schema as sch
 from crunch_uml import const
 from crunch_uml.excpetions import CrunchException
 from crunch_uml.renderers.renderer import ModelRenderer, RendererRegistry
-import crunch_uml.schema as sch
 
 logger = logging.getLogger()
 
@@ -72,7 +72,7 @@ class Jinja2Renderer(ModelRenderer):
     def getFilename(self, inputfilename, extension, package):
         return f"{inputfilename}_{package.name}{extension}"
 
-    def render(self, args, schema:sch.Schema):
+    def render(self, args, schema: sch.Schema):
         # setup output filename
         filename, extension = os.path.splitext(args.outputfile)
 
@@ -121,6 +121,7 @@ class Jinja2Renderer(ModelRenderer):
 class GGM_MDRenderer(Jinja2Renderer):
     template = 'ggm_markdown.j2'  # type: ignore
     enforce_output_package_ids = True  # Enforce list of Package ids
+
 
 @RendererRegistry.register(
     "json_schema",

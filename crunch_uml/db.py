@@ -1,5 +1,4 @@
 import logging
-import copy
 
 from sqlalchemy import (
     Column,
@@ -279,13 +278,16 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
                 attribute_copy = attribute.get_copy(self)
                 if self.name != copy_instance.name:  # When copy from superclass the attribute should get new ID
                     attribute_copy.id = util.getEAGuid()
-                
+
                 # copy enumeration if necesary
-                if attribute.enumeration and (not attribute.enumeration in self.package.get_enumerations_inscope() or self.name != copy_instance.name):
+                if attribute.enumeration and (
+                    attribute.enumeration not in self.package.get_enumerations_inscope()
+                    or self.name != copy_instance.name
+                ):
                     copy_enum = attribute.enumeration.get_copy(copy_instance.package)
-                    copy_enum.id = util.getEAGuid() # to avoid doubles give new ID
+                    copy_enum.id = util.getEAGuid()  # to avoid doubles give new ID
                     for literal in copy_enum.literals:
-                        literal.id = util.getEAGuid() 
+                        literal.id = util.getEAGuid()
                     attribute_copy.enumeration_id = copy_enum.id
 
                 # set class

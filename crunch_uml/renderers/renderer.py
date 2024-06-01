@@ -1,11 +1,11 @@
 import logging
 from abc import ABC, abstractmethod
 
-from crunch_uml import const, db, util
-from crunch_uml.db import Class, Package
-from crunch_uml.registry import Registry
-from crunch_uml.excpetions import CrunchException
 import crunch_uml.schema as sch
+from crunch_uml import const, util
+from crunch_uml.db import Class, Package
+from crunch_uml.excpetions import CrunchException
+from crunch_uml.registry import Registry
 
 logger = logging.getLogger()
 
@@ -36,9 +36,7 @@ def add_args(argumentparser, subparser_dict):
     output_subparser.add_argument(
         '-pi', '--output_package_ids', type=str, help='List of package ids separated by comma'
     )
-    output_subparser.add_argument(
-        '-ci', '--output_class_id', type=str, help='ID of class to be rendered.'
-    )
+    output_subparser.add_argument('-ci', '--output_class_id', type=str, help='ID of class to be rendered.')
     output_subparser.add_argument(
         '-xpi',
         '--output_exclude_package_ids',
@@ -60,7 +58,7 @@ def add_args(argumentparser, subparser_dict):
 
 class Renderer(ABC):
     @abstractmethod
-    def render(self, args, database: db.Database):
+    def render(self, args, schema: sch.Schema):
         pass
 
 
@@ -70,8 +68,8 @@ class ModelRenderer(Renderer):
     A model package is a package with at least 1 class inside
     '''
 
-    def getModels(self, args, schema):
-        lst = []
+    def getModels(self, args, schema: sch.Schema):
+        lst = []  # type: ignore
         if args.output_exclude_package_ids is not None:
             # Get package_ids to include
             excl_packageids = args.output_exclude_package_ids.split(',')
@@ -89,7 +87,14 @@ class ModelRenderer(Renderer):
         lst = []
         if args.output_package_ids is not None:
             # If list of p[ackage ids is supplied return query
-            lst = schema.get_session().query(Package).join(Class).filter(Package.id.in_(packageids), Package.schema_id==schema.schema_id).distinct().all()
+            lst = (
+                schema.get_session()
+                .query(Package)
+                .join(Class)
+                .filter(Package.id.in_(packageids), Package.schema_id == schema.schema_id)
+                .distinct()
+                .all()
+            )
         elif args.output_exclude_package_ids is not None:
             # If only list of excluded model supplied return query
             lst = (
@@ -102,28 +107,35 @@ class ModelRenderer(Renderer):
             )
         else:
             # If nothing is supplied return all model packages
-            lst = schema.get_session().query(Package).join(Class).filter(Package.schema_id==schema.schema_id).distinct().all()
+            lst = (
+                schema.get_session()
+                .query(Package)
+                .join(Class)
+                .filter(Package.schema_id == schema.schema_id)
+                .distinct()
+                .all()
+            )
         if len(lst) == 0:
             logger.warning("Could not find any model packages to render ")
         return lst
 
 
-class ClassRenderer():
+class ClassRenderer:
     '''
     Mixin that Renders a single class (and possible all connected classes)
     '''
 
-    def getClass(self, args, schema: sch):
-        lst = []
+    def getClass(self, args, schema: sch.Schema):
         if args.output_exclude_package_ids is not None:
             logger.warning("Parameter --output_exclude_package_ids not valid for class renderer.")
         if args.output_package_ids is not None:
             logger.warning("Parameter --output_package_ids not valid for class renderer.")
         if args.output_class_id is None:
-            raise CrunchException("Error: no --output_class_id in arguments. --output_class_id is compulsary for ClassRenderer.")
+            raise CrunchException(
+                "Error: no --output_class_id in arguments. --output_class_id is compulsary for ClassRenderer."
+            )
 
         clazz = schema.get_class(args.output_class_id)
         if not clazz:
             logger.warning(f"Rendering not possible: could not find any class with ID {args.output_class_id} ")
         return clazz
-
