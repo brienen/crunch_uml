@@ -150,7 +150,10 @@ def getJSONDatatype(self):  # "koppel_{{ associatie.name | snake_case }}_{{ asso
     else:
         return '"type": "string"'
 
-
+def getVerplichteAttributen(self):
+    set_verplicht = {attr.name for attr in self.attributes if attr.verplicht}
+    set_verplichr_rel = {assoc.name for assoc in self.uitgaande_associaties if assoc.isEnkelvoudig(dst=True) and assoc.isVerplicht(dst=True)}
+    return list(set_verplicht.union(set_verplichr_rel))
 
 @RendererRegistry.register(
     "json_schema",
@@ -165,6 +168,7 @@ class JSON_SchemaRenderer(Jinja2Renderer, ClassRenderer):
         try:
             # Add mthod to ger Correct JSON Datatypes from class instance
             db.Attribute.getJSONDatatype = getJSONDatatype # No error!
+            db.Class.getVerplichteAttributen = getVerplichteAttributen # No error!
             # setup output filename
             filename, extension = os.path.splitext(args.outputfile)
 
@@ -193,4 +197,5 @@ class JSON_SchemaRenderer(Jinja2Renderer, ClassRenderer):
                 file.write(output)
         finally:
             del db.Attribute.getJSONDatatype # No error!
+            del db.Class.getVerplichteAttributen # No error!
 

@@ -5,6 +5,7 @@ from sqlalchemy import (
     ForeignKeyConstraint,
     String,
     Text,
+    Boolean,
     create_engine,
     inspect,
 )
@@ -351,6 +352,7 @@ class Attribute(Base, UML_Generic):  # type: ignore
     type_class = relationship(
         "Class", foreign_keys="[Attribute.type_class_id, Attribute.schema_id]", overlaps="attributes,clazz,enumeration"
     )
+    verplicht = Column(Boolean, default=False)
 
     __table_args__ = (
         ForeignKeyConstraint(

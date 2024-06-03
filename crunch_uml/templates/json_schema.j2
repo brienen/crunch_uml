@@ -16,9 +16,13 @@
 {% else %}{{ '    ' * (indent+2) }}"type": "array",
 {{ '    ' * (indent+2) }}"items": { 
 {{ '    ' * (indent+3) }}{{ class_body(assoc.dst_class, indent+3) }}
-{{ '    ' * (indent+2) }}}{% endif %}
+{{ '    ' * (indent+2) }}}
+{%- if assoc.isVerplicht(dst=True) %}{{ '    ' * (indent+2) }}"minItems": 1,
+{{ '    ' * (indent+2) }}"uniqueItems": true{% endif %}{% endif %}
 {{ '    ' * (indent+1) }}}{% if not loop.last %},{% endif %}
 {%- endfor %}
+{%- if clazz.getVerplichteAttributen()|length>0 %}{{ '    ' * (indent+1) }}"required": [{%- for name in clazz.getVerplichteAttributen() %}"{{ name }}"{% if not loop.last %},{% endif %}{% endfor %}],
+{{ '    ' * (indent+1) }}"additionalProperties": false{% endif %}
 {{ '    ' * (indent) }}}
 {%- endmacro -%}
 {
