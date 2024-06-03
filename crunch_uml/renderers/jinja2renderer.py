@@ -8,7 +8,7 @@ from jinja2 import Environment, FileSystemLoader
 import crunch_uml.schema as sch
 from crunch_uml import const, db
 from crunch_uml.excpetions import CrunchException
-from crunch_uml.renderers.renderer import ModelRenderer, RendererRegistry, ClassRenderer
+from crunch_uml.renderers.renderer import ClassRenderer, ModelRenderer, RendererRegistry
 
 logger = logging.getLogger()
 
@@ -68,8 +68,9 @@ class Jinja2Renderer(ModelRenderer):
         )
         env.filters['del_newline'] = lambda s: s.replace('\n', ' ').replace('\r\n', ' ') if isinstance(s, str) else ''
         env.filters['set_url'] = lambda s: f"[{s}]({s})" if validators.url(s) else s
-        env.filters['reject_method'] = lambda iterable, method_name: [item for item in iterable if not getattr(item, method_name)()]
-
+        env.filters['reject_method'] = lambda iterable, method_name: [
+            item for item in iterable if not getattr(item, method_name)()
+        ]
 
     def getFilename(self, inputfilename, extension, uml_generic):
         return f"{inputfilename}_{uml_generic.name}{extension}"
@@ -131,29 +132,35 @@ def getJSONDatatype(self):  # "koppel_{{ associatie.name | snake_case }}_{{ asso
             return '"type": "boolean"'
         elif str(self.primitive).lower().startswith("int"):
             return '"type": "integer"'
-        elif str(self.primitive).lower().startswith("bedrag"): 
-            return '"$ref": "#/$defs/bedrag"' # Needs to be defined in Jinja2 template
-        elif "mail" in str(self.primitive).lower(): 
-            return '"$ref": "#/$defs/bedrag"' # Needs to be defined in Jinja2 template
+        elif str(self.primitive).lower().startswith("bedrag"):
+            return '"$ref": "#/$defs/bedrag"'  # Needs to be defined in Jinja2 template
+        elif "mail" in str(self.primitive).lower():
+            return '"$ref": "#/$defs/bedrag"'  # Needs to be defined in Jinja2 template
         elif str(self.primitive).lower() in ["tijd", "time"]:
-            return '"$ref": "#/$defs/tijd"' # Needs to be defined in Jinja2 template
+            return '"$ref": "#/$defs/tijd"'  # Needs to be defined in Jinja2 template
         elif str(self.primitive).lower() in ["datum", "date"]:
-            return '"$ref": "#/$defs/datum"' # Needs to be defined in Jinja2 template
+            return '"$ref": "#/$defs/datum"'  # Needs to be defined in Jinja2 template
         elif str(self.primitive).lower() in ["datumtijd", "datetime"]:
-            return '"$ref": "#/$defs/datum-tijd"' # Needs to be defined in Jinja2 template
+            return '"$ref": "#/$defs/datum-tijd"'  # Needs to be defined in Jinja2 template
         else:
             return '"type": "string"'
     elif self.enumeration is not None:
-        return f'"$ref": "#/$defs/{self.enumeration.name}"' # Needs to be defined in Jinja2 template
+        return f'"$ref": "#/$defs/{self.enumeration.name}"'  # Needs to be defined in Jinja2 template
     elif self.type_class is not None:
-        return f'"$ref": "#/$defs/{self.type_class.name}"' # Needs to be defined in Jinja2 template
+        return f'"$ref": "#/$defs/{self.type_class.name}"'  # Needs to be defined in Jinja2 template
     else:
         return '"type": "string"'
 
+
 def getVerplichteAttributen(self):
     set_verplicht = {attr.name for attr in self.attributes if attr.verplicht}
-    set_verplichr_rel = {assoc.name for assoc in self.uitgaande_associaties if assoc.isEnkelvoudig(dst=True) and assoc.isVerplicht(dst=True)}
+    set_verplichr_rel = {
+        assoc.name
+        for assoc in self.uitgaande_associaties
+        if assoc.isEnkelvoudig(dst=True) and assoc.isVerplicht(dst=True)
+    }
     return list(set_verplicht.union(set_verplichr_rel))
+
 
 @RendererRegistry.register(
     "json_schema",
@@ -164,11 +171,10 @@ class JSON_SchemaRenderer(Jinja2Renderer, ClassRenderer):
     enforce_output_package_ids = True  # Enforce list of Package ids
 
     def render(self, args, schema: sch.Schema):
-
         try:
             # Add mthod to ger Correct JSON Datatypes from class instance
-            db.Attribute.getJSONDatatype = getJSONDatatype # No error!
-            db.Class.getVerplichteAttributen = getVerplichteAttributen # No error!
+            db.Attribute.getJSONDatatype = getJSONDatatype  # No error!
+            db.Class.getVerplichteAttributen = getVerplichteAttributen  # No error!
             # setup output filename
             filename, extension = os.path.splitext(args.outputfile)
 
@@ -189,13 +195,10 @@ class JSON_SchemaRenderer(Jinja2Renderer, ClassRenderer):
             output = template.render(clazz=clazz, args=args)
 
             outputfilename = (
-                self.getFilename(filename, extension, clazz)
-                if clazz.name is not None
-                else f"{filename}{extension}"
+                self.getFilename(filename, extension, clazz) if clazz.name is not None else f"{filename}{extension}"
             )
             with open(outputfilename, 'w') as file:
                 file.write(output)
         finally:
-            del db.Attribute.getJSONDatatype # No error!
-            del db.Class.getVerplichteAttributen # No error!
-
+            del db.Attribute.getJSONDatatype  # No error!
+            del db.Class.getVerplichteAttributen  # No error!

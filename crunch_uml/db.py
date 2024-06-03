@@ -1,11 +1,11 @@
 import logging
 
 from sqlalchemy import (
+    Boolean,
     Column,
     ForeignKeyConstraint,
     String,
     Text,
-    Boolean,
     create_engine,
     inspect,
 )
@@ -180,7 +180,7 @@ class Package(Base, UMLBase):  # type: ignore
         if not self.parent_package:
             return self
         else:
-            return self.parent_package.get_root_package() 
+            return self.parent_package.get_root_package()
 
     def get_classes_inscope(self):
         clazzes = {clazz for clazz in self.classes}
@@ -493,18 +493,17 @@ class Association(Base, UML_Generic):  # type: ignore
         else:
             return 'n-1' if self.dst_mult_end == '1' else 'n-m'
 
-    def isEnkelvoudig(self, dst: True):
+    def isEnkelvoudig(self, dst: True):  # type: ignore
         if dst:
-            return True if self.dst_mult_end in ["0","1"] else False
+            return True if self.dst_mult_end in ["0", "1"] else False
         else:
-            return True if self.src_mult_end in ["0","1"] else False
+            return True if self.src_mult_end in ["0", "1"] else False
 
-    def isVerplicht(self, dst: True):
+    def isVerplicht(self, dst: True):  # type: ignore
         if dst:
-            return True if isinstance(self.dst_mult_start, int) and int(self.dst_mult_start)>0 else False
+            return True if isinstance(self.dst_mult_start, int) and int(self.dst_mult_start) > 0 else False
         else:
-            return True if isinstance(self.src_mult_start, int) and int(self.src_mult_start)>0 else False
-
+            return True if isinstance(self.src_mult_start, int) and int(self.src_mult_start) > 0 else False
 
 
 class Generalization(Base, UML_Generic):  # type: ignore
