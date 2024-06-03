@@ -175,16 +175,22 @@ class Package(Base, UMLBase):  # type: ignore
         ),
     )
 
+    def get_root_package(self):
+        if not self.parent_package:
+            return self
+        else:
+            return self.parent_package.get_root_package() 
+
     def get_classes_inscope(self):
         clazzes = {clazz for clazz in self.classes}
         for subpackage in self.subpackages:
-            clazzes.add(subpackage.get_classes_inscope())
+            clazzes = clazzes.union(subpackage.get_classes_inscope())
         return clazzes
 
     def get_enumerations_inscope(self):
         enums = {enum for enum in self.enumerations}
         for subpackage in self.subpackages:
-            enums.add(subpackage.get_enumerations_inscope())
+            enums = enums.union(subpackage.get_enumerations_inscope())
         return enums
 
     def get_copy(self, parent, materialize_generalizations=False):
@@ -484,6 +490,19 @@ class Association(Base, UML_Generic):  # type: ignore
             return '1-1' if self.dst_mult_end == '1' else '1-n'
         else:
             return 'n-1' if self.dst_mult_end == '1' else 'n-m'
+
+    def isEnkelvoudig(self, dst: True):
+        if dst:
+            return True if self.dst_mult_end in ["0","1"] else False
+        else:
+            return True if self.src_mult_end in ["0","1"] else False
+
+    def isVerplicht(self, dst: True):
+        if dst:
+            return True if isinstance(self.dst_mult_start, int) and int(self.dst_mult_start)>0 else False
+        else:
+            return True if isinstance(self.src_mult_start, int) and int(self.src_mult_start)>0 else False
+
 
 
 class Generalization(Base, UML_Generic):  # type: ignore

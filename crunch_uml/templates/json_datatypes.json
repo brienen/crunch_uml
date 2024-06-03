@@ -1,0 +1,24 @@
+        "datum": {
+            "type": "string",
+            "format": "date",
+            "description": "Een datum in het formaat YYYY-MM-DD."
+        },
+        "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Een emailadres."
+        },
+        "tijd": {
+            "type": "string",
+            "format": "time",
+            "description": "De tijd in het formaat HH:MM:SS (ISO 8601)."
+        },
+        "datum-tijd": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Datum en tijd in het formaat YYYY-MM-DDTHH:MM:SSZ (ISO 8601)."
+        },
+        "bedrag": {
+            "type": "integer",
+            "description": "Een geldbedrag in centen nauwkweurig."
+        }

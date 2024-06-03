@@ -1,23 +1,40 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.com/product.schema.json",
-  "title": "{{ package.name }}",
-  "description": "{{ package.definitie }}",
-  "type": "object",
-  "properties": {
-{%- for class in package.classes %}
-    "{{ class.name }}": {
-        "type": "object",
-        "properties": {
-{%- set attributen = class.attributes|rejectattr('name','none')|list %}
+{%- macro class_body(clazz, indent=1) -%}
+{{ '    ' * (1 if indent ==1 else 0) }}"type": "object",
+{{ '    ' * (indent) }}"description": {{ clazz.definitie|default('')|tojson }},
+{{ '    ' * (indent) }}"properties": {
+{%- set attributen = clazz.attributes|rejectattr('name','none')|list %}
 {%- for attribute in attributen %}
-            "{{ attribute.name }}": {
-                "description": "{{ attribute.definities }}",
-                "type": "{{ attribute.getDatatype() }}"
-            }{% if not loop.last %},{% endif %}
+{{ '    ' * (indent+1) }}"{{ attribute.name }}": {
+{%- if attribute.definities %}{{ '    ' * (indent+2) }}"description": {{ attribute.definities|default('')|tojson }},{% endif %}
+{{ '    ' * (indent+2) }}{{ attribute.getJSONDatatype() }}
+{{ '    ' * (indent+1) }}}{% if not loop.last %},{% endif %}
 {%- endfor %}
-        }
-    }{% if not loop.last %},{% endif %}
+{%- set assocs = clazz.uitgaande_associaties|reject_method('hasOrphan')|list %}
+{%- for assoc in assocs %}{% if loop.first %},{% endif %}
+{{ '    ' * (indent+1) }}"{{ assoc.dst_class.name }}": {
+{% if assoc.isEnkelvoudig(dst=True) %}{{ '    ' * (indent+2) }}{{ class_body(assoc.dst_class, indent+2) }}
+{% else %}{{ '    ' * (indent+2) }}"type": "array",
+{{ '    ' * (indent+2) }}"items": { 
+{{ '    ' * (indent+3) }}{{ class_body(assoc.dst_class, indent+3) }}
+{{ '    ' * (indent+2) }}}{% endif %}
+{{ '    ' * (indent+1) }}}{% if not loop.last %},{% endif %}
 {%- endfor %}
-  }
+{{ '    ' * (indent) }}}
+{%- endmacro -%}
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/product.schema.json",
+    "title": "{{ clazz.name }}",
+{{ class_body(clazz, 1) }},
+{%- set enums = clazz.package.get_root_package().get_enumerations_inscope()|list %}
+    "$defs": {
+{% include 'json_datatypes.json' %}{% if enums|length > 0 %},{% endif %}
+{%- for enum in enums %}
+        "{{ enum.name }}": {
+            "type": "string",
+            "description": {{ enum.definitie|default('')|tojson }},
+            "enum": [{%- for lit in enum.literals %}"{{ lit.name }}"{% if not loop.last %}, {% endif %}{%- endfor %}]
+        }{% if not loop.last %},{% endif %}
+{%- endfor %}
+    }
 }

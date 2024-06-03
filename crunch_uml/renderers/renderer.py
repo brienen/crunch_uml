@@ -101,7 +101,7 @@ class ModelRenderer(Renderer):
                 schema.get_session()
                 .query(Package)
                 .join(Class)
-                .filter(Package.id.notin_(excl_packageids), schema_id=schema.schema_id)
+                .filter(Package.id.notin_(excl_packageids), Package.schema_id == schema.schema_id)
                 .distinct()
                 .all()
             )

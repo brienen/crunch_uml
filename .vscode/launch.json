@@ -159,7 +159,8 @@
             "justMyCode": true,
             "args": ["export",
                 "-t", "json_schema",
-                "-f", "./test/output/schema.json"
+                "-f", "./test/output/schema.json",
+                "--output_class_id", "EAID_32C02923_EE3A_4553_B94B_31E0C273A829"
             ]
         },
         {

@@ -6,9 +6,9 @@ import validators
 from jinja2 import Environment, FileSystemLoader
 
 import crunch_uml.schema as sch
-from crunch_uml import const
+from crunch_uml import const, db
 from crunch_uml.excpetions import CrunchException
-from crunch_uml.renderers.renderer import ModelRenderer, RendererRegistry
+from crunch_uml.renderers.renderer import ModelRenderer, RendererRegistry, ClassRenderer
 
 logger = logging.getLogger()
 
@@ -68,9 +68,11 @@ class Jinja2Renderer(ModelRenderer):
         )
         env.filters['del_newline'] = lambda s: s.replace('\n', ' ').replace('\r\n', ' ') if isinstance(s, str) else ''
         env.filters['set_url'] = lambda s: f"[{s}]({s})" if validators.url(s) else s
+        env.filters['reject_method'] = lambda iterable, method_name: [item for item in iterable if not getattr(item, method_name)()]
 
-    def getFilename(self, inputfilename, extension, package):
-        return f"{inputfilename}_{package.name}{extension}"
+
+    def getFilename(self, inputfilename, extension, uml_generic):
+        return f"{inputfilename}_{uml_generic.name}{extension}"
 
     def render(self, args, schema: sch.Schema):
         # setup output filename
@@ -123,10 +125,72 @@ class GGM_MDRenderer(Jinja2Renderer):
     enforce_output_package_ids = True  # Enforce list of Package ids
 
 
+def getJSONDatatype(self):  # "koppel_{{ associatie.name | snake_case }}_{{ associatie.id}}"
+    if self.primitive is not None:
+        if str(self.primitive).lower().startswith("bool"):
+            return '"type": "boolean"'
+        elif str(self.primitive).lower().startswith("int"):
+            return '"type": "integer"'
+        elif str(self.primitive).lower().startswith("bedrag"): 
+            return '"$ref": "#/$defs/bedrag"' # Needs to be defined in Jinja2 template
+        elif "mail" in str(self.primitive).lower(): 
+            return '"$ref": "#/$defs/bedrag"' # Needs to be defined in Jinja2 template
+        elif str(self.primitive).lower() in ["tijd", "time"]:
+            return '"$ref": "#/$defs/tijd"' # Needs to be defined in Jinja2 template
+        elif str(self.primitive).lower() in ["datum", "date"]:
+            return '"$ref": "#/$defs/datum"' # Needs to be defined in Jinja2 template
+        elif str(self.primitive).lower() in ["datumtijd", "datetime"]:
+            return '"$ref": "#/$defs/datum-tijd"' # Needs to be defined in Jinja2 template
+        else:
+            return '"type": "string"'
+    elif self.enumeration is not None:
+        return f'"$ref": "#/$defs/{self.enumeration.name}"' # Needs to be defined in Jinja2 template
+    elif self.type_class is not None:
+        return f'"$ref": "#/$defs/{self.type_class.name}"' # Needs to be defined in Jinja2 template
+    else:
+        return '"type": "string"'
+
+
+
 @RendererRegistry.register(
     "json_schema",
     descr='Renderer renders a JSON schema from a single package. ',
 )
-class JSON_SchemaRenderer(Jinja2Renderer):
+class JSON_SchemaRenderer(Jinja2Renderer, ClassRenderer):
     template = 'json_schema.j2'  # type: ignore
     enforce_output_package_ids = True  # Enforce list of Package ids
+
+    def render(self, args, schema: sch.Schema):
+
+        try:
+            # Add mthod to ger Correct JSON Datatypes from class instance
+            db.Attribute.getJSONDatatype = getJSONDatatype # No error!
+            # setup output filename
+            filename, extension = os.path.splitext(args.outputfile)
+
+            # get template and templatedir
+            template, templatedir = self.getTemplateAndDir(args)
+
+            # sourcery skip: raise-specific-error
+            # Settup environment for rendering using Jinja2
+            file_loader = FileSystemLoader(templatedir)
+            env = Environment(loader=file_loader)
+            self.addFilters(env)
+
+            # Get list of packages that are to be rendered
+            clazz = self.getClass(args, schema)
+
+            # Render output
+            template = env.get_template(template)
+            output = template.render(clazz=clazz, args=args)
+
+            outputfilename = (
+                self.getFilename(filename, extension, clazz)
+                if clazz.name is not None
+                else f"{filename}{extension}"
+            )
+            with open(outputfilename, 'w') as file:
+                file.write(output)
+        finally:
+            del db.Attribute.getJSONDatatype # No error!
+
