@@ -46,7 +46,8 @@ setuptools.setup(
         'inflection>=0.5.1,<6',
         'validators>=0.28.0,<1',
         'requests>=2.32.3,<3',
-        'jsonschema>=4.22.0,<5'
+        'jsonschema>=4.22.0,<5',
+        'types-jsonschema>=4.22,<5'
         ],
     extras_require={
         'dev': [

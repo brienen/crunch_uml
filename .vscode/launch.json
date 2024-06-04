@@ -211,6 +211,15 @@
             "args": ["transform", "-ttp", "copy", "-sch_to", "onderwijs", "-rt_pkg", "EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E", "-m_gen", "True"]
         },
         {
+            "name": "Test Plugin",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["transform", "-ttp", "plugin", "-sch_to", "test", "-rt_pkg", "EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E", "--plugin_class_name", "TestPlugin", "--plugin_file_name", "./test/data/testplugin.py"]
+        },
+        {
             "name": "Python: pytest",
             "type": "python",
             "request": "launch",

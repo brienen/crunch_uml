@@ -32,6 +32,7 @@ from crunch_uml.renderers.pandasrenderer import JSONRenderer  # noqa: F401
 from crunch_uml.renderers.sqlarenderer import SQLARenderer  # noqa: F401
 from crunch_uml.renderers.xlsxrenderer import XLSXRenderer  # noqa: F401
 from crunch_uml.transformers.copytransformer import CopyTransformer  # noqa: F401
+from crunch_uml.transformers.plugintransformer import PluginTransformer  # noqa: F401
 
 # Configureer logging
 logging.basicConfig(

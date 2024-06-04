@@ -44,8 +44,6 @@ def getSQLADatatype(datatype):
         return "String"
 
 
-
-
 def getPackageLst(self, package: db.Package):
     if package.parent_package is None or getPackageLst(self, package.parent_package) == '':
         return package.modelnaam_kort if package.modelnaam_kort is not None else ''

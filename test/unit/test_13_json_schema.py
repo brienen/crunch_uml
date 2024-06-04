@@ -1,8 +1,8 @@
 import json
-import unittest
+
 import jsonschema
 from jsonschema import validate
-from urllib.request import urlopen
+
 import crunch_uml.schema as sch
 from crunch_uml import cli, const, db
 
@@ -18,7 +18,6 @@ def test_import_schuldhulp():
     assert schema.count_class() == 36
     assert schema.count_attribute() == 114
     assert schema.count_enumeratieliteral() == 20
-
 
     test_args = [
         "transform",
@@ -40,11 +39,15 @@ def test_import_schuldhulp():
     assert schema.count_enumeratieliteral() == 20
 
     test_args = [
-        "-sch", "schuldhulp",
+        "-sch",
+        "schuldhulp",
         "export",
-        "-t", "json_schema",
-        "--output_class_id", "EAID_839017B2_0F95_42d0_AB2B_E873636340DA",        
-        "-f", "./test/output/json_schema.json",
+        "-t",
+        "json_schema",
+        "--output_class_id",
+        "EAID_839017B2_0F95_42d0_AB2B_E873636340DA",
+        "-f",
+        "./test/output/json_schema.json",
     ]
     cli.main(test_args)
 
@@ -53,9 +56,7 @@ def test_import_schuldhulp():
     assert schema.count_package() == 1
 
 
-    
 def test_validate_json_schema():
-
     def load_json_file(file_path):
         with open(file_path, 'r') as file:
             return json.load(file)
@@ -70,7 +71,7 @@ def test_validate_json_schema():
     meta_schema_file_path = "./test/data/meta-schema.json"
     meta_schema = load_json_file(meta_schema_file_path)
 
-  # Use try-except to catch ValidationError and print detailed error message
+    # Use try-except to catch ValidationError and print detailed error message
     try:
         validate(instance=json_schema, schema=meta_schema)
     except jsonschema.exceptions.ValidationError as e:

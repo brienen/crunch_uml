@@ -1,6 +1,6 @@
 import logging
-import inflection
 
+import inflection
 from sqlalchemy import (
     Boolean,
     Column,
@@ -509,7 +509,7 @@ class Association(Base, UML_Generic):  # type: ignore
             return True if isinstance(self.src_mult_start, int) and int(self.src_mult_start) > 0 else False
 
     def getRole(self, view='src'):
-        if view=='src':
+        if view == 'src':
             if self.src_role:
                 return self.src_role
             elif self.isEnkelvoudig(dst=True):
