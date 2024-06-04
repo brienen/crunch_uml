@@ -1,6 +1,6 @@
 {%- macro class_body(clazz, indent=1) -%}
 {{ '    ' * (1 if indent ==1 else 0) }}"type": "object",
-{{ '    ' * (indent) }}"description": {{ clazz.definitie|default('')|tojson }},
+{%- if clazz.definitie %}{{ '    ' * (indent) }}"description": {{ clazz.definitie|default('')|tojson }},{%- endif %}
 {{ '    ' * (indent) }}"properties": {
 {%- set attributen = clazz.attributes|rejectattr('name','none')|list %}
 {%- for attribute in attributen %}
@@ -36,7 +36,7 @@
 {%- for enum in enums %}
         "{{ enum.name }}": {
             "type": "string",
-            "description": {{ enum.definitie|default('')|tojson }},
+            {%- if enum.definitie %}"description": {{ enum.definitie | default('')|tojson }},{% endif %}
             "enum": [{%- for lit in enum.literals %}"{{ lit.name }}"{% if not loop.last %}, {% endif %}{%- endfor %}]
         }{% if not loop.last %},{% endif %}
 {%- endfor %}

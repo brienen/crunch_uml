@@ -45,7 +45,8 @@ setuptools.setup(
         'rdflib>=7.0.0,<8',
         'inflection>=0.5.1,<6',
         'validators>=0.28.0,<1',
-        'requests>=2.32.3,<3'
+        'requests>=2.32.3,<3',
+        'jsonschema>=4.22.0,<5'
         ],
     extras_require={
         'dev': [

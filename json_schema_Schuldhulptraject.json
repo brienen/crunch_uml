@@ -1,0 +1,1041 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/product.schema.json",
+    "title": "Schuldhulptraject",
+    "type": "object",
+    "description": "Samenstel van achtereenvolgens uit te voeren en onderling samenhangende deelhandelingen of van opeenvolgende stadia in een proces, voorgesteld als een route die via opeenvolgende bestemmingen naar de eindbestemming voert.",
+    "properties": {
+        "einddatum": {
+            "$ref": "#/$defs/datum"
+        },
+        "naam": {
+            "type": "string"
+        },
+        "omschrijving": {
+            "type": "string"
+        },
+        "startdatum": {
+            "$ref": "#/$defs/datum"
+        },
+        "toekenningsdatum": {
+            "$ref": "#/$defs/datum"
+        },
+        "totaalSchuldbedragBijAanvangSchuld": {
+            "$ref": "#/$defs/bedrag"
+        },
+        "aanmelding": {
+            "type": "object",
+            "description": "Moment dat een persoon met een hulpvraag komt rondom (dreigende) schulden. Dit kan een persoonlijke, schriftelijke, digitale of telefonische vraag zijn. ",
+            "properties": {
+                "crisisinterventie": {
+                    "type": "boolean"
+                },
+                "einddatum": {
+                    "$ref": "#/$defs/datum"
+                },
+                "startdatum": {
+                    "$ref": "#/$defs/datum"
+                },
+                "intake": {
+                    "type": "object",
+                    "description": "Dit is de fase tussen het eerste gesprek en het Plan van Aanpak. Tijdens de\nintakefase wordt geinventariseerd welke instrumenten, ondersteuning, activiteiten en gegevens nodig zijn om een duurzaam financieel\nevenwicht te bereiken.",
+                    "properties": {
+                        "einddatum": {
+                            "$ref": "#/$defs/datum"
+                        },
+                        "startdatum": {
+                            "$ref": "#/$defs/datum"
+                        },
+                        "toelatingsbeschikking": {
+                            "$ref": "#/$defs/datum"
+                        },
+                        "begeleidingen": {
+                            "type": "array",
+                            "items": { 
+                                "type": "object",
+                                "description": "Begeleiding voor clienten in het kader van schuldhulpdienstverlening, die kan bestaan uit:\n1. budgetbeheer\n2. beschermingsbewind\n3. budgetcoaching\n",
+                                "properties": {
+                                    "einddatum": {
+                                        "$ref": "#/$defs/datum"
+                                    },
+                                    "soort": {
+                                        "$ref": "#/$defs/EnumBegeleidingssoort"
+                                    },
+                                    "startdatum": {
+                                        "$ref": "#/$defs/datum"
+                                    },
+                                    "begeleidingssoort": {
+                                        "type": "object",
+                                        "description": "Soort begeleiding in het kader van schuldhulpverlening",
+                                        "properties": {
+                                            "soort": {
+                                                "type": "string"
+                                            }
+                                        }
+
+                                    },
+                                    "nazorg": {
+                                        "type": "object",
+                                        "description": "Ondersteuning die een persoon ontvangt n\u0026#225; een schuldregelingstraject, om zo bij de start van een schuldenvrij leven zelfredzaamheid verder te bevorderen \u0026#233;n recidive (terugval) te voorkomen. ",
+                                        "properties": {
+                                            "einddatum": {
+                                                "$ref": "#/$defs/datum"
+                                            },
+                                            "startdatum": {
+                                                "$ref": "#/$defs/datum"
+                                            }
+                                        }
+
+                                    }
+                                }
+                            }
+                        },
+                        "stabilisatie": {
+                            "type": "object",
+                            "description": "Fase van het schuldhulpverleningstraject met als doel de inkomsten en uitgaven van een persoon in evenwicht te brengen. De stabilisatie van inkomen en uitgaven is een resultaat van\nwerkzaamheden uit het integrale plan van aanpak. Als stabilisatie bereikt is kan een betalingsregeling, herfinanciering of schuldregeling worden opgezet. Een belangrijk tweede doel is om de hulpvrager hierbij schuldenrust te bieden: stress wegnemen en tijd maken voor oplossingen naar een schuldenzorgvrije toekomst. In de stabilisatiefase kan een schuldhulpverlener andere instrumenten, activiteiten of ondersteuning inzetten, die bijdragen aan de duurzame oplossing van het financi\u0026#235;le probleem, zoals budgetcoaching, budgetbeheer, beschermingsbewind of flankerende hulp.",
+                            "properties": {
+                                "einddatum": {
+                                    "$ref": "#/$defs/datum"
+                                },
+                                "startdatum": {
+                                    "$ref": "#/$defs/datum"
+                                },
+                                "begeleidingen": {
+                                    "type": "array",
+                                    "items": { 
+                                        "type": "object",
+                                        "description": "Begeleiding voor clienten in het kader van schuldhulpdienstverlening, die kan bestaan uit:\n1. budgetbeheer\n2. beschermingsbewind\n3. budgetcoaching\n",
+                                        "properties": {
+                                            "einddatum": {
+                                                "$ref": "#/$defs/datum"
+                                            },
+                                            "soort": {
+                                                "$ref": "#/$defs/EnumBegeleidingssoort"
+                                            },
+                                            "startdatum": {
+                                                "$ref": "#/$defs/datum"
+                                            },
+                                            "begeleidingssoort": {
+                                                "type": "object",
+                                                "description": "Soort begeleiding in het kader van schuldhulpverlening",
+                                                "properties": {
+                                                    "soort": {
+                                                        "type": "string"
+                                                    }
+                                                }
+
+                                            },
+                                            "nazorg": {
+                                                "type": "object",
+                                                "description": "Ondersteuning die een persoon ontvangt n\u0026#225; een schuldregelingstraject, om zo bij de start van een schuldenvrij leven zelfredzaamheid verder te bevorderen \u0026#233;n recidive (terugval) te voorkomen. ",
+                                                "properties": {
+                                                    "einddatum": {
+                                                        "$ref": "#/$defs/datum"
+                                                    },
+                                                    "startdatum": {
+                                                        "$ref": "#/$defs/datum"
+                                                    }
+                                                }
+
+                                            }
+                                        }
+                                    }
+                                },
+                                "schuldregeling": {
+                                    "type": "object",
+                                    "description": "De schuldregeling heeft als doel een overeenkomst te sluiten tussen iemand met problematische schulden en zijn schuldeisers. Op basis van eventueel ingezet vermogen en de berekende afloscapaciteit (of op andere wijze vastgestelde minimale afdracht) lost de schuldenaar in maximaal 18 maanden zo veel mogelijk van de schuld af. Daarna schelden de schuldeisers de rest van hun vordering kwijt. Voordat de schuldregeling start, sluit je een schuldregelingsovereenkomst met de schuldenaar. Daarin staan de rechten en plichten van beide partijen. Een schuldregeling kan met een saneringskrediet of een schuldbemiddeling gerealiseerd worden. Als een of meer schuldeisers blijven weigeren in te stemmen met de minnelijke schuldregeling, informeer je de schuldenaar over mogelijke vervolgstappen, zoals het aanvragen van een dwangakkoord (artikel 287a Fw) of toelating tot de Wsnp.",
+                                    "properties": {
+                                        "afgewezen": {
+                                            "$ref": "#/$defs/datum"
+                                        },
+                                        "datum": {
+                                            "$ref": "#/$defs/datum"
+                                        },
+                                        "datumVerzoekDwangakkoord": {
+                                            "$ref": "#/$defs/datum"
+                                        },
+                                        "dwangakkoord": {
+                                            "type": "boolean"
+                                        },
+                                        "ingetrokken": {
+                                            "$ref": "#/$defs/datum"
+                                        },
+                                        "toegekend": {
+                                            "type": "string"
+                                        },
+                                        "begeleidingen": {
+                                            "type": "array",
+                                            "items": { 
+                                                "type": "object",
+                                                "description": "Begeleiding voor clienten in het kader van schuldhulpdienstverlening, die kan bestaan uit:\n1. budgetbeheer\n2. beschermingsbewind\n3. budgetcoaching\n",
+                                                "properties": {
+                                                    "einddatum": {
+                                                        "$ref": "#/$defs/datum"
+                                                    },
+                                                    "soort": {
+                                                        "$ref": "#/$defs/EnumBegeleidingssoort"
+                                                    },
+                                                    "startdatum": {
+                                                        "$ref": "#/$defs/datum"
+                                                    },
+                                                    "begeleidingssoort": {
+                                                        "type": "object",
+                                                        "description": "Soort begeleiding in het kader van schuldhulpverlening",
+                                                        "properties": {
+                                                            "soort": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+
+                                                    },
+                                                    "nazorg": {
+                                                        "type": "object",
+                                                        "description": "Ondersteuning die een persoon ontvangt n\u0026#225; een schuldregelingstraject, om zo bij de start van een schuldenvrij leven zelfredzaamheid verder te bevorderen \u0026#233;n recidive (terugval) te voorkomen. ",
+                                                        "properties": {
+                                                            "einddatum": {
+                                                                "$ref": "#/$defs/datum"
+                                                            },
+                                                            "startdatum": {
+                                                                "$ref": "#/$defs/datum"
+                                                            }
+                                                        }
+
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "oplossing": {
+                                            "type": "object",
+                                            "description": "De Oplossing beschrijft in 4 submodules wat de schuldhulpverlener doet om een oplossing te realiseren, en kent de volgende submodules: \n- submodule Herfinanciering;\n- submodule Betalingsregeling;\n- submodule Saneringskrediet;\n- submodule Schuldbemiddeling.",
+                                            "properties": {
+                                                "einddatum": {
+                                                    "$ref": "#/$defs/datum"
+                                                },
+                                                "soort": {
+                                                    "$ref": "#/$defs/EnumOplossingssoort"
+                                                },
+                                                "startdatum": {
+                                                    "$ref": "#/$defs/datum"
+                                                },
+                                                "nazorg": {
+                                                    "type": "object",
+                                                    "description": "Ondersteuning die een persoon ontvangt n\u0026#225; een schuldregelingstraject, om zo bij de start van een schuldenvrij leven zelfredzaamheid verder te bevorderen \u0026#233;n recidive (terugval) te voorkomen. ",
+                                                    "properties": {
+                                                        "einddatum": {
+                                                            "$ref": "#/$defs/datum"
+                                                        },
+                                                        "startdatum": {
+                                                            "$ref": "#/$defs/datum"
+                                                        }
+                                                    }
+
+                                                },
+                                                "oplossingssoort": {
+                                                    "type": "object",
+                                                    "description": "De soort oplossing in het kader van Schuldhulpverlening",
+                                                    "properties": {
+                                                        "soort": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+
+                                                }
+                                            }
+
+                                        }
+                                    }
+
+                                }
+                            }
+
+                        }
+                    }
+
+                }
+            }
+
+        },
+        "begeleidingen": {
+            "type": "array",
+            "items": { 
+                "type": "object",
+                "description": "Begeleiding voor clienten in het kader van schuldhulpdienstverlening, die kan bestaan uit:\n1. budgetbeheer\n2. beschermingsbewind\n3. budgetcoaching\n",
+                "properties": {
+                    "einddatum": {
+                        "$ref": "#/$defs/datum"
+                    },
+                    "soort": {
+                        "$ref": "#/$defs/EnumBegeleidingssoort"
+                    },
+                    "startdatum": {
+                        "$ref": "#/$defs/datum"
+                    },
+                    "begeleidingssoort": {
+                        "type": "object",
+                        "description": "Soort begeleiding in het kader van schuldhulpverlening",
+                        "properties": {
+                            "soort": {
+                                "type": "string"
+                            }
+                        }
+
+                    },
+                    "nazorg": {
+                        "type": "object",
+                        "description": "Ondersteuning die een persoon ontvangt n\u0026#225; een schuldregelingstraject, om zo bij de start van een schuldenvrij leven zelfredzaamheid verder te bevorderen \u0026#233;n recidive (terugval) te voorkomen. ",
+                        "properties": {
+                            "einddatum": {
+                                "$ref": "#/$defs/datum"
+                            },
+                            "startdatum": {
+                                "$ref": "#/$defs/datum"
+                            }
+                        }
+
+                    }
+                }
+            }
+        },
+        "crisisinterventies": {
+            "type": "array",
+            "items": { 
+                "type": "object",
+                "description": "Het afwenden van een crisis- of dreigende situatie om zo de mogelijkheid te cre\u0026#235;ren om de klant te helpen via de reguliere schuldhulpverlening.\nVolgens de Wgs gaat het in elk geval om de volgende situaties:\n\u25a0 gedwongen woningontruiming;\n\u25a0 be\u0026#235;indiging van de levering van gas, water, elektriciteit of stadsverwarming;\n\u25a0 opzegging of ontbinding van de zorgverzekering.\nGemeenten kunnen extra situaties toevoegen aan hun crisisprotocol, zoals:\n\u25a0 aangekondigde boedelverkoop of verkoop van de eigen woning;\n\u25a0 loon- of bankbeslag;\n\u25a0 een faillissementsaanvraag.\nEn voor ondernemers:\n\u25a0 beslag op (on)roerende zaken dat het voortbestaan van de onderneming bedreigt;\n\u25a0 opzegging van het bankkrediet.\n",
+                "properties": {
+                    "einddatum": {
+                        "$ref": "#/$defs/datum"
+                    },
+                    "startdatum": {
+                        "$ref": "#/$defs/datum"
+                    }
+                }
+            }
+        },
+        "intake": {
+            "type": "object",
+            "description": "Dit is de fase tussen het eerste gesprek en het Plan van Aanpak. Tijdens de\nintakefase wordt geinventariseerd welke instrumenten, ondersteuning, activiteiten en gegevens nodig zijn om een duurzaam financieel\nevenwicht te bereiken.",
+            "properties": {
+                "einddatum": {
+                    "$ref": "#/$defs/datum"
+                },
+                "startdatum": {
+                    "$ref": "#/$defs/datum"
+                },
+                "toelatingsbeschikking": {
+                    "$ref": "#/$defs/datum"
+                },
+                "begeleidingen": {
+                    "type": "array",
+                    "items": { 
+                        "type": "object",
+                        "description": "Begeleiding voor clienten in het kader van schuldhulpdienstverlening, die kan bestaan uit:\n1. budgetbeheer\n2. beschermingsbewind\n3. budgetcoaching\n",
+                        "properties": {
+                            "einddatum": {
+                                "$ref": "#/$defs/datum"
+                            },
+                            "soort": {
+                                "$ref": "#/$defs/EnumBegeleidingssoort"
+                            },
+                            "startdatum": {
+                                "$ref": "#/$defs/datum"
+                            },
+                            "begeleidingssoort": {
+                                "type": "object",
+                                "description": "Soort begeleiding in het kader van schuldhulpverlening",
+                                "properties": {
+                                    "soort": {
+                                        "type": "string"
+                                    }
+                                }
+
+                            },
+                            "nazorg": {
+                                "type": "object",
+                                "description": "Ondersteuning die een persoon ontvangt n\u0026#225; een schuldregelingstraject, om zo bij de start van een schuldenvrij leven zelfredzaamheid verder te bevorderen \u0026#233;n recidive (terugval) te voorkomen. ",
+                                "properties": {
+                                    "einddatum": {
+                                        "$ref": "#/$defs/datum"
+                                    },
+                                    "startdatum": {
+                                        "$ref": "#/$defs/datum"
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                },
+                "stabilisatie": {
+                    "type": "object",
+                    "description": "Fase van het schuldhulpverleningstraject met als doel de inkomsten en uitgaven van een persoon in evenwicht te brengen. De stabilisatie van inkomen en uitgaven is een resultaat van\nwerkzaamheden uit het integrale plan van aanpak. Als stabilisatie bereikt is kan een betalingsregeling, herfinanciering of schuldregeling worden opgezet. Een belangrijk tweede doel is om de hulpvrager hierbij schuldenrust te bieden: stress wegnemen en tijd maken voor oplossingen naar een schuldenzorgvrije toekomst. In de stabilisatiefase kan een schuldhulpverlener andere instrumenten, activiteiten of ondersteuning inzetten, die bijdragen aan de duurzame oplossing van het financi\u0026#235;le probleem, zoals budgetcoaching, budgetbeheer, beschermingsbewind of flankerende hulp.",
+                    "properties": {
+                        "einddatum": {
+                            "$ref": "#/$defs/datum"
+                        },
+                        "startdatum": {
+                            "$ref": "#/$defs/datum"
+                        },
+                        "begeleidingen": {
+                            "type": "array",
+                            "items": { 
+                                "type": "object",
+                                "description": "Begeleiding voor clienten in het kader van schuldhulpdienstverlening, die kan bestaan uit:\n1. budgetbeheer\n2. beschermingsbewind\n3. budgetcoaching\n",
+                                "properties": {
+                                    "einddatum": {
+                                        "$ref": "#/$defs/datum"
+                                    },
+                                    "soort": {
+                                        "$ref": "#/$defs/EnumBegeleidingssoort"
+                                    },
+                                    "startdatum": {
+                                        "$ref": "#/$defs/datum"
+                                    },
+                                    "begeleidingssoort": {
+                                        "type": "object",
+                                        "description": "Soort begeleiding in het kader van schuldhulpverlening",
+                                        "properties": {
+                                            "soort": {
+                                                "type": "string"
+                                            }
+                                        }
+
+                                    },
+                                    "nazorg": {
+                                        "type": "object",
+                                        "description": "Ondersteuning die een persoon ontvangt n\u0026#225; een schuldregelingstraject, om zo bij de start van een schuldenvrij leven zelfredzaamheid verder te bevorderen \u0026#233;n recidive (terugval) te voorkomen. ",
+                                        "properties": {
+                                            "einddatum": {
+                                                "$ref": "#/$defs/datum"
+                                            },
+                                            "startdatum": {
+                                                "$ref": "#/$defs/datum"
+                                            }
+                                        }
+
+                                    }
+                                }
+                            }
+                        },
+                        "schuldregeling": {
+                            "type": "object",
+                            "description": "De schuldregeling heeft als doel een overeenkomst te sluiten tussen iemand met problematische schulden en zijn schuldeisers. Op basis van eventueel ingezet vermogen en de berekende afloscapaciteit (of op andere wijze vastgestelde minimale afdracht) lost de schuldenaar in maximaal 18 maanden zo veel mogelijk van de schuld af. Daarna schelden de schuldeisers de rest van hun vordering kwijt. Voordat de schuldregeling start, sluit je een schuldregelingsovereenkomst met de schuldenaar. Daarin staan de rechten en plichten van beide partijen. Een schuldregeling kan met een saneringskrediet of een schuldbemiddeling gerealiseerd worden. Als een of meer schuldeisers blijven weigeren in te stemmen met de minnelijke schuldregeling, informeer je de schuldenaar over mogelijke vervolgstappen, zoals het aanvragen van een dwangakkoord (artikel 287a Fw) of toelating tot de Wsnp.",
+                            "properties": {
+                                "afgewezen": {
+                                    "$ref": "#/$defs/datum"
+                                },
+                                "datum": {
+                                    "$ref": "#/$defs/datum"
+                                },
+                                "datumVerzoekDwangakkoord": {
+                                    "$ref": "#/$defs/datum"
+                                },
+                                "dwangakkoord": {
+                                    "type": "boolean"
+                                },
+                                "ingetrokken": {
+                                    "$ref": "#/$defs/datum"
+                                },
+                                "toegekend": {
+                                    "type": "string"
+                                },
+                                "begeleidingen": {
+                                    "type": "array",
+                                    "items": { 
+                                        "type": "object",
+                                        "description": "Begeleiding voor clienten in het kader van schuldhulpdienstverlening, die kan bestaan uit:\n1. budgetbeheer\n2. beschermingsbewind\n3. budgetcoaching\n",
+                                        "properties": {
+                                            "einddatum": {
+                                                "$ref": "#/$defs/datum"
+                                            },
+                                            "soort": {
+                                                "$ref": "#/$defs/EnumBegeleidingssoort"
+                                            },
+                                            "startdatum": {
+                                                "$ref": "#/$defs/datum"
+                                            },
+                                            "begeleidingssoort": {
+                                                "type": "object",
+                                                "description": "Soort begeleiding in het kader van schuldhulpverlening",
+                                                "properties": {
+                                                    "soort": {
+                                                        "type": "string"
+                                                    }
+                                                }
+
+                                            },
+                                            "nazorg": {
+                                                "type": "object",
+                                                "description": "Ondersteuning die een persoon ontvangt n\u0026#225; een schuldregelingstraject, om zo bij de start van een schuldenvrij leven zelfredzaamheid verder te bevorderen \u0026#233;n recidive (terugval) te voorkomen. ",
+                                                "properties": {
+                                                    "einddatum": {
+                                                        "$ref": "#/$defs/datum"
+                                                    },
+                                                    "startdatum": {
+                                                        "$ref": "#/$defs/datum"
+                                                    }
+                                                }
+
+                                            }
+                                        }
+                                    }
+                                },
+                                "oplossing": {
+                                    "type": "object",
+                                    "description": "De Oplossing beschrijft in 4 submodules wat de schuldhulpverlener doet om een oplossing te realiseren, en kent de volgende submodules: \n- submodule Herfinanciering;\n- submodule Betalingsregeling;\n- submodule Saneringskrediet;\n- submodule Schuldbemiddeling.",
+                                    "properties": {
+                                        "einddatum": {
+                                            "$ref": "#/$defs/datum"
+                                        },
+                                        "soort": {
+                                            "$ref": "#/$defs/EnumOplossingssoort"
+                                        },
+                                        "startdatum": {
+                                            "$ref": "#/$defs/datum"
+                                        },
+                                        "nazorg": {
+                                            "type": "object",
+                                            "description": "Ondersteuning die een persoon ontvangt n\u0026#225; een schuldregelingstraject, om zo bij de start van een schuldenvrij leven zelfredzaamheid verder te bevorderen \u0026#233;n recidive (terugval) te voorkomen. ",
+                                            "properties": {
+                                                "einddatum": {
+                                                    "$ref": "#/$defs/datum"
+                                                },
+                                                "startdatum": {
+                                                    "$ref": "#/$defs/datum"
+                                                }
+                                            }
+
+                                        },
+                                        "oplossingssoort": {
+                                            "type": "object",
+                                            "description": "De soort oplossing in het kader van Schuldhulpverlening",
+                                            "properties": {
+                                                "soort": {
+                                                    "type": "string"
+                                                }
+                                            }
+
+                                        }
+                                    }
+
+                                }
+                            }
+
+                        }
+                    }
+
+                }
+            }
+
+        },
+        "moratoriumen": {
+            "type": "array",
+            "items": { 
+                "type": "object",
+                "description": "Het gaat hier om de datum waarop een verzoek tot een moratorium (ex art. 287 b Fw) is ingediend bij de rechter.\n\nEr kan een verzoek tot een moratorium bij de rechter worden gedaan om te voorkomen dat een schuldeiser zijn specifieke inningsmogelijkheden gebruikt, terwijl een aanvraag voor een minnelijke schuldregeling in behandeling is. Het moratorium is bedoeld om het minnelijke traject te kunnen voortzetten.\n\nHet moratorium kan in de volgende situaties worden ingezet:\n- gedwongen woningontruiming;\n- be\u0026#235;indiging van de levering van gas, water elektriciteit of stadsverwarming;\n- opzegging dan wel ontbinding van de zorgverzekering.\n\nHet moratorium duurt maximaal zes maanden.",
+                "properties": {
+                    "datumAanvraag": {
+                        "$ref": "#/$defs/datum"
+                    },
+                    "datumGoedkeuring": {
+                        "$ref": "#/$defs/datum"
+                    },
+                    "einddatum": {
+                        "$ref": "#/$defs/datum"
+                    },
+                    "startdatum": {
+                        "$ref": "#/$defs/datum"
+                    }
+                }
+            }
+        },
+        "nazorg": {
+            "type": "object",
+            "description": "Ondersteuning die een persoon ontvangt n\u0026#225; een schuldregelingstraject, om zo bij de start van een schuldenvrij leven zelfredzaamheid verder te bevorderen \u0026#233;n recidive (terugval) te voorkomen. ",
+            "properties": {
+                "einddatum": {
+                    "$ref": "#/$defs/datum"
+                },
+                "startdatum": {
+                    "$ref": "#/$defs/datum"
+                }
+            }
+
+        },
+        "notarieleStatusen": {
+            "type": "array",
+            "items": { 
+                "type": "object",
+                
+                "properties": {
+                }
+            }
+        },
+        "oplossing": {
+            "type": "object",
+            "description": "De Oplossing beschrijft in 4 submodules wat de schuldhulpverlener doet om een oplossing te realiseren, en kent de volgende submodules: \n- submodule Herfinanciering;\n- submodule Betalingsregeling;\n- submodule Saneringskrediet;\n- submodule Schuldbemiddeling.",
+            "properties": {
+                "einddatum": {
+                    "$ref": "#/$defs/datum"
+                },
+                "soort": {
+                    "$ref": "#/$defs/EnumOplossingssoort"
+                },
+                "startdatum": {
+                    "$ref": "#/$defs/datum"
+                },
+                "nazorg": {
+                    "type": "object",
+                    "description": "Ondersteuning die een persoon ontvangt n\u0026#225; een schuldregelingstraject, om zo bij de start van een schuldenvrij leven zelfredzaamheid verder te bevorderen \u0026#233;n recidive (terugval) te voorkomen. ",
+                    "properties": {
+                        "einddatum": {
+                            "$ref": "#/$defs/datum"
+                        },
+                        "startdatum": {
+                            "$ref": "#/$defs/datum"
+                        }
+                    }
+
+                },
+                "oplossingssoort": {
+                    "type": "object",
+                    "description": "De soort oplossing in het kader van Schuldhulpverlening",
+                    "properties": {
+                        "soort": {
+                            "type": "string"
+                        }
+                    }
+
+                }
+            }
+
+        },
+        "planVanAanpak": {
+            "type": "object",
+            "description": "Een document waarin in elk geval het volgende staat:\n\u25a0 de hulpvraag van de persoon;\n\u25a0 de voorgestelde ondersteuning;\n\u25a0 eventueel de organisatie(s) waarnaar je hebt doorverwezen;\n\u25a0 de voorwaarden voor schuldhulpverlening (bijvoorbeeld dat de persoon geen nieuwe schulden mag maken).\n\nDe hoogte van beslagvrije voet voor de persoon (zie artikel 4a:5 van de Wgs) moet in acht worden genomen.",
+            "properties": {
+                "datumAfronding": {
+                    "$ref": "#/$defs/datum"
+                }
+            }
+
+        },
+        "projecten": {
+            "type": "array",
+            "items": { 
+                "type": "object",
+                "description": "Geheel van activiteiten uitgevoerd in een tijdelijk samenwerkingsverband gericht op het binnen bepaalde randvoorwaarden (bv. tijd, geld) bereiken van een vooraf gedefinieerd resultaat.",
+                "properties": {
+                    "einddatum": {
+                        "$ref": "#/$defs/datum"
+                    },
+                    "omschrijving": {
+                        "type": "string"
+                    },
+                    "resultaat": {
+                        "type": "string"
+                    },
+                    "startdatum": {
+                        "$ref": "#/$defs/datum"
+                    },
+                    "toekennningsdatum": {
+                        "$ref": "#/$defs/datum"
+                    },
+                    "uitstroomreden": {
+                        "type": "string"
+                    },
+                    "projectsoort": {
+                        "type": "object",
+                        "description": "Typering van een project",
+                        "properties": {
+                            "naam": {
+                                "type": "string"
+                            },
+                            "omschrijving": {
+                                "type": "string"
+                            }
+                        }
+
+                    },
+                    "resultaat": {
+                        "type": "object",
+                        "description": "De uitkomst van iets, bijvoorbeeld een berekening of een onderzoek. een gevolg. ",
+                        "properties": {
+                            "datum": {
+                                "$ref": "#/$defs/datum"
+                            },
+                            "naam": {
+                                "type": "string"
+                            },
+                            "omschrijving": {
+                                "type": "string"
+                            },
+                            "resultaatsoort": {
+                                "type": "object",
+                                "description": "Typering van een resultaat",
+                                "properties": {
+                                    "naam": {
+                                        "type": "string"
+                                    },
+                                    "omschrijving": {
+                                        "type": "string"
+                                    }
+                                }
+
+                            }
+                        }
+
+                    }
+                }
+            }
+        },
+        "schuldregeling": {
+            "type": "object",
+            "description": "De schuldregeling heeft als doel een overeenkomst te sluiten tussen iemand met problematische schulden en zijn schuldeisers. Op basis van eventueel ingezet vermogen en de berekende afloscapaciteit (of op andere wijze vastgestelde minimale afdracht) lost de schuldenaar in maximaal 18 maanden zo veel mogelijk van de schuld af. Daarna schelden de schuldeisers de rest van hun vordering kwijt. Voordat de schuldregeling start, sluit je een schuldregelingsovereenkomst met de schuldenaar. Daarin staan de rechten en plichten van beide partijen. Een schuldregeling kan met een saneringskrediet of een schuldbemiddeling gerealiseerd worden. Als een of meer schuldeisers blijven weigeren in te stemmen met de minnelijke schuldregeling, informeer je de schuldenaar over mogelijke vervolgstappen, zoals het aanvragen van een dwangakkoord (artikel 287a Fw) of toelating tot de Wsnp.",
+            "properties": {
+                "afgewezen": {
+                    "$ref": "#/$defs/datum"
+                },
+                "datum": {
+                    "$ref": "#/$defs/datum"
+                },
+                "datumVerzoekDwangakkoord": {
+                    "$ref": "#/$defs/datum"
+                },
+                "dwangakkoord": {
+                    "type": "boolean"
+                },
+                "ingetrokken": {
+                    "$ref": "#/$defs/datum"
+                },
+                "toegekend": {
+                    "type": "string"
+                },
+                "begeleidingen": {
+                    "type": "array",
+                    "items": { 
+                        "type": "object",
+                        "description": "Begeleiding voor clienten in het kader van schuldhulpdienstverlening, die kan bestaan uit:\n1. budgetbeheer\n2. beschermingsbewind\n3. budgetcoaching\n",
+                        "properties": {
+                            "einddatum": {
+                                "$ref": "#/$defs/datum"
+                            },
+                            "soort": {
+                                "$ref": "#/$defs/EnumBegeleidingssoort"
+                            },
+                            "startdatum": {
+                                "$ref": "#/$defs/datum"
+                            },
+                            "begeleidingssoort": {
+                                "type": "object",
+                                "description": "Soort begeleiding in het kader van schuldhulpverlening",
+                                "properties": {
+                                    "soort": {
+                                        "type": "string"
+                                    }
+                                }
+
+                            },
+                            "nazorg": {
+                                "type": "object",
+                                "description": "Ondersteuning die een persoon ontvangt n\u0026#225; een schuldregelingstraject, om zo bij de start van een schuldenvrij leven zelfredzaamheid verder te bevorderen \u0026#233;n recidive (terugval) te voorkomen. ",
+                                "properties": {
+                                    "einddatum": {
+                                        "$ref": "#/$defs/datum"
+                                    },
+                                    "startdatum": {
+                                        "$ref": "#/$defs/datum"
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                },
+                "oplossing": {
+                    "type": "object",
+                    "description": "De Oplossing beschrijft in 4 submodules wat de schuldhulpverlener doet om een oplossing te realiseren, en kent de volgende submodules: \n- submodule Herfinanciering;\n- submodule Betalingsregeling;\n- submodule Saneringskrediet;\n- submodule Schuldbemiddeling.",
+                    "properties": {
+                        "einddatum": {
+                            "$ref": "#/$defs/datum"
+                        },
+                        "soort": {
+                            "$ref": "#/$defs/EnumOplossingssoort"
+                        },
+                        "startdatum": {
+                            "$ref": "#/$defs/datum"
+                        },
+                        "nazorg": {
+                            "type": "object",
+                            "description": "Ondersteuning die een persoon ontvangt n\u0026#225; een schuldregelingstraject, om zo bij de start van een schuldenvrij leven zelfredzaamheid verder te bevorderen \u0026#233;n recidive (terugval) te voorkomen. ",
+                            "properties": {
+                                "einddatum": {
+                                    "$ref": "#/$defs/datum"
+                                },
+                                "startdatum": {
+                                    "$ref": "#/$defs/datum"
+                                }
+                            }
+
+                        },
+                        "oplossingssoort": {
+                            "type": "object",
+                            "description": "De soort oplossing in het kader van Schuldhulpverlening",
+                            "properties": {
+                                "soort": {
+                                    "type": "string"
+                                }
+                            }
+
+                        }
+                    }
+
+                }
+            }
+
+        },
+        "uitstroom": {
+            "type": "object",
+            "description": "Motivatie voor uitstroom",
+            "properties": {
+                "datum": {
+                    "$ref": "#/$defs/datum"
+                },
+                "omschrijving": {
+                    "type": "string"
+                },
+                "reden": {
+                    "$ref": "#/$defs/EnumUitstroomreden"
+                },
+                "uitstroomredensoort": {
+                    "type": "object",
+                    "description": "Typering van een uitstroomreden",
+                    "properties": {
+                        "naam": {
+                            "type": "string"
+                        },
+                        "omschrijving": {
+                            "type": "string"
+                        }
+                    }
+
+                }
+            }
+
+        },
+        "stabilisatie": {
+            "type": "object",
+            "description": "Fase van het schuldhulpverleningstraject met als doel de inkomsten en uitgaven van een persoon in evenwicht te brengen. De stabilisatie van inkomen en uitgaven is een resultaat van\nwerkzaamheden uit het integrale plan van aanpak. Als stabilisatie bereikt is kan een betalingsregeling, herfinanciering of schuldregeling worden opgezet. Een belangrijk tweede doel is om de hulpvrager hierbij schuldenrust te bieden: stress wegnemen en tijd maken voor oplossingen naar een schuldenzorgvrije toekomst. In de stabilisatiefase kan een schuldhulpverlener andere instrumenten, activiteiten of ondersteuning inzetten, die bijdragen aan de duurzame oplossing van het financi\u0026#235;le probleem, zoals budgetcoaching, budgetbeheer, beschermingsbewind of flankerende hulp.",
+            "properties": {
+                "einddatum": {
+                    "$ref": "#/$defs/datum"
+                },
+                "startdatum": {
+                    "$ref": "#/$defs/datum"
+                },
+                "begeleidingen": {
+                    "type": "array",
+                    "items": { 
+                        "type": "object",
+                        "description": "Begeleiding voor clienten in het kader van schuldhulpdienstverlening, die kan bestaan uit:\n1. budgetbeheer\n2. beschermingsbewind\n3. budgetcoaching\n",
+                        "properties": {
+                            "einddatum": {
+                                "$ref": "#/$defs/datum"
+                            },
+                            "soort": {
+                                "$ref": "#/$defs/EnumBegeleidingssoort"
+                            },
+                            "startdatum": {
+                                "$ref": "#/$defs/datum"
+                            },
+                            "begeleidingssoort": {
+                                "type": "object",
+                                "description": "Soort begeleiding in het kader van schuldhulpverlening",
+                                "properties": {
+                                    "soort": {
+                                        "type": "string"
+                                    }
+                                }
+
+                            },
+                            "nazorg": {
+                                "type": "object",
+                                "description": "Ondersteuning die een persoon ontvangt n\u0026#225; een schuldregelingstraject, om zo bij de start van een schuldenvrij leven zelfredzaamheid verder te bevorderen \u0026#233;n recidive (terugval) te voorkomen. ",
+                                "properties": {
+                                    "einddatum": {
+                                        "$ref": "#/$defs/datum"
+                                    },
+                                    "startdatum": {
+                                        "$ref": "#/$defs/datum"
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                },
+                "schuldregeling": {
+                    "type": "object",
+                    "description": "De schuldregeling heeft als doel een overeenkomst te sluiten tussen iemand met problematische schulden en zijn schuldeisers. Op basis van eventueel ingezet vermogen en de berekende afloscapaciteit (of op andere wijze vastgestelde minimale afdracht) lost de schuldenaar in maximaal 18 maanden zo veel mogelijk van de schuld af. Daarna schelden de schuldeisers de rest van hun vordering kwijt. Voordat de schuldregeling start, sluit je een schuldregelingsovereenkomst met de schuldenaar. Daarin staan de rechten en plichten van beide partijen. Een schuldregeling kan met een saneringskrediet of een schuldbemiddeling gerealiseerd worden. Als een of meer schuldeisers blijven weigeren in te stemmen met de minnelijke schuldregeling, informeer je de schuldenaar over mogelijke vervolgstappen, zoals het aanvragen van een dwangakkoord (artikel 287a Fw) of toelating tot de Wsnp.",
+                    "properties": {
+                        "afgewezen": {
+                            "$ref": "#/$defs/datum"
+                        },
+                        "datum": {
+                            "$ref": "#/$defs/datum"
+                        },
+                        "datumVerzoekDwangakkoord": {
+                            "$ref": "#/$defs/datum"
+                        },
+                        "dwangakkoord": {
+                            "type": "boolean"
+                        },
+                        "ingetrokken": {
+                            "$ref": "#/$defs/datum"
+                        },
+                        "toegekend": {
+                            "type": "string"
+                        },
+                        "begeleidingen": {
+                            "type": "array",
+                            "items": { 
+                                "type": "object",
+                                "description": "Begeleiding voor clienten in het kader van schuldhulpdienstverlening, die kan bestaan uit:\n1. budgetbeheer\n2. beschermingsbewind\n3. budgetcoaching\n",
+                                "properties": {
+                                    "einddatum": {
+                                        "$ref": "#/$defs/datum"
+                                    },
+                                    "soort": {
+                                        "$ref": "#/$defs/EnumBegeleidingssoort"
+                                    },
+                                    "startdatum": {
+                                        "$ref": "#/$defs/datum"
+                                    },
+                                    "begeleidingssoort": {
+                                        "type": "object",
+                                        "description": "Soort begeleiding in het kader van schuldhulpverlening",
+                                        "properties": {
+                                            "soort": {
+                                                "type": "string"
+                                            }
+                                        }
+
+                                    },
+                                    "nazorg": {
+                                        "type": "object",
+                                        "description": "Ondersteuning die een persoon ontvangt n\u0026#225; een schuldregelingstraject, om zo bij de start van een schuldenvrij leven zelfredzaamheid verder te bevorderen \u0026#233;n recidive (terugval) te voorkomen. ",
+                                        "properties": {
+                                            "einddatum": {
+                                                "$ref": "#/$defs/datum"
+                                            },
+                                            "startdatum": {
+                                                "$ref": "#/$defs/datum"
+                                            }
+                                        }
+
+                                    }
+                                }
+                            }
+                        },
+                        "oplossing": {
+                            "type": "object",
+                            "description": "De Oplossing beschrijft in 4 submodules wat de schuldhulpverlener doet om een oplossing te realiseren, en kent de volgende submodules: \n- submodule Herfinanciering;\n- submodule Betalingsregeling;\n- submodule Saneringskrediet;\n- submodule Schuldbemiddeling.",
+                            "properties": {
+                                "einddatum": {
+                                    "$ref": "#/$defs/datum"
+                                },
+                                "soort": {
+                                    "$ref": "#/$defs/EnumOplossingssoort"
+                                },
+                                "startdatum": {
+                                    "$ref": "#/$defs/datum"
+                                },
+                                "nazorg": {
+                                    "type": "object",
+                                    "description": "Ondersteuning die een persoon ontvangt n\u0026#225; een schuldregelingstraject, om zo bij de start van een schuldenvrij leven zelfredzaamheid verder te bevorderen \u0026#233;n recidive (terugval) te voorkomen. ",
+                                    "properties": {
+                                        "einddatum": {
+                                            "$ref": "#/$defs/datum"
+                                        },
+                                        "startdatum": {
+                                            "$ref": "#/$defs/datum"
+                                        }
+                                    }
+
+                                },
+                                "oplossingssoort": {
+                                    "type": "object",
+                                    "description": "De soort oplossing in het kader van Schuldhulpverlening",
+                                    "properties": {
+                                        "soort": {
+                                            "type": "string"
+                                        }
+                                    }
+
+                                }
+                            }
+
+                        }
+                    }
+
+                }
+            }
+
+        }
+    },
+    "$defs": {
+        "datum": {
+            "type": "string",
+            "format": "date",
+            "description": "Een datum in het formaat YYYY-MM-DD."
+        },
+        "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Een emailadres."
+        },
+        "tijd": {
+            "type": "string",
+            "format": "time",
+            "description": "De tijd in het formaat HH:MM:SS (ISO 8601)."
+        },
+        "datum-tijd": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Datum en tijd in het formaat YYYY-MM-DDTHH:MM:SSZ (ISO 8601)."
+        },
+        "bedrag": {
+            "type": "integer",
+            "description": "Een geldbedrag in centen nauwkweurig."
+        },
+        "EnumOplossingssoort": {
+            "type": "string",
+            
+            "enum": ["Betalingsregeling", "Herfinanciering", "Saneringskrediet", "Schuldbemiddeling"]
+        },
+        "EnumSchuldensoort": {
+            "type": "string",
+            
+            "enum": ["Zorg", "Publiek (Belastingdienst, Dienst Toeslagen,CJIB etc)", "Energie, water, gemeentelijke belastingen en telecom", "Overig"]
+        },
+        "EnumHuishoudenssoort": {
+            "type": "string",
+            
+            "enum": ["Particulier Huishouden", "Instituuttioneel Huishouden"]
+        },
+        "EnumBegeleidingssoort": {
+            "type": "string",
+            
+            "enum": ["Budgetcoaching", "Budgetbeheer", "Beschermingsbewind"]
+        },
+        "EnumUitstroomreden": {
+            "type": "string",
+            
+            "enum": ["Succesvolle uitstroom/traject doorlopen", "BRP-redenen: Klant is verhuisd/niet woonachtig in regio/overleden", "Klant voldoet niet aan wettelijke verplichtingen (meewerken en (juiste) inlichtingen verstrekken) --> hier valt ook onder: klant heeft zich misdragen", "Schuldhulpverlening is niet (meer) passend", "Klant kan zelfstandig verder/schulden zelf geregeld", "Klant heeft zelf aanvraag ingetrokken", "Overig"]
+        },
+        "EnumSchuleiserssoort": {
+            "type": "string",
+            
+            "enum": []
+        }
+    }
+}
