@@ -5,7 +5,7 @@ import re
 import inflection
 
 import crunch_uml.schema as sch
-from crunch_uml import db
+from crunch_uml import db, util
 from crunch_uml.renderers.jinja2renderer import Jinja2Renderer
 from crunch_uml.renderers.renderer import RendererRegistry
 
@@ -44,25 +44,6 @@ def getSQLADatatype(datatype):
         return "String"
 
 
-def getMeervoud(naamwoord):
-    # Woorden die eindigen op een onbeklemtoonde 'e' krijgen 'n'
-    if not isinstance(naamwoord, str):
-        return ''
-    # Woorden die eindigen op een onbeklemtoonde 'e' krijgen 'n'
-    elif naamwoord.endswith('ie'):
-        return f"{naamwoord}s"
-    # Woorden die eindigen op een onbeklemtoonde 'e' krijgen 'n'
-    elif naamwoord.endswith('e'):
-        return f"{naamwoord}n"
-    # Woorden die eindigen op een klinker (behalve 'e') krijgen 's'
-    elif naamwoord[-1] in 'aiou':
-        return f"{naamwoord}s"
-    # Woorden die eindigen op 's', 'f' of 'ch' krijgen 'en'
-    elif naamwoord.endswith(('s', 'f', 'ch')):
-        return f"{naamwoord}en"
-    # Default regel
-    else:
-        return f"{naamwoord}en"
 
 
 def getPackageLst(self, package: db.Package):
@@ -152,7 +133,7 @@ class SQLARenderer(Jinja2Renderer):
         # Voeg het inflection filter toe
         super().addFilters(env)
         env.filters['sqla_datatype'] = getSQLADatatype
-        env.filters['meervoud'] = getMeervoud
+        env.filters['meervoud'] = util.getMeervoud
         env.filters['snake_case'] = lambda s: (
             pythonize(inflection.underscore(s.replace(" ", ""))) if isinstance(s, str) else ''
         )

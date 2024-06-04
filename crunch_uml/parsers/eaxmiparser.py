@@ -137,12 +137,10 @@ class EAXMIParser(XMIParser):
         connectorrefs = extension.xpath(".//connector[@xmi:idref and properties/@ea_type='Association']", namespaces=ns)  # type: ignore
         for connectorref in connectorrefs:
             idref = connectorref.get('{' + ns['xmi'] + '}idref')
-            # sourceref = connectorref.xpath('./source/@xmi:idref', namespaces=ns)[0]
-            # targetref = connectorref.xpath('./target/@xmi:idref', namespaces=ns)[0]
             association = schema.get_association(idref)
             if association is not None:
-                # association.src_class = sourceref
-                # association.dst_class = targetref
+                association.src_role = connectorref.xpath('./source/role', namespaces=ns)[0].get('name')
+                association.dst_role = connectorref.xpath('./target/role', namespaces=ns)[0].get('name')
 
                 documentation = connectorref.xpath('./documentation')
                 if len(documentation) == 1:

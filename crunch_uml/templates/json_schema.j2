@@ -11,7 +11,7 @@
 {%- endfor %}
 {%- set assocs = clazz.uitgaande_associaties|reject_method('hasOrphan')|list %}
 {%- for assoc in assocs %}{% if loop.first %},{% endif %}
-{{ '    ' * (indent+1) }}"{{ assoc.dst_class.name }}": {
+{{ '    ' * (indent+1) }}"{{ assoc.getRole(view='src') }}": {
 {% if assoc.isEnkelvoudig(dst=True) %}{{ '    ' * (indent+2) }}{{ class_body(assoc.dst_class, indent+2) }}
 {% else %}{{ '    ' * (indent+2) }}"type": "array",
 {{ '    ' * (indent+2) }}"items": { 

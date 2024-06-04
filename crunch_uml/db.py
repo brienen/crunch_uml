@@ -1,4 +1,5 @@
 import logging
+import inflection
 
 from sqlalchemy import (
     Boolean,
@@ -463,6 +464,7 @@ class Association(Base, UML_Generic):  # type: ignore
     src_mult_end = Column(String)
     src_multiplicity = Column(String)
     src_documentation = Column(Text)
+    src_role = Column(String)
     dst_class_id = Column(String, index=True, nullable=False)
     dst_class = relationship(
         "Class",
@@ -474,6 +476,7 @@ class Association(Base, UML_Generic):  # type: ignore
     dst_mult_end = Column(String)
     dst_multiplicity = Column(String)
     dst_documentation = Column(Text)
+    dst_role = Column(String)
 
     __table_args__ = (
         ForeignKeyConstraint(
@@ -504,6 +507,22 @@ class Association(Base, UML_Generic):  # type: ignore
             return True if isinstance(self.dst_mult_start, int) and int(self.dst_mult_start) > 0 else False
         else:
             return True if isinstance(self.src_mult_start, int) and int(self.src_mult_start) > 0 else False
+
+    def getRole(self, view='src'):
+        if view=='src':
+            if self.src_role:
+                return self.src_role
+            elif self.isEnkelvoudig(dst=True):
+                return inflection.camelize(self.dst_class.name.replace(" ", ""), False)
+            else:
+                return inflection.camelize(util.getMeervoud(self.dst_class.name.replace(" ", "")), False)
+        else:
+            if self.dst_role:
+                return self.dst_role
+            elif self.isEnkelvoudig(dst=False):
+                return inflection.camelize(self.src_class.name.replace(" ", ""), False)
+            else:
+                return inflection.camelize(util.getMeervoud(self.src_class.name.replace(" ", "")), False)
 
 
 class Generalization(Base, UML_Generic):  # type: ignore

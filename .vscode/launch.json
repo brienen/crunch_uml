@@ -47,7 +47,7 @@
             "justMyCode": true,
             "args": ["import",
                 "-t", "eaxmi",
-                "-f", "../GGM-Sociaal-Domein/Model Schuldhulpverlening.xml",
+                "-f", "./test/data/Model Schuldhulpverlening.xml",
                 "-db_create"
             ]
         },
