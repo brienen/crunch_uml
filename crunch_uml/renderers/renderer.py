@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import crunch_uml.schema as sch
 from crunch_uml import const, util
 from crunch_uml.db import Class, Package
-from crunch_uml.excpetions import CrunchException
+from crunch_uml.exceptions import CrunchException
 from crunch_uml.registry import Registry
 
 logger = logging.getLogger()

@@ -7,7 +7,7 @@ from lxml import etree
 
 import crunch_uml.schema as sch
 from crunch_uml import const, db
-from crunch_uml.excpetions import CrunchException
+from crunch_uml.exceptions import CrunchException
 from crunch_uml.parsers.parser import Parser, ParserRegistry
 
 logger = logging.getLogger()

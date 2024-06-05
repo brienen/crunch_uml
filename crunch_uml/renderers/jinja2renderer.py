@@ -1,5 +1,6 @@
 import logging
 import os
+import json
 
 import inflection
 import validators
@@ -7,7 +8,7 @@ from jinja2 import Environment, FileSystemLoader
 
 import crunch_uml.schema as sch
 from crunch_uml import const, db
-from crunch_uml.excpetions import CrunchException
+from crunch_uml.exceptions import CrunchException
 from crunch_uml.renderers.renderer import ClassRenderer, ModelRenderer, RendererRegistry
 
 logger = logging.getLogger()
@@ -194,11 +195,20 @@ class JSON_SchemaRenderer(Jinja2Renderer, ClassRenderer):
             template = env.get_template(template)
             output = template.render(clazz=clazz, args=args)
 
+            # JSON-gegevens formatteren
+            try:
+                # Stap 1: Laad de JSON-string in een Python dictionary
+                data = json.loads(output)
+                formatted_json = json.dumps(data, indent=4)
+            except:
+                formatted_json = output
+                logger.warning("Could not format JSON data")
+
             outputfilename = (
                 self.getFilename(filename, extension, clazz) if clazz.name is not None else f"{filename}{extension}"
             )
             with open(outputfilename, 'w') as file:
-                file.write(output)
+                file.write(formatted_json)
         finally:
             del db.Attribute.getJSONDatatype  # No error!
             del db.Class.getVerplichteAttributen  # No error!

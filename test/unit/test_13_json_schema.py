@@ -16,7 +16,7 @@ def test_import_schuldhulp():
     assert schema.count_package() == 3
     assert schema.count_enumeratie() == 6
     assert schema.count_class() == 36
-    assert schema.count_attribute() == 114
+    assert schema.count_attribute() == 116
     assert schema.count_enumeratieliteral() == 20
 
     test_args = [
@@ -35,7 +35,7 @@ def test_import_schuldhulp():
     assert schema.count_package() == 1
     assert schema.count_enumeratie() == 6
     assert schema.count_class() == 31
-    assert schema.count_attribute() == 114
+    assert schema.count_attribute() == 116
     assert schema.count_enumeratieliteral() == 20
 
     test_args = [

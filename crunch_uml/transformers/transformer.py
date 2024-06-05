@@ -3,7 +3,7 @@ from abc import ABC
 
 import crunch_uml.schema as sch
 from crunch_uml import const, db
-from crunch_uml.excpetions import CrunchException
+from crunch_uml.exceptions import CrunchException
 from crunch_uml.registry import Registry
 
 logger = logging.getLogger()

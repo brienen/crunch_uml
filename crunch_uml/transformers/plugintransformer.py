@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 
-from crunch_uml.excpetions import CrunchException
+from crunch_uml.exceptions import CrunchException
 from crunch_uml.transformers.plugin import Plugin
 from crunch_uml.transformers.transformer import Transformer, TransformerRegistry
 

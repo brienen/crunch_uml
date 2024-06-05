@@ -1,44 +1,67 @@
-{%- macro class_body(clazz, indent=1) -%}
-{{ '    ' * (1 if indent ==1 else 0) }}"type": "object",
-{%- if clazz.definitie %}{{ '    ' * (indent) }}"description": {{ clazz.definitie|default('')|tojson }},{%- endif %}
-{{ '    ' * (indent) }}"properties": {
+{%- macro class_body(clazz, rendered_classes=None) -%}
+{%- if rendered_classes is none -%}
+    {%- set rendered_classes = [] -%}
+{%- endif -%}
+
+{%- set rendered_classes = rendered_classes + [clazz.name] -%}
+"type": "object",
+{%- if clazz.definitie %}
+    "description": {{ clazz.definitie|default('')|tojson }},
+{%- endif %}
+    "properties": {
 {%- set attributen = clazz.attributes|rejectattr('name','none')|list %}
 {%- for attribute in attributen %}
-{{ '    ' * (indent+1) }}"{{ attribute.name }}": {
-{%- if attribute.definities %}{{ '    ' * (indent+2) }}"description": {{ attribute.definities|default('')|tojson }},{% endif %}
-{{ '    ' * (indent+2) }}{{ attribute.getJSONDatatype() }}
-{{ '    ' * (indent+1) }}}{% if not loop.last %},{% endif %}
+    "{{ attribute.name }}": {
+    {%- if attribute.definities %}
+    "description": {{ attribute.definities|default('')|tojson }},
+    {%- endif %}
+    {{ attribute.getJSONDatatype() }}
+    }{% if not loop.last %},{% endif %}
 {%- endfor %}
 {%- set assocs = clazz.uitgaande_associaties|reject_method('hasOrphan')|list %}
-{%- for assoc in assocs %}{% if loop.first %},{% endif %}
-{{ '    ' * (indent+1) }}"{{ assoc.getRole(view='src') }}": {
-{% if assoc.isEnkelvoudig(dst=True) %}{{ '    ' * (indent+2) }}{{ class_body(assoc.dst_class, indent+2) }}
-{% else %}{{ '    ' * (indent+2) }}"type": "array",
-{{ '    ' * (indent+2) }}"items": { 
-{{ '    ' * (indent+3) }}{{ class_body(assoc.dst_class, indent+3) }}
-{{ '    ' * (indent+2) }}}
-{%- if assoc.isVerplicht(dst=True) %}{{ '    ' * (indent+2) }}"minItems": 1,
-{{ '    ' * (indent+2) }}"uniqueItems": true{% endif %}{% endif %}
-{{ '    ' * (indent+1) }}}{% if not loop.last %},{% endif %}
+{%- for assoc in assocs %}
+    {%- if assoc.dst_class.name not in rendered_classes %}
+        {% if loop.first %},{% endif %}
+        "{{ assoc.getRole(view='src') }}": {
+        {% if assoc.isEnkelvoudig(dst=True) %}
+            {{ class_body(assoc.dst_class, rendered_classes) }}
+        {% else %}
+            "type": "array",
+            "items": { 
+        {{ class_body(assoc.dst_class, rendered_classes) }}
+        }
+        {%- if assoc.isVerplicht(dst=True) %}
+            ,"minItems": 1,
+            "uniqueItems": true
+        {% endif %}
+        {% endif %}
+        }{% if not loop.last %},{% endif %}
+    {%- endif %}
 {%- endfor %}
-{%- if clazz.getVerplichteAttributen()|length>0 %}{{ '    ' * (indent+1) }}"required": [{%- for name in clazz.getVerplichteAttributen() %}"{{ name }}"{% if not loop.last %},{% endif %}{% endfor %}],
-{{ '    ' * (indent+1) }}"additionalProperties": false{% endif %}
-{{ '    ' * (indent) }}}
+{%- if clazz.getVerplichteAttributen()|length > 0 %}
+    ,"required": [{%- for name in clazz.getVerplichteAttributen() %}"{{ name }}"{% if not loop.last %},{% endif %}{% endfor %}],
+    "additionalProperties": false
+{%- endif %}
+}
 {%- endmacro -%}
+
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://example.com/product.schema.json",
     "title": "{{ clazz.name }}",
-{{ class_body(clazz, 1) }},
+{{ class_body(clazz) }}
 {%- set enums = clazz.package.get_root_package().get_enumerations_inscope()|list %}
-    "$defs": {
-{% include 'json_datatypes.json' %}{% if enums|length > 0 %},{% endif %}
+,"$defs": {
+{% include 'json_datatypes.json' %}
+{%- if enums|length > 0 %},{% endif %}
 {%- for enum in enums %}
-        "{{ enum.name }}": {
-            "type": "string",
-            {%- if enum.definitie %}"description": {{ enum.definitie | default('')|tojson }},{% endif %}
-            "enum": [{%- for lit in enum.literals %}"{{ lit.name }}"{% if not loop.last %}, {% endif %}{%- endfor %}]
-        }{% if not loop.last %},{% endif %}
+    "{{ enum.name }}": {
+    "type": "string",
+    {%- if enum.definitie %}
+    "description": {{ enum.definitie | default('')|tojson }},
+    {%- endif %}
+    "enum": [{%- for lit in enum.literals %}"{{ lit.name }}"{% if not loop.last %}, {% endif %}{%- endfor %}]
+}{% if not loop.last %},{% endif %}
 {%- endfor %}
-    }
+}
 }

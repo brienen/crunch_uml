@@ -15,7 +15,7 @@ from sqlalchemy.orm.relationships import RelationshipProperty
 
 import crunch_uml.const as const
 import crunch_uml.util as util
-from crunch_uml.excpetions import CrunchException
+from crunch_uml.exceptions import CrunchException
 
 logger = logging.getLogger()
 

@@ -7,7 +7,7 @@ from rdflib.namespace import OWL, RDF, RDFS, XSD
 
 import crunch_uml.schema as sch
 from crunch_uml import const, util
-from crunch_uml.excpetions import CrunchException
+from crunch_uml.exceptions import CrunchException
 from crunch_uml.renderers.renderer import ModelRenderer, RendererRegistry
 
 logger = logging.getLogger()
