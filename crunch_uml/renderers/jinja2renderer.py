@@ -136,7 +136,7 @@ def getJSONDatatype(self):  # "koppel_{{ associatie.name | snake_case }}_{{ asso
         elif str(self.primitive).lower().startswith("bedrag"):
             return '"$ref": "#/$defs/bedrag"'  # Needs to be defined in Jinja2 template
         elif "mail" in str(self.primitive).lower():
-            return '"$ref": "#/$defs/bedrag"'  # Needs to be defined in Jinja2 template
+            return '"$ref": "#/$defs/email"'  # Needs to be defined in Jinja2 template
         elif str(self.primitive).lower() in ["tijd", "time"]:
             return '"$ref": "#/$defs/tijd"'  # Needs to be defined in Jinja2 template
         elif str(self.primitive).lower() in ["datum", "date"]:

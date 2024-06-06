@@ -10,6 +10,7 @@ logger = logging.getLogger()
 TRAJECT_ID="EAID_839017B2_0F95_42d0_AB2B_E873636340DA"
 ORGANISATIE_ID="EAID_A947042E_7CA6_44f8_902A_1C1185A391F6"
 UITWISSELMODEL_ID="EAID_6b4326e3_eb4e_41d2_902b_0bff06604f63"
+CLIENT_ID="EAID_DAF09055_A5A6_4ff4_A158_21B20567B296"
 
 class DDASPlugin(Plugin):
     def transformLogic(self, args, root_package, schema_from, schema_to):
@@ -48,4 +49,15 @@ class DDASPlugin(Plugin):
 
         kopie.classes.append(uitwisselmodel)
         schema_to.add(kopie, recursive=True)
+
+        #Zet de juiste attrributen bij client
+        client = schema_to.get_class(CLIENT_ID)
+        for attr in client.attributes:
+            client.attributes.remove(attr)
+        client.attributes.append(Attribute(id=util.getEAGuid(), name="bsn", schema_id=schema_to.schema_id, primitive="AN200", verplicht=False))
+        client.attributes.append(Attribute(id=util.getEAGuid(), name="postcode", schema_id=schema_to.schema_id, primitive="AN6", verplicht=False))
+        client.attributes.append(Attribute(id=util.getEAGuid(), name="geboortedatum", schema_id=schema_to.schema_id, primitive="Datum", verplicht=False))
+        client.attributes.append(Attribute(id=util.getEAGuid(), name="geslacht", schema_id=schema_to.schema_id, primitive="AN6", verplicht=False))
+
+
         logger.info("DDAS Plugin finished.")
