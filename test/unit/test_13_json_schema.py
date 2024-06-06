@@ -14,9 +14,9 @@ def test_import_schuldhulp():
     database = db.Database(const.DATABASE_URL, db_create=False)
     schema = sch.Schema(database)
     assert schema.count_package() == 3
-    assert schema.count_enumeratie() == 6
-    assert schema.count_class() == 36
-    assert schema.count_attribute() == 116
+    assert schema.count_enumeratie() == 5
+    assert schema.count_class() == 61
+    assert schema.count_attribute() == 127
     assert schema.count_enumeratieliteral() == 20
 
     test_args = [
@@ -33,9 +33,9 @@ def test_import_schuldhulp():
     database = db.Database(const.DATABASE_URL, db_create=False)
     schema = sch.Schema(database, 'schuldhulp')
     assert schema.count_package() == 1
-    assert schema.count_enumeratie() == 6
-    assert schema.count_class() == 31
-    assert schema.count_attribute() == 116
+    assert schema.count_enumeratie() == 5
+    assert schema.count_class() == 32
+    assert schema.count_attribute() == 127
     assert schema.count_enumeratieliteral() == 20
 
     test_args = [
