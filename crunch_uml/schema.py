@@ -70,6 +70,9 @@ class Schema:
     def get_package(self, id):
         return self.database.session.query(db.Package).filter_by(id=id, schema_id=self.schema_id).first()
 
+    def get_diagram(self, id):
+        return self.database.session.query(db.Diagram).filter_by(id=id, schema_id=self.schema_id).first()
+
     def get_class(self, id):
         return self.database.session.query(db.Class).filter_by(id=id, schema_id=self.schema_id).first()
 
@@ -105,6 +108,11 @@ class Schema:
 
     def count_generalizations(self):
         return self.database.session.query(db.Generalization).filter_by(schema_id=self.schema_id).count()
+
+    def count_diagrams(self):
+        return self.database.session.query(db.Diagram).filter_by(schema_id=self.schema_id).count()
+
+
 
     def get_session(self):
         return self.database.session

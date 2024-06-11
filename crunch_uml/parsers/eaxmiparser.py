@@ -1,6 +1,7 @@
 import logging
 
 import crunch_uml.schema as sch
+import crunch_uml.db as db
 from crunch_uml.parsers.parser import ParserRegistry, copy_values, fixtag
 from crunch_uml.parsers.xmiparser import XMIParser
 
@@ -147,3 +148,66 @@ class EAXMIParser(XMIParser):
                     association.definitie = documentation[0].get('value')
 
                 schema.save(association)
+
+
+
+        '''
+        Voorbeeld van Diagram
+
+                    <diagram xmi:id="EAID_7429E175_1CBE_4336_BF92_6C5029395E69">
+                        <model package="EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652" localID="27" owner="EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652"/>
+                        <properties name="Diagram Monumenten" type="Logical"/>
+                        <project author="Arjen Brienen" version="1.0" created="2019-07-03 00:00:00" modified="2019-10-16 16:24:23"/>
+                        <style1 value="ShowPrivate=1;ShowProtected=1;ShowPublic=1;HideRelationships=0;Locked=0;Border=1;HighlightForeign=1;PackageContents=1;SequenceNotes=0;ScalePrintImage=0;PPgs.cx=1;PPgs.cy=1;DocSize.cx=791;DocSize.cy=1134;ShowDetails=0;Orientation=P;Zoom=100;ShowTags=0;OpParams=1;VisibleAttributeDetail=0;ShowOpRetType=1;ShowIcons=1;CollabNums=0;HideProps=0;ShowReqs=0;ShowCons=0;PaperSize=9;HideParents=0;UseAlias=0;HideAtts=1;HideOps=1;HideStereo=0;HideElemStereo=0;ShowTests=0;ShowMaint=0;ConnectorNotation=UML 2.1;ExplicitNavigability=0;ShowShape=1;AllDockable=0;AdvancedElementProps=1;AdvancedFeatureProps=1;AdvancedConnectorProps=1;m_bElementClassifier=1;SPT=1;ShowNotes=0;SuppressBrackets=0;SuppConnectorLabels=0;PrintPageHeadFoot=0;ShowAsList=0;"/>
+                        <style2 value="SaveTag=4E6278C2;ExcludeRTF=0;DocAll=0;HideQuals=0;AttPkg=1;ShowTests=0;ShowMaint=0;SuppressFOC=1;MatrixActive=0;SwimlanesActive=1;KanbanActive=0;MatrixLineWidth=1;MatrixLineClr=0;MatrixLocked=0;TConnectorNotation=UML 2.1;TExplicitNavigability=0;AdvancedElementProps=1;AdvancedFeatureProps=1;AdvancedConnectorProps=1;m_bElementClassifier=1;SPT=1;MDGDgm=;STBLDgm=;ShowNotes=0;VisibleAttributeDetail=0;ShowOpRetType=1;SuppressBrackets=0;SuppConnectorLabels=0;PrintPageHeadFoot=0;ShowAsList=0;SuppressedCompartments=;Theme=:119;"/>
+                        <swimlanes value="locked=false;orientation=0;width=0;inbar=false;names=false;color=-1;bold=false;fcol=0;tcol=-1;ofCol=-1;ufCol=-1;hl=0;ufh=0;hh=0;cls=0;bw=0;hli=0;bro=0;SwimlaneFont=lfh:-21,lfw:0,lfi:0,lfu:0,lfs:0,lfface:Calibri,lfe:0,lfo:0,lfchar:1,lfop:0,lfcp:0,lfq:0,lfpf=0,lfWidth=0;"/>
+                        <matrixitems value="locked=false;matrixactive=false;swimlanesactive=true;kanbanactive=false;width=1;clrLine=0;"/>
+                        <extendedProperties/>
+                        <xrefs/>
+                        <elements>
+                            <element geometry="Left=90;Top=30;Right=210;Bottom=90;" subject="EAID_78218601_F6B3_40b0_90AE_3513B4919064" seqno="1" style="DUID=740C889F;"/>
+                            <element geometry="Left=648;Top=528;Right=768;Bottom=588;" subject="EAID_EBF38EE2_DAF0_4704_ADA6_705868BA7C05" seqno="2" style="DUID=7F76508F;"/>
+                            <element geometry="Left=280;Top=30;Right=389;Bottom=110;" subject="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" seqno="3" style="DUID=5EE10493;"/>
+                            <element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=4;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_D07FFC12_AA8D_421a_A795_28E66B5E6C9C" style="Mode=3;EOID=0E0961A5;SOID=7F76508F;Color=-1;LWidth=0;Hidden=0;"/>
+                            <element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=3;$LLB=;LLT=;LMT=CX=28:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_59A9090E_CF7A_4e6f_91E1_592085B0DA94" style="Mode=3;EOID=0E0961A5;SOID=5EE10493;Color=-1;LWidth=0;Hidden=0;"/>
+                            <element geometry="SCTR=1;SCME=1;SX=0;SY=0;EX=0;EY=0;EDGE=2;SCTR.LEFT=225;SCTR.TOP=-205;SCTR.RIGHT=256;SCTR.BOTTOM=-190;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=226:-205$256:-205$256:-190$226:-190$;" subject="EAID_EBEE5BED_D39A_4e50_ACD7_4924DF1DF463" style="Mode=3;EOID=0E0961A5;SOID=0E0961A5;Color=-1;LWidth=0;Hidden=1;"/>
+                            <element geometry="EDGE=4;$LLB=;LLT=;LMT=CX=74:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LMB=CX=63:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_CBFBC098_828D_42e9_8450_3A17680001B6" style="Mode=3;EOID=6C964D59;SOID=06807BCA;Color=-1;LWidth=0;Hidden=0;"/>
+                            <element geometry="EDGE=1;$LLB=CX=17:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LLT=;LMT=CX=30:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LMB=CX=58:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LRT=;LRB=CX=6:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;IRHS=;ILHS=;Path=;" subject="EAID_85187FF7_4357_4128_8E54_8EE077AD6C43" style="Mode=3;EOID=973BE7D4;SOID=FC1F7D8E;Color=-1;LWidth=0;Hidden=0;"/>
+                            <element geometry="SCTR=1;SCME=1;SX=0;SY=0;EX=0;EY=0;EDGE=2;SCTR.LEFT=225;SCTR.TOP=-384;SCTR.RIGHT=256;SCTR.BOTTOM=-369;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=226:-384$256:-384$256:-369$226:-369$;" subject="EAID_9A56AD9F_136A_485a_93B1_7137FCC39416" style="Mode=3;EOID=6C964D59;SOID=6C964D59;Color=-1;LWidth=0;Hidden=1;"/>
+                        </elements>
+                    </diagram>
+        '''
+
+        diagramrefs = extension.xpath(".//diagram[@xmi:id]", namespaces=ns)  # type: ignore
+        for diagramref in diagramrefs:
+            idref = diagramref.get('{' + ns['xmi'] + '}id')
+            package_id = diagramref.xpath('./model')[0].get('package')
+            name = diagramref.xpath('./properties')[0].get('name')
+            author = diagramref.xpath('./project')[0].get('author')
+            version = diagramref.xpath('./project')[0].get('version')
+            created = diagramref.xpath('./project')[0].get('created')
+            modified = diagramref.xpath('./project')[0].get('modified')
+            documentation = diagramref.xpath('./properties')[0].get('documentation')
+            diagram = db.Diagram(id=idref, name=name, package_id=package_id, author=author, version=version, created=created, modified=modified, definitie=documentation)
+            schema.add(diagram)
+
+            for element in diagramref.xpath('./elements/element'):
+                element_id = element.get('subject')
+                logger.debug(f'Found element with id {element.get("subject")} in diagram {name}')
+                if schema.get_class(element_id) is not None:
+                    diagram.classes.append(schema.get_class(element_id))
+                    logger.debug(f'Element {element.get("subject")} in diagram {name} is een class met naam {schema.get_class(element_id).name}')
+                elif schema.get_association(element_id) is not None:
+                    diagram.associations.append(schema.get_association(element_id))
+                    logger.debug(f'Element {element.get("subject")} in diagram {name} is een association')
+                elif schema.get_enumeration(element_id) is not None:
+                    diagram.enumerations.append(schema.get_enumeration(element_id))
+                    logger.debug(f'Element {element.get("subject")} in diagram {name} is een enumeration met naam {schema.get_enumeration(element_id).name}')
+                elif schema.get_generalization(element_id) is not None:
+                    diagram.generalizations.append(schema.get_generalization(element_id))
+                    logger.debug(f'Element {element.get("subject")} in diagram {name} is een generalisatie')
+                else:
+                    logger.info(f'Element {element.get("subject")} in diagram {name} is niet gevonden in de database. Kan een niet geimplemneteerde type zijn zoals: Note of Constraint, of kan een relatie zij naar een element buiten het model.')
+
+            logger.debug(f'Diagram {diagram.name} met id {diagram.id} ingelezen met inhoud: {diagram}')
+            schema.save(diagram)

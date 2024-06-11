@@ -28,9 +28,9 @@ def test_relations_export_json():
         'classes',
         'attributes',
         'packages',
-        'enumeraties',
-        'enumeratieliterals',
-        'associaties',
+        'enumerations',
+        'enumerationliterals',
+        'associations',
         'generalizations',
     ]
     for expectedkey in expectedkeys:
@@ -39,7 +39,7 @@ def test_relations_export_json():
     assert len(data['packages']) == 1
     assert len(data['classes']) == 7
     assert len(data['attributes']) == 5
-    assert len(data['enumeraties']) == 1
-    assert len(data['enumeratieliterals']) == 1
-    assert len(data['associaties']) == 3
+    assert len(data['enumerations']) == 1
+    assert len(data['enumerationliterals']) == 1
+    assert len(data['associations']) == 3
     assert len(data['generalizations']) == 1
