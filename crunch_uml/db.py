@@ -105,6 +105,9 @@ class DiagramClass(Base):
         ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
         ForeignKeyConstraint(['class_id', 'schema_id'], ['classes.id', 'classes.schema_id'])
     )
+    __mapper_args__ = {
+        'confirm_deleted_rows': False
+    }
 
 
 class DiagramEnumeration(Base):
@@ -117,6 +120,9 @@ class DiagramEnumeration(Base):
         ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
         ForeignKeyConstraint(['enumeration_id', 'schema_id'], ['enumerations.id', 'enumerations.schema_id'])
     )
+    __mapper_args__ = {
+        'confirm_deleted_rows': False
+    }
 
 class DiagramAssociation(Base):
     __tablename__ = 'diagram_association'
@@ -128,6 +134,9 @@ class DiagramAssociation(Base):
         ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
         ForeignKeyConstraint(['association_id', 'schema_id'], ['associations.id', 'associations.schema_id'])
     )
+    __mapper_args__ = {
+        'confirm_deleted_rows': False
+    }
 
 class DiagramGeneralization(Base):
     __tablename__ = 'diagram_generalization'
@@ -139,6 +148,9 @@ class DiagramGeneralization(Base):
         ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
         ForeignKeyConstraint(['generalization_id', 'schema_id'], ['generalizations.id', 'generalizations.schema_id'])
     )
+    __mapper_args__ = {
+        'confirm_deleted_rows': False
+    }
 
 # Mixins
 class UML_Generic:
@@ -617,9 +629,13 @@ class Diagram(Base, UMLBase):  # type: ignore
     package_id = Column(String, index=True, nullable=False)
     package = relationship("Package", back_populates="diagrams")
     classes = relationship('Class', secondary='diagram_class', back_populates='diagrams')
+    diagram_classes = relationship('DiagramClass', cascade="all, delete-orphan", overlaps="classes,diagrams")
     enumerations = relationship('Enumeratie', secondary='diagram_enumeration', back_populates='diagrams')
+    diagram_enumerations = relationship('DiagramEnumeration', cascade="all, delete-orphan", overlaps="enumerations,diagrams")
     associations = relationship('Association', secondary='diagram_association', back_populates='diagrams')
+    diagram_associations = relationship('DiagramAssociation', cascade="all, delete-orphan", overlaps="associations,diagrams")
     generalizations = relationship('Generalization', secondary='diagram_generalization', back_populates='diagrams')
+    diagram_generalizations = relationship('DiagramGeneralization', cascade="all, delete-orphan", overlaps="generalizations,diagrams")
 
     __table_args__ = (
         ForeignKeyConstraint(
