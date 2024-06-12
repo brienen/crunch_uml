@@ -40,9 +40,11 @@ def store_data(entity_name, data, schema):
             new_entity = entity(**data)
             schema.save(new_entity)
     else:
-        logger.warning(
-            f"Could not save entity with table '{entity_name}' to schema {schema.schema_id}: no imakd present: {data}."
+        logger.debug(
+            f"Could not save entity with table '{entity_name}' to schema {schema.schema_id}: no column id present: {data}."
         )
+        new_entity = entity(**data)
+        schema.save(new_entity)
 
 
 @ParserRegistry.register(

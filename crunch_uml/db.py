@@ -95,39 +95,50 @@ def getColumnNames(tablename):
 
 
 # Koppeltabellen
-diagram_class = Table('diagram_class', Base.metadata,
-    Column('diagram_id', Integer, nullable=False),
-    Column('schema_id', Integer, nullable=False),
-    Column('class_id', Integer, nullable=False),
-    PrimaryKeyConstraint('diagram_id', 'schema_id', 'class_id'),
-    ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
-    ForeignKeyConstraint(['class_id', 'schema_id'], ['classes.id', 'classes.schema_id'])
-)
-diagram_enumeration = Table('diagram_enumeration', Base.metadata,
-    Column('diagram_id', Integer, nullable=False),
-    Column('schema_id', Integer, nullable=False),
-    Column('enumeration_id', Integer, nullable=False),
-    PrimaryKeyConstraint('diagram_id', 'schema_id', 'enumeration_id'),
-    ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
-    ForeignKeyConstraint(['enumeration_id', 'schema_id'], ['enumerations.id', 'enumerations.schema_id'])
-)
-diagram_association = Table('diagram_association', Base.metadata,
-    Column('diagram_id', Integer, nullable=False),
-    Column('schema_id', Integer, nullable=False),
-    Column('association_id', Integer, nullable=False),
-    PrimaryKeyConstraint('diagram_id', 'schema_id', 'association_id'),
-    ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
-    ForeignKeyConstraint(['association_id', 'schema_id'], ['associations.id', 'associations.schema_id'])
-)
-diagram_generalization = Table('diagram_generalization', Base.metadata,
-    Column('diagram_id', Integer, nullable=False),
-    Column('schema_id', Integer, nullable=False),
-    Column('generalization_id', Integer, nullable=False),
-    PrimaryKeyConstraint('diagram_id', 'schema_id', 'generalization_id'),
-    ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
-    ForeignKeyConstraint(['generalization_id', 'schema_id'], ['generalizations.id', 'generalizations.schema_id'])
-)
+class DiagramClass(Base):
+    __tablename__ = 'diagram_class'
+    diagram_id = Column(Integer, nullable=False)
+    schema_id = Column(Integer, nullable=False)
+    class_id = Column(Integer, nullable=False)
+    __table_args__ = (
+        PrimaryKeyConstraint('diagram_id', 'schema_id', 'class_id'),
+        ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
+        ForeignKeyConstraint(['class_id', 'schema_id'], ['classes.id', 'classes.schema_id'])
+    )
 
+
+class DiagramEnumeration(Base):
+    __tablename__ = 'diagram_enumeration'
+    diagram_id = Column(Integer, nullable=False)
+    schema_id = Column(Integer, nullable=False)
+    enumeration_id = Column(Integer, nullable=False)
+    __table_args__ = (
+        PrimaryKeyConstraint('diagram_id', 'schema_id', 'enumeration_id'),
+        ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
+        ForeignKeyConstraint(['enumeration_id', 'schema_id'], ['enumerations.id', 'enumerations.schema_id'])
+    )
+
+class DiagramAssociation(Base):
+    __tablename__ = 'diagram_association'
+    diagram_id = Column(Integer, nullable=False)
+    schema_id = Column(Integer, nullable=False)
+    association_id = Column(Integer, nullable=False)
+    __table_args__ = (
+        PrimaryKeyConstraint('diagram_id', 'schema_id', 'association_id'),
+        ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
+        ForeignKeyConstraint(['association_id', 'schema_id'], ['associations.id', 'associations.schema_id'])
+    )
+
+class DiagramGeneralization(Base):
+    __tablename__ = 'diagram_generalization'
+    diagram_id = Column(Integer, nullable=False)
+    schema_id = Column(Integer, nullable=False)
+    generalization_id = Column(Integer, nullable=False)
+    __table_args__ = (
+        PrimaryKeyConstraint('diagram_id', 'schema_id', 'generalization_id'),
+        ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
+        ForeignKeyConstraint(['generalization_id', 'schema_id'], ['generalizations.id', 'generalizations.schema_id'])
+    )
 
 # Mixins
 class UML_Generic:
@@ -307,7 +318,7 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
         cascade="all, delete-orphan",
         overlaps="superclasses",
     )
-    diagrams = relationship('Diagram', secondary=diagram_class, back_populates='classes')
+    diagrams = relationship('Diagram', secondary='diagram_class', back_populates='classes')
     indicatie_formele_historie = Column(String)
     authentiek = Column(String)
     nullable = Column(String)
@@ -441,7 +452,7 @@ class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
     literals = relationship(
         "EnumerationLiteral", back_populates="enumeratie", lazy='joined', cascade="all, delete-orphan"
     )
-    diagrams = relationship('Diagram', secondary=diagram_enumeration, back_populates='enumerations')
+    diagrams = relationship('Diagram', secondary='diagram_enumeration', back_populates='enumerations')
 
     __table_args__ = (
         ForeignKeyConstraint(['package_id', 'schema_id'], ['packages.id', 'packages.schema_id'], deferrable=True),
@@ -518,7 +529,7 @@ class Association(Base, UML_Generic):  # type: ignore
     dst_multiplicity = Column(String)
     dst_documentation = Column(Text)
     dst_role = Column(String)
-    diagrams = relationship('Diagram', secondary=diagram_association, back_populates='associations')
+    diagrams = relationship('Diagram', secondary='diagram_association', back_populates='associations')
 
     __table_args__ = (
         ForeignKeyConstraint(
@@ -584,7 +595,7 @@ class Generalization(Base, UML_Generic):  # type: ignore
         foreign_keys='[Generalization.subclass_id, Generalization.schema_id]',
         overlaps="subclasses, superclass",
     )
-    diagrams = relationship('Diagram', secondary=diagram_generalization, back_populates='generalizations')
+    diagrams = relationship('Diagram', secondary='diagram_generalization', back_populates='generalizations')
 
     __table_args__ = (
         ForeignKeyConstraint(
@@ -605,10 +616,10 @@ class Diagram(Base, UMLBase):  # type: ignore
 
     package_id = Column(String, index=True, nullable=False)
     package = relationship("Package", back_populates="diagrams")
-    classes = relationship('Class', secondary=diagram_class, back_populates='diagrams')
-    enumerations = relationship('Enumeratie', secondary=diagram_enumeration, back_populates='diagrams')
-    associations = relationship('Association', secondary=diagram_association, back_populates='diagrams')
-    generalizations = relationship('Generalization', secondary=diagram_generalization, back_populates='diagrams')
+    classes = relationship('Class', secondary='diagram_class', back_populates='diagrams')
+    enumerations = relationship('Enumeratie', secondary='diagram_enumeration', back_populates='diagrams')
+    associations = relationship('Association', secondary='diagram_association', back_populates='diagrams')
+    generalizations = relationship('Generalization', secondary='diagram_generalization', back_populates='diagrams')
 
     __table_args__ = (
         ForeignKeyConstraint(
