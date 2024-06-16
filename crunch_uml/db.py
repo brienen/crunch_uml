@@ -97,9 +97,9 @@ def getColumnNames(tablename):
 # Koppeltabellen
 class DiagramClass(Base):
     __tablename__ = 'diagram_class'
-    diagram_id = Column(Integer, nullable=False)
-    schema_id = Column(Integer, nullable=False)
-    class_id = Column(Integer, nullable=False)
+    diagram_id = Column(String, nullable=False)
+    schema_id = Column(String, nullable=False)
+    class_id = Column(String, nullable=False)
     __table_args__ = (
         PrimaryKeyConstraint('diagram_id', 'schema_id', 'class_id'),
         ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
@@ -112,9 +112,9 @@ class DiagramClass(Base):
 
 class DiagramEnumeration(Base):
     __tablename__ = 'diagram_enumeration'
-    diagram_id = Column(Integer, nullable=False)
-    schema_id = Column(Integer, nullable=False)
-    enumeration_id = Column(Integer, nullable=False)
+    diagram_id = Column(String, nullable=False)
+    schema_id = Column(String, nullable=False)
+    enumeration_id = Column(String, nullable=False)
     __table_args__ = (
         PrimaryKeyConstraint('diagram_id', 'schema_id', 'enumeration_id'),
         ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
@@ -126,9 +126,9 @@ class DiagramEnumeration(Base):
 
 class DiagramAssociation(Base):
     __tablename__ = 'diagram_association'
-    diagram_id = Column(Integer, nullable=False)
-    schema_id = Column(Integer, nullable=False)
-    association_id = Column(Integer, nullable=False)
+    diagram_id = Column(String, nullable=False)
+    schema_id = Column(String, nullable=False)
+    association_id = Column(String, nullable=False)
     __table_args__ = (
         PrimaryKeyConstraint('diagram_id', 'schema_id', 'association_id'),
         ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
@@ -140,9 +140,9 @@ class DiagramAssociation(Base):
 
 class DiagramGeneralization(Base):
     __tablename__ = 'diagram_generalization'
-    diagram_id = Column(Integer, nullable=False)
-    schema_id = Column(Integer, nullable=False)
-    generalization_id = Column(Integer, nullable=False)
+    diagram_id = Column(String, nullable=False)
+    schema_id = Column(String, nullable=False)
+    generalization_id = Column(String, nullable=False)
     __table_args__ = (
         PrimaryKeyConstraint('diagram_id', 'schema_id', 'generalization_id'),
         ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),

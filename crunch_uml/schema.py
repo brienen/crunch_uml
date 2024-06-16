@@ -31,14 +31,16 @@ class Schema:
         self.schema_id = schema_name
         self.processed_objects = set()  # Houdt bij welke objecten al verwerkt zijn
 
-    def add(self, obj, recursive=False, processed_objects={}):
+    def add(self, obj, recursive=False, processed_objects=set()):
         self.save(obj, recursive=recursive, processed_objects=processed_objects, add=True)
 
-    def save(self, obj, recursive=False, processed_objects={}, add=False):
+    def save(self, obj, recursive=False, processed_objects=set(), add=False):
+        if obj is None:
+            return
         # Voeg het object toe aan de set van verwerkte objecten
-        if obj in self.processed_objects:
+        if obj in processed_objects:
             return  # Voorkom recursieve lus door het object niet opnieuw te verwerken
-        self.processed_objects.add(obj)
+        processed_objects.add(obj)
 
         # Save object
         if hasattr(obj, 'schema_id'):
