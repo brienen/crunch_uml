@@ -138,7 +138,7 @@ class XMIParser(Parser):
                         )
                         logger.warning(msg)
 
-                        clazz = db.Class(id=clsid, name='<Orphan Class>', definitie=msg)
+                        clazz = db.Class(id=clsid, name=const.ORPHAN_CLASS, definitie=msg)
                         schema.save(clazz)
                         if 'src' in id:
                             association.src_class_id = clsid  # type: ignore
@@ -163,7 +163,7 @@ class XMIParser(Parser):
                                 f" edge: generating placeholder class with uudi {clsid}."
                             )
                             logger.warning(msg)
-                            cls = db.Class(id=clsid, name='<Orphan Class>', definitie=msg)
+                            cls = db.Class(id=clsid, name=const.ORPHAN_CLASS, definitie=msg)
                             schema.save(cls)
                             if 'src' in id:
                                 association.src_class_id = clsid  # type: ignore
@@ -173,7 +173,7 @@ class XMIParser(Parser):
                             clsid = endpoint.xpath('./type')[0].get('{' + ns['xmi'] + '}idref')
                             cls = schema.get_class(clsid)
                             if cls is None:
-                                clazz = db.Class(id=clsid, name='<Orphan Class>')
+                                clazz = db.Class(id=clsid, name=const.ORPHAN_CLASS)
                                 schema.save(clazz)
                             if 'src' in id:
                                 association.src_class_id = clsid  # type: ignore

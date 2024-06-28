@@ -12,3 +12,5 @@ CMD_TRANSFORM = 'transform'
 
 DEFAULT_LOD_NS = 'http://example.org/myns/'
 DEFAULT_SCHEMA = 'default'
+
+ORPHAN_CLASS = '<Orphan Class>'

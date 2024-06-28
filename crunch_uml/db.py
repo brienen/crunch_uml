@@ -247,12 +247,16 @@ class Package(Base, UMLBase):  # type: ignore
 
     def get_classes_inscope(self):
         clazzes = {clazz for clazz in self.classes}
+        #for diagram in self.diagrams:
+        #    clazzes = clazzes.union({clazz for clazz in diagram.classes})
         for subpackage in self.subpackages:
             clazzes = clazzes.union(subpackage.get_classes_inscope())
         return clazzes
 
     def get_enumerations_inscope(self):
         enums = {enum for enum in self.enumerations}
+        #for diagram in self.diagrams:
+        #    enums = enums.union({enum for enum in diagram.enumerations})
         for subpackage in self.subpackages:
             enums = enums.union(subpackage.get_enumerations_inscope())
         return enums
@@ -279,13 +283,18 @@ class Package(Base, UMLBase):  # type: ignore
             subpackage_copy.parent_package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
             copy_instance.subpackages.append(subpackage_copy)
         for clazz in self.classes:
-            clazz_copy = clazz.get_copy(copy_instance, materialize_generalizations=materialize_generalizations)
-            clazz_copy.package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
-            copy_instance.classes.append(clazz_copy)
+            if clazz.name != const.ORPHAN_CLASS:
+                clazz_copy = clazz.get_copy(copy_instance, materialize_generalizations=materialize_generalizations)
+                clazz_copy.package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
+                #copy_instance.classes.append(clazz_copy)
         for enum in self.enumerations:
             enum_copy = enum.get_copy(copy_instance)
             enum_copy.package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
-            copy_instance.enumerations.append(enum_copy)
+            #copy_instance.enumerations.append(enum_copy)
+        for diagram in self.diagrams:
+            diagram_copy = diagram.get_copy(copy_instance)
+            diagram_copy.package_id = copy_instance.id
+            #copy_instance.diagrams.append(diagram_copy)
 
         return copy_instance
 
@@ -341,7 +350,7 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
 
     def copy_attributes(self, copy_instance, materialize_generalizations=False):
         # Maak lijst van namen van al aanwezige attributen
-        copy_attr_lst = [attribute.name for attribute in copy_instance.attributes]
+        copy_attr_lst = [attribute.name for attribute in copy_instance.attributes if attribute.name and attribute.name != 'None']
 
         # Voer eventuele extra stappen uit voor de literals
         for attribute in self.attributes:
@@ -385,17 +394,17 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
         copy_instance = self.copy_attributes(copy_instance, materialize_generalizations)
 
         if self.package:
-            classes_in_scope = self.package.get_classes_inscope()
+            classes_in_scope = self.package.get_root_package().get_classes_inscope()
             for assoc in self.uitgaande_associaties:
-                if assoc.dst_class in classes_in_scope:
+                if assoc.dst_class in classes_in_scope and assoc.dst_class.name != const.ORPHAN_CLASS:
                     assoc_kopie = assoc.get_copy(self)
                     assoc_kopie.src_class_id = copy_instance.id
-                    copy_instance.uitgaande_associaties.append(assoc_kopie)
+                    #copy_instance.uitgaande_associaties.append(assoc_kopie)
             for gener in self.subclasses:
-                if gener.subclass in classes_in_scope:
+                if gener.subclass in classes_in_scope and gener.subclass.name != const.ORPHAN_CLASS:
                     gener_kopie = gener.get_copy(self)
                     gener_kopie.superclass_id = copy_instance.id
-                    copy_instance.subclasses.append(gener_kopie)
+                    #copy_instance.subclasses.append(gener_kopie)
 
         return copy_instance
 
@@ -443,6 +452,8 @@ class Attribute(Base, UML_Generic):  # type: ignore
         # Roep de get_copy methode van de superklasse aan
         copy_instance = super().get_copy(parent)
         copy_instance.clazz = parent
+        copy_instance.enumeration_id = None
+        copy_instance.type_class_id = None
         return copy_instance
 
     def getDatatype(self):
@@ -642,6 +653,64 @@ class Diagram(Base, UMLBase):  # type: ignore
             ['package_id', 'schema_id'], ['packages.id', 'packages.schema_id'], deferrable=True
         ),
     )
+
+    def get_instances(self, type, root_package_id):
+        # Find root_package of self that is equal to root_package_id
+        root_package = self.package
+        while not root_package.id == root_package_id or root_package is None:
+            root_package = root_package.parent_package
+        if type == Class:
+            return root_package.get_classes_inscope()
+        elif type == Association:
+            return root_package.get_associations_inscope()
+        elif type == Generalization:
+            return root_package.get_generalizations_inscope()
+        elif type == Enumeratie:
+            return root_package.get_enumerations_inscope()
+        else:
+            raise CrunchException(
+                "Error: while getting instances of type {type} from Diagram. Type must be of type Class, Association, Generalization or Enumeratie"
+                f" and cannot be of type {type}"
+            )
+
+    def get_copy(self, parent, materialize_generalizations=False):
+        if not parent or not isinstance(parent, Package):
+            raise CrunchException(
+                "Error: wrong parent type for Diagram while copying. Parent must be of type Package and"
+                f" cannot be of type {type(parent)}"
+            )
+
+        # Roep de get_copy methode van de superklasse aan
+        copy_instance = super().get_copy(parent)
+        copy_instance.package = parent
+
+        # Append classes
+        clazzIDs_in_scope = [clazz.id for clazz in self.get_instances(Class, parent.get_root_package().id)]
+        clazzIDs_already_copied = [clazz.id for clazz in copy_instance.package.get_root_package().get_classes_inscope()] 
+        for clazz in self.classes:
+            if clazz.name != const.ORPHAN_CLASS:
+                if not clazz.id in clazzIDs_in_scope and not clazz.id in clazzIDs_already_copied:
+                    copy_clazz = clazz.get_copy(copy_instance.package, materialize_generalizations=materialize_generalizations)
+                    #copy_instance.package.classes.append(copy_clazz)
+                    logger.debug(f"Class {clazz.name} outside of scope copied to package {copy_instance.package.name}")
+                    diagram_class = DiagramClass(diagram_id=copy_instance.id, schema_id=copy_instance.schema_id, class_id=copy_clazz.id)
+                else:
+                    diagram_class = DiagramClass(diagram_id=copy_instance.id, schema_id=copy_instance.schema_id, class_id=clazz.id)
+                copy_instance.diagram_classes.append(diagram_class)
+
+        # Append enumerations
+        enumerationIDs_in_scope = [enum.id for enum in self.get_instances(Enumeratie, parent.get_root_package().id)] #parent.get_enumerations_inscope()
+        enumerationIDs_already_copied = [enum.id for enum in copy_instance.package.get_root_package().get_enumerations_inscope()] 
+        for enum in self.enumerations:
+            if not enum.id in enumerationIDs_in_scope and not enum.id in enumerationIDs_already_copied:
+                copy_enum = enum.get_copy(copy_instance.package, materialize_generalizations=materialize_generalizations)
+                logger.debug(f"Enumeration {enum.name} outside of scope copied to package {copy_instance.package.name}")
+                diagram_enum = DiagramEnumeration(diagram_id=copy_instance.id, schema_id=copy_instance.schema_id, enumeration_id=copy_enum.id)
+            else:
+                diagram_enum = DiagramEnumeration(diagram_id=copy_instance.id, schema_id=copy_instance.schema_id, enumeration_id=enum.id)
+            copy_instance.diagram_enumerations.append(diagram_enum)
+
+        return copy_instance
 
 
 

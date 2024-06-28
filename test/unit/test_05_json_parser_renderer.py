@@ -103,7 +103,7 @@ def test_json_parser_and_changes():
 
     # Check if other things are unchanged
     clazz = schema.get_class('EAID_9775E778_DBF8_4122_94CE_551466B62F46')
-    assert clazz.name == '<Orphan Class>'
+    assert clazz.name == const.ORPHAN_CLASS
 
     # Cleanup
     os.remove(inputfile)
