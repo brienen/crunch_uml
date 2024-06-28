@@ -76,7 +76,21 @@
                 "-db_create" //,
                 //"--skip_xmi_relations"
             ]
-        },
+        }, 
+        {
+            "name": "Import GGM Sociaal Domein",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["import",
+                "-t", "eaxmi",
+                "-f", "/Users/arjen/Dropbox/Development/GGM-Sociaal-Domein/Gemeentelijk Gegevensmodel XMI2.1.xml",
+                "-db_create" //,
+                //"--skip_xmi_relations"
+            ]
+        }, //Dropbox\Development\GGM-Sociaal-Domein\Gemeentelijk Gegevensmodel XMI2.1.xml
         {
             "name": "Import GGM Monumenten",
             "type": "python",
@@ -160,7 +174,21 @@
             "args": ["export",
                 "-t", "json_schema",
                 "-f", "./test/output/schema.json",
-                "--output_class_id", "EAID_32C02923_EE3A_4553_B94B_31E0C273A829"
+                "--output_class_id", "EAID_6b4326e3_eb4e_41d2_902b_0bff06604f63"
+            ]
+        },
+        {
+            "name": "Export JSON Schema DDAS",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["-sch", "schuldhulp",
+                "export",
+                "-t", "json_schema",
+                "-f", "./test/output/schema.json",
+                "--output_class_id", "EAID_6b4326e3_eb4e_41d2_902b_0bff06604f63"
             ]
         },
         {

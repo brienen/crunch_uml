@@ -376,7 +376,8 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
 
         if materialize_generalizations:
             for gener in self.superclasses:
-                gener.superclass.copy_attributes(copy_instance, materialize_generalizations)
+                if gener.superclass:
+                    gener.superclass.copy_attributes(copy_instance, materialize_generalizations)
         return copy_instance
 
     def get_copy(self, parent, materialize_generalizations=False):

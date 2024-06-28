@@ -6,7 +6,7 @@ import requests
 from lxml import etree
 
 import crunch_uml.schema as sch
-from crunch_uml import const, db
+from crunch_uml import const, db, util
 from crunch_uml.exceptions import CrunchException
 from crunch_uml.parsers.parser import Parser, ParserRegistry
 
@@ -131,7 +131,7 @@ class XMIParser(Parser):
                     id = memberend.get('{' + ns['xmi'] + '}idref')
                     endpoints = node.xpath(f".//*[@xmi:id='{id}']", namespaces=ns)
                     if len(endpoints) == 0:
-                        clsid = str(uuid.uuid4())
+                        clsid = util.getEAGuid()
                         msg = (
                             f"Association '{association.name}' with {association.id} only has information on one edge:"
                             f" generating placeholder class with uudi {clsid}."
@@ -157,7 +157,7 @@ class XMIParser(Parser):
                         )  # noqa
                         typenode = endpoint.xpath('./type')
                         if len(typenode) == 0:
-                            clsid = str(uuid.uuid4())
+                            clsid = util.getEAGuid()
                             msg = (
                                 f"Association '{association.name}' with {association.id} only has information on one"
                                 f" edge: generating placeholder class with uudi {clsid}."

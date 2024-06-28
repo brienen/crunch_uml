@@ -21,7 +21,7 @@ class DDASPlugin(Plugin):
             raise CrunchException(msg)
 
         # Kopie schuldhulpverlening model
-        kopie = root_package.get_copy(None, materialize_generalizations=False)
+        kopie = root_package.get_copy(None, materialize_generalizations=True)
 
         # Now remove all associations with name 'resulteert in'
         for clazz in kopie.classes:
