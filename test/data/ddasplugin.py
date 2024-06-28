@@ -15,6 +15,9 @@ CLIENT_ID="EAID_DAF09055_A5A6_4ff4_A158_21B20567B296"
 class DDASPlugin(Plugin):
     def transformLogic(self, args, root_package, schema_from, schema_to):
         logger.info("Starting DDAS-Plugin")
+        # Clean up 
+        schema_to.clean()
+
         if not root_package.id == "EAPK_06C51790_1F81_4ac4_8E16_5177352EF2E1":
             msg = f"Cannot transform using {self.__class__.__name__}: Root package is needs to be model schuldhulpverlening with id EAPK_06C51790_1F81_4ac4_8E16_5177352EF2E1."
             logger.error(msg)

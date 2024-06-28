@@ -400,12 +400,12 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
                 if assoc.dst_class in classes_in_scope and assoc.dst_class.name != const.ORPHAN_CLASS:
                     assoc_kopie = assoc.get_copy(self)
                     assoc_kopie.src_class_id = copy_instance.id
-                    #copy_instance.uitgaande_associaties.append(assoc_kopie)
+                    copy_instance.uitgaande_associaties.append(assoc_kopie)
             for gener in self.subclasses:
                 if gener.subclass in classes_in_scope and gener.subclass.name != const.ORPHAN_CLASS:
                     gener_kopie = gener.get_copy(self)
                     gener_kopie.superclass_id = copy_instance.id
-                    #copy_instance.subclasses.append(gener_kopie)
+                    copy_instance.subclasses.append(gener_kopie)
 
         return copy_instance
 

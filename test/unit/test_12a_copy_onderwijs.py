@@ -28,5 +28,5 @@ def test_import_onderwijs():
     assert schema.count_class() == 12
     assert schema.count_attribute() == 16
     assert schema.count_enumeratieliteral() == 5
-    #assert schema.count_association() == 10
+    assert schema.count_association() == 10
     assert schema.count_generalizations() == 0
