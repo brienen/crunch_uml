@@ -17,7 +17,7 @@ def test_importAndTransform_schuldhulp():
         "-t",
         "eaxmi",
         "-f",
-        "/Users/arjen/Dropbox/Development/GGM-Sociaal-Domein/Gemeentelijk Gegevensmodel XMI2.1.xml",
+        "./test/data/Gemeentelijk Gegevensmodel XMI2.1 Sociaal Domein.xml",
         "-db_create",
     ]
     cli.main(test_args)
