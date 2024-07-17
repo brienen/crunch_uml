@@ -66,5 +66,5 @@ setuptools.setup(
             'crunch_uml=crunch_uml.cli:main',
         ]
     },
-    python_requires='>=3.8, <4',
+    python_requires='>=3.9, <4',
 )
