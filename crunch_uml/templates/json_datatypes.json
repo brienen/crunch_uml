@@ -20,5 +20,5 @@
         },
         "bedrag": {
             "type": "integer",
-            "description": "Een geldbedrag in centen nauwkweurig."
+            "description": "Een geldbedrag in hele euros nauwkweurig."
         }

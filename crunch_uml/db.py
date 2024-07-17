@@ -4,12 +4,10 @@ import inflection
 from sqlalchemy import (
     Boolean,
     Column,
-    Integer,
     ForeignKeyConstraint,
     PrimaryKeyConstraint,
     String,
     Text,
-    Table,
     create_engine,
     inspect,
 )
@@ -95,7 +93,7 @@ def getColumnNames(tablename):
 
 
 # Koppeltabellen
-class DiagramClass(Base):
+class DiagramClass(Base):  # type: ignore
     __tablename__ = 'diagram_class'
     diagram_id = Column(String, nullable=False)
     schema_id = Column(String, nullable=False)
@@ -103,14 +101,12 @@ class DiagramClass(Base):
     __table_args__ = (
         PrimaryKeyConstraint('diagram_id', 'schema_id', 'class_id'),
         ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
-        ForeignKeyConstraint(['class_id', 'schema_id'], ['classes.id', 'classes.schema_id'])
+        ForeignKeyConstraint(['class_id', 'schema_id'], ['classes.id', 'classes.schema_id']),
     )
-    __mapper_args__ = {
-        'confirm_deleted_rows': False
-    }
+    __mapper_args__ = {'confirm_deleted_rows': False}
 
 
-class DiagramEnumeration(Base):
+class DiagramEnumeration(Base):  # type: ignore
     __tablename__ = 'diagram_enumeration'
     diagram_id = Column(String, nullable=False)
     schema_id = Column(String, nullable=False)
@@ -118,13 +114,12 @@ class DiagramEnumeration(Base):
     __table_args__ = (
         PrimaryKeyConstraint('diagram_id', 'schema_id', 'enumeration_id'),
         ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
-        ForeignKeyConstraint(['enumeration_id', 'schema_id'], ['enumerations.id', 'enumerations.schema_id'])
+        ForeignKeyConstraint(['enumeration_id', 'schema_id'], ['enumerations.id', 'enumerations.schema_id']),
     )
-    __mapper_args__ = {
-        'confirm_deleted_rows': False
-    }
+    __mapper_args__ = {'confirm_deleted_rows': False}
 
-class DiagramAssociation(Base):
+
+class DiagramAssociation(Base):  # type: ignore
     __tablename__ = 'diagram_association'
     diagram_id = Column(String, nullable=False)
     schema_id = Column(String, nullable=False)
@@ -132,13 +127,12 @@ class DiagramAssociation(Base):
     __table_args__ = (
         PrimaryKeyConstraint('diagram_id', 'schema_id', 'association_id'),
         ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
-        ForeignKeyConstraint(['association_id', 'schema_id'], ['associations.id', 'associations.schema_id'])
+        ForeignKeyConstraint(['association_id', 'schema_id'], ['associations.id', 'associations.schema_id']),
     )
-    __mapper_args__ = {
-        'confirm_deleted_rows': False
-    }
+    __mapper_args__ = {'confirm_deleted_rows': False}
 
-class DiagramGeneralization(Base):
+
+class DiagramGeneralization(Base):  # type: ignore
     __tablename__ = 'diagram_generalization'
     diagram_id = Column(String, nullable=False)
     schema_id = Column(String, nullable=False)
@@ -146,11 +140,10 @@ class DiagramGeneralization(Base):
     __table_args__ = (
         PrimaryKeyConstraint('diagram_id', 'schema_id', 'generalization_id'),
         ForeignKeyConstraint(['diagram_id', 'schema_id'], ['diagrams.id', 'diagrams.schema_id']),
-        ForeignKeyConstraint(['generalization_id', 'schema_id'], ['generalizations.id', 'generalizations.schema_id'])
+        ForeignKeyConstraint(['generalization_id', 'schema_id'], ['generalizations.id', 'generalizations.schema_id']),
     )
-    __mapper_args__ = {
-        'confirm_deleted_rows': False
-    }
+    __mapper_args__ = {'confirm_deleted_rows': False}
+
 
 # Mixins
 class UML_Generic:
@@ -247,7 +240,7 @@ class Package(Base, UMLBase):  # type: ignore
 
     def get_classes_inscope(self):
         clazzes = {clazz for clazz in self.classes}
-        #for diagram in self.diagrams:
+        # for diagram in self.diagrams:
         #    clazzes = clazzes.union({clazz for clazz in diagram.classes})
         for subpackage in self.subpackages:
             clazzes = clazzes.union(subpackage.get_classes_inscope())
@@ -255,7 +248,7 @@ class Package(Base, UMLBase):  # type: ignore
 
     def get_enumerations_inscope(self):
         enums = {enum for enum in self.enumerations}
-        #for diagram in self.diagrams:
+        # for diagram in self.diagrams:
         #    enums = enums.union({enum for enum in diagram.enumerations})
         for subpackage in self.subpackages:
             enums = enums.union(subpackage.get_enumerations_inscope())
@@ -286,15 +279,15 @@ class Package(Base, UMLBase):  # type: ignore
             if clazz.name != const.ORPHAN_CLASS:
                 clazz_copy = clazz.get_copy(copy_instance, materialize_generalizations=materialize_generalizations)
                 clazz_copy.package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
-                #copy_instance.classes.append(clazz_copy)
+                # copy_instance.classes.append(clazz_copy)
         for enum in self.enumerations:
             enum_copy = enum.get_copy(copy_instance)
             enum_copy.package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
-            #copy_instance.enumerations.append(enum_copy)
+            # copy_instance.enumerations.append(enum_copy)
         for diagram in self.diagrams:
             diagram_copy = diagram.get_copy(copy_instance)
             diagram_copy.package_id = copy_instance.id
-            #copy_instance.diagrams.append(diagram_copy)
+            # copy_instance.diagrams.append(diagram_copy)
 
         return copy_instance
 
@@ -350,7 +343,9 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
 
     def copy_attributes(self, copy_instance, materialize_generalizations=False):
         # Maak lijst van namen van al aanwezige attributen
-        copy_attr_lst = [attribute.name for attribute in copy_instance.attributes if attribute.name and attribute.name != 'None']
+        copy_attr_lst = [
+            attribute.name for attribute in copy_instance.attributes if attribute.name and attribute.name != 'None'
+        ]
 
         # Voer eventuele extra stappen uit voor de literals
         for attribute in self.attributes:
@@ -453,8 +448,8 @@ class Attribute(Base, UML_Generic):  # type: ignore
         # Roep de get_copy methode van de superklasse aan
         copy_instance = super().get_copy(parent)
         copy_instance.clazz = parent
-        copy_instance.enumeration_id = None
-        copy_instance.type_class_id = None
+        # copy_instance.enumeration_id = None
+        # copy_instance.type_class_id = None
         return copy_instance
 
     def getDatatype(self):
@@ -506,6 +501,7 @@ class EnumerationLiteral(Base, UML_Generic):  # type: ignore
 
     enumeratie_id = Column(String, index=True, nullable=False)
     enumeratie = relationship("Enumeratie", back_populates='literals')
+    type = Column(String)
 
     __table_args__ = (
         ForeignKeyConstraint(
@@ -565,7 +561,12 @@ class Association(Base, UML_Generic):  # type: ignore
     )
 
     def hasOrphan(self):
-        return self.dst_class.package_id is None or self.src_class.package_id is None
+        return (
+            self.dst_class is None
+            or self.dst_class.package_id is None
+            or self.src_class is None
+            or self.src_class.package_id is None
+        )
 
     def getType(self, clazz):
         if self.src_mult_end == '1':
@@ -643,16 +644,20 @@ class Diagram(Base, UMLBase):  # type: ignore
     classes = relationship('Class', secondary='diagram_class', back_populates='diagrams')
     diagram_classes = relationship('DiagramClass', cascade="all, delete-orphan", overlaps="classes,diagrams")
     enumerations = relationship('Enumeratie', secondary='diagram_enumeration', back_populates='diagrams')
-    diagram_enumerations = relationship('DiagramEnumeration', cascade="all, delete-orphan", overlaps="enumerations,diagrams")
+    diagram_enumerations = relationship(
+        'DiagramEnumeration', cascade="all, delete-orphan", overlaps="enumerations,diagrams"
+    )
     associations = relationship('Association', secondary='diagram_association', back_populates='diagrams')
-    diagram_associations = relationship('DiagramAssociation', cascade="all, delete-orphan", overlaps="associations,diagrams")
+    diagram_associations = relationship(
+        'DiagramAssociation', cascade="all, delete-orphan", overlaps="associations,diagrams"
+    )
     generalizations = relationship('Generalization', secondary='diagram_generalization', back_populates='diagrams')
-    diagram_generalizations = relationship('DiagramGeneralization', cascade="all, delete-orphan", overlaps="generalizations,diagrams")
+    diagram_generalizations = relationship(
+        'DiagramGeneralization', cascade="all, delete-orphan", overlaps="generalizations,diagrams"
+    )
 
     __table_args__ = (
-        ForeignKeyConstraint(
-            ['package_id', 'schema_id'], ['packages.id', 'packages.schema_id'], deferrable=True
-        ),
+        ForeignKeyConstraint(['package_id', 'schema_id'], ['packages.id', 'packages.schema_id'], deferrable=True),
     )
 
     def get_instances(self, type, root_package_id):
@@ -670,8 +675,8 @@ class Diagram(Base, UMLBase):  # type: ignore
             return root_package.get_enumerations_inscope()
         else:
             raise CrunchException(
-                "Error: while getting instances of type {type} from Diagram. Type must be of type Class, Association, Generalization or Enumeratie"
-                f" and cannot be of type {type}"
+                "Error: while getting instances of type {type} from Diagram. Type must be of type Class,"
+                f" Association, Generalization or Enumeratie and cannot be of type {type}"
             )
 
     def get_copy(self, parent, materialize_generalizations=False):
@@ -687,32 +692,47 @@ class Diagram(Base, UMLBase):  # type: ignore
 
         # Append classes
         clazzIDs_in_scope = [clazz.id for clazz in self.get_instances(Class, parent.get_root_package().id)]
-        clazzIDs_already_copied = [clazz.id for clazz in copy_instance.package.get_root_package().get_classes_inscope()] 
+        clazzIDs_already_copied = [clazz.id for clazz in copy_instance.package.get_root_package().get_classes_inscope()]
         for clazz in self.classes:
             if clazz.name != const.ORPHAN_CLASS:
-                if not clazz.id in clazzIDs_in_scope and not clazz.id in clazzIDs_already_copied:
-                    copy_clazz = clazz.get_copy(copy_instance.package, materialize_generalizations=materialize_generalizations)
-                    #copy_instance.package.classes.append(copy_clazz)
+                if clazz.id not in clazzIDs_in_scope and clazz.id not in clazzIDs_already_copied:
+                    copy_clazz = clazz.get_copy(
+                        copy_instance.package, materialize_generalizations=materialize_generalizations
+                    )
+                    # copy_instance.package.classes.append(copy_clazz)
                     logger.debug(f"Class {clazz.name} outside of scope copied to package {copy_instance.package.name}")
-                    diagram_class = DiagramClass(diagram_id=copy_instance.id, schema_id=copy_instance.schema_id, class_id=copy_clazz.id)
+                    diagram_class = DiagramClass(
+                        diagram_id=copy_instance.id, schema_id=copy_instance.schema_id, class_id=copy_clazz.id
+                    )
                 else:
-                    diagram_class = DiagramClass(diagram_id=copy_instance.id, schema_id=copy_instance.schema_id, class_id=clazz.id)
+                    diagram_class = DiagramClass(
+                        diagram_id=copy_instance.id, schema_id=copy_instance.schema_id, class_id=clazz.id
+                    )
                 copy_instance.diagram_classes.append(diagram_class)
 
         # Append enumerations
-        enumerationIDs_in_scope = [enum.id for enum in self.get_instances(Enumeratie, parent.get_root_package().id)] #parent.get_enumerations_inscope()
-        enumerationIDs_already_copied = [enum.id for enum in copy_instance.package.get_root_package().get_enumerations_inscope()] 
+        enumerationIDs_in_scope = [
+            enum.id for enum in self.get_instances(Enumeratie, parent.get_root_package().id)
+        ]  # parent.get_enumerations_inscope()
+        enumerationIDs_already_copied = [
+            enum.id for enum in copy_instance.package.get_root_package().get_enumerations_inscope()
+        ]
         for enum in self.enumerations:
-            if not enum.id in enumerationIDs_in_scope and not enum.id in enumerationIDs_already_copied:
-                copy_enum = enum.get_copy(copy_instance.package, materialize_generalizations=materialize_generalizations)
+            if enum.id not in enumerationIDs_in_scope and enum.id not in enumerationIDs_already_copied:
+                copy_enum = enum.get_copy(
+                    copy_instance.package, materialize_generalizations=materialize_generalizations
+                )
                 logger.debug(f"Enumeration {enum.name} outside of scope copied to package {copy_instance.package.name}")
-                diagram_enum = DiagramEnumeration(diagram_id=copy_instance.id, schema_id=copy_instance.schema_id, enumeration_id=copy_enum.id)
+                diagram_enum = DiagramEnumeration(
+                    diagram_id=copy_instance.id, schema_id=copy_instance.schema_id, enumeration_id=copy_enum.id
+                )
             else:
-                diagram_enum = DiagramEnumeration(diagram_id=copy_instance.id, schema_id=copy_instance.schema_id, enumeration_id=enum.id)
+                diagram_enum = DiagramEnumeration(
+                    diagram_id=copy_instance.id, schema_id=copy_instance.schema_id, enumeration_id=enum.id
+                )
             copy_instance.diagram_enumerations.append(diagram_enum)
 
         return copy_instance
-
 
 
 class Database:

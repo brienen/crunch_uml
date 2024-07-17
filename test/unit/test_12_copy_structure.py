@@ -15,7 +15,7 @@ def test_import_monumenten():
     assert schema.count_enumeratieliteral() == 2
     assert schema.count_association() == 9
 
-    root = schema.get_package('EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E') # Main Package
+    root = schema.get_package('EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E')  # Main Package
     kopie_schema = sch.Schema(database, 'kopie')
     kopie = root.get_copy(None)
     kopie_schema.add(kopie, recursive=True)
@@ -25,7 +25,7 @@ def test_import_monumenten():
     kopie2_schema.add(kopie2, recursive=True)
     database.commit()
 
-    model = schema.get_package('EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466') # Model Package
+    model = schema.get_package('EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466')  # Model Package
     kopie3_schema = sch.Schema(database, 'kopie3')
     kopie3 = model.get_copy(None)
     kopie3_schema.add(kopie3, recursive=True)
@@ -55,7 +55,7 @@ def test_import_monumenten():
 
     database = db.Database(const.DATABASE_URL, db_create=False)
     schema = sch.Schema(database)
-    root = schema.get_package('EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E') # Main Package
+    root = schema.get_package('EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E')  # Main Package
     kopie_schema = sch.Schema(database, 'kopie4')
     kopie = root.get_copy(None)
     kopie_schema.add(kopie, recursive=True)

@@ -16,9 +16,9 @@ LEVERING_ID = "EAID_DAB09055_A5A6_4ff4_A158_21B20567B888"
 SCHULDEN_ID = "EAID_93E12A3E_71E3_431e_9871_BF6075EAAEF1"
 
 
-class DDASPlugin(Plugin):
+class DDASPluginUitwisselmodel(Plugin):
     def transformLogic(self, args, root_package, schema_from, schema_to):
-        logger.info("Starting DDAS-Plugin")
+        logger.info("Starting DDAS Uitwisselmodel Plugin")
         # Clean up
         schema_to.clean()
 
@@ -32,20 +32,6 @@ class DDASPlugin(Plugin):
 
         # Kopie schuldhulpverlening model
         kopie = root_package.get_copy(None, materialize_generalizations=True)
-
-        # Fix Copy error where enums are not connected
-        for enum in kopie.enumerations:
-            if enum.name in [
-                "Geslachtsaanduiding",
-                "Burgerlijke staat",
-                "adelijkeTitel",
-                "soortRechtsvorm",
-                "Boolean",
-                "geslacht",
-                "Gezinsrelatie",
-                "soortRechtsvorm",
-            ]:
-                kopie.enumerations.remove(enum)
 
         # Now remove all associations with name 'resulteert in'
         for clazz in kopie.classes:
@@ -151,76 +137,4 @@ class DDASPlugin(Plugin):
         kopie.classes.append(uitwisselmodel)
         schema_to.add(kopie, recursive=True)
 
-        # Zet de juiste attrributen bij aanlevereende organisatie
-        def set_org(org_id, lst_incl):
-            org = schema_to.get_class(org_id)
-            lst_attr = [attr for attr in schema_to.get_class(org_id).attributes]
-            for attr in lst_attr:
-                if not str(attr.name).strip().lower() in lst_incl:
-                    org.attributes.remove(attr)
-                    attr.clazz_id = None
-            org.attributes.append(
-                Attribute(
-                    id=util.getEAGuid(),
-                    name="postcode",
-                    schema_id=schema_to.schema_id,
-                    primitive="AN6",
-                    verplicht=False,
-                )
-            )
-
-        set_org(ORGANISATIE_ID, ["(statutaire) naam", "kvk-nummer"])
-        org = schema_to.get_class(ORGANISATIE_ID)
-        org.attributes.append(
-            Attribute(
-                id=util.getEAGuid(),
-                name="gemeentecode",
-                schema_id=schema_to.schema_id,
-                primitive="AN2",
-                verplicht=False,
-                definitie="De gemeentecode als de aanleverende organisatie een gemeente is.",
-            )
-        )
-
-        set_org(SCHULDEISER_ID, ["naam", "kvknummer"])
-        org = schema_to.get_class(SCHULDEISER_ID)
-        org.attributes.append(
-            Attribute(
-                id=util.getEAGuid(),
-                name="privepersoon",
-                schema_id=schema_to.schema_id,
-                primitive="boolean",
-                verplicht=False,
-            )
-        )
-
-        # Zet de juiste attrributen bij client postcode, geboortedatum en geslacht (en huisnummer(toevoeging))
-        lst_attr = [attr for attr in schema_to.get_class(CLIENT_ID).attributes]
-        client = schema_to.get_class(CLIENT_ID)
-        for attr in lst_attr:
-            if not str(attr.name).strip().lower() in ["geslachtsaanduiding", "burgerservicenummer", "geboortedatum"]:
-                client.attributes.remove(attr)
-                attr.clazz_id = None
-        client.attributes.append(
-            Attribute(
-                id=util.getEAGuid(), name="Postcode", schema_id=schema_to.schema_id, primitive="AN6", verplicht=False
-            )
-        )
-        client.attributes.append(
-            Attribute(
-                id=util.getEAGuid(), name="Huisnummer", schema_id=schema_to.schema_id, primitive="AN5", verplicht=False
-            )
-        )
-        client.attributes.append(
-            Attribute(
-                id=util.getEAGuid(),
-                name="Huisnummertoevoeging",
-                schema_id=schema_to.schema_id,
-                primitive="AN4",
-                verplicht=False,
-            )
-        )
-
-        # Laat alleen schulden in hetleefgebied va de client zien
-
-        logger.info("DDAS Plugin finished.")
+        logger.info("DDAS Uitwisselmodel Plugin finished.")

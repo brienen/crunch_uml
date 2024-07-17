@@ -1,0 +1,523 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/brienen/ddas/main/json_schema_Uitwisselmodel.json",
+    "title": "Uitwisselmodel",
+    "type": "object",
+    "description": "Het uitwisselmodel is een model dat de gegevens bevat die uitgewisseld worden tussen de verschillende partijen.",
+    "properties": {
+        "startdatumLevering": {
+            "$ref": "#/$defs/datum"
+        },
+        "einddatumLevering": {
+            "$ref": "#/$defs/datum"
+        },
+        "aanleverdatumEnTijd": {
+            "$ref": "#/$defs/datum-tijd"
+        },
+        "leveringen": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "description": "Een levering is steeds een schuldhulporganisatie met daarbij een verzameling van schuldhulptrajecten die op een bepaald moment worden aangeleverd.",
+                "properties": {
+                    "teller": {
+                        "type": "integer"
+                    },
+                    "aanleverende_organisatie": {
+                        "type": "object",
+                        "description": "Een schuldhulporganisatie is een instantie die individuen en gezinnen helpt met het beheren, verminderen en oplossen van hun schulden door middel van advies, begeleiding en bemiddeling.",
+                        "properties": {
+                            "(Statutaire) Naam": {
+                                "type": "string"
+                            },
+                            "KvK-nummer": {
+                                "type": "string"
+                            },
+                            "postcode": {
+                                "type": "string"
+                            },
+                            "gemeentecode": {
+                                "description": "De gemeentecode als de aanleverende organisatie een gemeente is.",
+                                "type": "string"
+                            },
+                            "contactpersonen": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "description": "Contactpersoon van een organisatie",
+                                    "properties": {
+                                        "email": {
+                                            "$ref": "#/$defs/email"
+                                        },
+                                        "naam": {
+                                            "type": "string"
+                                        },
+                                        "telefoonnummer": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "schuldhulptrajecten": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "description": "Samenstel van achtereenvolgens uit te voeren en onderling samenhangende deelhandelingen of van opeenvolgende stadia in een proces, voorgesteld als een route die via opeenvolgende bestemmingen naar de eindbestemming voert.",
+                            "properties": {
+                                "einddatum": {
+                                    "$ref": "#/$defs/datum"
+                                },
+                                "omschrijving": {
+                                    "type": "string"
+                                },
+                                "startdatum": {
+                                    "$ref": "#/$defs/datum"
+                                },
+                                "toekenningsdatum": {
+                                    "$ref": "#/$defs/datum"
+                                },
+                                "totaalSchuldbedragBijAanvangSchuld": {
+                                    "$ref": "#/$defs/bedrag"
+                                },
+                                "aanmelding": {
+                                    "type": "object",
+                                    "description": "Moment dat een persoon met een hulpvraag komt rondom (dreigende) schulden. Dit kan een persoonlijke, schriftelijke, digitale of telefonische vraag zijn. ",
+                                    "properties": {
+                                        "crisisinterventie": {
+                                            "type": "boolean"
+                                        },
+                                        "einddatum": {
+                                            "$ref": "#/$defs/datum"
+                                        },
+                                        "startdatum": {
+                                            "$ref": "#/$defs/datum"
+                                        }
+                                    }
+                                },
+                                "begeleiding": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "description": "Begeleiding voor clienten in het kader van schuldhulpdienstverlening, die kan bestaan uit:\n1. budgetbeheer\n2. beschermingsbewind\n3. budgetcoaching\n",
+                                        "properties": {
+                                            "einddatum": {
+                                                "$ref": "#/$defs/datum"
+                                            },
+                                            "soort": {
+                                                "$ref": "#/$defs/EnumBegeleidingssoort"
+                                            },
+                                            "startdatum": {
+                                                "$ref": "#/$defs/datum"
+                                            }
+                                        }
+                                    }
+                                },
+                                "client": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "description": "Een ingeschreven persoon die gebruik maakt van producten en diensten van de gemeente binnen de sociaal domein.",
+                                        "properties": {
+                                            "Burgerservicenummer": {
+                                                "type": "string"
+                                            },
+                                            "Geboortedatum": {
+                                                "type": "string"
+                                            },
+                                            "Geslachtsaanduiding": {
+                                                "$ref": "#/$defs/geslacht"
+                                            },
+                                            "Postcode": {
+                                                "type": "string"
+                                            },
+                                            "Huisnummer": {
+                                                "type": "string"
+                                            },
+                                            "Huisnummertoevoeging": {
+                                                "type": "string"
+                                            },
+                                            "leefsituatie": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "description": "Leefsituatie is de combinatie van factoren zoals schulden, ondernemerschap, aanwezigheid van een partner, en inkomen, die samen de sociale en economische omstandigheden van een individu bepalen. Deze wordt in het kader van schuldhulpverlening gebruikt om alle relevante zaken van clienten aan te koppelen.",
+                                                    "properties": {
+                                                        "datumGeldigTot": {
+                                                            "$ref": "#/$defs/datum"
+                                                        },
+                                                        "datumGeldigVanaf": {
+                                                            "$ref": "#/$defs/datum"
+                                                        },
+                                                        "schulden": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "description": "Een financi&#235;le schuld is een verplichting waarbij een individu, bedrijf of instelling een geldbedrag verschuldigd is aan een ander partij en dit bedrag op een later tijdstip moet terugbetalen.",
+                                                                "properties": {
+                                                                    "bedrag": {
+                                                                        "$ref": "#/$defs/bedrag"
+                                                                    },
+                                                                    "peildatum": {
+                                                                        "$ref": "#/$defs/datum"
+                                                                    },
+                                                                    "soort": {
+                                                                        "$ref": "#/$defs/EnumSchuldensoort"
+                                                                    },
+                                                                    "zakelijkeSchuld": {
+                                                                        "type": "boolean"
+                                                                    },
+                                                                    "schuldeiser": {
+                                                                        "type": "object",
+                                                                        "description": "Een schuldeiser is bedrijf of persoon die recht heeft op een prestatie van een ander, de schuldenaar. In de meeste gevallen is de prestatie het betalen van geld. Dit geldbedrag is dan de schuld die de schuldenaar aan de schuldeiser moet betalen. De schuld is meestal het gevolg van het niet nakomen van een verplichting uit een overeenkomst tussen de partijen. De schuldeiser kan de schuldenaar dwingen om de schuld te voldoen.",
+                                                                        "properties": {
+                                                                            "naam": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "kvknummer": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "Naam": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "postcode": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "privepersoon": {
+                                                                                "type": "boolean"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "crisisinterventies": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "description": "Het afwenden van een crisis- of dreigende situatie om zo de mogelijkheid te cre&#235;ren om de klant te helpen via de reguliere schuldhulpverlening.\nVolgens de Wgs gaat het in elk geval om de volgende situaties:\n\u25a0 gedwongen woningontruiming;\n\u25a0 be&#235;indiging van de levering van gas, water, elektriciteit of stadsverwarming;\n\u25a0 opzegging of ontbinding van de zorgverzekering.\nGemeenten kunnen extra situaties toevoegen aan hun crisisprotocol, zoals:\n\u25a0 aangekondigde boedelverkoop of verkoop van de eigen woning;\n\u25a0 loon- of bankbeslag;\n\u25a0 een faillissementsaanvraag.\nEn voor ondernemers:\n\u25a0 beslag op (on)roerende zaken dat het voortbestaan van de onderneming bedreigt;\n\u25a0 opzegging van het bankkrediet.\n",
+                                        "properties": {
+                                            "einddatum": {
+                                                "$ref": "#/$defs/datum"
+                                            },
+                                            "startdatum": {
+                                                "$ref": "#/$defs/datum"
+                                            }
+                                        }
+                                    }
+                                },
+                                "intake": {
+                                    "type": "object",
+                                    "description": "Dit is de fase tussen het eerste gesprek en het Plan van Aanpak. Tijdens de\nintakefase wordt geinventariseerd welke instrumenten, ondersteuning, activiteiten en gegevens nodig zijn om een duurzaam financieel\nevenwicht te bereiken.",
+                                    "properties": {
+                                        "einddatum": {
+                                            "$ref": "#/$defs/datum"
+                                        },
+                                        "startdatum": {
+                                            "$ref": "#/$defs/datum"
+                                        },
+                                        "toelatingsbeschikking": {
+                                            "$ref": "#/$defs/datum"
+                                        }
+                                    }
+                                },
+                                "moratoria": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "description": "Het gaat hier om de datum waarop een verzoek tot een moratorium (ex art. 287 b Fw) is ingediend bij de rechter.\n\nEr kan een verzoek tot een moratorium bij de rechter worden gedaan om te voorkomen dat een schuldeiser zijn specifieke inningsmogelijkheden gebruikt, terwijl een aanvraag voor een minnelijke schuldregeling in behandeling is. Het moratorium is bedoeld om het minnelijke traject te kunnen voortzetten.\n\nHet moratorium kan in de volgende situaties worden ingezet:\n- gedwongen woningontruiming;\n- be&#235;indiging van de levering van gas, water elektriciteit of stadsverwarming;\n- opzegging dan wel ontbinding van de zorgverzekering.\n\nHet moratorium duurt maximaal zes maanden.",
+                                        "properties": {
+                                            "datumAanvraag": {
+                                                "$ref": "#/$defs/datum"
+                                            },
+                                            "datumGoedkeuring": {
+                                                "$ref": "#/$defs/datum"
+                                            },
+                                            "einddatum": {
+                                                "$ref": "#/$defs/datum"
+                                            },
+                                            "startdatum": {
+                                                "$ref": "#/$defs/datum"
+                                            }
+                                        }
+                                    }
+                                },
+                                "nazorg": {
+                                    "type": "object",
+                                    "description": "Ondersteuning die een persoon ontvangt n&#225; een schuldregelingstraject, om zo bij de start van een schuldenvrij leven zelfredzaamheid verder te bevorderen &#233;n recidive (terugval) te voorkomen. ",
+                                    "properties": {
+                                        "einddatum": {
+                                            "$ref": "#/$defs/datum"
+                                        },
+                                        "startdatum": {
+                                            "$ref": "#/$defs/datum"
+                                        }
+                                    }
+                                },
+                                "oplossing": {
+                                    "type": "object",
+                                    "description": "De Oplossing beschrijft in 4 submodules wat de schuldhulpverlener doet om een oplossing te realiseren, en kent de volgende submodules: \n- submodule Herfinanciering;\n- submodule Betalingsregeling;\n- submodule Saneringskrediet;\n- submodule Schuldbemiddeling.\n\nHet kan ook gaan om een 0%-aanbod",
+                                    "properties": {
+                                        "einddatum": {
+                                            "$ref": "#/$defs/datum"
+                                        },
+                                        "soort": {
+                                            "$ref": "#/$defs/EnumOplossingssoort"
+                                        },
+                                        "startdatum": {
+                                            "$ref": "#/$defs/datum"
+                                        }
+                                    }
+                                },
+                                "planVanAanpak": {
+                                    "type": "object",
+                                    "description": "Een document waarin in elk geval het volgende staat:\n\u25a0 de hulpvraag van de persoon;\n\u25a0 de voorgestelde ondersteuning;\n\u25a0 eventueel de organisatie(s) waarnaar je hebt doorverwezen;\n\u25a0 de voorwaarden voor schuldhulpverlening (bijvoorbeeld dat de persoon geen nieuwe schulden mag maken).\n\nDe hoogte van beslagvrije voet voor de persoon (zie artikel 4a:5 van de Wgs) moet in acht worden genomen.",
+                                    "properties": {
+                                        "datumAfronding": {
+                                            "$ref": "#/$defs/datum"
+                                        }
+                                    }
+                                },
+                                "schuldregeling": {
+                                    "type": "object",
+                                    "description": "De schuldregeling heeft als doel een overeenkomst te sluiten tussen iemand met problematische schulden en zijn schuldeisers. Op basis van eventueel ingezet vermogen en de berekende afloscapaciteit (of op andere wijze vastgestelde minimale afdracht) lost de schuldenaar in maximaal 18 maanden zo veel mogelijk van de schuld af. Daarna schelden de schuldeisers de rest van hun vordering kwijt. Voordat de schuldregeling start, sluit je een schuldregelingsovereenkomst met de schuldenaar. Daarin staan de rechten en plichten van beide partijen. Een schuldregeling kan met een saneringskrediet of een schuldbemiddeling gerealiseerd worden. Als een of meer schuldeisers blijven weigeren in te stemmen met de minnelijke schuldregeling, informeer je de schuldenaar over mogelijke vervolgstappen, zoals het aanvragen van een dwangakkoord (artikel 287a Fw) of toelating tot de Wsnp.",
+                                    "properties": {
+                                        "afgewezen": {
+                                            "$ref": "#/$defs/datum"
+                                        },
+                                        "datum": {
+                                            "$ref": "#/$defs/datum"
+                                        },
+                                        "datumVerzoekDwangakkoord": {
+                                            "$ref": "#/$defs/datum"
+                                        },
+                                        "dwangakkoord": {
+                                            "type": "boolean"
+                                        },
+                                        "ingetrokken": {
+                                            "$ref": "#/$defs/datum"
+                                        },
+                                        "toegekend": {
+                                            "$ref": "#/$defs/datum"
+                                        }
+                                    }
+                                },
+                                "uitstroom": {
+                                    "type": "object",
+                                    "description": "Motivatie voor uitstroom",
+                                    "properties": {
+                                        "datum": {
+                                            "$ref": "#/$defs/datum"
+                                        },
+                                        "omschrijving": {
+                                            "type": "string"
+                                        },
+                                        "reden": {
+                                            "$ref": "#/$defs/EnumUitstroomreden"
+                                        },
+                                        "uitstroomredensoort": {
+                                            "type": "object",
+                                            "description": "Typering van een uitstroomreden",
+                                            "properties": {
+                                                "naam": {
+                                                    "type": "string"
+                                                },
+                                                "omschrijving": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "stabilisatie": {
+                                    "type": "object",
+                                    "description": "Fase van het schuldhulpverleningstraject met als doel de inkomsten en uitgaven van een persoon in evenwicht te brengen. De stabilisatie van inkomen en uitgaven is een resultaat van\nwerkzaamheden uit het integrale plan van aanpak. Als stabilisatie bereikt is kan een betalingsregeling, herfinanciering of schuldregeling worden opgezet. Een belangrijk tweede doel is om de hulpvrager hierbij schuldenrust te bieden: stress wegnemen en tijd maken voor oplossingen naar een schuldenzorgvrije toekomst. In de stabilisatiefase kan een schuldhulpverlener andere instrumenten, activiteiten of ondersteuning inzetten, die bijdragen aan de duurzame oplossing van het financi&#235;le probleem, zoals budgetcoaching, budgetbeheer, beschermingsbewind of flankerende hulp.",
+                                    "properties": {
+                                        "einddatum": {
+                                            "$ref": "#/$defs/datum"
+                                        },
+                                        "startdatum": {
+                                            "$ref": "#/$defs/datum"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": [
+                        "teller"
+                    ],
+                    "additionalProperties": false
+                }
+            }
+        }
+    },
+    "$defs": {
+        "datum": {
+            "type": "string",
+            "format": "date",
+            "description": "Een datum in het formaat YYYY-MM-DD."
+        },
+        "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Een emailadres."
+        },
+        "tijd": {
+            "type": "string",
+            "format": "time",
+            "description": "De tijd in het formaat HH:MM:SS (ISO 8601)."
+        },
+        "datum-tijd": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Datum en tijd in het formaat YYYY-MM-DDTHH:MM:SSZ (ISO 8601)."
+        },
+        "bedrag": {
+            "type": "integer",
+            "description": "Een geldbedrag in hele euros nauwkweurig."
+        },
+        "soortRechtsvorm": {
+            "type": "string",
+            "enum": [
+                "Besloten vennootschap",
+                "cooperatie, Europees Economische Samenwerking",
+                "Europese Cooperatieve Vennootschap",
+                "Europese Naamloze Vennootschap",
+                "kerkelijke Organisatie",
+                "naamloze Vennootschap",
+                "onderlinge Waarborg Maatschappij",
+                "overig privaatrechtelijke rechtspersoon",
+                "stichting",
+                "vereniging",
+                "vereniging van Eigenaars",
+                "publiekrechtelijke Rechtspersoon",
+                "vennootschap onder Firma",
+                "maatschap",
+                "rederij",
+                "commanditaire vennootschap",
+                "kapitaalvennootschap binnen EER",
+                "overige buitenlandse rechtspersoon vennootschap",
+                "kapitaalvennootschap buiten EER",
+                "Onbekend",
+                "Leeg"
+            ]
+        },
+        "EnumBegeleidingssoort": {
+            "type": "string",
+            "enum": [
+                "Budgetcoaching",
+                "Budgetbeheer",
+                "Beschermingsbewind",
+                "Lange Termijn Begeleiding (DFD)"
+            ]
+        },
+        "Gezinsrelatie": {
+            "type": "string",
+            "enum": [
+                "Hoofd gezin zonder kind(eren)",
+                "Hoofd gezin met kind(eren)",
+                "Ouder met kind(eren)",
+                "Echtgenote binnen gezin",
+                "Kind",
+                "Alleenstaand/Samenwonend",
+                "Hoofd partnerrelatie",
+                "Hoofd huwelijk gelijk geslacht",
+                "Onbekend",
+                "Leeg"
+            ]
+        },
+        "Boolean": {
+            "type": "string",
+            "enum": [
+                "Ja",
+                "Nee",
+                "Onbekend",
+                "Leeg"
+            ]
+        },
+        "geslacht": {
+            "type": "string",
+            "enum": [
+                "Man",
+                "Vrouw",
+                "Onbekend",
+                "Leeg"
+            ]
+        },
+        "EnumHuishoudenssoort": {
+            "type": "string",
+            "enum": [
+                "Particulier Huishouden",
+                "Instituuttioneel Huishouden"
+            ]
+        },
+        "EnumOplossingssoort": {
+            "type": "string",
+            "enum": [
+                "Betalingsregeling",
+                "Herfinanciering",
+                "Saneringskrediet",
+                "Schuldbemiddeling",
+                "0%-aanbod"
+            ]
+        },
+        "EnumSchuldensoort": {
+            "type": "string",
+            "enum": [
+                "Zorg",
+                "Publiek",
+                "Nuts",
+                "Overig"
+            ]
+        },
+        "EnumUitstroomreden": {
+            "type": "string",
+            "enum": [
+                "Client is overleden",
+                "Client is verhuisd naar een andere gemeente",
+                "Client is niet verschenen",
+                "Client trekt aanvraag in",
+                "Dienstverlening niet (meer) passend",
+                "Client voldoet niet aan verplichtingen",
+                "Overig",
+                "Schuldtraject positief doorlopen en afgerond",
+                "Client heeft schulden zelf geregeld"
+            ]
+        },
+        "EnumWoningbezit": {
+            "type": "string",
+            "enum": [
+                "Eigen Woning",
+                "Huurwoning",
+                "Huurwoning geen huurtoeslag",
+                "Huurwoning wel huurtoeslag"
+            ]
+        },
+        "adelijkeTitel": {
+            "type": "string",
+            "enum": [
+                "baron",
+                "barones",
+                "graaf",
+                "gravin",
+                "hertog",
+                "hertogin",
+                "markies",
+                "markiezin",
+                "prins",
+                "prinses",
+                "ridder",
+                "Onbekend",
+                "Leeg"
+            ]
+        }
+    }
+}

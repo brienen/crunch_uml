@@ -81,6 +81,9 @@ class Schema:
     def get_enumeration(self, id):
         return self.database.session.query(db.Enumeratie).filter_by(id=id, schema_id=self.schema_id).first()
 
+    def get_enumeration_literal(self, id):
+        return self.database.session.query(db.EnumerationLiteral).filter_by(id=id, schema_id=self.schema_id).first()
+
     def get_attribute(self, id):
         return self.database.session.query(db.Attribute).filter_by(id=id, schema_id=self.schema_id).first()
 
@@ -113,8 +116,6 @@ class Schema:
 
     def count_diagrams(self):
         return self.database.session.query(db.Diagram).filter_by(schema_id=self.schema_id).count()
-
-
 
     def get_session(self):
         return self.database.session

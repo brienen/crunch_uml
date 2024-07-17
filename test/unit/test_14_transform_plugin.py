@@ -31,33 +31,41 @@ def test_import_onderwijs():
     cli.main(test_args)
 
 
-
 def test_ddas_plugin():
-    test_args = ["import",
-                "-t", "eaxmi",
-                "-f", "./test/data/Model Schuldhulpverlening.xml",
-                "-db_create"
-            ]
+    test_args = ["import", "-t", "eaxmi", "-f", "./test/data/Model Schuldhulpverlening.xml", "-db_create"]
     cli.main(test_args)
 
-    #database = db.Database(const.DATABASE_URL, db_create=False)
-    #schema = sch.Schema(database)
-    #root = schema.get_package('EAPK_06C51790_1F81_4ac4_8E16_5177352EF2E1')
-    #kopie = root.get_copy(None)
-    #kopie_schema = sch.Schema(database, 'schuldhulp')
-    #kopie_schema.add(kopie, recursive=True)
+    # database = db.Database(const.DATABASE_URL, db_create=False)
+    # schema = sch.Schema(database)
+    # root = schema.get_package('EAPK_06C51790_1F81_4ac4_8E16_5177352EF2E1')
+    # kopie = root.get_copy(None)
+    # kopie_schema = sch.Schema(database, 'schuldhulp')
+    # kopie_schema.add(kopie, recursive=True)
 
-    #database = db.Database(const.DATABASE_URL, db_create=False)
-    #schema = sch.Schema(database, 'schuldhulp')
-    #assert schema.count_package() == 1
-    #assert schema.count_enumeratie() == 6
-    #assert schema.count_class() == 31
-    #assert schema.count_attribute() == 114
-    #assert schema.count_enumeratieliteral() == 20
+    # database = db.Database(const.DATABASE_URL, db_create=False)
+    # schema = sch.Schema(database, 'schuldhulp')
+    # assert schema.count_package() == 1
+    # assert schema.count_enumeratie() == 6
+    # assert schema.count_class() == 31
+    # assert schema.count_attribute() == 114
+    # assert schema.count_enumeratieliteral() == 20
 
-    test_args = ["transform", "-ttp", "plugin", "-sch_from", "default", "-sch_to", "uitwisselmodel", "-rt_pkg", "EAPK_06C51790_1F81_4ac4_8E16_5177352EF2E1", "--plugin_class_name", "DDASPlugin", "--plugin_file_name", "./test/data/ddasplugin.py"]
+    test_args = [
+        "transform",
+        "-ttp",
+        "plugin",
+        "-sch_from",
+        "default",
+        "-sch_to",
+        "uitwisselmodel",
+        "-rt_pkg",
+        "EAPK_06C51790_1F81_4ac4_8E16_5177352EF2E1",
+        "--plugin_class_name",
+        "DDASPlugin",
+        "--plugin_file_name",
+        "./test/data/ddasplugin.py",
+    ]
     cli.main(test_args)
-
 
     test_args = [
         "-sch",

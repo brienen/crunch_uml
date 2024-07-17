@@ -188,7 +188,8 @@
                 "export",
                 "-t", "json_schema",
                 "-f", "./test/output/schema.json",
-                "--output_class_id", "EAID_6b4326e3_eb4e_41d2_902b_0bff06604f63"
+                "--output_class_id", "EAID_6b4326e3_eb4e_41d2_902b_0bff06604f63",
+                "-js_url", "https://raw.githubusercontent.com/brienen/ddas/main/json_schema_Uitwisselmodel.json"
             ]
         },
         {
@@ -198,7 +199,8 @@
             "program": "./crunch_uml/cli.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["export",
+            "args": ["-sch", "schuldhulp",
+                "export",
                 "-t", "jinja2",
                 "--output_jinja2_template", "ddas_markdown.j2",
                 "-f", "./test/output/def.md"
@@ -257,12 +259,51 @@
             "args": ["transform", "-ttp", "plugin", "-sch_to", "schuldhulp", "-rt_pkg", "EAPK_06C51790_1F81_4ac4_8E16_5177352EF2E1", "--plugin_class_name", "DDASPlugin", "--plugin_file_name", "./test/data/ddasplugin.py"]
         },
         {
+            "name": "DDAS Informatiemodel Plugin",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["transform", 
+                    "-ttp", "plugin", 
+                    "-sch_to", "schuldhulp_informatiemodel", 
+                    "-rt_pkg", "EAPK_06C51790_1F81_4ac4_8E16_5177352EF2E1", 
+                    "--plugin_class_name", "DDASPluginInformatiemodel", 
+                    "--plugin_file_name", "./test/data/ddasplugin_informatiemodel.py"]
+        },
+        {
+            "name": "DDAS Uitwisselmodel Plugin",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["transform", 
+                    "-ttp", "plugin", 
+                    "-sch_to", "schuldhulp_uitwisselmodel", 
+                    "-rt_pkg", "EAPK_06C51790_1F81_4ac4_8E16_5177352EF2E1", 
+                    "--plugin_class_name", "DDASPluginUitwisselmodel", 
+                    "--plugin_file_name", "./test/data/ddasplugin_uitwisselmodel.py"]
+        },
+        {
             "name": "Python: pytest",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/.venv/bin/pytest",  // Pas aan naar je lokale pytest pad
             "args": [
                 "${workspaceFolder}/test/unit"  // Pas aan naar je testmap
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: pytest test_99_ddas",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/pytest",  // Pas aan naar je lokale pytest pad
+            "args": [
+                "${workspaceFolder}/test/unit/test_99_ddas.py"  // Pas aan naar je testmap
             ],
             "console": "integratedTerminal",
             "justMyCode": false

@@ -1,6 +1,5 @@
 import logging
 import re
-import uuid
 
 import requests
 from lxml import etree

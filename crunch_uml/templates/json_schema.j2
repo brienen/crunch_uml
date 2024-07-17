@@ -12,8 +12,8 @@
 {%- set attributen = clazz.attributes|rejectattr('name','none')|list %}
 {%- for attribute in attributen %}
     "{{ attribute.name }}": {
-    {%- if attribute.definities %}
-    "description": {{ attribute.definities|default('')|tojson }},
+    {%- if attribute.definitie %}
+    "description": {{ attribute.definitie|default('')|tojson }},
     {%- endif %}
     {{ attribute.getJSONDatatype() }}
     }{% if not loop.last %},{% endif %}
@@ -38,16 +38,16 @@
         }{% if not loop.last %},{% endif %}
     {%- endif %}
 {%- endfor %}
+    }
 {%- if clazz.getVerplichteAttributen()|length > 0 %}
     ,"required": [{%- for name in clazz.getVerplichteAttributen() %}"{{ name }}"{% if not loop.last %},{% endif %}{% endfor %}],
     "additionalProperties": false
 {%- endif %}
-}
 {%- endmacro -%}
 
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://example.com/product.schema.json",
+    "$id": "{{ args.json_schema_url }}",
     "title": "{{ clazz.name }}",
 {{ class_body(clazz) }}
 {%- set enums = clazz.package.get_root_package().get_enumerations_inscope()|list %}
@@ -58,7 +58,7 @@
     "{{ enum.name }}": {
     "type": "string",
     {%- if enum.definitie %}
-    "description": {{ enum.definitie | default('')|tojson }},
+    "description": {{ enum.definitie|default('')|tojson }},
     {%- endif %}
     "enum": [{%- for lit in enum.literals %}"{{ lit.name }}"{% if not loop.last %}, {% endif %}{%- endfor %}]
 }{% if not loop.last %},{% endif %}

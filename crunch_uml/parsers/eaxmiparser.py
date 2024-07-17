@@ -1,7 +1,7 @@
 import logging
 
-import crunch_uml.schema as sch
 import crunch_uml.db as db
+import crunch_uml.schema as sch
 from crunch_uml.parsers.parser import ParserRegistry, copy_values, fixtag
 from crunch_uml.parsers.xmiparser import XMIParser
 
@@ -104,22 +104,21 @@ class EAXMIParser(XMIParser):
         '''
         Third find all attributes, like
             <attribute xmi:idref="EAID_B2AE8AFC_C1D5_4d83_BFD3_EBF1663F3468" name="rijksmonument" scope="Public">
-                <initial/>
-                <documentation/>
-                <model ea_localid="3233" ea_guid="{B2AE8AFC-C1D5-4d83-BFD3-EBF1663F3468}"/>
-                <properties type="1" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
-                <coords ordered="0" scale="0"/>
-                <containment containment="Not Specified" position="0"/>
-                <stereotype stereotype="enum"/>
-                <bounds lower="1" upper="1"/>
-                <options/>
-                <style/>
-                <styleex value="IsLiteral=1;volatile=0;"/>
-                <tags/>
-                <xrefs/>
+            <initial/>
+            <documentation/>
+            <model ea_localid="3233" ea_guid="{B2AE8AFC-C1D5-4d83-BFD3-EBF1663F3468}"/>
+            <properties type="1" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+            <coords ordered="0" scale="0"/>
+            <containment containment="Not Specified" position="0"/>
+            <stereotype stereotype="enum"/>
+            <bounds lower="1" upper="1"/>
+            <options/>
+            <style/>
+            <styleex value="IsLiteral=1;volatile=0;"/>
+            <tags/>
+            <xrefs/>
             </attribute>
         '''
-
         attrrefs = extension.xpath(".//attribute[@xmi:idref]", namespaces=ns)  # type: ignore
         for attrref in attrrefs:
             idref = attrref.get('{' + ns['xmi'] + '}idref')
@@ -127,13 +126,23 @@ class EAXMIParser(XMIParser):
             if attr is not None:
                 properties = attrref.xpath('./properties')
                 copy_values(properties, attr)
-                documentation = attrref.xpath('./properties')[0]
-                if documentation is not None:
-                    attr.definitie = documentation.get('documentation')
+                documentation = attrref.xpath("./documentation")
+                attr.definitie = documentation[0].get('value') if documentation is not None else None
                 stereotype = attrref.xpath('./stereotype')
                 copy_values(stereotype, attr)
 
-                schema.save(attr)
+                schema.save(attr)  # can also reference to enumeration literals
+            else:
+                literal = schema.get_enumeration_literal(idref)
+                if literal is not None:
+                    properties = attrref.xpath('./properties')
+                    copy_values(properties, literal)
+                    documentation = attrref.xpath("./documentation")
+                    literal.definitie = documentation[0].get('value') if documentation is not None else None
+                    stereotype = attrref.xpath('./stereotype')
+                    copy_values(stereotype, literal)
+
+                    schema.save(literal)
 
         connectorrefs = extension.xpath(".//connector[@xmi:idref and properties/@ea_type='Association']", namespaces=ns)  # type: ignore
         for connectorref in connectorrefs:
@@ -148,8 +157,6 @@ class EAXMIParser(XMIParser):
                     association.definitie = documentation[0].get('value')
 
                 schema.save(association)
-
-
 
         '''
         Voorbeeld van Diagram
@@ -188,7 +195,16 @@ class EAXMIParser(XMIParser):
             created = diagramref.xpath('./project')[0].get('created')
             modified = diagramref.xpath('./project')[0].get('modified')
             documentation = diagramref.xpath('./properties')[0].get('documentation')
-            diagram = db.Diagram(id=idref, name=name, package_id=package_id, author=author, version=version, created=created, modified=modified, definitie=documentation)
+            diagram = db.Diagram(
+                id=idref,
+                name=name,
+                package_id=package_id,
+                author=author,
+                version=version,
+                created=created,
+                modified=modified,
+                definitie=documentation,
+            )
             schema.add(diagram)
 
             for element in diagramref.xpath('./elements/element'):
@@ -196,18 +212,28 @@ class EAXMIParser(XMIParser):
                 logger.debug(f'Found element with id {element.get("subject")} in diagram {name}')
                 if schema.get_class(element_id) is not None:
                     diagram.classes.append(schema.get_class(element_id))
-                    logger.debug(f'Element {element.get("subject")} in diagram {name} is een class met naam {schema.get_class(element_id).name}')
+                    logger.debug(
+                        f'Element {element.get("subject")} in diagram {name} is een class met naam'
+                        f' {schema.get_class(element_id).name}'
+                    )
                 elif schema.get_association(element_id) is not None:
                     diagram.associations.append(schema.get_association(element_id))
                     logger.debug(f'Element {element.get("subject")} in diagram {name} is een association')
                 elif schema.get_enumeration(element_id) is not None:
                     diagram.enumerations.append(schema.get_enumeration(element_id))
-                    logger.debug(f'Element {element.get("subject")} in diagram {name} is een enumeration met naam {schema.get_enumeration(element_id).name}')
+                    logger.debug(
+                        f'Element {element.get("subject")} in diagram {name} is een enumeration met naam'
+                        f' {schema.get_enumeration(element_id).name}'
+                    )
                 elif schema.get_generalization(element_id) is not None:
                     diagram.generalizations.append(schema.get_generalization(element_id))
                     logger.debug(f'Element {element.get("subject")} in diagram {name} is een generalisatie')
                 else:
-                    logger.info(f'Element {element.get("subject")} in diagram {name} is niet gevonden in de database. Kan een niet geimplemneteerde type zijn zoals: Note of Constraint, of kan een relatie zij naar een element buiten het model.')
+                    logger.info(
+                        f'Element {element.get("subject")} in diagram {name} is niet gevonden in de database. Kan een'
+                        ' niet geimplemneteerde type zijn zoals: Note of Constraint, of kan een relatie zij naar een'
+                        ' element buiten het model.'
+                    )
 
             logger.debug(f'Diagram {diagram.name} met id {diagram.id} ingelezen met inhoud: {diagram}')
             schema.save(diagram)

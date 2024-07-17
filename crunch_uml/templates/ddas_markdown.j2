@@ -18,7 +18,7 @@ Attributen van objecttype {{ class.name }}:
 {% set attributen = class.attributes|rejectattr('name','none')|list %}
 | Attribuut | Datatype | Omschrijving | Verplicht |
 | :--- | :--- | :--- | :--- |
-{% for attribute in attributen|sort(attribute='name') %}| {{ attribute.name }} | {{ attribute.getDatatype()|default("", true) }} | {{ attribute.definitie|default("", true) }} | Nee |
+{% for attribute in attributen|sort(attribute='name') %}| {{ attribute.name }} | {{ attribute.getDatatype()|default("", true) }} | {{ attribute.definitie|default("", true)|del_newline()|set_url() }} | Nee |
 {% endfor %}
 
 {% endfor %}

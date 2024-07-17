@@ -41,7 +41,8 @@ def store_data(entity_name, data, schema):
             schema.save(new_entity)
     else:
         logger.debug(
-            f"Could not save entity with table '{entity_name}' to schema {schema.schema_id}: no column id present: {data}."
+            f"Could not save entity with table '{entity_name}' to schema {schema.schema_id}: no column id present:"
+            f" {data}."
         )
         new_entity = entity(**data)
         schema.save(new_entity)

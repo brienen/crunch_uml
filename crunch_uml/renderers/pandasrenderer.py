@@ -29,7 +29,7 @@ class JSONRenderer(Renderer):
         for table_name, table in models.items():
             # Model class associated with the table
             model = base.model_lookup_by_table_name(table_name)
-            if not model: # In geval van koppeltabel
+            if not model:  # In geval van koppeltabel
                 continue
 
             # Retrieve data
@@ -56,7 +56,7 @@ class CSVRenderer(Renderer):
         for table_name, table in models.items():
             # Model class associated with the table
             model = base.model_lookup_by_table_name(table_name)
-            if not model: # In geval van koppeltabel
+            if not model:  # In geval van koppeltabel
                 continue
 
             # Retrieve data

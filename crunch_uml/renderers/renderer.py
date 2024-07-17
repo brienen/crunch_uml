@@ -48,6 +48,12 @@ def add_args(argumentparser, subparser_dict):
     output_subparser.add_argument(
         '-ldns', '--linked_data_namespace', type=util.urlparse, help='Namespace for linked data renderers'
     )
+    output_subparser.add_argument(
+        '-js_url',
+        '--json_schema_url',
+        type=str,
+        help='URL for JSON schema that should be used for references to the schema.',
+    )
 
     # Set the epilog help text
     entries = RendererRegistry.entries()

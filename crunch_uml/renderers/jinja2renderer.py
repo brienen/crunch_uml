@@ -1,6 +1,6 @@
+import json
 import logging
 import os
-import json
 
 import inflection
 import validators
@@ -200,9 +200,9 @@ class JSON_SchemaRenderer(Jinja2Renderer, ClassRenderer):
                 # Stap 1: Laad de JSON-string in een Python dictionary
                 data = json.loads(output)
                 formatted_json = json.dumps(data, indent=4)
-            except:
+            except Exception as ex:
                 formatted_json = output
-                logger.warning("Could not format JSON data")
+                logger.warning(f"Exception Could not format JSON data with message {ex}")
 
             outputfilename = (
                 self.getFilename(filename, extension, clazz) if clazz.name is not None else f"{filename}{extension}"
