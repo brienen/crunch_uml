@@ -21,11 +21,12 @@ import crunch_uml.util as util
 from crunch_uml.exceptions import CrunchException
 
 logger = logging.getLogger()
+suppress_warnings = True
 
 
 def add_args(argumentparser, subparser_dict):
-    # argumentparser.add_argument(
-    #    '-db_noorph',
+    global suppress_warnings
+    # Rest of the code...
     #    '--database_no_orphans',
     #    action='store_true',
     #    help='Do not create orphan classes when relations point to classes that are not found in the imported file.',
@@ -236,7 +237,7 @@ class Package(Base, UMLBase):  # type: ignore
 
     def get_root_package(self):
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=sa_exc.SAWarning)
+            warnings.simplefilter("ignore" if suppress_warnings else "default", category=sa_exc.SAWarning)
             if not self.parent_package:
                 return self
             else:
@@ -244,7 +245,7 @@ class Package(Base, UMLBase):  # type: ignore
 
     def get_classes_inscope(self):
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=sa_exc.SAWarning)
+            warnings.simplefilter("ignore" if suppress_warnings else "default", category=sa_exc.SAWarning)
             clazzes = {clazz for clazz in self.classes}
             # for diagram in self.diagrams:
             #    clazzes = clazzes.union({clazz for clazz in diagram.classes})
@@ -254,7 +255,7 @@ class Package(Base, UMLBase):  # type: ignore
 
     def get_enumerations_inscope(self):
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=sa_exc.SAWarning)
+            warnings.simplefilter("ignore" if suppress_warnings else "default", category=sa_exc.SAWarning)
             enums = {enum for enum in self.enumerations}
             # for diagram in self.diagrams:
             #    enums = enums.union({enum for enum in diagram.enumerations})
@@ -351,7 +352,7 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
 
     def copy_attributes(self, copy_instance, materialize_generalizations=False):
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=sa_exc.SAWarning)
+            warnings.simplefilter("ignore" if suppress_warnings else "default", category=sa_exc.SAWarning)
 
             # Maak lijst van namen van al aanwezige attributen
             copy_attr_lst = [
@@ -673,7 +674,7 @@ class Diagram(Base, UMLBase):  # type: ignore
 
     def get_instances(self, type, root_package_id):
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=sa_exc.SAWarning)
+            warnings.simplefilter("ignore" if suppress_warnings else "default", category=sa_exc.SAWarning)
 
             # Find root_package of self that is equal to root_package_id
             root_package = self.package

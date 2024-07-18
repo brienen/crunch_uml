@@ -17,8 +17,8 @@ from crunch_uml.parsers.multiple_parsers import (  # noqa: F401
     XLXSParser,
 )
 from crunch_uml.parsers.xmiparser import XMIParser  # noqa: F401
-from crunch_uml.renderers.jinja2renderer import Jinja2Renderer  # noqa: F401
 from crunch_uml.renderers.jinja2renderer import (  # noqa: F401
+    Jinja2Renderer, 
     GGM_MDRenderer,
     JSON_SchemaRenderer,
 )
@@ -49,6 +49,9 @@ def main(args=None):
     argumentparser = argparse.ArgumentParser(description="Parse XMI to SQLite DB using SQLAlchemy")
     argumentparser.add_argument('-v', '--verbose', action='store_true', help='zet logniveau op INFO')
     argumentparser.add_argument('-d', '--debug', action='store_true', help='zet logniveau op DEBUG')
+    argumentparser.add_argument(
+        '-w', '--do_not_suppress_warnings', action='store_true', help='onderdruk geen warnings.'
+    )
 
     # Voeg subparsers toe aan het hoofdparser-object
     subparsers = argumentparser.add_subparsers(dest="command", help="Beschikbare subcommando's.")

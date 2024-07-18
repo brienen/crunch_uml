@@ -83,7 +83,16 @@ python ./crunch_uml/cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] [-sch] {import,
     - `xlsx`: Produces an Excel sheet with tabs corresponding to tables in the data model.
     - `ttl`: Renderer that renders Linked Data ontology in turtle from the supplied models, where a model is a package that includes at least one Class. Needs parameter "output_lod_url".
     - `rdf`: Renderer that renders Linked Data ontology in RDF from the supplied models, where a model is a package that includes at least one Class.  Needs parameter "output_lod_url".
+    - `json_schema`: Render JSON-Schema from a model using a base class as starting point and use outgoing associations only. Needs parameter "json_schema_url".  
 
+- `transform`: Transfrom the datamodel from one schema to a datamodel in another schema.
+  - `-sch_from`, `--schema_from`: Schema in database om het datamodel uit te lezen, standaard waarde is 'default'.
+  - `-sch_to`, `--schema_to`: Schema in database om het getransformeerde datamodel naar te schrijven.
+  - `-ttp`, `--transformationtype`: Geeft transformationtype aan. Beschikbare types zijn: 'copy', 'transform'.
+  - `-rt_pkg`, `--root_package`: Geeft het root package dat getransformeerd moet worden.
+  - `-m_gen`, `--materialize_generalizations`: Kopieert alle attributen van bovenliggende klassen naar de onderliggende klassen. Alle strings anders dan "True" worden geïnterpreteerd als False.
+  - `-plug_mod`, `--plugin_file_name`: Naam (inclusief pad) van het Python-bestand dat de transformation plugin bevat die dynamisch geladen moet worden.
+  - `-plug_cl`, `--plugin_class_name`: Naam van de klasse binnen de module die de transformation plugin implementeert. De klasse moet een subklasse zijn van 'crunch_uml.transformers.plugin.Plugin'.
 
 ## Development
 
