@@ -52,7 +52,7 @@ setuptools.setup(
         ],
     extras_require={
         'dev': [
-            'black == 23.*',
+            'black == 24.*',
             'build == 0.10.*',
             'flake8 == 6.*',
             'isort == 5.*',
