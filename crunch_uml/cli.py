@@ -18,8 +18,8 @@ from crunch_uml.parsers.multiple_parsers import (  # noqa: F401
 )
 from crunch_uml.parsers.xmiparser import XMIParser  # noqa: F401
 from crunch_uml.renderers.jinja2renderer import (  # noqa: F401
-    Jinja2Renderer, 
     GGM_MDRenderer,
+    Jinja2Renderer,
     JSON_SchemaRenderer,
 )
 from crunch_uml.renderers.lodrenderer import (  # noqa: F401
