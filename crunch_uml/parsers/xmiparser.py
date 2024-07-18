@@ -135,7 +135,7 @@ class XMIParser(Parser):
                             f"Association '{association.name}' with {association.id} only has information on one edge:"
                             f" generating placeholder class with uudi {clsid}."
                         )
-                        logger.warning(msg)
+                        logger.debug(msg)
 
                         clazz = db.Class(id=clsid, name=const.ORPHAN_CLASS, definitie=msg)
                         schema.save(clazz)
@@ -146,7 +146,7 @@ class XMIParser(Parser):
 
                     elif len(endpoints) > 0:
                         if len(endpoints) > 1:
-                            logger.warning(
+                            logger.debug(
                                 f"Association {association.name} with {association.id} has more than two endpoints."
                             )
 
@@ -161,7 +161,7 @@ class XMIParser(Parser):
                                 f"Association '{association.name}' with {association.id} only has information on one"
                                 f" edge: generating placeholder class with uudi {clsid}."
                             )
-                            logger.warning(msg)
+                            logger.debug(msg)
                             cls = db.Class(id=clsid, name=const.ORPHAN_CLASS, definitie=msg)
                             schema.save(cls)
                             if 'src' in id:

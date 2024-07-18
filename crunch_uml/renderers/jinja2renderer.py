@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import sys
 
 import inflection
 import validators
@@ -37,7 +38,11 @@ class Jinja2Renderer(ModelRenderer):
         elif args.output_jinja2_templatedir is not None:
             templatedir = args.output_jinja2_templatedir
         else:
-            templatedir = const.TEMPLATE_DIR
+            # Use the virtual environment's template directory if no templatedir is provided
+            templatedir = os.path.join(sys.prefix, const.TEMPLATE_DIR)
+            if not os.path.isdir(templatedir):
+                templatedir = const.TEMPLATE_DIR
+
         if not os.path.isdir(templatedir):
             msg = f"Template directory with value {templatedir} does not exist, exiting"
             logger.error(msg)

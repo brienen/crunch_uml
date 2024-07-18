@@ -1,4 +1,5 @@
 import logging
+import warnings
 
 import inflection
 from sqlalchemy import (
@@ -9,8 +10,9 @@ from sqlalchemy import (
     String,
     Text,
     create_engine,
-    inspect,
 )
+from sqlalchemy import exc as sa_exc
+from sqlalchemy import inspect
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy.orm.relationships import RelationshipProperty
 
@@ -233,26 +235,32 @@ class Package(Base, UMLBase):  # type: ignore
     )
 
     def get_root_package(self):
-        if not self.parent_package:
-            return self
-        else:
-            return self.parent_package.get_root_package()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=sa_exc.SAWarning)
+            if not self.parent_package:
+                return self
+            else:
+                return self.parent_package.get_root_package()
 
     def get_classes_inscope(self):
-        clazzes = {clazz for clazz in self.classes}
-        # for diagram in self.diagrams:
-        #    clazzes = clazzes.union({clazz for clazz in diagram.classes})
-        for subpackage in self.subpackages:
-            clazzes = clazzes.union(subpackage.get_classes_inscope())
-        return clazzes
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=sa_exc.SAWarning)
+            clazzes = {clazz for clazz in self.classes}
+            # for diagram in self.diagrams:
+            #    clazzes = clazzes.union({clazz for clazz in diagram.classes})
+            for subpackage in self.subpackages:
+                clazzes = clazzes.union(subpackage.get_classes_inscope())
+            return clazzes
 
     def get_enumerations_inscope(self):
-        enums = {enum for enum in self.enumerations}
-        # for diagram in self.diagrams:
-        #    enums = enums.union({enum for enum in diagram.enumerations})
-        for subpackage in self.subpackages:
-            enums = enums.union(subpackage.get_enumerations_inscope())
-        return enums
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=sa_exc.SAWarning)
+            enums = {enum for enum in self.enumerations}
+            # for diagram in self.diagrams:
+            #    enums = enums.union({enum for enum in diagram.enumerations})
+            for subpackage in self.subpackages:
+                enums = enums.union(subpackage.get_enumerations_inscope())
+            return enums
 
     def get_copy(self, parent, materialize_generalizations=False):
         if parent and not isinstance(parent, Package):
@@ -342,38 +350,41 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
     )
 
     def copy_attributes(self, copy_instance, materialize_generalizations=False):
-        # Maak lijst van namen van al aanwezige attributen
-        copy_attr_lst = [
-            attribute.name for attribute in copy_instance.attributes if attribute.name and attribute.name != 'None'
-        ]
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=sa_exc.SAWarning)
 
-        # Voer eventuele extra stappen uit voor de literals
-        for attribute in self.attributes:
-            if attribute.name not in copy_attr_lst:  # only add attributes whos name not already present
-                attribute_copy = attribute.get_copy(self)
-                if self.name != copy_instance.name:  # When copy from superclass the attribute should get new ID
-                    attribute_copy.id = util.getEAGuid()
+            # Maak lijst van namen van al aanwezige attributen
+            copy_attr_lst = [
+                attribute.name for attribute in copy_instance.attributes if attribute.name and attribute.name != 'None'
+            ]
 
-                # copy enumeration if necesary
-                if attribute.enumeration and (
-                    attribute.enumeration not in self.package.get_enumerations_inscope()
-                    or self.name != copy_instance.name
-                ):
-                    copy_enum = attribute.enumeration.get_copy(copy_instance.package)
-                    copy_enum.id = util.getEAGuid()  # to avoid doubles give new ID
-                    for literal in copy_enum.literals:
-                        literal.id = util.getEAGuid()
-                    attribute_copy.enumeration_id = copy_enum.id
+            # Voer eventuele extra stappen uit voor de literals
+            for attribute in self.attributes:
+                if attribute.name not in copy_attr_lst:  # only add attributes whos name not already present
+                    attribute_copy = attribute.get_copy(self)
+                    if self.name != copy_instance.name:  # When copy from superclass the attribute should get new ID
+                        attribute_copy.id = util.getEAGuid()
 
-                # set class
-                attribute_copy.clazz_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
-                copy_instance.attributes.append(attribute_copy)
+                    # copy enumeration if necesary
+                    if attribute.enumeration and (
+                        attribute.enumeration not in self.package.get_enumerations_inscope()
+                        or self.name != copy_instance.name
+                    ):
+                        copy_enum = attribute.enumeration.get_copy(copy_instance.package)
+                        copy_enum.id = util.getEAGuid()  # to avoid doubles give new ID
+                        for literal in copy_enum.literals:
+                            literal.id = util.getEAGuid()
+                        attribute_copy.enumeration_id = copy_enum.id
 
-        if materialize_generalizations:
-            for gener in self.superclasses:
-                if gener.superclass:
-                    gener.superclass.copy_attributes(copy_instance, materialize_generalizations)
-        return copy_instance
+                    # set class
+                    attribute_copy.clazz_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
+                    copy_instance.attributes.append(attribute_copy)
+
+            if materialize_generalizations:
+                for gener in self.superclasses:
+                    if gener.superclass:
+                        gener.superclass.copy_attributes(copy_instance, materialize_generalizations)
+            return copy_instance
 
     def get_copy(self, parent, materialize_generalizations=False):
         if not parent or not isinstance(parent, Package):
@@ -661,23 +672,26 @@ class Diagram(Base, UMLBase):  # type: ignore
     )
 
     def get_instances(self, type, root_package_id):
-        # Find root_package of self that is equal to root_package_id
-        root_package = self.package
-        while not root_package.id == root_package_id or root_package is None:
-            root_package = root_package.parent_package
-        if type == Class:
-            return root_package.get_classes_inscope()
-        elif type == Association:
-            return root_package.get_associations_inscope()
-        elif type == Generalization:
-            return root_package.get_generalizations_inscope()
-        elif type == Enumeratie:
-            return root_package.get_enumerations_inscope()
-        else:
-            raise CrunchException(
-                "Error: while getting instances of type {type} from Diagram. Type must be of type Class,"
-                f" Association, Generalization or Enumeratie and cannot be of type {type}"
-            )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=sa_exc.SAWarning)
+
+            # Find root_package of self that is equal to root_package_id
+            root_package = self.package
+            while not root_package.id == root_package_id or root_package is None:
+                root_package = root_package.parent_package
+            if type == Class:
+                return root_package.get_classes_inscope()
+            elif type == Association:
+                return root_package.get_associations_inscope()
+            elif type == Generalization:
+                return root_package.get_generalizations_inscope()
+            elif type == Enumeratie:
+                return root_package.get_enumerations_inscope()
+            else:
+                raise CrunchException(
+                    "Error: while getting instances of type {type} from Diagram. Type must be of type Class,"
+                    f" Association, Generalization or Enumeratie and cannot be of type {type}"
+                )
 
     def get_copy(self, parent, materialize_generalizations=False):
         if not parent or not isinstance(parent, Package):

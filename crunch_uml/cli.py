@@ -36,7 +36,7 @@ from crunch_uml.transformers.plugintransformer import PluginTransformer  # noqa:
 
 # Configureer logging
 logging.basicConfig(
-    level=logging.WARNING,
+    level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     datefmt='%d-%b-%y %H:%M:%S',
     stream=sys.stderr,
@@ -83,6 +83,11 @@ def main(args=None):
         logger.setLevel(logging.DEBUG)
     elif args.verbose:
         logger.setLevel(logging.INFO)
+
+    # Show help if no command is given
+    if args.command is None:
+        argumentparser.print_help()
+        sys.exit(1)
 
     # Parse input
     if args.command == const.CMD_IMPORT:
