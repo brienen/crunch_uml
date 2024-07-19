@@ -1,14 +1,13 @@
 import json
 import logging
 import os
-import sys
 
 import inflection
 import validators
 from jinja2 import Environment, FileSystemLoader
 
 import crunch_uml.schema as sch
-from crunch_uml import const, db
+from crunch_uml import const, db, util
 from crunch_uml.exceptions import CrunchException
 from crunch_uml.renderers.renderer import ClassRenderer, ModelRenderer, RendererRegistry
 
@@ -39,7 +38,9 @@ class Jinja2Renderer(ModelRenderer):
             templatedir = args.output_jinja2_templatedir
         else:
             # Use the virtual environment's template directory if no templatedir is provided
-            templatedir = os.path.join(sys.prefix, const.TEMPLATE_DIR)
+            templatedir = util.find_module_path('crunch_uml')
+            if templatedir:
+                templatedir = os.path.join(templatedir, 'templates')
             if not os.path.isdir(templatedir):
                 templatedir = const.TEMPLATE_DIR
 

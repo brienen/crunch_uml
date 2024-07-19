@@ -7,7 +7,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='crunch_uml',
-    version='0.2.10',
+    version='0.2.11',
     description='Reads UML Class model from multiple formats (including XMI) and renders them to other formats (including Markdown).',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -52,7 +52,7 @@ setuptools.setup(
         ],
     extras_require={
         'dev': [
-            'black == 24.*',
+            'black == 24..venv.*',
             'build == 0.10.*',
             'flake8 == 6.*',
             'isort == 5.*',
