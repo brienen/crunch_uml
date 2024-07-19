@@ -114,7 +114,7 @@ class XMIParser(Parser):
             </ownedEnd>
         </packagedElement>
         '''
-        logger.info('Entering second phase parsing: connectors')
+        logger.info('Entering second phase parsing: associations and generalisations')
         try:
             associations_xmi = node.xpath(".//packagedElement[@xmi:type='uml:Association']", namespaces=ns)  # type: ignore
             for association_xp in associations_xmi:

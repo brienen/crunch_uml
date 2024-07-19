@@ -44,6 +44,7 @@ class EAXMIParser(XMIParser):
             </element>
         and set value
         '''
+        logger.info('Processing references to packages')
         packagerefs = extension.xpath(".//element[@xmi:type='uml:Package' and @xmi:idref]", namespaces=ns)  # type: ignore
         for packageref in packagerefs:
             idref = packageref.get('{' + ns['xmi'] + '}idref')
@@ -80,6 +81,7 @@ class EAXMIParser(XMIParser):
                 <extendedProperties tagged="0" package_name="Model Monumenten"/>
         '''
 
+        logger.info('Processing references to classes')
         clazzrefs = extension.xpath(".//element[@xmi:type='uml:Class' and @xmi:idref]", namespaces=ns)  # type: ignore
         for clazzref in clazzrefs:
             idref = clazzref.get('{' + ns['xmi'] + '}idref')
@@ -119,6 +121,7 @@ class EAXMIParser(XMIParser):
             <xrefs/>
             </attribute>
         '''
+        logger.info('Processing references to attributes')
         attrrefs = extension.xpath(".//attribute[@xmi:idref]", namespaces=ns)  # type: ignore
         for attrref in attrrefs:
             idref = attrref.get('{' + ns['xmi'] + '}idref')
@@ -144,6 +147,7 @@ class EAXMIParser(XMIParser):
 
                     schema.save(literal)
 
+        logger.info('Processing references to associations')
         connectorrefs = extension.xpath(".//connector[@xmi:idref and properties/@ea_type='Association']", namespaces=ns)  # type: ignore
         for connectorref in connectorrefs:
             idref = connectorref.get('{' + ns['xmi'] + '}idref')
@@ -185,6 +189,7 @@ class EAXMIParser(XMIParser):
                     </diagram>
         '''
 
+        logger.info('Processing references to attributes')
         diagramrefs = extension.xpath(".//diagram[@xmi:id]", namespaces=ns)  # type: ignore
         for diagramref in diagramrefs:
             idref = diagramref.get('{' + ns['xmi'] + '}id')
@@ -229,7 +234,7 @@ class EAXMIParser(XMIParser):
                     diagram.generalizations.append(schema.get_generalization(element_id))
                     logger.debug(f'Element {element.get("subject")} in diagram {name} is een generalisatie')
                 else:
-                    logger.info(
+                    logger.debug(
                         f'Element {element.get("subject")} in diagram {name} is niet gevonden in de database. Kan een'
                         ' niet geimplemneteerde type zijn zoals: Note of Constraint, of kan een relatie zij naar een'
                         ' element buiten het model.'
