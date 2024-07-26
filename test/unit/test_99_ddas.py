@@ -1,8 +1,8 @@
 import json
 import os
-import pytest
 
 import jsonschema
+import pytest
 from jsonschema import validate
 
 # import crunch_uml.schema as sch

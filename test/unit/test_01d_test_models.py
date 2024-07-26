@@ -19,7 +19,7 @@ def test_modelafhandeling():
 
     root = schema.get_package('EAPK_3F4BE1F0_796D_489b_9C61_042E7C4E2410')
     assert root.name == 'Nested Package Hierarchy'
-    assert root.is_model() == True
+    assert root.is_model() is True
     assert len(root.get_submodels()) == 3
     assert len(root.get_submodels(recursive=True)) == 5
     assert len(root.get_packages_in_model()) == 1

@@ -62,7 +62,7 @@ def test_lod_renderer():
 
     # Test if all classes are there
     assert count_occurences('owl:Class', outputfile) == 6  # Only classes in the model
-    #assert count_occurences('RDF:Property', outputfile) == 31
+    # assert count_occurences('RDF:Property', outputfile) == 31
 
     # Cleanup
     os.remove(outputfile)

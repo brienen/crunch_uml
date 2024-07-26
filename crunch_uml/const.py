@@ -15,4 +15,4 @@ DEFAULT_SCHEMA = 'default'
 
 ORPHAN_CLASS = '<Orphan Class>'
 
-DESCRIPTION="Crunch_uml reads UML Class model from multiple formats (including XMI, Enterprise Architect XMI, Excel, Json, and others), can perform transformations and renders them to other formats (including Markdown, json, json schema and many others)."
+DESCRIPTION = "Crunch_uml reads UML Class model from multiple formats (including XMI, Enterprise Architect XMI, Excel, Json, and others), can perform transformations and renders them to other formats (including Markdown, json, json schema and many others)."

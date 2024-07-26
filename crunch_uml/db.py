@@ -10,18 +10,16 @@ from sqlalchemy import (
     String,
     Text,
     create_engine,
-    inspect
 )
 from sqlalchemy import exc as sa_exc
+from sqlalchemy import inspect
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy.orm.relationships import RelationshipProperty
-from sqlalchemy.engine import reflection
 
 import crunch_uml.const as const
 import crunch_uml.util as util
 from crunch_uml.exceptions import CrunchException
-
 
 logger = logging.getLogger()
 suppress_warnings = True
@@ -241,11 +239,11 @@ class Package(Base, UMLBase):  # type: ignore
     # Logic for models
     def is_model(self):
         return self.modelnaam_kort is not None or self.parent_package is None
-    
+
     def get_model(self):
         if self.is_model() or self.parent_package is None:
             return self
-        else: 
+        else:
             return self.parent_package.get_model()
 
     def get_parent_model(self):
@@ -283,12 +281,13 @@ class Package(Base, UMLBase):  # type: ignore
         return {clazz for package in packages for clazz in package.classes}
 
     def get_enumerations_in_model(self):
-            packages = self.get_packages_in_model()
-            return {enum for package in packages for enum in package.enumerations}
-    
+        packages = self.get_packages_in_model()
+        return {enum for package in packages for enum in package.enumerations}
+
     def get_diagrams_in_model(self):
         packages = self.get_packages_in_model()
         return {diagram for package in packages for diagram in package.diagrams}
+
     # End of logic for models
 
     def get_root_package(self):
@@ -818,13 +817,13 @@ class Database:
             cls._instance.session = Session()
         if db_create:
             cls._instance._reset_database()
-        
-        cls._instance._check_and_create_database() # Check if the database exists, if not create it
+
+        cls._instance._check_and_create_database()  # Check if the database exists, if not create it
         return cls._instance
 
     def _reset_database(self):
-            Base.metadata.drop_all(bind=self.engine)  # Drop all tables
-            Base.metadata.create_all(bind=self.engine)  # Create all tables
+        Base.metadata.drop_all(bind=self.engine)  # Drop all tables
+        Base.metadata.create_all(bind=self.engine)  # Create all tables
 
     def _check_and_create_database(self):
         try:
@@ -835,7 +834,6 @@ class Database:
         except OperationalError:
             # If the database does not exist or is not reachable, create it
             Base.metadata.create_all(bind=self.engine)
-
 
     def save(self, obj):
         self.session.merge(obj)
