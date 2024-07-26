@@ -1,8 +1,10 @@
 <div align="center">
 
-# Crunch-UML
+# Crunch_UML
 
-Crunch_UML is a parser for XMI files originating from UML tools such as Enterprise Architect. The tool reads the XMI and stores entities and relationships in an SQLite database for further analysis or use.
+Crunch_UML is a tool for parsing, trasforming and exporting UML information models. It can parse XMI files originating from UML tools such as Enterprise Architect. Crunch_uml reads the XMI (and other formats) with its import routines and stores entities and relationships in a SQLAlchemy compatible database (default SQLite) for further use. After it supports transformations to different model schema's in the database, and it supports different kind of exports using its export routines.
+
+Crunch_uml is work in progress, I use it for different projects that involve datamodels 
 
 [![Build Status](https://github.com/brienen/crunch_uml/workflows/build/badge.svg)](https://github.com/brienen/crunch_uml/actions)
 [![Coverage Status](https://coveralls.io/repos/github/brienen/crunch_uml/badge.svg?branch=main)](https://coveralls.io/github/brienen/crunch_uml?branch=main)
@@ -11,12 +13,13 @@ Crunch_UML is a parser for XMI files originating from UML tools such as Enterpri
 
 </div>
 
-- Parses entities such as `Package`, `Class`, and `Relation` from an XMI file.
+- Parses entities such as `Package`, `Class`, `Generalization` and `Relation` from an XMI file.
 - Uses SQLAlchemy for database access and manipulation.
 - Imports different input formats into the databases
 - Saves all imported data to SQLAlchemy database
 - Can use different schema's within the same database to hold different datamodels
 - Supports Upserts to be able to import different datasets, changes to datasets etc.  
+- Supports `Model Schemas` that enable storing different versions of the same model in the samen database. This way it can be used for manipulating sub-models or multi lingual daat models.
 - Exports to different output formats: Excel, JSON, CSV, Jinja2 templating, Markdown
 
 ## Install and Usage
@@ -83,6 +86,7 @@ python ./crunch_uml/cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] [-sch] {import,
     - `xlsx`: Produces an Excel sheet with tabs corresponding to tables in the data model.
     - `ttl`: Renderer that renders Linked Data ontology in turtle from the supplied models, where a model is a package that includes at least one Class. Needs parameter "output_lod_url".
     - `rdf`: Renderer that renders Linked Data ontology in RDF from the supplied models, where a model is a package that includes at least one Class.  Needs parameter "output_lod_url".
+    - `json-ld`: Renderer that renders Linked Data ontology in JSON-LD from the supplied models, where a model is a package that includes at least one Class. Needs parameter "output_lod_url".',
     - `json_schema`: Render JSON-Schema from a model using a base class as starting point and use outgoing associations only. Needs parameter "json_schema_url".  
 
 - `transform`: Transfrom the datamodel from one schema to a datamodel in another schema.

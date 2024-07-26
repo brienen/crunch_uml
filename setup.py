@@ -1,5 +1,6 @@
 import setuptools
 import os
+import crunch_uml.const as const
 
 long_description = None
 with open('README.md', 'r') as fh:
@@ -8,7 +9,7 @@ with open('README.md', 'r') as fh:
 setuptools.setup(
     name='crunch_uml',
     version='0.2.11',
-    description='Reads UML Class model from multiple formats (including XMI) and renders them to other formats (including Markdown).',
+    description=const.DESCRIPTION,
     long_description=long_description,
     long_description_content_type="text/markdown",
     url='http://github.com/brienen/crunch_uml',

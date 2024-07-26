@@ -220,6 +220,34 @@
             ]
         },
         {
+            "name": "Export Turtle Schema Financien",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["-sch", "financien",
+                "export",
+                "-t", "ttl",
+                "-f", "./test/output/output.ttl",
+                "--linked_data_namespace", "https://www.gemeentelijkgegevensmodel.nl/"
+            ]
+        },
+        {
+            "name": "Export JSON-LD form Schema Financien",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["-sch", "financien",
+                "export",
+                "-t", "json-ld",
+                "-f", "./test/output/output.json",
+                "--linked_data_namespace", "https://www.gemeentelijkgegevensmodel.nl/"
+            ]
+        },
+        {
             "name": "Export SQLA",
             "type": "python",
             "request": "launch",
@@ -239,6 +267,15 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": ["transform", "-ttp", "copy", "-sch_to", "onderwijs", "-rt_pkg", "EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E", "-m_gen", "True"]
+        },
+        {
+            "name": "Copy Financien",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["transform", "-ttp", "copy", "-sch_to", "financien", "-rt_pkg", "EAPK_4F010A09_D9D0_4bcf_A233_8430F8EFE54A", "-m_gen", "True"]
         },
         {
             "name": "Test Plugin",
@@ -298,12 +335,12 @@
             "justMyCode": false
         },
         {
-            "name": "Python: pytest test_99_ddas",
+            "name": "Python: pytest test_09_lod_renderer",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/.venv/bin/pytest",  // Pas aan naar je lokale pytest pad
             "args": [
-                "${workspaceFolder}/test/unit/test_99_ddas.py"  // Pas aan naar je testmap
+                "${workspaceFolder}/test/unit/test_09_lod_renderer.py"  // Pas aan naar je testmap
             ],
             "console": "integratedTerminal",
             "justMyCode": false

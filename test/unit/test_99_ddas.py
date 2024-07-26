@@ -1,5 +1,6 @@
 import json
 import os
+import pytest
 
 import jsonschema
 from jsonschema import validate
@@ -8,6 +9,7 @@ from jsonschema import validate
 from crunch_uml import cli
 
 
+@pytest.mark.slow
 def test_importAndTransform_schuldhulp():
     dir = "./test/output/"
 

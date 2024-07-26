@@ -46,15 +46,15 @@ logger = logging.getLogger()
 
 def main(args=None):
     """The main entrypoint for this script used in the setup.py file."""
-    argumentparser = argparse.ArgumentParser(description="Parse XMI to SQLite DB using SQLAlchemy")
-    argumentparser.add_argument('-v', '--verbose', action='store_true', help='zet logniveau op INFO')
-    argumentparser.add_argument('-d', '--debug', action='store_true', help='zet logniveau op DEBUG')
+    argumentparser = argparse.ArgumentParser(description=const.DESCRIPTION)
+    argumentparser.add_argument('-v', '--verbose', action='store_true', help='set log level INFO')
+    argumentparser.add_argument('-d', '--debug', action='store_true', help='set log level to DEBUG')
     argumentparser.add_argument(
-        '-w', '--do_not_suppress_warnings', action='store_true', help='onderdruk geen warnings.'
+        '-w', '--do_not_suppress_warnings', action='store_true', help='do not suppress warnings.'
     )
 
     # Voeg subparsers toe aan het hoofdparser-object
-    subparsers = argumentparser.add_subparsers(dest="command", help="Beschikbare subcommando's.")
+    subparsers = argumentparser.add_subparsers(dest="command", help="Available sub commands.")
     subparser_dict = {
         const.CMD_IMPORT: subparsers.add_parser(
             const.CMD_IMPORT,
@@ -111,7 +111,7 @@ def main(args=None):
         except Exception as ex:
             logger.error(
                 f"Error while parsing file, writing data to database with message: {ex}. Exiting and"
-                " descarding all changes to datbase."
+                " descarding all changes to database."
             )
             database.rollback()
             raise

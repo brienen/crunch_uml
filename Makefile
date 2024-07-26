@@ -58,6 +58,11 @@ mypy:
 
 ## test - Test the project
 test:
+	$(VIRTUAL_BIN)/pytest -m "not slow"
+
+## test - Test the project
+test-all:
 	$(VIRTUAL_BIN)/pytest
+
 
 .PHONY: help build coverage clean black black-check format format-check install isort isort-check lint mypy test
