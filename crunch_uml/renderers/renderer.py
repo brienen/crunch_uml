@@ -54,6 +54,14 @@ def add_args(argumentparser, subparser_dict):
         type=str,
         help='URL for JSON schema that should be used for references to the schema.',
     )
+    output_subparser.add_argument(
+        '-vt',
+        '--version_type',
+        type=str,
+        default=const.VERSION_STEP_MINOR,
+        choices=[const.VERSION_STEP_MINOR, const.VERSION_STEP_MAJOR, const.VERSION_STEP_NONE],
+        help=f'Used only for Enterprise Architect Repository Updater! After update should the version be updated? {const.VERSION_STEP_MINOR} for minnor increments or {const.VERSION_STEP_MAJOR} for major increments, None for no version update.',
+    )
 
     # Set the epilog help text
     entries = RendererRegistry.entries()
@@ -77,7 +85,7 @@ class ModelRenderer(Renderer):
     def getModels(self, args, schema: sch.Schema):
         lst = []  # type: ignore
         if args.output_exclude_package_ids is not None:
-            # Get package_ids to include
+            # Get package_ids to exclude
             excl_packageids = args.output_exclude_package_ids.split(',')
             excl_packageids = [elem.strip() for elem in excl_packageids]
         if args.output_package_ids is not None:

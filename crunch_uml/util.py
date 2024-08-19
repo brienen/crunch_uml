@@ -3,7 +3,10 @@ import importlib.util
 import logging
 import re
 import uuid
+from datetime import datetime
 from urllib.parse import urlparse
+
+from crunch_uml import const
 
 logger = logging.getLogger()
 
@@ -24,6 +27,11 @@ def getEAGuid():
     str_uuid = uuid.uuid4()
     str_uuid = str(str_uuid).replace("-", "_")
     return 'EAID_' + str_uuid
+
+
+def fromEAGuid(ea_guid):
+    strea_guid = ea_guid.lstrip("EA").lstrip("ID_").lstrip("PK_").replace("_", "-")
+    return '{' + strea_guid + '}'
 
 
 def getMeervoud(naamwoord):
@@ -55,3 +63,36 @@ def find_module_path(module_name):
     spec = str(spec.origin).removesuffix('__init__.py')
 
     return spec
+
+
+def parse_date(date_string):
+    # Lijst van mogelijke datumformaten
+    formats = [
+        const.DEFAULT_DATE_TIME_FORMAT,  # Default format
+        "%Y-%m-%d",
+        "%d/%m/%Y",
+        "%m/%d/%Y",
+        "%Y/%m/%d",
+        "%d-%m-%Y",
+        "%d/%m/%Y %H:%M:%S",
+        "%m/%d/%Y %H:%M:%S",
+        "%Y/%m/%d %H:%M:%S",
+        "%d-%m-%Y %H:%M:%S",
+        "%B %d, %Y",
+        "%b %d, %Y",
+        "%d %B %Y",
+        "%d %b %Y",
+        "%I:%M %p",  # Time only, for edge cases
+    ]
+
+    for fmt in formats:
+        try:
+            return datetime.strptime(date_string, fmt)
+        except ValueError:
+            continue
+
+    raise ValueError(f"Date format of '{date_string}' is not recognized.")
+
+
+def reverse_dict(d):
+    return {v: k for k, v in d.items()}
