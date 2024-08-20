@@ -62,6 +62,15 @@ def add_args(argumentparser, subparser_dict):
         choices=[const.VERSION_STEP_MINOR, const.VERSION_STEP_MAJOR, const.VERSION_STEP_NONE],
         help=f'Used only for Enterprise Architect Repository Updater! After update should the version be updated? {const.VERSION_STEP_MINOR} for minnor increments or {const.VERSION_STEP_MAJOR} for major increments, None for no version update.',
     )
+    output_subparser.add_argument(
+        '-ts',
+        '--tag_strategy',
+        type=str,
+        default=const.TAG_STRATEGY_REPLACE,
+        choices=[const.TAG_STRATEGY_UPDATE, const.TAG_STRATEGY_UPSERT, const.TAG_STRATEGY_REPLACE],
+        help='Used only for Enterprise Architect Repository Updater! Defines how changing tags of Classes, Enumerations, Attributes, Literals and Packages should be updated.'
+        + f'{const.TAG_STRATEGY_UPDATE} for updating only existing tags, {const.TAG_STRATEGY_UPSERT} for updating existing tags and adding new tags, {const.TAG_STRATEGY_REPLACE} for replacing all tags.',
+    )
 
     # Set the epilog help text
     entries = RendererRegistry.entries()

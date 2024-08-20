@@ -1,11 +1,12 @@
 import logging
 from datetime import datetime
 
-from sqlalchemy import MetaData, create_engine
+from sqlalchemy import Column, MetaData, create_engine, insert, text
 from sqlalchemy.orm import sessionmaker
 
 import crunch_uml.schema as sch
 from crunch_uml import const, util
+from crunch_uml.db import UMLTags
 from crunch_uml.exceptions import CrunchException
 from crunch_uml.renderers.renderer import ModelRenderer, RendererRegistry
 
@@ -85,7 +86,95 @@ class EARepoUpdater(ModelRenderer):
         """
         return {field_mapper.get(k, k): v for k, v in data_dict.items()}
 
-    def update_existing_record(self, data_dict, table_name, session, metadata, version_type=None, field_mapper=None):
+    def get_tablefields(self, table):
+        if table == 't_objectproperties':
+            return 'Object_ID', 'Object_ID', 'Property', 'Value'
+        elif table == 't_attributetag':
+            return 'ID', 'ElementID', 'Property', 'VALUE'
+        else:
+            return None, None, None, None
+
+    def update_sequence(self, session, sequence_name, increment=1):
+        try:
+            # Controleer of de sequence al bestaat
+            result = session.execute(
+                text("SELECT seq FROM sqlite_sequence WHERE name = :name"), {'name': sequence_name}
+            )
+            row = result.fetchone()
+
+            if row is None:
+                # Als de sequence niet bestaat, voeg deze dan toe met een startwaarde van 0
+                current_value = 0
+                session.execute(
+                    text("INSERT INTO sqlite_sequence (name, seq) VALUES (:name, :seq)"),
+                    {'name': sequence_name, 'seq': current_value},
+                )
+            else:
+                current_value = row[0]
+
+            # Verhoog de waarde van de sequence
+            new_value = current_value + increment
+            session.execute(
+                text("UPDATE sqlite_sequence SET seq = :new_value WHERE name = :name"),
+                {'new_value': new_value, 'name': sequence_name},
+            )
+
+            return new_value
+        except Exception as e:
+            msg = f"Error while updating sequence {sequence_name} with message: {e}"
+            logger.error(msg)
+            raise CrunchException(msg)
+
+    def update_repo(self, update_dict, session, table_name, metadata, object_id):
+        table = self.get_table_structure(table_name, metadata)
+        tag_id_parent_column, tag_id_child_column, tag_property_column, tag_value_column = self.get_tablefields(
+            table_name
+        )
+
+        for key, value in update_dict.items():
+            session.query(table).filter_by(**{tag_id_parent_column: object_id, tag_property_column: key}).update(
+                {tag_value_column: value}
+            )
+
+    def insert_repo(self, insert_dict, session, table_name, metadata, object_id):
+        table = self.get_table_structure(table_name, metadata)
+        tag_id_parent_column, tag_id_child_column, tag_property_column, tag_value_column = self.get_tablefields(
+            table_name
+        )
+
+        for key, value in insert_dict.items():
+            seq = self.update_sequence(session, table_name)
+
+            insert_item = {
+                'PropertyID': seq,
+                tag_id_child_column: object_id,
+                tag_property_column: key,
+                tag_value_column: value,
+                'ea_guid': util.get_repo_guid(),
+            }
+            # Voer de insert statement uit
+            session.execute(insert(table).values(insert_item))
+
+    def delete_repo(self, delete_dict, session, table_name, metadata, object_id):
+        table = self.get_table_structure(table_name, metadata)
+        tag_id_parent_column, tag_id_child_column, tag_property_column, tag_value_column = self.get_tablefields(
+            table_name
+        )
+
+        for key, value in delete_dict.items():
+            session.query(table).filter_by(**{tag_id_parent_column: object_id, tag_property_column: key}).delete()
+
+    def update_existing_record(
+        self,
+        data_dict,
+        table_name,
+        session,
+        metadata,
+        version_type=None,
+        field_mapper=None,
+        tag_table=None,
+        tag_strategy=const.TAG_STRATEGY_REPLACE,
+    ):
         ea_guid = const.EA_REPO_MAPPER['id']
 
         try:
@@ -117,6 +206,64 @@ class EARepoUpdater(ModelRenderer):
                 # Filter de data_dict om alleen kolommen in te voegen die bestaan in de tabel
                 valid_data = {col: data_dict[col] for col in data_dict if col in table.columns.keys()}
 
+                changed = False
+                tag_id_parent_column, tag_id_child_column, tag_property_column, tag_value_column = self.get_tablefields(
+                    tag_table
+                )
+                if (
+                    tag_table
+                    and tag_id_parent_column
+                    and tag_id_child_column
+                    and tag_property_column
+                    and tag_value_column
+                ):
+                    # Haal de bestaande tags op uit de definities
+                    uml_tag_names = [attr for attr in UMLTags.__dict__ if isinstance(getattr(UMLTags, attr), Column)]
+
+                    # Haal de bestaande tags op uit de database
+                    db_tags = (
+                        session.query(self.get_table_structure(tag_table, metadata))
+                        .filter_by(**{tag_id_child_column: getattr(existing_record, tag_id_parent_column)})
+                        .all()
+                    )
+                    db_tags = {getattr(tag, tag_property_column): getattr(tag, tag_value_column) for tag in db_tags}
+
+                    # Bepaal welke tags zijn gewijzigd
+                    tags_changed = {
+                        col: data_dict[col]
+                        for col in data_dict
+                        if col in uml_tag_names and col in db_tags.keys() and data_dict[col] != db_tags[col]
+                    }
+                    tags_new = {
+                        col: data_dict[col] for col in data_dict if col in uml_tag_names and col not in db_tags.keys()
+                    }
+                    tags_deleted = {col: db_tags[col] for col in db_tags if col not in data_dict.keys()}
+
+                    if tag_strategy == const.TAG_STRATEGY_UPSERT:
+                        self.update_repo(
+                            tags_changed, session, tag_table, metadata, getattr(existing_record, tag_id_parent_column)
+                        )
+                        self.insert_repo(
+                            tags_new, session, tag_table, metadata, getattr(existing_record, tag_id_parent_column)
+                        )
+                        changed = len(tags_changed) > 0 or len(tags_new) > 0
+                    elif tag_strategy == const.TAG_STRATEGY_UPDATE:
+                        self.update_repo(
+                            tags_changed, session, tag_table, metadata, getattr(existing_record, tag_id_parent_column)
+                        )
+                        changed = len(tags_changed) > 0
+                    elif tag_strategy == const.TAG_STRATEGY_REPLACE:
+                        self.update_repo(
+                            tags_changed, session, tag_table, metadata, getattr(existing_record, tag_id_parent_column)
+                        )
+                        self.delete_repo(
+                            tags_deleted, session, tag_table, metadata, getattr(existing_record, tag_id_parent_column)
+                        )
+                        self.insert_repo(
+                            tags_new, session, tag_table, metadata, getattr(existing_record, tag_id_parent_column)
+                        )
+                        changed = len(tags_changed) > 0 or len(tags_new) > 0 or len(tags_deleted) > 0
+
                 # Check of er iets is veranderd
                 changes = {}
                 for key, value in valid_data.items():
@@ -126,8 +273,9 @@ class EARepoUpdater(ModelRenderer):
                     ]:
                         changes[key] = value
 
+                changed = changed or len(changes) > 0
                 # Alleen updaten als er daadwerkelijk wijzigingen zijn
-                if len(changes) > 0:
+                if changed:
                     # Update het modified veld
                     if const.EA_REPO_MAPPER['modified'] in columns:
                         changes[const.EA_REPO_MAPPER['modified']] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -138,9 +286,7 @@ class EARepoUpdater(ModelRenderer):
                         new_version = self.increment_version(current_version, version_type)
                         changes[const.EA_REPO_MAPPER['version']] = new_version
 
-                    # Voer de update uit
                     session.query(table).filter_by(**{ea_guid: guid_value}).update(changes)
-                    # session.commit()
                     logger.debug(f"Record with GUID {guid_value} has been updated.")
                 else:
                     logger.debug(f"No changes detected for record with GUID {guid_value}.")
@@ -158,14 +304,23 @@ class EARepoUpdater(ModelRenderer):
         target_metadata,
         version_type=None,
         field_mapper=None,
+        tag_table=None,
         batch_size=100,
+        tag_strategy=const.TAG_STRATEGY_REPLACE,
     ):
         # Verwerk de data in batches
         for i in range(0, len(source_data), batch_size):
             batch = source_data[i : i + batch_size]
             for record in batch:
                 self.update_existing_record(
-                    record, target_table_name, target_session, target_metadata, version_type, field_mapper
+                    record,
+                    target_table_name,
+                    target_session,
+                    target_metadata,
+                    version_type,
+                    field_mapper,
+                    tag_table,
+                    tag_strategy=tag_strategy,
                 )
 
     def render(self, args, schema: sch.Schema):
@@ -178,7 +333,10 @@ class EARepoUpdater(ModelRenderer):
         target_session, target_metadata = self.get_database_session(args.outputfile)
         if target_session and target_metadata:
             version_type = args.version_type
-            logger.info(f"Updating EA Repository {args.outputfile} with version type {version_type}...")
+            tag_strategy = args.tag_strategy
+            logger.info(
+                f"Updating EA Repository {args.outputfile} with version type {version_type} and tag_strategy {tag_strategy}..."
+            )
 
             try:
                 # Process all classes
@@ -191,7 +349,9 @@ class EARepoUpdater(ModelRenderer):
                     target_session,
                     target_metadata,
                     version_type=version_type,
+                    tag_table='t_objectproperties',
                     field_mapper=const.EA_REPO_MAPPER,
+                    tag_strategy=tag_strategy,
                 )
 
                 # Process all attributes
@@ -205,6 +365,8 @@ class EARepoUpdater(ModelRenderer):
                     target_metadata,
                     version_type=version_type,
                     field_mapper=const.EA_REPO_MAPPER_ATTRIBUTES,
+                    tag_table='t_attributetag',
+                    tag_strategy=tag_strategy,
                 )
 
                 # Process all literals
@@ -218,6 +380,8 @@ class EARepoUpdater(ModelRenderer):
                     target_metadata,
                     version_type=version_type,
                     field_mapper=const.EA_REPO_MAPPER_LITERALS,
+                    tag_table='t_attributetag',
+                    tag_strategy=tag_strategy,
                 )
 
                 # Process all enumerations
@@ -231,6 +395,8 @@ class EARepoUpdater(ModelRenderer):
                     target_metadata,
                     version_type=version_type,
                     field_mapper=const.EA_REPO_MAPPER,
+                    tag_table='t_objectproperties',
+                    tag_strategy=tag_strategy,
                 )
 
                 # Process all packages
@@ -244,6 +410,8 @@ class EARepoUpdater(ModelRenderer):
                     target_metadata,
                     version_type=version_type,
                     field_mapper=const.EA_REPO_MAPPER,
+                    tag_table='t_objectproperties',
+                    tag_strategy=tag_strategy,
                 )
                 self.process_batch(
                     dict_packages,
@@ -252,6 +420,7 @@ class EARepoUpdater(ModelRenderer):
                     target_metadata,
                     version_type=version_type,
                     field_mapper=const.EA_REPO_MAPPER,
+                    tag_strategy=tag_strategy,
                 )
 
                 # Process all associations
@@ -265,6 +434,7 @@ class EARepoUpdater(ModelRenderer):
                     target_metadata,
                     version_type=version_type,
                     field_mapper=const.EA_REPO_MAPPER_ASSOCIATION,
+                    tag_strategy=tag_strategy,
                 )
 
                 # Process all diagrams
@@ -278,6 +448,7 @@ class EARepoUpdater(ModelRenderer):
                     target_metadata,
                     version_type=version_type,
                     field_mapper=const.EA_REPO_MAPPER,
+                    tag_strategy=tag_strategy,
                 )
 
                 logger.info(f"All data updated in repo {args.outputfile}, commiting...")

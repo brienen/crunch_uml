@@ -29,6 +29,25 @@ def getRecordFromEARepository(table, ea_guid):
     return record
 
 
+def countTagsOfObject(object_id):
+    # Verbinding maken met de Monumenten.qea SQLite database
+    conn = sqlite3.connect(EA_DB)
+
+    # Instellen van de row factory om resultaten als dictionaries te krijgen
+    conn.row_factory = sqlite3.Row
+
+    cursor = conn.cursor()
+    # Voer een COUNT(*) query uit om het aantal tags te tellen
+    cursor.execute("SELECT COUNT(*) as tag_count FROM t_objectproperties WHERE Object_ID = ?", (object_id,))
+    result = cursor.fetchone()
+
+    # Database verbinding sluiten
+    conn.close()
+
+    # Retourneer het aantal tags
+    return result['tag_count'] if result else 0
+
+
 @pytest.fixture(scope="function", autouse=True)
 def copy_test_files():
     # Pad naar de bronbestanden
@@ -94,7 +113,7 @@ def test_import_monumenten():
 
     # Voer nu de changes door en kijk of de waarden zijn aangepast
     # export to json
-    test_args = ["export", "-f", EA_DB, "-t", "earepo"]
+    test_args = ["export", "-f", EA_DB, "-t", "earepo", "--tag_strategy", "update"]
     cli.main(test_args)
 
     # Testen of het record voldoet aan bepaalde voorwaarden
@@ -112,6 +131,12 @@ def test_import_monumenten():
     version = record[const.EA_REPO_MAPPER['version']]
     major, minor = map(int, version.split('.'))
     assert minor == minor_original + 1
+    assert countTagsOfObject(record['Object_ID']) == 17
+
+    # Testen van tags
+    tag = getRecordFromEARepository('t_objectproperties', '{5BAA8E81-480F-405D-A818-A3F79725AFE3}')
+    assert tag is not None
+    assert tag['Value'] == "test_"
 
     # Packages testen eerste
     record = getRecordFromEARepository('t_object', '{F7651B45-2B64-4197-A6E5-BFC56EC98466}')
@@ -157,3 +182,27 @@ def test_import_monumenten():
     assert unchange_bouwtype[const.EA_REPO_MAPPER['name']] == "Bouwtype"
     assert unchange_bouwtype[const.EA_REPO_MAPPER['modified']] == bouwtype[const.EA_REPO_MAPPER['modified']]
     assert unchange_bouwtype[const.EA_REPO_MAPPER['version']] == bouwtype[const.EA_REPO_MAPPER['version']]
+
+    # Nog even andere tag update strategien testen
+    # export to json
+    test_args = ["export", "-f", EA_DB, "-t", "earepo", "--tag_strategy", "upsert"]
+    cli.main(test_args)
+    record = getRecordFromEARepository('t_object', '{54944273-F312-44b2-A78D-43488F915429}')
+    assert countTagsOfObject(record['Object_ID']) == 26
+
+    # Testen van tags
+    tag = getRecordFromEARepository('t_objectproperties', '{5BAA8E81-480F-405D-A818-A3F79725AFE3}')
+    assert tag is not None
+    assert tag['Value'] == "test_"
+
+    # Nog even andere tag update strategien testen
+    # export to json
+    test_args = ["export", "-f", EA_DB, "-t", "earepo", "--tag_strategy", "replace"]
+    cli.main(test_args)
+    record = getRecordFromEARepository('t_object', '{54944273-F312-44b2-A78D-43488F915429}')
+    assert countTagsOfObject(record['Object_ID']) == 11
+
+    # Testen van tags
+    tag = getRecordFromEARepository('t_objectproperties', '{5BAA8E81-480F-405D-A818-A3F79725AFE3}')
+    assert tag is not None
+    assert tag['Value'] == "test_"

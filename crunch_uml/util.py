@@ -29,6 +29,11 @@ def getEAGuid():
     return 'EAID_' + str_uuid
 
 
+def get_repo_guid():
+    str_uuid = str(uuid.uuid4())
+    return '{' + str_uuid + '}'
+
+
 def fromEAGuid(ea_guid):
     strea_guid = ea_guid.lstrip("EA").lstrip("ID_").lstrip("PK_").replace("_", "-")
     return '{' + strea_guid + '}'
