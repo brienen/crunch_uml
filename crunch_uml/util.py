@@ -1,5 +1,6 @@
 import argparse
 import importlib.util
+import json
 import logging
 import re
 import uuid
@@ -101,3 +102,59 @@ def parse_date(date_string):
 
 def reverse_dict(d):
     return {v: k for k, v in d.items()}
+
+
+def is_valid_i18n_file(file_path):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+
+        # Controleer of de root een dictionary is
+        if not isinstance(data, dict):
+            print("Root element is not a dictionary.")
+            return False
+
+        # Controleer of er minstens één taalcode aanwezig is
+        if not all(isinstance(key, str) for key in data.keys()):
+            print("One or more keys in the root element are not strings.")
+            return False
+
+        # Controleer elke taalcode
+        for language, content in data.items():
+            # Content moet een dictionary zijn
+            if not isinstance(content, dict):
+                print(f"Content for language '{language}' is not a dictionary.")
+                return False
+
+            # Controleer verwachte secties (bijvoorbeeld "packages", "classes", etc.)
+            for section, entries in content.items():
+                if not isinstance(entries, list):
+                    print(f"Section '{section}' under language '{language}' is not a list.")
+                    return False
+
+                for entry in entries:
+                    if not isinstance(entry, dict):
+                        print(f"An entry in section '{section}' under language '{language}' is not a dictionary.")
+                        return False
+
+                    for key, value in entry.items():
+                        if not isinstance(value, dict):
+                            print(
+                                f"Entry '{key}' in section '{section}' under language '{language}' is not a dictionary."
+                            )
+                            return False
+                        if 'name' not in value:
+                            print(
+                                f"Entry '{key}' in section '{section}' under language '{language}' does not have a 'name' key."
+                            )
+                            return False
+
+        # Als alle controles slagen
+        return True
+
+    except json.JSONDecodeError:
+        print("The file is not a valid JSON file.")
+        return False
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return False

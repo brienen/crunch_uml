@@ -212,6 +212,7 @@ class UMLTags:
     synoniemen = Column(String)
     domein_dcat = Column(String)
     domein_iv3 = Column(String)
+    synoniemen = Column(String)
     gemma_naam = Column(String)
     gemma_type = Column(String)
     gemma_url = Column(String)

@@ -77,7 +77,11 @@ python ./crunch_uml/cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] [-sch] {import,
   - `-xpi OUTPUT_EXCLUDE_PACKAGE_IDS, --output_exclude_package_ids OUTPUT_EXCLUDE_PACKAGE_IDS`: List of package IDs to be excluded from the output, separated by commas.
   - `-jtd OUTPUT_JINJA2_TEMPLATEDIR, --output_jinja2_templatedir OUTPUT_JINJA2_TEMPLATEDIR`: Directory for Jinja2 templates.
   - `-jt OUTPUT_JINJA2_TEMPLATE, --output_jinja2_template OUTPUT_JINJA2_TEMPLATE`: Specific Jinja2 template file.
-  
+  - `-ldns LINKED_DATA_NAMESPACE, --linked_data_namespace LINKED_DATA_NAMESPACE`: Namespace for linked data renderers.
+  - `-js_url JSON_SCHEMA_URL, --json_schema_url JSON_SCHEMA_URL`: URL for JSON schema that should be used for references to the schema.
+  - `-vt {minor,major,none}, --version_type {minor,major,none}`: Used only for Enterprise Architect Repository Updater! After update should the version be updated? minor for minnor increments or major for major increments, None for no version update.
+  - ` -ts {update,upsert,replace}, --tag_strategy {update,upsert,replace}`: Used only for Enterprise Architect Repository Updater! Defines how changing tags of Classes, Enumerations, Attributes, Literals and Packages should be updated.update for updating only existing tags, upsert for updating existing tags and adding new tags, replace for replacing all tags.
+ 
   **Supported Export Types**:
     - `jinja2`: Renderer using Jinja2 to render one file per model in the database, where a model refers to a package with at least one Class. Requires "output_jinja2_template" and "output_jinja2_templatedir".
     - `ggm_md`: Renderer that produces a basic markdown file per model in the database, where a model refers to a package containing at least one Class.
@@ -88,6 +92,7 @@ python ./crunch_uml/cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] [-sch] {import,
     - `rdf`: Renderer that renders Linked Data ontology in RDF from the supplied models, where a model is a package that includes at least one Class.  Needs parameter "output_lod_url".
     - `json-ld`: Renderer that renders Linked Data ontology in JSON-LD from the supplied models, where a model is a package that includes at least one Class. Needs parameter "output_lod_url".',
     - `json_schema`: Render JSON-Schema from a model using a base class as starting point and use outgoing associations only. Needs parameter "json_schema_url".  
+    - `earepo`: Updates as Enterprise Architect v16 repository. Only updates existing Classes and attributes, Enumerations and literals, Packages and Associations. Does not add new things, updates only.provide the EA Repo through the --file parameter.
 
 - `transform`: Transfrom the datamodel from one schema to a datamodel in another schema.
   - `-sch_from`, `--schema_from`: Schema in database om het datamodel uit te lezen, standaard waarde is 'default'.

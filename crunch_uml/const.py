@@ -47,3 +47,19 @@ EA_REPO_MAPPER_ASSOCIATION['definitie'] = 'Notes'
 TAG_STRATEGY_UPDATE = 'update'
 TAG_STRATEGY_UPSERT = 'upsert'
 TAG_STRATEGY_REPLACE = 'replace'
+
+RECORD_TYPE_RECORD = 'record'
+RECORD_TYPE_INDEXED = 'indexed'
+
+DEFAULT_LANGUAGE = 'nl'
+LANGUAGE_TRANSLATE_FIELDS = [
+    'name',
+    'definitie',
+    'toelichting',
+    'alias',
+    'stereotype',
+    'type',
+    'synoniemen',
+    'src_documentation',
+    'dst_documentation',
+]

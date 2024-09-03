@@ -71,6 +71,14 @@ def add_args(argumentparser, subparser_dict):
         help='Used only for Enterprise Architect Repository Updater! Defines how changing tags of Classes, Enumerations, Attributes, Literals and Packages should be updated.'
         + f'{const.TAG_STRATEGY_UPDATE} for updating only existing tags, {const.TAG_STRATEGY_UPSERT} for updating existing tags and adding new tags, {const.TAG_STRATEGY_REPLACE} for replacing all tags.',
     )
+    output_subparser.add_argument(
+        '-lan',
+        '--language',
+        type=str,
+        default=const.DEFAULT_LANGUAGE,
+        help='Used only for i18n renderer. Defines the language of the output file.'
+        + f' Default is {const.DEFAULT_LANGUAGE}.',
+    )
 
     # Set the epilog help text
     entries = RendererRegistry.entries()
