@@ -1,0 +1,1202 @@
+{
+    "no": {
+        "packages": [
+            {
+                "EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E": {
+                    "alias": null,
+                    "name": "Monumenter",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652": {
+                    "alias": null,
+                    "name": "Diagram",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466": {
+                    "alias": null,
+                    "name": "Modell Monumenter",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            }
+        ],
+        "classes": [
+            {
+                "EAID_54944273_F312_44b2_A78D_43488F915429": {
+                    "alias": "Håndverk_alias",
+                    "name": "Håndverk_name",
+                    "definitie": "Håndverk_definitie",
+                    "toelichting": "Håndverk_toelichting",
+                    "stereotype": "Håndverk_stereotype",
+                    "synoniemen": "Håndverk_synoniemen"
+                }
+            },
+            {
+                "EAID_32C02923_EE3A_4553_B94B_31E0C273A829": {
+                    "alias": null,
+                    "name": "Beskyttet Status",
+                    "definitie": "Statusen for beskyttelse av et monument. Et monument / kulturarv er en levning av kunst, kultur, arkitektur eller håndverk som anses som av allmenn interesse på grunn av dets historiske, folkelige, kunstneriske, vitenskapelige, industrielt-arkeologiske eller andre sosialkulturelle verdi. Former for monument / kulturarv med status som nasjonal-, provinsiell- eller kommunalt monument / kulturarv er beskyttet i henhold til en beslutning fra henholdsvis Kunnskapsdepartementet, provinsen eller kommunen.",
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            },
+            {
+                "EAID_4AD539EC_A308_43da_B025_17A1647303F3": {
+                    "alias": null,
+                    "name": "Byggeaktivitet",
+                    "definitie": "Bygging av en konstruksjon.",
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            },
+            {
+                "EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA": {
+                    "alias": null,
+                    "name": "Byggestil",
+                    "definitie": "Måten å bygge på med bestemte kjennetegn i en bestemt periode. I de aktuelle epokene var det ikke levende forestillinger; det er senere formulerte (generelle) historiske konstruksjoner. Denne tendensen begynte bevisst rundt 1830. (Haslinghuis)",
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            },
+            {
+                "EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4": {
+                    "alias": null,
+                    "name": "Byggetype",
+                    "definitie": "Typifisering av en byggestil",
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            },
+            {
+                "EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D": {
+                    "alias": null,
+                    "name": "OpprinneligFunksjon",
+                    "definitie": "Funksjonen til et objekt etter bygging eller ferdigstillelse",
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            },
+            {
+                "EAID_7FE4B466_B051_4068_9ED1_6E60C3B2DBAD": {
+                    "alias": null,
+                    "name": "<Foreldreløs Klasse>",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            },
+            {
+                "EAID_FB13857C_C695_4b53_8060_BACFA0E16950": {
+                    "alias": null,
+                    "name": "<Foreldreløs Klasse>",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            },
+            {
+                "EAID_9775E778_DBF8_4122_94CE_551466B62F46": {
+                    "alias": null,
+                    "name": "<Foreldreløs Klasse>",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            },
+            {
+                "EAID_26D1113F_F7B3_4bdd_9AAE_EA14CC9F3C3F": {
+                    "alias": null,
+                    "name": "<Foreldreløs Klasse>",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            }
+        ],
+        "attributes": [
+            {
+                "EAID_97B64E49_D913_4648_985D_C2692F1EDC51": {
+                    "name": "håndverkstype",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_6FEBCD91_8B50_4942_A989_6C9B242CEBC2": {
+                    "name": "årHåndverkTil",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_6277018C_A2EC_4069_9625_487494821237": {
+                    "name": "årHåndverkFra",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_0E956D19_44D9_42f6_9C44_15FDAAF5AEF1": {
+                    "name": "kilder",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_04B5CEE9_8929_4729_A545_FEEB5604B5C8": {
+                    "name": "kompleks",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_B2A9E96D_DC0F_453b_99F3_D75390210700": {
+                    "name": "registreringsdato",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_CFD1E016_5347_4e65_9463_B06E114AE5C8": {
+                    "name": "kommunalMonumentKode",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_399FC352_454E_478d_8129_4F6BBCE00ABE": {
+                    "name": "ansiktskoden",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_0637412A_E928_4608_969E_ACF9350F4594": {
+                    "name": "navn",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_7A602A0E_AC3C_4ce0_A81C_6812EE227662": {
+                    "name": "beskrivelse",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_38278B83_0BD7_4bba_A69E_1B6D519F95C9": {
+                    "name": "merknader",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_658B0AAC_0653_4fa1_A6AD_DF1D656311BC": {
+                    "name": "nasjonalmonumentkode",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_EBD24559_2F60_43fb_B865_2A7AAA4E3001": {
+                    "name": "type",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_dst4ADF26_C2E9_4080_8F4F_32F9B255E4AE": {
+                    "name": null,
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_dst08C810_A491_4e07_B859_C3D4EDEBA557": {
+                    "name": null,
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_dstE4F035_7E96_48df_B6CF_93C945FF97C3": {
+                    "name": null,
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_dst585CB9_E569_47ca_9EFE_B9D5CF46BCBD": {
+                    "name": null,
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_dstA9090E_CF7A_4e6f_91E1_592085B0DA94": {
+                    "name": null,
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_dst18F665_2A86_44fd_AD55_3E435A282BDF": {
+                    "name": null,
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_dst893BFE_1A66_4760_9124_B62A81F45997": {
+                    "name": null,
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_dst27EB67_1CFA_4f40_AE79_329DE9DE6754": {
+                    "name": null,
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_9561214E_44CD_42e3_AC07_CD73506F1241": {
+                    "name": "byggeårklasse",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_CDFCF97C_39D8_410d_B591_D6FEF8CF41B1": {
+                    "name": "byggeårTil",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_60D6B0E6_F9D5_467c_8B02_4848752DC97C": {
+                    "name": "byggeårFra",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_AE9C37BF_B89D_49c7_B5AA_48F8D7329E8E": {
+                    "name": "indikasjon",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_597FF0BC_0D0B_447a_B84C_77400DF2FADF": {
+                    "name": "beskrivelse",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_44497CB2_F315_4af5_8119_A10357D8EBEA": {
+                    "name": "hovedstil",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_F17EBA71_A509_4b7c_B481_BEB999EC1E3B": {
+                    "name": "understil",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_491D0BF2_5FFE_446e_B90E_5267BE035670": {
+                    "name": "forklaring",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_5B8476E8_9A80_4d9f_A8B3_ACFAF59A9C58": {
+                    "name": "renhet",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_7DA39723_70C0_40cf_AE51_E7769275DC7F": {
+                    "name": "hovedkategori",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_2781DF4B_E651_4033_8C4D_F9676E1E7F85": {
+                    "name": "underkategori",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_A21A8DA2_B53E_44e3_AA67_A06D67E22D3A": {
+                    "name": "forklaring",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_81A910B1_E4CE_4953_9FED_6AA16332E0C4": {
+                    "name": "funksjon",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_9654B4C5_953E_4b72_96C6_C476A597CAEC": {
+                    "name": "funksjonstype",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_C5D26518_353C_4399_9E00_BCC1FDB5DD61": {
+                    "name": "hovedkategori",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_127EBC2C_5CBD_439f_8A06_13CEAE8EEF09": {
+                    "name": "hovedfunksjon",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_6556EB21_AE8A_475d_9B53_9A06409CAA07": {
+                    "name": "underkategori",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_7E77EC52_B954_4e5d_BAAB_BDD88DFFB8CA": {
+                    "name": "forklaring",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_200B84E0_1D73_4608_9258_12338B5EC034": {
+                    "name": "spesifikasjon",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            }
+        ],
+        "enumerations": [
+            {
+                "EAID_5C808AC9_CB09_4f4d_813E_821829856BA8": {
+                    "alias": null,
+                    "name": "MonumentType",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            }
+        ],
+        "enumerationliterals": [
+            {
+                "EAID_B2AE8AFC_C1D5_4d83_BFD3_EBF1663F3468": {
+                    "type": "1",
+                    "name": "nasjonalmonument",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": "enum"
+                }
+            },
+            {
+                "EAID_774B86B6_5B16_4f29_ABF0_40671AD9E0F9": {
+                    "type": "1",
+                    "name": "kommunaltmonument",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": "enum"
+                }
+            }
+        ],
+        "associations": [
+            {
+                "EAID_8E18F665_2A86_44fd_AD55_3E435A282BDF": {
+                    "src_documentation": null,
+                    "dst_documentation": null,
+                    "name": "monument håndverk",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_144ADF26_C2E9_4080_8F4F_32F9B255E4AE": {
+                    "src_documentation": null,
+                    "dst_documentation": null,
+                    "name": "monument byggestil",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_1F08C810_A491_4e07_B859_C3D4EDEBA557": {
+                    "src_documentation": null,
+                    "dst_documentation": null,
+                    "name": "monument bilder",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_44E4F035_7E96_48df_B6CF_93C945FF97C3": {
+                    "src_documentation": null,
+                    "dst_documentation": null,
+                    "name": "gjelder",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_55585CB9_E569_47ca_9EFE_B9D5CF46BCBD": {
+                    "src_documentation": null,
+                    "dst_documentation": null,
+                    "name": "monument byggeaktivitet",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_59A9090E_CF7A_4e6f_91E1_592085B0DA94": {
+                    "src_documentation": null,
+                    "dst_documentation": null,
+                    "name": "gjelder",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_D9634EAD_2869_40a1_B243_805897E4B1B3": {
+                    "src_documentation": null,
+                    "dst_documentation": null,
+                    "name": "monument byggetype",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_F7893BFE_1A66_4760_9124_B62A81F45997": {
+                    "src_documentation": null,
+                    "dst_documentation": null,
+                    "name": "gjelder",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_FD27EB67_1CFA_4f40_AE79_329DE9DE6754": {
+                    "src_documentation": null,
+                    "dst_documentation": null,
+                    "name": "monument funksjon",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            }
+        ],
+        "generalizations": [],
+        "diagrams": [
+            {
+                "EAID_7429E175_1CBE_4336_BF92_6C5029395E69": {
+                    "alias": null,
+                    "name": "Diagram Monumenter",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_58EA4966_DBC2_4359_94C4_ABC774DBE5E2": {
+                    "alias": null,
+                    "name": "Diagram Monumenter Detalj",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            }
+        ]
+    },
+    "de": {
+        "packages": [
+            {
+                "EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E": {
+                    "alias": null,
+                    "name": "Denkmäler",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652": {
+                    "alias": null,
+                    "name": "Diagramm",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466": {
+                    "alias": null,
+                    "name": "Modell Denkmäler",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            }
+        ],
+        "classes": [
+            {
+                "EAID_54944273_F312_44b2_A78D_43488F915429": {
+                    "alias": "Handwerk_alias",
+                    "name": "Handwerk_name",
+                    "definitie": "Handwerk_definitie",
+                    "toelichting": "Handwerk_toelichting",
+                    "stereotype": "Handwerk_stereotype",
+                    "synoniemen": "Handwerk_synoniemen"
+                }
+            },
+            {
+                "EAID_32C02923_EE3A_4553_B94B_31E0C273A829": {
+                    "alias": null,
+                    "name": "Geschützter Status",
+                    "definitie": "Status des Schutzes eines Denkmals. Ein Denkmal / Kulturerbe ist ein Überbleibsel von Kunst, Kultur, Architektur oder Handwerk, das aufgrund seines historischen, volkskundlichen, künstlerischen, wissenschaftlichen, industriell-archäologischen oder sonstigen soziokulturellen Wertes als von allgemeinem Interesse angesehen wird. Formen von Denkmälern / Kulturerbe mit dem Status eines nationalen, provinzialen oder kommunalen Denkmals / Kulturerbes sind aufgrund eines Beschlusses des jeweiligen Ministeriums für Bildung, Kultur und Wissenschaft, der Provinz oder der Gemeinde geschützt.",
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            },
+            {
+                "EAID_4AD539EC_A308_43da_B025_17A1647303F3": {
+                    "alias": null,
+                    "name": "Bautätigkeit",
+                    "definitie": "Der Bau eines Bauwerks.",
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            },
+            {
+                "EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA": {
+                    "alias": null,
+                    "name": "Baustil",
+                    "definitie": "Art des Bauens mit bestimmten Merkmalen in einer bestimmten Zeitperiode. In den betreffenden Epochen waren es keine lebendigen Darstellungen; es handelt sich um später formulierte (verallgemeinernde) historische Konstruktionen. Diese Tendenz kommt seit etwa 1830 gezielt auf. (Haslinghuis)",
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            },
+            {
+                "EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4": {
+                    "alias": null,
+                    "name": "Bautyp",
+                    "definitie": "Typisierung eines Baustils",
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            },
+            {
+                "EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D": {
+                    "alias": null,
+                    "name": "UrsprünglicheFunktion",
+                    "definitie": "Die Funktion eines Objekts nach dem Bau oder der Fertigstellung",
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            },
+            {
+                "EAID_7FE4B466_B051_4068_9ED1_6E60C3B2DBAD": {
+                    "alias": null,
+                    "name": "<Verwaiste Klasse>",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            },
+            {
+                "EAID_FB13857C_C695_4b53_8060_BACFA0E16950": {
+                    "alias": null,
+                    "name": "<Verwaiste Klasse>",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            },
+            {
+                "EAID_9775E778_DBF8_4122_94CE_551466B62F46": {
+                    "alias": null,
+                    "name": "<Verwaiste Klasse>",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            },
+            {
+                "EAID_26D1113F_F7B3_4bdd_9AAE_EA14CC9F3C3F": {
+                    "alias": null,
+                    "name": "<Verwaiste Klasse>",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            }
+        ],
+        "attributes": [
+            {
+                "EAID_97B64E49_D913_4648_985D_C2692F1EDC51": {
+                    "name": "Handwerksart",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_6FEBCD91_8B50_4942_A989_6C9B242CEBC2": {
+                    "name": "JahrHandwerkBis",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_6277018C_A2EC_4069_9625_487494821237": {
+                    "name": "JahrHandwerkAb",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_0E956D19_44D9_42f6_9C44_15FDAAF5AEF1": {
+                    "name": "Quellen",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_04B5CEE9_8929_4729_A545_FEEB5604B5C8": {
+                    "name": "Komplex",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_B2A9E96D_DC0F_453b_99F3_D75390210700": {
+                    "name": "Registrierungsdatum",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_CFD1E016_5347_4e65_9463_B06E114AE5C8": {
+                    "name": "GemeindeDenkmalCode",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_399FC352_454E_478d_8129_4F6BBCE00ABE": {
+                    "name": "Gesichtscode",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_0637412A_E928_4608_969E_ACF9350F4594": {
+                    "name": "Name",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_7A602A0E_AC3C_4ce0_A81C_6812EE227662": {
+                    "name": "Beschreibung",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_38278B83_0BD7_4bba_A69E_1B6D519F95C9": {
+                    "name": "Bemerkungen",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_658B0AAC_0653_4fa1_A6AD_DF1D656311BC": {
+                    "name": "DenkmalCode",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_EBD24559_2F60_43fb_B865_2A7AAA4E3001": {
+                    "name": "Typ",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_dst4ADF26_C2E9_4080_8F4F_32F9B255E4AE": {
+                    "name": null,
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_dst08C810_A491_4e07_B859_C3D4EDEBA557": {
+                    "name": null,
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_dstE4F035_7E96_48df_B6CF_93C945FF97C3": {
+                    "name": null,
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_dst585CB9_E569_47ca_9EFE_B9D5CF46BCBD": {
+                    "name": null,
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_dstA9090E_CF7A_4e6f_91E1_592085B0DA94": {
+                    "name": null,
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_dst18F665_2A86_44fd_AD55_3E435A282BDF": {
+                    "name": null,
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_dst893BFE_1A66_4760_9124_B62A81F45997": {
+                    "name": null,
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_dst27EB67_1CFA_4f40_AE79_329DE9DE6754": {
+                    "name": null,
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_9561214E_44CD_42e3_AC07_CD73506F1241": {
+                    "name": "Baujahresklasse",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_CDFCF97C_39D8_410d_B591_D6FEF8CF41B1": {
+                    "name": "BaujahrBis",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_60D6B0E6_F9D5_467c_8B02_4848752DC97C": {
+                    "name": "BaujahrAb",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_AE9C37BF_B89D_49c7_B5AA_48F8D7329E8E": {
+                    "name": "Indikation",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_597FF0BC_0D0B_447a_B84C_77400DF2FADF": {
+                    "name": "Beschreibung",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_44497CB2_F315_4af5_8119_A10357D8EBEA": {
+                    "name": "Hauptstil",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_F17EBA71_A509_4b7c_B481_BEB999EC1E3B": {
+                    "name": "Unterstil",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_491D0BF2_5FFE_446e_B90E_5267BE035670": {
+                    "name": "Erläuterung",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_5B8476E8_9A80_4d9f_A8B3_ACFAF59A9C58": {
+                    "name": "Reinheit",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_7DA39723_70C0_40cf_AE51_E7769275DC7F": {
+                    "name": "Hauptkategorie",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_2781DF4B_E651_4033_8C4D_F9676E1E7F85": {
+                    "name": "Unterkategorie",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_A21A8DA2_B53E_44e3_AA67_A06D67E22D3A": {
+                    "name": "Erläuterung",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_81A910B1_E4CE_4953_9FED_6AA16332E0C4": {
+                    "name": "Funktion",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_9654B4C5_953E_4b72_96C6_C476A597CAEC": {
+                    "name": "Funktionsart",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_C5D26518_353C_4399_9E00_BCC1FDB5DD61": {
+                    "name": "Hauptkategorie",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_127EBC2C_5CBD_439f_8A06_13CEAE8EEF09": {
+                    "name": "Hauptfunktion",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_6556EB21_AE8A_475d_9B53_9A06409CAA07": {
+                    "name": "Unterkategorie",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_7E77EC52_B954_4e5d_BAAB_BDD88DFFB8CA": {
+                    "name": "Erläuterung",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_200B84E0_1D73_4608_9258_12338B5EC034": {
+                    "name": "Spezifikation",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            }
+        ],
+        "enumerations": [
+            {
+                "EAID_5C808AC9_CB09_4f4d_813E_821829856BA8": {
+                    "alias": null,
+                    "name": "DenkmalTyp",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null,
+                    "synoniemen": null
+                }
+            }
+        ],
+        "enumerationliterals": [
+            {
+                "EAID_B2AE8AFC_C1D5_4d83_BFD3_EBF1663F3468": {
+                    "type": "1",
+                    "name": "Nationaldenkmal",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": "enum"
+                }
+            },
+            {
+                "EAID_774B86B6_5B16_4f29_ABF0_40671AD9E0F9": {
+                    "type": "1",
+                    "name": "Gemeindedenkmal",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": "enum"
+                }
+            }
+        ],
+        "associations": [
+            {
+                "EAID_8E18F665_2A86_44fd_AD55_3E435A282BDF": {
+                    "src_documentation": null,
+                    "dst_documentation": null,
+                    "name": "Denkmal Handwerk",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_144ADF26_C2E9_4080_8F4F_32F9B255E4AE": {
+                    "src_documentation": null,
+                    "dst_documentation": null,
+                    "name": "Denkmal Baustil",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_1F08C810_A491_4e07_B859_C3D4EDEBA557": {
+                    "src_documentation": null,
+                    "dst_documentation": null,
+                    "name": "Denkmal Fotos",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_44E4F035_7E96_48df_B6CF_93C945FF97C3": {
+                    "src_documentation": null,
+                    "dst_documentation": null,
+                    "name": "betrifft",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_55585CB9_E569_47ca_9EFE_B9D5CF46BCBD": {
+                    "src_documentation": null,
+                    "dst_documentation": null,
+                    "name": "Denkmal Bautätigkeit",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_59A9090E_CF7A_4e6f_91E1_592085B0DA94": {
+                    "src_documentation": null,
+                    "dst_documentation": null,
+                    "name": "betrifft",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_D9634EAD_2869_40a1_B243_805897E4B1B3": {
+                    "src_documentation": null,
+                    "dst_documentation": null,
+                    "name": "Denkmal Bautyp",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_F7893BFE_1A66_4760_9124_B62A81F45997": {
+                    "src_documentation": null,
+                    "dst_documentation": null,
+                    "name": "betrifft",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_FD27EB67_1CFA_4f40_AE79_329DE9DE6754": {
+                    "src_documentation": null,
+                    "dst_documentation": null,
+                    "name": "Denkmal Funktion",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            }
+        ],
+        "generalizations": [],
+        "diagrams": [
+            {
+                "EAID_7429E175_1CBE_4336_BF92_6C5029395E69": {
+                    "alias": null,
+                    "name": "Diagramm Denkmäler",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            },
+            {
+                "EAID_58EA4966_DBC2_4359_94C4_ABC774DBE5E2": {
+                    "alias": null,
+                    "name": "Diagramm Denkmäler Detail",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            }
+        ]
+    }
+}

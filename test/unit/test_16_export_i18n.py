@@ -1,12 +1,58 @@
 import json
 import os
+import shutil
+import sqlite3
+
+import pytest
 
 import crunch_uml.schema as sch
 from crunch_uml import cli, const, db, util
 
+EA_DB = './test/output/Monumenten.qea'
+
+
+def getRecordFromEARepository(table, ea_guid):
+
+    # Test eerst de waarde in de EA Repository
+    # Verbinding maken met de Monumenten.qea SQLite database
+    conn = sqlite3.connect(EA_DB)
+
+    # Instellen van de row factory om resultaten als dictionaries te krijgen
+    conn.row_factory = sqlite3.Row
+
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT * FROM {table} WHERE ea_guid = '{ea_guid}'")
+    record = cursor.fetchone()
+
+    # Database verbinding sluiten
+    conn.close()
+
+    return record
+
+
+@pytest.fixture(scope="function", autouse=True)
+def copy_test_files():
+    # Pad naar de bronbestanden
+    source_files = [
+        ('./test/data/Monumenten.qea', EA_DB),
+    ]
+
+    # Zorg ervoor dat de testdata-map bestaat
+    os.makedirs('./test/output', exist_ok=True)
+
+    # Kopieer de bestanden naar de testdata-map
+    for source, destination in source_files:
+        shutil.copyfile(source, destination)
+
+    yield  # Test wordt uitgevoerd na deze yield
+
+    # Opruimen na de test als dat nodig is
+    # Bijvoorbeeld: os.remove(destination)
+
 
 def test_import_monumenten():
     outputfile = "./test/output/Monumenten.i18n"
+    duitse_vertaling = "./test/data/Monumenten.i18n"
 
     test_args = ["import", "-f", "./test/data/GGM_Monumenten_EA2.1.xml", "-t", "eaxmi", "-db_create"]
     cli.main(test_args)
@@ -56,3 +102,18 @@ def test_import_monumenten():
     assert clazz.stereotype == 'Ambacht_stereotype'
     assert clazz.synoniemen == 'Ambacht_synoniemen'
     print("test_import_monumenten passed")
+
+    # Lees Duitse vertaling in
+    test_args = ["import", "-f", duitse_vertaling, "-t", "i18n", '--language', 'no']
+    cli.main(test_args)
+
+    # Voer nu de changes door en kijk of de waarden zijn aangepast
+    # export to json
+    test_args = ["export", "-f", EA_DB, "-t", "earepo", "--tag_strategy", "update"]
+    cli.main(test_args)
+    print("test_import_monumenten passed")
+
+    # Testen of het record voldoet aan bepaalde voorwaarden
+    record = getRecordFromEARepository('t_object', '{54944273-F312-44b2-A78D-43488F915429}')
+    assert record is not None, "Record met de naam 'MonumentNaam' niet gevonden."
+    assert record[const.EA_REPO_MAPPER['name']] == "Håndverk_name"
