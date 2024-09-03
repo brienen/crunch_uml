@@ -6,7 +6,7 @@ import pandas as pd
 import requests
 
 import crunch_uml.schema as sch
-from crunch_uml import db
+from crunch_uml import const, db
 from crunch_uml.exceptions import CrunchException
 from crunch_uml.parsers.parser import Parser, ParserRegistry
 
@@ -52,6 +52,13 @@ def store_data(entity_name, data, schema):
     "json", descr='Generic parser that parses JSON-files, and looks for table and column definitions.'
 )
 class JSONParser(Parser):
+
+    def get_data_subset(self, data, args):
+        return data
+
+    def transform_record(self, record):
+        return record
+
     def parse(self, args, schema: sch.Schema):
         logger.info(f"Starting parsing JSON file {args.inputfile}")
         # sourcery skip: raise-specific-error
@@ -63,18 +70,42 @@ class JSONParser(Parser):
                 response = requests.get(args.url)
                 response.raise_for_status()  # Zorg dat we een fout krijgen als de download mislukt
                 parsed_data = response.json()  #
+            parsed_data = self.get_data_subset(parsed_data, args)
 
             tables = db.getTables()
             # Ga ervan uit dat het JSON-bestand een structuur heeft zoals eerder beschreven
             for entity_name, records in parsed_data.items():
                 if entity_name in tables and entity_name != 'schemas':
                     for record in records:
+                        record = self.transform_record(record)
                         store_data(entity_name, record, schema)
         except json.JSONDecodeError as ex:
             msg = f"File with name {args.inputfile} is not a valid JSON-file, aborting with message {ex.msg}"
             logger.error(msg)
             raise CrunchException(msg) from ex
         logger.info(f"Ended parsing JSON file {args.inputfile} with success")
+
+
+@ParserRegistry.register(
+    "i18n",
+    descr=f'Parser that reads i18n file and stores the values in the database. Use --language to specify language. (default: {const.DEFAULT_LANGUAGE})',
+)
+class I18nParser(JSONParser):
+
+    def get_data_subset(self, data, args):
+        # Bepaal welke taal moet worden verwerkt
+        language = args.language if args.language else const.LANGUAGE.DEFAULT
+        if language not in data:
+            raise ValueError(f"Language '{language}' not found in the i18n file.")
+
+        return data[language]
+
+    def transform_record(self, record):
+        # i18n records always are in the form of RECORD_TYPE_INDEXED: key: {record}
+        key, value = next(iter(record.items()))
+        record = value
+        record['id'] = key
+        return record
 
 
 @ParserRegistry.register(

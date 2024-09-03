@@ -13,6 +13,7 @@ from crunch_uml.db import Database
 from crunch_uml.parsers.eaxmiparser import EAXMIParser  # noqa: F401
 from crunch_uml.parsers.multiple_parsers import (  # noqa: F401
     CSVParser,
+    I18nParser,
     JSONParser,
     XLXSParser,
 )

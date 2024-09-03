@@ -76,7 +76,8 @@ class JSONRenderer(Renderer):
 
 
 @RendererRegistry.register(
-    "i18n", descr='Renders JSON document where each element corresponds to one of the tables in the datamodel.'
+    "i18n",
+    descr=f'Renders a i18n file containing all tables with keys to the translatable fields ({const.LANGUAGE_TRANSLATE_FIELDS}).',
 )
 class I18nRenderer(JSONRenderer):
 

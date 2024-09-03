@@ -31,6 +31,14 @@ def add_args(argumentparser, subparser_dict):
     import_subparser.add_argument(
         '--skip_xmi_relations', default=False, action='store_true', help="Skip parsing relations for XMI files only)"
     )
+    import_subparser.add_argument(
+        '-lan',
+        '--language',
+        type=str,
+        default=const.DEFAULT_LANGUAGE,
+        help='Used only for i18n parser. Defines the language of the input file.'
+        + f' Default is {const.DEFAULT_LANGUAGE}.',
+    )
 
     # Set the epilog help text
     entries = ParserRegistry.entries()
