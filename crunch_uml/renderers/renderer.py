@@ -79,6 +79,21 @@ def add_args(argumentparser, subparser_dict):
         help='Used only for i18n renderer. Defines the language of the output file.'
         + f' Default is {const.DEFAULT_LANGUAGE}.',
     )
+    output_subparser.add_argument(
+        '-frlan',
+        '--from_language',
+        default='auto',
+        type=str,
+        help='Used only for i18n renderer. Defines the language of the input language. Only has impact if translating.',
+    )
+    output_subparser.add_argument(
+        '-trans',
+        '--translate',
+        type=bool,
+        default=False,
+        help='Used only for i18n renderer. When set to true the input values will be translated using automatic translating.'
+        + f' Default is {const.DEFAULT_LANGUAGE}.',
+    )
 
     # Set the epilog help text
     entries = RendererRegistry.entries()

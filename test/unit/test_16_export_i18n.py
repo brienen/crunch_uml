@@ -51,8 +51,8 @@ def copy_test_files():
 
 
 def test_import_monumenten():
-    outputfile = "./test/output/Monumenten.i18n"
-    duitse_vertaling = "./test/data/Monumenten.i18n"
+    outputfile = "./test/output/Monumenten.i18n.json"
+    duitse_vertaling = "./test/data/Monumenten.i18n.json"
 
     test_args = ["import", "-f", "./test/data/GGM_Monumenten_EA2.1.xml", "-t", "eaxmi", "-db_create"]
     cli.main(test_args)
@@ -67,6 +67,20 @@ def test_import_monumenten():
 
     # export to json
     test_args = ["export", "-f", outputfile, "-t", "i18n", '--language', 'nl']
+    cli.main(test_args)
+    test_args = [
+        "export",
+        "-f",
+        outputfile,
+        "-t",
+        "i18n",
+        '--language',
+        'en',
+        '--translate',
+        'True',
+        '--from_language',
+        'nl',
+    ]
     cli.main(test_args)
     assert os.path.exists(outputfile)
     assert util.is_valid_i18n_file(outputfile)

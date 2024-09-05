@@ -57,7 +57,6 @@ LANGUAGE_TRANSLATE_FIELDS = [
     'definitie',
     'toelichting',
     'alias',
-    'stereotype',
     'type',
     'synoniemen',
     'src_documentation',

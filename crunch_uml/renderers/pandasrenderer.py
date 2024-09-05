@@ -4,6 +4,7 @@ import os
 
 import pandas as pd
 import sqlalchemy
+import translators as ts  # type: ignore
 
 import crunch_uml.schema as sch
 from crunch_uml import const, db
@@ -30,7 +31,7 @@ class JSONRenderer(Renderer):
     def get_record_type(self):
         return const.RECORD_TYPE_RECORD
 
-    def get_all_data(self, args, schema: sch.Schema):
+    def get_all_data(self, args, schema: sch.Schema, empty_values=True):
         # Retrieve all models dynamically
         base = db.Base
         models = base.metadata.tables
@@ -57,14 +58,19 @@ class JSONRenderer(Renderer):
             filtered_data = []
             for record in data:
                 if included_columns and len(included_columns) > 0:
-                    filtered_record = {key: value for key, value in record.items() if key in included_columns}
+                    filtered_record = {
+                        key: value
+                        for key, value in record.items()
+                        if key in included_columns and (empty_values or value is not None)
+                    }
                 else:
                     filtered_record = record  # Include all columns if included_columns is empty
-                filtered_data.append(
-                    filtered_record
-                    if self.get_record_type() == const.RECORD_TYPE_RECORD
-                    else {record['id']: filtered_record}
-                )
+                if len(filtered_record) > 0:
+                    filtered_data.append(
+                        filtered_record
+                        if self.get_record_type() == const.RECORD_TYPE_RECORD
+                        else {record['id']: filtered_record}
+                    )
 
             all_data[table_name] = filtered_data
         return all_data
@@ -77,7 +83,7 @@ class JSONRenderer(Renderer):
 
 @RendererRegistry.register(
     "i18n",
-    descr=f'Renders a i18n file containing all tables with keys to the translatable fields ({const.LANGUAGE_TRANSLATE_FIELDS}).',
+    descr=f'Renders a i18n file containing all tables with keys to the translatable fields ({const.LANGUAGE_TRANSLATE_FIELDS}) Also translates to a specified language.',
 )
 class I18nRenderer(JSONRenderer):
 
@@ -89,9 +95,29 @@ class I18nRenderer(JSONRenderer):
     def get_record_type(self):
         return const.RECORD_TYPE_INDEXED
 
+    def translate(self, data, to_language, from_language='auto'):
+        logger.info(f"Staring Translating data to {to_language}. This may take a while: {len(data)} entries...")
+        translated_data = {}
+        for section, entries in data.items():
+            logger.info(f"Translating section {section}...")
+            translated_data[section] = []
+            for entry in entries:
+                translated_record = {}
+                for key, record in entry.items():
+                    for field, value in record.items():
+                        translated_record[field] = ts.translate_text(
+                            value, to_language=to_language, from_language=from_language
+                        )
+                translated_data[section].append({key: translated_record})
+
+        logger.info(f"Finished translating data to {to_language}.")
+        return translated_data
+
     def render(self, args, schema: sch.Schema):
         # Retrieve all data
-        all_data = self.get_all_data(args, schema)
+        all_data = self.get_all_data(args, schema, empty_values=False)
+        if args.translate:
+            all_data = self.translate(all_data, args.language)
 
         # Initialize the i18n structure
         i18n_data = {}
