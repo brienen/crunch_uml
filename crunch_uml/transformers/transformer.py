@@ -31,9 +31,13 @@ def add_args(argumentparser, subparser_dict):
         required=True,
         help="Schema in database to write the tranformed datamodel to.",
     )
-    # transformation_subparser.add_argument(
-    #    '-sch_to_cln', '--schema_to_clean', type=str, default=True, help="Cleans the content of schema_to before transformation. Default is True"
-    # )
+    transformation_subparser.add_argument(
+        '-sch_to_cln',
+        '--schema_to_clean',
+        type=str,
+        default=True,
+        help="Cleans the content of schema_to before transformation. Default is True",
+    )
     transformation_subparser.add_argument(
         '-ttp',
         '--transformationtype',
@@ -90,6 +94,9 @@ def add_args(argumentparser, subparser_dict):
 
 
 class Transformer(ABC):
+    def __str__(self):
+        return f'Schema {self.__class__.__name__}'
+
     def transformLogic(self, args, root_package, schema_from, schema_to):
         pass
 
@@ -111,6 +118,9 @@ class Transformer(ABC):
         # Retrieve all models dynamically
         schema_from = sch.Schema(database, args.schema_from)
         schema_to = sch.Schema(database, args.schema_to)
+
+        if args.schema_to_clean:
+            schema_to.clean()
 
         # Get root package, make a copy and save it
         root_package = schema_from.get_package(args.root_package)

@@ -1,0 +1,325 @@
+{
+    "en": {
+        "packages": [
+            {
+                "EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E": {
+                    "name": "Monuments"
+                }
+            },
+            {
+                "EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652": {
+                    "name": "Diagram"
+                }
+            },
+            {
+                "EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466": {
+                    "name": "Model Monuments"
+                }
+            }
+        ],
+        "classes": [
+            {
+                "EAID_54944273_F312_44b2_A78D_43488F915429": {
+                    "alias": "Håndverk_alias",
+                    "name": "Håndverk_name",
+                    "definitie": "Håndverk_definitie",
+                    "toelichting": "Håndverk_toelichting",
+                    "synoniemen": "Håndverk_synoniemen"
+                }
+            },
+            {
+                "EAID_32C02923_EE3A_4553_B94B_31E0C273A829": {
+                    "name": "Protected Status",
+                    "definitie": "The status of protection of a monument. A monument/cultural heritage is a remnant of art, culture, architecture or crafts that is considered of public interest due to its historical, popular, artistic, scientific, industrial-archaeological or other socio-cultural value. Forms of monument/cultural heritage with the status of national, provincial or municipal monument/cultural heritage are protected according to a decision of the Ministry of Education, province or municipality, respectively."
+                }
+            },
+            {
+                "EAID_4AD539EC_A308_43da_B025_17A1647303F3": {
+                    "name": "Construction activity",
+                    "definitie": "Construction of a structure."
+                }
+            },
+            {
+                "EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA": {
+                    "name": "Building style",
+                    "definitie": "The way of building with specific characteristics in a specific period. In the epochs in question, there were no live performances; There are later formulated (general) historical constructions. This tendency began deliberately around 1830. (Haslinghuis)"
+                }
+            },
+            {
+                "EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4": {
+                    "name": "Building type",
+                    "definitie": "Typifying a building style"
+                }
+            },
+            {
+                "EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D": {
+                    "name": "OriginalFeature",
+                    "definitie": "The function of an object after construction or completion"
+                }
+            },
+            {
+                "EAID_7FE4B466_B051_4068_9ED1_6E60C3B2DBAD": {
+                    "name": "<Foreldreløs Klasse>"
+                }
+            },
+            {
+                "EAID_FB13857C_C695_4b53_8060_BACFA0E16950": {
+                    "name": "<Foreldreløs Klasse>"
+                }
+            },
+            {
+                "EAID_9775E778_DBF8_4122_94CE_551466B62F46": {
+                    "name": "<Foreldreløs Klasse>"
+                }
+            },
+            {
+                "EAID_26D1113F_F7B3_4bdd_9AAE_EA14CC9F3C3F": {
+                    "name": "<Foreldreløs Klasse>"
+                }
+            }
+        ],
+        "attributes": [
+            {
+                "EAID_97B64E49_D913_4648_985D_C2692F1EDC51": {
+                    "name": "Craft type"
+                }
+            },
+            {
+                "EAID_6FEBCD91_8B50_4942_A989_6C9B242CEBC2": {
+                    "name": "yearsCraftsTo"
+                }
+            },
+            {
+                "EAID_6277018C_A2EC_4069_9625_487494821237": {
+                    "name": "yearsCraftsFrom"
+                }
+            },
+            {
+                "EAID_0E956D19_44D9_42f6_9C44_15FDAAF5AEF1": {
+                    "name": "Sources"
+                }
+            },
+            {
+                "EAID_04B5CEE9_8929_4729_A545_FEEB5604B5C8": {
+                    "name": "complex"
+                }
+            },
+            {
+                "EAID_B2A9E96D_DC0F_453b_99F3_D75390210700": {
+                    "name": "Registration Date"
+                }
+            },
+            {
+                "EAID_CFD1E016_5347_4e65_9463_B06E114AE5C8": {
+                    "name": "municipalMonumentCodeCode"
+                }
+            },
+            {
+                "EAID_399FC352_454E_478d_8129_4F6BBCE00ABE": {
+                    "name": "The face code"
+                }
+            },
+            {
+                "EAID_0637412A_E928_4608_969E_ACF9350F4594": {
+                    "name": "name"
+                }
+            },
+            {
+                "EAID_7A602A0E_AC3C_4ce0_A81C_6812EE227662": {
+                    "name": "description"
+                }
+            },
+            {
+                "EAID_38278B83_0BD7_4bba_A69E_1B6D519F95C9": {
+                    "name": "Comments"
+                }
+            },
+            {
+                "EAID_658B0AAC_0653_4fa1_A6AD_DF1D656311BC": {
+                    "name": "National Monument Code"
+                }
+            },
+            {
+                "EAID_EBD24559_2F60_43fb_B865_2A7AAA4E3001": {
+                    "name": "type"
+                }
+            },
+            {
+                "EAID_9561214E_44CD_42e3_AC07_CD73506F1241": {
+                    "name": "year of construction"
+                }
+            },
+            {
+                "EAID_CDFCF97C_39D8_410d_B591_D6FEF8CF41B1": {
+                    "name": "year of constructionTo"
+                }
+            },
+            {
+                "EAID_60D6B0E6_F9D5_467c_8B02_4848752DC97C": {
+                    "name": "year of constructionFrom"
+                }
+            },
+            {
+                "EAID_AE9C37BF_B89D_49c7_B5AA_48F8D7329E8E": {
+                    "name": "indication"
+                }
+            },
+            {
+                "EAID_597FF0BC_0D0B_447a_B84C_77400DF2FADF": {
+                    "name": "description"
+                }
+            },
+            {
+                "EAID_44497CB2_F315_4af5_8119_A10357D8EBEA": {
+                    "name": "Main Style"
+                }
+            },
+            {
+                "EAID_F17EBA71_A509_4b7c_B481_BEB999EC1E3B": {
+                    "name": "Understyle"
+                }
+            },
+            {
+                "EAID_491D0BF2_5FFE_446e_B90E_5267BE035670": {
+                    "name": "explanation"
+                }
+            },
+            {
+                "EAID_5B8476E8_9A80_4d9f_A8B3_ACFAF59A9C58": {
+                    "name": "purity"
+                }
+            },
+            {
+                "EAID_7DA39723_70C0_40cf_AE51_E7769275DC7F": {
+                    "name": "Main category"
+                }
+            },
+            {
+                "EAID_2781DF4B_E651_4033_8C4D_F9676E1E7F85": {
+                    "name": "subcategory"
+                }
+            },
+            {
+                "EAID_A21A8DA2_B53E_44e3_AA67_A06D67E22D3A": {
+                    "name": "explanation"
+                }
+            },
+            {
+                "EAID_81A910B1_E4CE_4953_9FED_6AA16332E0C4": {
+                    "name": "function"
+                }
+            },
+            {
+                "EAID_9654B4C5_953E_4b72_96C6_C476A597CAEC": {
+                    "name": "Feature Type"
+                }
+            },
+            {
+                "EAID_C5D26518_353C_4399_9E00_BCC1FDB5DD61": {
+                    "name": "Main category"
+                }
+            },
+            {
+                "EAID_127EBC2C_5CBD_439f_8A06_13CEAE8EEF09": {
+                    "name": "Main function"
+                }
+            },
+            {
+                "EAID_6556EB21_AE8A_475d_9B53_9A06409CAA07": {
+                    "name": "subcategory"
+                }
+            },
+            {
+                "EAID_7E77EC52_B954_4e5d_BAAB_BDD88DFFB8CA": {
+                    "name": "explanation"
+                }
+            },
+            {
+                "EAID_200B84E0_1D73_4608_9258_12338B5EC034": {
+                    "name": "specification"
+                }
+            }
+        ],
+        "enumerations": [
+            {
+                "EAID_5C808AC9_CB09_4f4d_813E_821829856BA8": {
+                    "name": "MonumentType"
+                }
+            }
+        ],
+        "enumerationliterals": [
+            {
+                "EAID_B2AE8AFC_C1D5_4d83_BFD3_EBF1663F3468": {
+                    "type": "One",
+                    "name": "National monument"
+                }
+            },
+            {
+                "EAID_774B86B6_5B16_4f29_ABF0_40671AD9E0F9": {
+                    "type": "One",
+                    "name": "municipal monument"
+                }
+            }
+        ],
+        "associations": [
+            {
+                "EAID_8E18F665_2A86_44fd_AD55_3E435A282BDF": {
+                    "name": "Monument crafts"
+                }
+            },
+            {
+                "EAID_144ADF26_C2E9_4080_8F4F_32F9B255E4AE": {
+                    "name": "Monument building style"
+                }
+            },
+            {
+                "EAID_1F08C810_A491_4e07_B859_C3D4EDEBA557": {
+                    "name": "Monument photos"
+                }
+            },
+            {
+                "EAID_44E4F035_7E96_48df_B6CF_93C945FF97C3": {
+                    "name": "Applies"
+                }
+            },
+            {
+                "EAID_55585CB9_E569_47ca_9EFE_B9D5CF46BCBD": {
+                    "name": "monument building activity"
+                }
+            },
+            {
+                "EAID_59A9090E_CF7A_4e6f_91E1_592085B0DA94": {
+                    "name": "Applies"
+                }
+            },
+            {
+                "EAID_D9634EAD_2869_40a1_B243_805897E4B1B3": {
+                    "name": "Monument building type"
+                }
+            },
+            {
+                "EAID_F7893BFE_1A66_4760_9124_B62A81F45997": {
+                    "name": "Applies"
+                }
+            },
+            {
+                "EAID_FD27EB67_1CFA_4f40_AE79_329DE9DE6754": {
+                    "name": "Monument feature"
+                }
+            }
+        ],
+        "generalizations": [],
+        "diagrams": [
+            {
+                "EAID_7429E175_1CBE_4336_BF92_6C5029395E69": {
+                    "name": "Chart Monuments"
+                }
+            },
+            {
+                "EAID_58EA4966_DBC2_4359_94C4_ABC774DBE5E2": {
+                    "name": "Diagram Monuments Detail"
+                }
+            }
+        ]
+    }
+}

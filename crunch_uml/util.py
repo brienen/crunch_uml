@@ -24,6 +24,12 @@ def remove_substring(s, substring):
     return pattern.sub('', s).strip()
 
 
+def lremove_substring(text, prefix):
+    if text.startswith(prefix):
+        return text[len(prefix) :]
+    return text
+
+
 def getEAGuid():
     str_uuid = uuid.uuid4()
     str_uuid = str(str_uuid).replace("-", "_")
@@ -36,7 +42,9 @@ def get_repo_guid():
 
 
 def fromEAGuid(ea_guid):
-    strea_guid = ea_guid.lstrip("EA").lstrip("ID_").lstrip("PK_").replace("_", "-")
+    strea_guid = lremove_substring(ea_guid, "EAID_")
+    strea_guid = lremove_substring(strea_guid, "EAPK_")
+    strea_guid = strea_guid.replace("_", "-")
     return '{' + strea_guid + '}'
 
 
@@ -158,3 +166,19 @@ def is_valid_i18n_file(file_path):
     except Exception as e:
         print(f"An error occurred: {e}")
         return False
+
+
+def count_dict_elements(d):
+    count = 0
+
+    if isinstance(d, dict):
+        for key, value in d.items():
+            count += 1  # Tel de huidige key-value pair
+            count += count_dict_elements(value)  # Recursief tellen van geneste elementen
+    elif isinstance(d, list):
+        for item in d:
+            count += count_dict_elements(item)  # Recursief tellen van elementen in de lijst
+    else:
+        count += 1  # Als het een enkel element is (geen dict of lijst), tel het als 1
+
+    return count

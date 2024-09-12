@@ -4,10 +4,9 @@ import os
 
 import pandas as pd
 import sqlalchemy
-import translators as ts  # type: ignore
 
 import crunch_uml.schema as sch
-from crunch_uml import const, db
+from crunch_uml import const, db, lang, util
 from crunch_uml.renderers.renderer import Renderer, RendererRegistry
 
 logger = logging.getLogger()
@@ -95,8 +94,10 @@ class I18nRenderer(JSONRenderer):
     def get_record_type(self):
         return const.RECORD_TYPE_INDEXED
 
-    def translate(self, data, to_language, from_language='auto'):
-        logger.info(f"Staring Translating data to {to_language}. This may take a while: {len(data)} entries...")
+    def translate_data(self, data, to_language, from_language='auto'):
+        logger.info(
+            f"Staring Translating data to language '{to_language}'. This may take a while: {util.count_dict_elements(data)} entries..."
+        )
         translated_data = {}
         for section, entries in data.items():
             logger.info(f"Translating section {section}...")
@@ -105,19 +106,21 @@ class I18nRenderer(JSONRenderer):
                 translated_record = {}
                 for key, record in entry.items():
                     for field, value in record.items():
-                        translated_record[field] = ts.translate_text(
-                            value, to_language=to_language, from_language=from_language
+                        translated_record[field] = lang.translate(  #
+                            value, to_language=to_language, from_language=from_language, max_retries=1
                         )
                 translated_data[section].append({key: translated_record})
 
-        logger.info(f"Finished translating data to {to_language}.")
+        logger.info(f"Finished translating data to language '{to_language}'.")
         return translated_data
 
     def render(self, args, schema: sch.Schema):
+
+        logger.info(f"Starting rendering i18n file {args.outputfile}...")
         # Retrieve all data
         all_data = self.get_all_data(args, schema, empty_values=False)
         if args.translate:
-            all_data = self.translate(all_data, args.language)
+            all_data = self.translate_data(all_data, args.language, from_language=args.from_language)
 
         # Initialize the i18n structure
         i18n_data = {}
@@ -136,9 +139,15 @@ class I18nRenderer(JSONRenderer):
         # Update the i18n data with the new language entry
         i18n_data[args.language] = all_data
 
+        # Controleer of het bestand al bestaat
+        if not os.path.exists(args.outputfile):
+            logger.info(f"Vertaalbestand {args.outputfile} bestaat niet, maak een nieuw bestand aan...")
+
         # Write the updated i18n data back to the file
         with open(args.outputfile, "w", encoding="utf-8") as json_file:
             json.dump(i18n_data, json_file, ensure_ascii=False, indent=4, default=str)
+
+        logger.info(f"Rendering i18n file {args.outputfile} success")
 
 
 @RendererRegistry.register(

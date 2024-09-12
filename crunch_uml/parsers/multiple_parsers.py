@@ -13,7 +13,7 @@ from crunch_uml.parsers.parser import Parser, ParserRegistry
 logger = logging.getLogger()
 
 
-def store_data(entity_name, data, schema):
+def store_data(entity_name, data, schema, update_only=False):
     # session = SessionLocal()
     # Retrieve all models dynamically
     base = db.Base
@@ -30,22 +30,24 @@ def store_data(entity_name, data, schema):
     if "id" in data:
         if existing_entity := session.query(entity).filter_by(id=data["id"], schema_id=schema.schema_id).first():
             for key, value in data.items():
-                if value is not None and value != '':
+                if value is not None and value != '' and key != 'id':
                     setattr(existing_entity, key, value)
             logger.debug(f"Updated {entity_name} with ID {data['id']}.")
             schema.save(existing_entity)
         else:
-            # ID was aanwezig, maar geen overeenkomstige record werd gevonden
-            logger.debug(f"No {entity_name} found with ID {data['id']}, creating a new record.")
+            if not update_only:
+                # ID was aanwezig, maar geen overeenkomstige record werd gevonden
+                logger.debug(f"No {entity_name} found with ID {data['id']}, creating a new record.")
+                new_entity = entity(**data)
+                schema.save(new_entity)
+    else:
+        if not update_only:
+            logger.debug(
+                f"Could not save entity with table '{entity_name}' to schema {schema.schema_id}: no column id present:"
+                f" {data}."
+            )
             new_entity = entity(**data)
             schema.save(new_entity)
-    else:
-        logger.debug(
-            f"Could not save entity with table '{entity_name}' to schema {schema.schema_id}: no column id present:"
-            f" {data}."
-        )
-        new_entity = entity(**data)
-        schema.save(new_entity)
 
 
 @ParserRegistry.register(
@@ -53,10 +55,15 @@ def store_data(entity_name, data, schema):
 )
 class JSONParser(Parser):
 
+    def update_only(self):
+        return False
+
     def get_data_subset(self, data, args):
         return data
 
     def transform_record(self, record):
+        """Update or insert the record in the database"""
+
         return record
 
     def parse(self, args, schema: sch.Schema):
@@ -78,7 +85,7 @@ class JSONParser(Parser):
                 if entity_name in tables and entity_name != 'schemas':
                     for record in records:
                         record = self.transform_record(record)
-                        store_data(entity_name, record, schema)
+                        store_data(entity_name, record, schema, update_only=self.update_only())
         except json.JSONDecodeError as ex:
             msg = f"File with name {args.inputfile} is not a valid JSON-file, aborting with message {ex.msg}"
             logger.error(msg)
@@ -91,6 +98,10 @@ class JSONParser(Parser):
     descr=f'Parser that reads i18n file and stores the values in the database. Use --language to specify language. (default: {const.DEFAULT_LANGUAGE})',
 )
 class I18nParser(JSONParser):
+
+    def update_only(self):
+        """Update only the records that already exist. do not add new ones to not get errors"""
+        return True
 
     def get_data_subset(self, data, args):
         # Bepaal welke taal moet worden verwerkt

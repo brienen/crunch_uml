@@ -291,7 +291,9 @@ class EARepoUpdater(ModelRenderer):
                 else:
                     logger.debug(f"No changes detected for record with GUID {guid_value}.")
             else:
-                logger.info(f"No record found with GUID {guid_value}. No update performed.")
+                logger.info(
+                    f"No record found with GUID {guid_value} in table {table} and data dict {data_dict}. No update performed."
+                )
         except Exception as e:
             logger.error(f"Error while updating record with GUID {guid_value} with message: {e}")
             raise CrunchException(f"Error while updating record with GUID {guid_value} with message: {e}")

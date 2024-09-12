@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "Python: Current File",
             "type": "python",
@@ -357,12 +358,12 @@
             "justMyCode": false
         },
         {
-            "name": "Python: pytest test_16_i18n",
+            "name": "Python: pytest test_16a_export_i18n_rsgb",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/.venv/bin/pytest",  // Pas aan naar je lokale pytest pad
             "args": [
-                "${workspaceFolder}/test/unit/test_16_export_i18n.py"  // Pas aan naar je testmap
+                "${workspaceFolder}/test/unit/test_16a_export_i18n_rsgb.py"  // Pas aan naar je testmap
             ],
             "console": "integratedTerminal",
             "justMyCode": false

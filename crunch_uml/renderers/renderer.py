@@ -98,7 +98,7 @@ def add_args(argumentparser, subparser_dict):
     # Set the epilog help text
     entries = RendererRegistry.entries()
     items = [f'"{item}": {RendererRegistry.getDescription(item)}' for item in entries]
-    epilog = 'More informaation on the importe types that are supported:\n\n' + '\n'.join(items)
+    epilog = 'More information on the imported types that are supported:\n\n' + '\n'.join(items)
     output_subparser.epilog = epilog
 
 
