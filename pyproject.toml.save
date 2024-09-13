@@ -1,0 +1,12 @@
+[tool.black]
+preview = true
+line-length = 120
+skip-string-normalization = true
+
+[tool.isort]
+profile = "black"
+
+[build-system]
+# XXX: If your project needs other packages to build properly, add them to this list.
+requires = ["setuptools >= 64"]
+build-backend = "setuptools.build_meta"
