@@ -12,8 +12,6 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: "3.11"
-      - name: Install latest setuptools and wheel
-        run: pip install --upgrade setuptools wheel pip
       - name: Install Dependencies
         run: make install
       - name: Check format
