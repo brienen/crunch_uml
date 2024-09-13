@@ -96,7 +96,7 @@ class I18nRenderer(JSONRenderer):
 
     def translate_data(self, data, to_language, from_language='auto'):
         logger.info(
-            f"Staring Translating data to language '{to_language}'. This may take a while: {util.count_dict_elements(data)} entries..."
+            f"Starting Translating data to language '{to_language}'. This may take a while: {util.count_dict_elements(data)} entries..."
         )
         translated_data = {}
         for section, entries in data.items():
