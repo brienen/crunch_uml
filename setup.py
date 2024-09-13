@@ -8,7 +8,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='crunch_uml',
-    version='0.2.11',
+    version='0.2.12',
     description=const.DESCRIPTION,
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -50,9 +50,7 @@ setuptools.setup(
         'requests>=2.32.3,<3',
         'jsonschema>=4.22.0,<5',
         'types-jsonschema>=4.22,<5',
-        'translators>=5.9.2,<6',
-        'inflection>=0.5.1,<6',
-        'types-validators>=0.28.0,<2'
+        'translators>=5.9.2,<6'
         ],
     extras_require={
         'dev': [
