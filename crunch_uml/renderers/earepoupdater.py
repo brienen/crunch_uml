@@ -291,7 +291,7 @@ class EARepoUpdater(ModelRenderer):
                 else:
                     logger.debug(f"No changes detected for record with GUID {guid_value}.")
             else:
-                logger.info(
+                logger.debug(
                     f"No record found with GUID {guid_value} in table {table} and data dict {data_dict}. No update performed."
                 )
         except Exception as e:

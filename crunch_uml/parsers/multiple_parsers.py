@@ -63,7 +63,6 @@ class JSONParser(Parser):
 
     def transform_record(self, record):
         """Update or insert the record in the database"""
-
         return record
 
     def parse(self, args, schema: sch.Schema):

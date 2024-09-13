@@ -66,6 +66,7 @@ python ./crunch_uml/cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] [-sch] {import,
     - `json`: Generic parser that reads JSON files and looks for table and column definitions.
     - `xlsx`: Generic parser that reads Excel files, expecting one or more worksheets that correspond with the names of one or more tables.
     - `csv`: Generic parser that reads a single CSV file, expecting its name to be in the list of tables.
+    - `i18n`: Parser that reads i18n file and stores the values in the database. Use --language to specify language. default language: 'nl'
   
   The following tables are supported: ['packages', 'classes', 'attributes', 'enumerations', 'enumerationliterals', 'associations', 'generalizations'].
 
@@ -93,6 +94,7 @@ python ./crunch_uml/cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] [-sch] {import,
     - `json-ld`: Renderer that renders Linked Data ontology in JSON-LD from the supplied models, where a model is a package that includes at least one Class. Needs parameter "output_lod_url".',
     - `json_schema`: Render JSON-Schema from a model using a base class as starting point and use outgoing associations only. Needs parameter "json_schema_url".  
     - `earepo`: Updates as Enterprise Architect v16 repository. Only updates existing Classes and attributes, Enumerations and literals, Packages and Associations. Does not add new things, updates only.provide the EA Repo through the --file parameter.
+    - `i18n`: Renders a i18n file containing all tables with keys to the translatable fields: 'name', 'definitie', 'toelichting', 'alias', 'type','synoniemen','src_documentation', 'dst_documentation', Also translates to a specified language when using the --translate parameter.
 
 - `transform`: Transfrom the datamodel from one schema to a datamodel in another schema.
   - `-sch_from`, `--schema_from`: Schema in database om het datamodel uit te lezen, standaard waarde is 'default'.
@@ -116,4 +118,4 @@ make help
 - Export XMI, Turtle (Linked Data)
 - Develop more Jinja2 templates
 - Perform checking
-- Direct access to repositories (import and export)
+- Direct access to repositories export
