@@ -9,7 +9,7 @@ with open('README.md', 'r') as fh:
 setuptools.setup(
     name='crunch_uml',
     version='0.2.12',
-    description=const.DESCRIPTION,
+    description="Crunch_uml reads UML Class model from multiple formats (including XMI, Enterprise Architect XMI, Excel, Json, and others), can perform transformations and renders them to other formats (including Markdown, json, json schema and many others).",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url='http://github.com/brienen/crunch_uml',
@@ -32,7 +32,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    #install_requires=REQUIREMENTS,
     install_requires=[
         'SQLAlchemy>=2.0.20,<3',
         'lxml>=4.9.3,<5',
@@ -53,7 +52,7 @@ setuptools.setup(
         'translators>=5.9.2,<6'
         ],
     extras_require={
-        'dev': [
+        'dev':[
             'black == 24.*',
             'build == 0.10.*',
             'flake8 == 6.*',

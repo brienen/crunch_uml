@@ -38,7 +38,7 @@ format-check: black-check isort-check lint mypy
 ## install - Install the project locally
 install:
 	$(PYTHON_BINARY) -m venv $(VIRTUAL_ENV)
-	$(VIRTUAL_BIN)/pip install --upgrade setuptools>=64 wheel pip
+	$(VIRTUAL_BIN)/pip install --upgrade setuptools wheel pip
 	$(VIRTUAL_BIN)/pip install ."[dev]"
 
 ## isort - Sorts imports throughout the project
