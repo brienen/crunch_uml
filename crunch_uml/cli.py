@@ -11,19 +11,22 @@ import crunch_uml.transformers.transformer as transformers
 from crunch_uml import const
 from crunch_uml.db import Database
 from crunch_uml.parsers.eaxmiparser import EAXMIParser  # noqa: F401
-from crunch_uml.parsers.multiple_parsers import (CSVParser,  # noqa: F401
-                                                 I18nParser, JSONParser,
-                                                 XLXSParser)
+from crunch_uml.parsers.multiple_parsers import CSVParser  # noqa: F401
+from crunch_uml.parsers.multiple_parsers import I18nParser  # noqa: F401
+from crunch_uml.parsers.multiple_parsers import JSONParser  # noqa: F401
+from crunch_uml.parsers.multiple_parsers import XLXSParser  # noqa: F401
 from crunch_uml.parsers.xmiparser import XMIParser  # noqa: F401
 from crunch_uml.renderers.earepoupdater import EARepoUpdater  # noqa: F401
-from crunch_uml.renderers.jinja2renderer import (GGM_MDRenderer,  # noqa: F401
-                                                 Jinja2Renderer,
-                                                 JSON_SchemaRenderer)
-from crunch_uml.renderers.lodrenderer import (JSONLDRenderer,  # noqa: F401
-                                              RDFRenderer, TTLRenderer)
+from crunch_uml.renderers.jinja2renderer import GGM_MDRenderer  # noqa: F401
+from crunch_uml.renderers.jinja2renderer import Jinja2Renderer  # noqa: F401
+from crunch_uml.renderers.jinja2renderer import \
+    JSON_SchemaRenderer  # noqa: F401
+from crunch_uml.renderers.lodrenderer import JSONLDRenderer  # noqa: F401
+from crunch_uml.renderers.lodrenderer import (RDFRenderer,  # noqa: F401
+                                              TTLRenderer)
 from crunch_uml.renderers.pandasrenderer import CSVRenderer  # noqa: F401
-from crunch_uml.renderers.pandasrenderer import (I18nRenderer,  # noqa: F401
-                                                 JSONRenderer)
+from crunch_uml.renderers.pandasrenderer import I18nRenderer  # noqa: F401
+from crunch_uml.renderers.pandasrenderer import JSONRenderer  # noqa: F401
 from crunch_uml.renderers.sqlarenderer import SQLARenderer  # noqa: F401
 from crunch_uml.renderers.xlsxrenderer import XLSXRenderer  # noqa: F401
 from crunch_uml.transformers.copytransformer import \
