@@ -39,7 +39,7 @@ format-check: black-check isort-check lint mypy
 install:
 	$(PYTHON_BINARY) -m venv $(VIRTUAL_ENV)
 	$(VIRTUAL_BIN)/pip install --upgrade setuptools wheel pip
-	$(VIRTUAL_BIN)/pip install ".[dev]" --no-use-pep517
+	$(VIRTUAL_BIN)/pip install ".[dev]"
 
 ## isort - Sorts imports throughout the project
 isort:
