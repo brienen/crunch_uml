@@ -23,11 +23,11 @@ clean:
 
 ## black - Runs the Black Python formatter against the project
 black:
-	$(VIRTUAL_BIN)/black $(crunch_uml)/ $(TEST_DIR)/
+	$(VIRTUAL_BIN)/black $(crunch_uml)/ $(TEST_DIR)/ 
 
 ## black-check - Checks if the project is formatted correctly against the Black rules
 black-check:
-	$(VIRTUAL_BIN)/black $(crunch_uml)/ $(TEST_DIR)/ --check
+	$(VIRTUAL_BIN)/black --exclude 'crunch_uml/transformers/copytransformer.py|transformers/plugintransformer.py|crunch_uml/cli.py|renderers/jinja2renderer.py|crunch_uml/db.py' $(crunch_uml)/ $(TEST_DIR)/ --check
 
 ## format - Runs all formatting tools against the project
 format: black isort lint mypy

@@ -22,8 +22,8 @@ from crunch_uml.renderers.jinja2renderer import Jinja2Renderer  # noqa: F401
 from crunch_uml.renderers.jinja2renderer import \
     JSON_SchemaRenderer  # noqa: F401
 from crunch_uml.renderers.lodrenderer import JSONLDRenderer  # noqa: F401
-from crunch_uml.renderers.lodrenderer import (RDFRenderer,  # noqa: F401
-                                              TTLRenderer)
+from crunch_uml.renderers.lodrenderer import RDFRenderer  # noqa: F401
+from crunch_uml.renderers.lodrenderer import TTLRenderer  # noqa: F401
 from crunch_uml.renderers.pandasrenderer import CSVRenderer  # noqa: F401
 from crunch_uml.renderers.pandasrenderer import I18nRenderer  # noqa: F401
 from crunch_uml.renderers.pandasrenderer import JSONRenderer  # noqa: F401

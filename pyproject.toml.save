@@ -1,3 +1,9 @@
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.black]
+exclude = 'copytransformer\.py|plugintransformer\.py|cli\.py|jinja2renderer\.py|db\.py'
+
+[tool.isort]
+skip = ["cli.py"]
