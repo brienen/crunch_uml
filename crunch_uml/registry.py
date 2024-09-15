@@ -3,7 +3,7 @@ class Registry:
     _descr_registry = {}  # type: ignore
 
     @classmethod
-    def register(cls, name=None, descr=''):  # sourcery skip: or-if-exp-identity
+    def register(cls, name=None, descr=""):  # sourcery skip: or-if-exp-identity
         def inner(registered_class):
             class_name = name if name else registered_class.__name__
             # if class_name in cls._registry:
@@ -31,4 +31,4 @@ class Registry:
     @classmethod
     def getDescription(cls, name):
         descr = cls._descr_registry.get(name)
-        return descr if descr is not None else ''
+        return descr if descr is not None else ""

@@ -6,7 +6,14 @@ from crunch_uml import cli, const, db
 
 @pytest.mark.filterwarnings(":Object of type <.*> not in session")
 def test_import_onderwijs():
-    test_args = ["import", "-f", "./test/data/GGM_Onderwijs_XMI.2.1.xml", "-t", "xmi", "-db_create"]
+    test_args = [
+        "import",
+        "-f",
+        "./test/data/GGM_Onderwijs_XMI.2.1.xml",
+        "-t",
+        "xmi",
+        "-db_create",
+    ]
     cli.main(test_args)
 
     test_args = [
@@ -21,7 +28,7 @@ def test_import_onderwijs():
     cli.main(test_args)
 
     database = db.Database(const.DATABASE_URL, db_create=False)
-    schema = sch.Schema(database, 'onderwijs')
+    schema = sch.Schema(database, "onderwijs")
 
     assert schema.count_package() == 1
     assert schema.count_enumeratie() == 1

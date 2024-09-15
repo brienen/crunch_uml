@@ -3,7 +3,14 @@ from crunch_uml import cli, const, db
 
 
 def test_import_onderwijs():
-    test_args = ["import", "-f", "./test/data/GGM_Onderwijs_XMI.2.1.xml", "-t", "eaxmi", "-db_create"]
+    test_args = [
+        "import",
+        "-f",
+        "./test/data/GGM_Onderwijs_XMI.2.1.xml",
+        "-t",
+        "eaxmi",
+        "-db_create",
+    ]
     cli.main(test_args)
 
     database = db.Database(const.DATABASE_URL, db_create=False)
@@ -32,7 +39,14 @@ def test_import_onderwijs():
 
 
 def test_ddas_plugin():
-    test_args = ["import", "-t", "eaxmi", "-f", "./test/data/Model Schuldhulpverlening.xml", "-db_create"]
+    test_args = [
+        "import",
+        "-t",
+        "eaxmi",
+        "-f",
+        "./test/data/Model Schuldhulpverlening.xml",
+        "-db_create",
+    ]
     cli.main(test_args)
 
     # database = db.Database(const.DATABASE_URL, db_create=False)
@@ -81,5 +95,5 @@ def test_ddas_plugin():
     cli.main(test_args)
 
     database = db.Database(const.DATABASE_URL, db_create=False)
-    schema = sch.Schema(database, 'uitwisselmodel')
+    schema = sch.Schema(database, "uitwisselmodel")
     assert schema.count_package() == 1

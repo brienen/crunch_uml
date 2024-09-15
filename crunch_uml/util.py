@@ -21,7 +21,7 @@ def valid_url(value):
 
 def remove_substring(s, substring):
     pattern = re.compile(re.escape(substring), re.IGNORECASE)
-    return pattern.sub('', s).strip()
+    return pattern.sub("", s).strip()
 
 
 def lremove_substring(text, prefix):
@@ -33,36 +33,36 @@ def lremove_substring(text, prefix):
 def getEAGuid():
     str_uuid = uuid.uuid4()
     str_uuid = str(str_uuid).replace("-", "_")
-    return 'EAID_' + str_uuid
+    return "EAID_" + str_uuid
 
 
 def get_repo_guid():
     str_uuid = str(uuid.uuid4())
-    return '{' + str_uuid + '}'
+    return "{" + str_uuid + "}"
 
 
 def fromEAGuid(ea_guid):
     strea_guid = lremove_substring(ea_guid, "EAID_")
     strea_guid = lremove_substring(strea_guid, "EAPK_")
     strea_guid = strea_guid.replace("_", "-")
-    return '{' + strea_guid + '}'
+    return "{" + strea_guid + "}"
 
 
 def getMeervoud(naamwoord):
     # Woorden die eindigen op een onbeklemtoonde 'e' krijgen 'n'
     if not isinstance(naamwoord, str):
-        return ''
+        return ""
     # Woorden die eindigen op een onbeklemtoonde 'e' krijgen 'n'
-    elif naamwoord.endswith('ie'):
+    elif naamwoord.endswith("ie"):
         return f"{naamwoord}s"
     # Woorden die eindigen op een onbeklemtoonde 'e' krijgen 'n'
-    elif naamwoord.endswith('e'):
+    elif naamwoord.endswith("e"):
         return f"{naamwoord}n"
     # Woorden die eindigen op een klinker (behalve 'e') krijgen 's'
-    elif naamwoord[-1] in 'aiou':
+    elif naamwoord[-1] in "aiou":
         return f"{naamwoord}s"
     # Woorden die eindigen op 's', 'f' of 'ch' krijgen 'en'
-    elif naamwoord.endswith(('s', 'f', 'ch')):
+    elif naamwoord.endswith(("s", "f", "ch")):
         return f"{naamwoord}en"
     # Default regel
     else:
@@ -74,7 +74,7 @@ def find_module_path(module_name):
     if spec is None:
         logger.warning(f"Module {module_name} not found")
         return None
-    spec = str(spec.origin).removesuffix('__init__.py')
+    spec = str(spec.origin).removesuffix("__init__.py")
 
     return spec
 
@@ -114,7 +114,7 @@ def reverse_dict(d):
 
 def is_valid_i18n_file(file_path):
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         # Controleer of de root een dictionary is
@@ -137,12 +137,16 @@ def is_valid_i18n_file(file_path):
             # Controleer verwachte secties (bijvoorbeeld "packages", "classes", etc.)
             for section, entries in content.items():
                 if not isinstance(entries, list):
-                    print(f"Section '{section}' under language '{language}' is not a list.")
+                    print(
+                        f"Section '{section}' under language '{language}' is not a list."
+                    )
                     return False
 
                 for entry in entries:
                     if not isinstance(entry, dict):
-                        print(f"An entry in section '{section}' under language '{language}' is not a dictionary.")
+                        print(
+                            f"An entry in section '{section}' under language '{language}' is not a dictionary."
+                        )
                         return False
 
                     for key, value in entry.items():
@@ -151,7 +155,7 @@ def is_valid_i18n_file(file_path):
                                 f"Entry '{key}' in section '{section}' under language '{language}' is not a dictionary."
                             )
                             return False
-                        if 'name' not in value:
+                        if "name" not in value:
                             print(
                                 f"Entry '{key}' in section '{section}' under language '{language}' does not have a 'name' key."
                             )
@@ -174,10 +178,14 @@ def count_dict_elements(d):
     if isinstance(d, dict):
         for key, value in d.items():
             count += 1  # Tel de huidige key-value pair
-            count += count_dict_elements(value)  # Recursief tellen van geneste elementen
+            count += count_dict_elements(
+                value
+            )  # Recursief tellen van geneste elementen
     elif isinstance(d, list):
         for item in d:
-            count += count_dict_elements(item)  # Recursief tellen van elementen in de lijst
+            count += count_dict_elements(
+                item
+            )  # Recursief tellen van elementen in de lijst
     else:
         count += 1  # Als het een enkel element is (geen dict of lijst), tel het als 1
 

@@ -51,7 +51,12 @@ class DDASPlugin(Plugin):
         for clazz in kopie.classes:
             lst_assoc = [assoc for assoc in clazz.uitgaande_associaties]
             for association in lst_assoc:
-                if str(association.name).strip() in ["resulteert in", "dienstverlening", "voert traject uit", "soort"]:
+                if str(association.name).strip() in [
+                    "resulteert in",
+                    "dienstverlening",
+                    "voert traject uit",
+                    "soort",
+                ]:
                     clazz.uitgaande_associaties.remove(association)
 
         # Now remove classes 'project', 'projectsoort' en 'notariele status'
@@ -77,13 +82,22 @@ class DDASPlugin(Plugin):
             ),
         )
         startdatumLevering = Attribute(
-            id=util.getEAGuid(), name="startdatumLevering", schema_id=schema_to.schema_id, primitive="Datum"
+            id=util.getEAGuid(),
+            name="startdatumLevering",
+            schema_id=schema_to.schema_id,
+            primitive="Datum",
         )
         einddatumLevering = Attribute(
-            id=util.getEAGuid(), name="einddatumLevering", schema_id=schema_to.schema_id, primitive="Datum"
+            id=util.getEAGuid(),
+            name="einddatumLevering",
+            schema_id=schema_to.schema_id,
+            primitive="Datum",
         )
         aanleverdatumEnTijd = Attribute(
-            id=util.getEAGuid(), name="aanleverdatumEnTijd", schema_id=schema_to.schema_id, primitive="datumtijd"
+            id=util.getEAGuid(),
+            name="aanleverdatumEnTijd",
+            schema_id=schema_to.schema_id,
+            primitive="datumtijd",
         )
         uitwisselmodel.attributes.append(startdatumLevering)
         uitwisselmodel.attributes.append(einddatumLevering)
@@ -198,17 +212,29 @@ class DDASPlugin(Plugin):
         lst_attr = [attr for attr in schema_to.get_class(CLIENT_ID).attributes]
         client = schema_to.get_class(CLIENT_ID)
         for attr in lst_attr:
-            if not str(attr.name).strip().lower() in ["geslachtsaanduiding", "burgerservicenummer", "geboortedatum"]:
+            if not str(attr.name).strip().lower() in [
+                "geslachtsaanduiding",
+                "burgerservicenummer",
+                "geboortedatum",
+            ]:
                 client.attributes.remove(attr)
                 attr.clazz_id = None
         client.attributes.append(
             Attribute(
-                id=util.getEAGuid(), name="Postcode", schema_id=schema_to.schema_id, primitive="AN6", verplicht=False
+                id=util.getEAGuid(),
+                name="Postcode",
+                schema_id=schema_to.schema_id,
+                primitive="AN6",
+                verplicht=False,
             )
         )
         client.attributes.append(
             Attribute(
-                id=util.getEAGuid(), name="Huisnummer", schema_id=schema_to.schema_id, primitive="AN5", verplicht=False
+                id=util.getEAGuid(),
+                name="Huisnummer",
+                schema_id=schema_to.schema_id,
+                primitive="AN5",
+                verplicht=False,
             )
         )
         client.attributes.append(

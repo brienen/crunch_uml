@@ -18,84 +18,89 @@ def add_args(argumentparser, subparser_dict):
     transformation_subparser = subparser_dict.get(const.CMD_TRANSFORM)
 
     transformation_subparser.add_argument(
-        '-sch_from',
-        '--schema_from',
+        "-sch_from",
+        "--schema_from",
         type=str,
         default=const.DEFAULT_SCHEMA,
         help=f"Schema in database to read the datamodel from, default {const.DEFAULT_SCHEMA}",
     )
     transformation_subparser.add_argument(
-        '-sch_to',
-        '--schema_to',
+        "-sch_to",
+        "--schema_to",
         type=str,
         required=True,
         help="Schema in database to write the tranformed datamodel to.",
     )
     transformation_subparser.add_argument(
-        '-sch_to_cln',
-        '--schema_to_clean',
+        "-sch_to_cln",
+        "--schema_to_clean",
         type=str,
         default=True,
         help="Cleans the content of schema_to before transformation. Default is True",
     )
     transformation_subparser.add_argument(
-        '-ttp',
-        '--transformationtype',
+        "-ttp",
+        "--transformationtype",
         type=str,
         choices=TransformerRegistry.entries(),
-        help=f'geeft transformationtype aan: {TransformerRegistry.entries()}.',
+        help=f"geeft transformationtype aan: {TransformerRegistry.entries()}.",
     )
     transformation_subparser.add_argument(
-        '-rt_pkg',
-        '--root_package',
+        "-rt_pkg",
+        "--root_package",
         type=str,
-        help='provides the root package that needs to be transformed',
+        help="provides the root package that needs to be transformed",
     )
     transformation_subparser.add_argument(
-        '-m_gen',
-        '--materialize_generalizations',
+        "-m_gen",
+        "--materialize_generalizations",
         type=str,
         default="False",
         help=(
             'Copies all attributes of parent classes to the child classes. All strings other than "True" are'
-            ' interpreted as False.'
+            " interpreted as False."
         ),
     )
     transformation_subparser.add_argument(
-        '-plug_mod',
-        '--plugin_file_name',
+        "-plug_mod",
+        "--plugin_file_name",
         type=str,
-        default='./plugin.py',
+        default="./plugin.py",
         help=(
-            'Name (incl. path) of the python file that holds the transformation plugin that need sto be dynamicly'
-            ' loaded.'
+            "Name (incl. path) of the python file that holds the transformation plugin that need sto be dynamicly"
+            " loaded."
         ),
     )
     transformation_subparser.add_argument(
-        '-plug_cl',
-        '--plugin_class_name',
+        "-plug_cl",
+        "--plugin_class_name",
         type=str,
-        default='MyPlugin',
+        default="MyPlugin",
         help=(
-            'Name of the class within the module that implements the transformation plugin. Class needs to be a'
-            ' subclass of crunch_uml.transformers.plugin.Plugin.'
+            "Name of the class within the module that implements the transformation plugin. Class needs to be a"
+            " subclass of crunch_uml.transformers.plugin.Plugin."
         ),
     )
     # Creëer een mutually exclusive group en add options
     group = transformation_subparser.add_mutually_exclusive_group(required=False)
-    group.add_argument('-pf', '--plugin_file', type=str, help="Plugin file")
-    group.add_argument('-purl', '--plugin_url', type=str, help="Plugin URL")
+    group.add_argument("-pf", "--plugin_file", type=str, help="Plugin file")
+    group.add_argument("-purl", "--plugin_url", type=str, help="Plugin URL")
 
     # Set the epilog help text
     entries = TransformerRegistry.entries()
-    items = [f'"{item}": {TransformerRegistry.getDescription(item)}' for item in entries]
-    epilog = 'More informaation on the transformation types that are supported:\n\n' + '\n'.join(items)
+    items = [
+        f'"{item}": {TransformerRegistry.getDescription(item)}' for item in entries
+    ]
+    epilog = (
+        "More informaation on the transformation types that are supported:\n\n"
+        + "\n".join(items)
+    )
     transformation_subparser.epilog = epilog
 
 
 class Transformer(ABC):
     def __str__(self):
-        return f'Schema {self.__class__.__name__}'
+        return f"Schema {self.__class__.__name__}"
 
     def transformLogic(self, args, root_package, schema_from, schema_to):
         pass

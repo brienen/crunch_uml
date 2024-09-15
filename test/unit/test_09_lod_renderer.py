@@ -8,7 +8,7 @@ from crunch_uml import cli, const, db
 
 def count_occurences(word, file):
     count = 0
-    with open(file, 'r') as f:
+    with open(file, "r") as f:
         for line in f:
             words = line.split()
             for i in words:
@@ -41,7 +41,14 @@ def test_lod_renderer():
     outputfile = "./test/output/Monumenten.ttl"
 
     # import monumenten into clean database
-    test_args = ["import", "-f", "./test/data/GGM_Monumenten_EA2.1.xml", "-t", "eaxmi", "-db_create"]
+    test_args = [
+        "import",
+        "-f",
+        "./test/data/GGM_Monumenten_EA2.1.xml",
+        "-t",
+        "eaxmi",
+        "-db_create",
+    ]
     cli.main(test_args)
 
     # Check if content is correctly loaded
@@ -61,7 +68,7 @@ def test_lod_renderer():
     assert is_valid_ttl_file(outputfile)
 
     # Test if all classes are there
-    assert count_occurences('owl:Class', outputfile) == 6  # Only classes in the model
+    assert count_occurences("owl:Class", outputfile) == 6  # Only classes in the model
     # assert count_occurences('RDF:Property', outputfile) == 31
 
     # Cleanup

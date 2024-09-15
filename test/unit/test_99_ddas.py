@@ -114,22 +114,22 @@ def test_importAndTransform_schuldhulp():
 
     cli.main(test_args)
 
-    monfilename = f'{dir}def_Model Schuldhulpverlening.md'
+    monfilename = f"{dir}def_Model Schuldhulpverlening.md"
     assert os.path.exists(monfilename)
     assert (
-        open(monfilename, 'r')
+        open(monfilename, "r")
         .read()
         .find(
-            'Begeleiding voor clienten in het kader van schuldhulpdienstverlening, die kan bestaan uit: 1. budgetbeheer'
-            ' 2. beschermingsbewind 3. budgetcoaching'
+            "Begeleiding voor clienten in het kader van schuldhulpdienstverlening, die kan bestaan uit: 1. budgetbeheer"
+            " 2. beschermingsbewind 3. budgetcoaching"
         )
     )
-    assert open(monfilename, 'r').read().find('### Schuldhulptraject')
+    assert open(monfilename, "r").read().find("### Schuldhulptraject")
 
 
 def validate_json_schema(dir):
     def load_json_file(file_path):
-        with open(file_path, 'r') as file:
+        with open(file_path, "r") as file:
             return json.load(file)
 
     # Path to the JSON schema file to be tested

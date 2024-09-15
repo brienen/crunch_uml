@@ -28,16 +28,22 @@ def store_data(entity_name, data, schema, update_only=False):
 
     # Als er een ID in de data aanwezig is, zoek dan naar een bestaand record
     if "id" in data:
-        if existing_entity := session.query(entity).filter_by(id=data["id"], schema_id=schema.schema_id).first():
+        if (
+            existing_entity := session.query(entity)
+            .filter_by(id=data["id"], schema_id=schema.schema_id)
+            .first()
+        ):
             for key, value in data.items():
-                if value is not None and value != '' and key != 'id':
+                if value is not None and value != "" and key != "id":
                     setattr(existing_entity, key, value)
             logger.debug(f"Updated {entity_name} with ID {data['id']}.")
             schema.save(existing_entity)
         else:
             if not update_only:
                 # ID was aanwezig, maar geen overeenkomstige record werd gevonden
-                logger.debug(f"No {entity_name} found with ID {data['id']}, creating a new record.")
+                logger.debug(
+                    f"No {entity_name} found with ID {data['id']}, creating a new record."
+                )
                 new_entity = entity(**data)
                 schema.save(new_entity)
     else:
@@ -51,7 +57,8 @@ def store_data(entity_name, data, schema, update_only=False):
 
 
 @ParserRegistry.register(
-    "json", descr='Generic parser that parses JSON-files, and looks for table and column definitions.'
+    "json",
+    descr="Generic parser that parses JSON-files, and looks for table and column definitions.",
 )
 class JSONParser(Parser):
 
@@ -70,7 +77,7 @@ class JSONParser(Parser):
         # sourcery skip: raise-specific-error
         try:
             if args.inputfile is not None:
-                with open(args.inputfile, 'r') as f:
+                with open(args.inputfile, "r") as f:
                     parsed_data = json.load(f)
             elif args.url is not None:
                 response = requests.get(args.url)
@@ -81,10 +88,12 @@ class JSONParser(Parser):
             tables = db.getTables()
             # Ga ervan uit dat het JSON-bestand een structuur heeft zoals eerder beschreven
             for entity_name, records in parsed_data.items():
-                if entity_name in tables and entity_name != 'schemas':
+                if entity_name in tables and entity_name != "schemas":
                     for record in records:
                         record = self.transform_record(record)
-                        store_data(entity_name, record, schema, update_only=self.update_only())
+                        store_data(
+                            entity_name, record, schema, update_only=self.update_only()
+                        )
         except json.JSONDecodeError as ex:
             msg = f"File with name {args.inputfile} is not a valid JSON-file, aborting with message {ex.msg}"
             logger.error(msg)
@@ -94,7 +103,7 @@ class JSONParser(Parser):
 
 @ParserRegistry.register(
     "i18n",
-    descr=f'Parser that reads i18n file and stores the values in the database. Use --language to specify language. (default: {const.DEFAULT_LANGUAGE})',
+    descr=f"Parser that reads i18n file and stores the values in the database. Use --language to specify language. (default: {const.DEFAULT_LANGUAGE})",
 )
 class I18nParser(JSONParser):
 
@@ -114,15 +123,15 @@ class I18nParser(JSONParser):
         # i18n records always are in the form of RECORD_TYPE_INDEXED: key: {record}
         key, value = next(iter(record.items()))
         record = value
-        record['id'] = key
+        record["id"] = key
         return record
 
 
 @ParserRegistry.register(
     "xlsx",
     descr=(
-        'Generic parser that parses Excel files, and excpect one or more worksheets that correspond with the names of'
-        ' one or more of the tables.'
+        "Generic parser that parses Excel files, and excpect one or more worksheets that correspond with the names of"
+        " one or more of the tables."
     ),
 )
 class XLXSParser(Parser):
@@ -132,14 +141,16 @@ class XLXSParser(Parser):
 
         try:
             # Lees het Excel-bestand
-            xls = pd.ExcelFile(args.inputfile if args.inputfile is not None else args.url)
+            xls = pd.ExcelFile(
+                args.inputfile if args.inputfile is not None else args.url
+            )
 
             tables = db.getTables()
             # Loop door elk tabblad in het Excel-bestand
             for sheet_name in xls.sheet_names:
-                if sheet_name in tables and sheet_name != 'schemas':
+                if sheet_name in tables and sheet_name != "schemas":
                     # Lees de gegevens van het huidige tabblad als een lijst van woordenboeken
-                    records = xls.parse(sheet_name).to_dict(orient='records')
+                    records = xls.parse(sheet_name).to_dict(orient="records")
 
                     for record in records:
                         store_data(sheet_name, record, schema)
@@ -153,7 +164,8 @@ class XLXSParser(Parser):
 
 
 @ParserRegistry.register(
-    "csv", descr='Generic parser that parses one CSV file, and excpect its name to be in the list of tables.'
+    "csv",
+    descr="Generic parser that parses one CSV file, and excpect its name to be in the list of tables.",
 )
 class CSVParser(Parser):
     def parse(self, args, schema: sch.Schema):
@@ -164,18 +176,22 @@ class CSVParser(Parser):
             entity_name = os.path.splitext(os.path.basename(args.inputfile))[0]
 
             tables = db.getTables()
-            if entity_name in tables and entity_name != 'schemas':
+            if entity_name in tables and entity_name != "schemas":
                 # Lees het CSV-bestand in een dataframe
-                df = pd.read_csv(args.inputfile if args.inputfile is not None else args.url)
+                df = pd.read_csv(
+                    args.inputfile if args.inputfile is not None else args.url
+                )
 
                 # Converteer het dataframe naar een lijst van woordenboeken (records)
-                records = df.to_dict(orient='records')
+                records = df.to_dict(orient="records")
 
                 for record in records:
                     store_data(entity_name, record, schema)
 
             else:
-                logger.warning(f"Could not import file: no entity found with name {entity_name}")
+                logger.warning(
+                    f"Could not import file: no entity found with name {entity_name}"
+                )
 
         except Exception as ex:
             msg = f"Error while parsing the CSV file {args.inputfile}: {str(ex)}"

@@ -37,7 +37,12 @@ class DDASPluginUitwisselmodel(Plugin):
         for clazz in kopie.classes:
             lst_assoc = [assoc for assoc in clazz.uitgaande_associaties]
             for association in lst_assoc:
-                if str(association.name).strip() in ["resulteert in", "dienstverlening", "voert traject uit", "soort"]:
+                if str(association.name).strip() in [
+                    "resulteert in",
+                    "dienstverlening",
+                    "voert traject uit",
+                    "soort",
+                ]:
                     clazz.uitgaande_associaties.remove(association)
 
         # Now remove classes 'project', 'projectsoort' en 'notariele status'
@@ -63,13 +68,22 @@ class DDASPluginUitwisselmodel(Plugin):
             ),
         )
         startdatumLevering = Attribute(
-            id=util.getEAGuid(), name="startdatumLevering", schema_id=schema_to.schema_id, primitive="Datum"
+            id=util.getEAGuid(),
+            name="startdatumLevering",
+            schema_id=schema_to.schema_id,
+            primitive="Datum",
         )
         einddatumLevering = Attribute(
-            id=util.getEAGuid(), name="einddatumLevering", schema_id=schema_to.schema_id, primitive="Datum"
+            id=util.getEAGuid(),
+            name="einddatumLevering",
+            schema_id=schema_to.schema_id,
+            primitive="Datum",
         )
         aanleverdatumEnTijd = Attribute(
-            id=util.getEAGuid(), name="aanleverdatumEnTijd", schema_id=schema_to.schema_id, primitive="datumtijd"
+            id=util.getEAGuid(),
+            name="aanleverdatumEnTijd",
+            schema_id=schema_to.schema_id,
+            primitive="datumtijd",
         )
         uitwisselmodel.attributes.append(startdatumLevering)
         uitwisselmodel.attributes.append(einddatumLevering)

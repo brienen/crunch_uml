@@ -14,10 +14,10 @@ logger = logging.getLogger()
 
 
 class LodRenderer(ModelRenderer):
-    '''
+    """
     Renders all model packages using jinja2 and a template.
     A model package is a package with at least 1 class inside
-    '''
+    """
 
     def writeToFile(self, graph, args):
         pass
@@ -48,8 +48,10 @@ class LodRenderer(ModelRenderer):
         class_dict = {}  # used to find all classes by guid
         # First add all classes
         for model in models:
-            modelname = util.remove_substring(model.name, 'model')
-            ns = Namespace(urljoin(str(args.linked_data_namespace), f"/{quote(modelname)}/"))
+            modelname = util.remove_substring(model.name, "model")
+            ns = Namespace(
+                urljoin(str(args.linked_data_namespace), f"/{quote(modelname)}/")
+            )
 
             for cls in model.classes:
                 # Werk eerst de dict bij
@@ -69,7 +71,13 @@ class LodRenderer(ModelRenderer):
                         g.add((ns[attribute.id], RDFS.label, Literal(attribute.name)))
                         g.add((ns[attribute.id], RDFS.range, XSD.string))
                         if attribute.definitie is not None:
-                            g.add((ns[attribute.id], RDFS.comment, Literal(attribute.definitie)))
+                            g.add(
+                                (
+                                    ns[attribute.id],
+                                    RDFS.comment,
+                                    Literal(attribute.definitie),
+                                )
+                            )
 
         # Then add all relations
         for model in models:
@@ -95,69 +103,71 @@ class LodRenderer(ModelRenderer):
                         g.add((ns[assoc.id], RDFS.range, to_cls))
                         g.add((ns[assoc.id], RDFS.label, Literal(assoc.name)))
                         if assoc.definitie is not None:
-                            g.add((ns[assoc.id], RDFS.comment, Literal(assoc.definitie)))
+                            g.add(
+                                (ns[assoc.id], RDFS.comment, Literal(assoc.definitie))
+                            )
 
         self.writeToFile(g, args)
 
 
 @RendererRegistry.register(
     "ttl",
-    descr='Renderer that renders Linked Data ontology in turtle from the supplied models, '
-    + 'where a model is a package that includes at least one Class. '
+    descr="Renderer that renders Linked Data ontology in turtle from the supplied models, "
+    + "where a model is a package that includes at least one Class. "
     + 'Needs parameter "output_lod_url".',
 )
 class TTLRenderer(LodRenderer):
-    '''
+    """
     Renders all model packages using jinja2 and a template.
     A model package is a package with at least 1 class inside
-    '''
+    """
 
     def writeToFile(self, graph, args):
         # get filename
         base_name, ext = os.path.splitext(args.outputfile)
-        outputfile = f'{base_name}.ttl'
+        outputfile = f"{base_name}.ttl"
 
-        with open(outputfile, 'w') as file:
-            file.write(graph.serialize(format='turtle'))
+        with open(outputfile, "w") as file:
+            file.write(graph.serialize(format="turtle"))
 
 
 @RendererRegistry.register(
     "rdf",
-    descr='Renderer that renders Linked Data ontology in RDF from the supplied models, '
-    + 'where a model is a package that includes at least one Class. '
+    descr="Renderer that renders Linked Data ontology in RDF from the supplied models, "
+    + "where a model is a package that includes at least one Class. "
     + ' Needs parameter "output_lod_url".',
 )
 class RDFRenderer(LodRenderer):
-    '''
+    """
     Renders all model packages using jinja2 and a template.
     A model package is a package with at least 1 class inside
-    '''
+    """
 
     def writeToFile(self, graph, args):
         # get filename
         base_name, ext = os.path.splitext(args.outputfile)
-        outputfile = f'{base_name}.rdf'
+        outputfile = f"{base_name}.rdf"
 
-        with open(outputfile, 'w') as file:
-            file.write(graph.serialize(format='xml'))
+        with open(outputfile, "w") as file:
+            file.write(graph.serialize(format="xml"))
 
 
 @RendererRegistry.register(
     "json-ld",
-    descr='Renderer that renders Linked Data ontology in JSON-LD from the supplied models, '
-    + 'where a model is a package that includes at least one Class. '
+    descr="Renderer that renders Linked Data ontology in JSON-LD from the supplied models, "
+    + "where a model is a package that includes at least one Class. "
     + ' Needs parameter "output_lod_url".',
 )
 class JSONLDRenderer(LodRenderer):
-    '''
+    """
     Renders all model packages using jinja2 and a template.
     A model package is a package with at least 1 class inside
-    '''
+    """
 
     def writeToFile(self, graph, args):
         # get filename
         base_name, ext = os.path.splitext(args.outputfile)
-        outputfile = f'{base_name}.jsonld'
+        outputfile = f"{base_name}.jsonld"
 
-        with open(outputfile, 'w') as file:
-            file.write(graph.serialize(format='json-ld'))
+        with open(outputfile, "w") as file:
+            file.write(graph.serialize(format="json-ld"))

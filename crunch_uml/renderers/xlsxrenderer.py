@@ -10,7 +10,8 @@ logger = logging.getLogger()
 
 
 @RendererRegistry.register(
-    "xlsx", descr='Renders Excel sheet where each tab corresponds to one of the tables in te datamodel.'
+    "xlsx",
+    descr="Renders Excel sheet where each tab corresponds to one of the tables in te datamodel.",
 )
 class XLSXRenderer(Renderer):
     def render(self, args, schema: sch.Schema):
@@ -29,8 +30,8 @@ class XLSXRenderer(Renderer):
             # Headers
             # columns = [c.name for c in table.columns]
             # Sort columns: 'id' first, then others alphabetically
-            columns = ['id'] if 'id' in table.columns else []
-            columns.extend(sorted([c.name for c in table.columns if c.name != 'id']))
+            columns = ["id"] if "id" in table.columns else []
+            columns.extend(sorted([c.name for c in table.columns if c.name != "id"]))
 
             for col_num, column in enumerate(columns, 1):
                 ws.cell(row=1, column=col_num, value=column)
@@ -41,9 +42,14 @@ class XLSXRenderer(Renderer):
             if model:  # Ensure there's an associated model class
                 # Data
                 for row_num, record in enumerate(
-                    session.query(model).filter(model.schema_id == schema.schema_id).all(), 2
+                    session.query(model)
+                    .filter(model.schema_id == schema.schema_id)
+                    .all(),
+                    2,
                 ):
                     for col_num, column in enumerate(columns, 1):
-                        ws.cell(row=row_num, column=col_num, value=getattr(record, column))
+                        ws.cell(
+                            row=row_num, column=col_num, value=getattr(record, column)
+                        )
 
         wb.save(args.outputfile)

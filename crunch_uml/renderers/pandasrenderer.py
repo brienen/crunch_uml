@@ -14,11 +14,14 @@ logger = logging.getLogger()
 
 def object_as_dict(obj):
     """Converts a SQLAlchemy model object to a dictionary, excluding private attributes."""
-    return {c.key: getattr(obj, c.key) for c in sqlalchemy.inspect(obj).mapper.column_attrs}
+    return {
+        c.key: getattr(obj, c.key) for c in sqlalchemy.inspect(obj).mapper.column_attrs
+    }
 
 
 @RendererRegistry.register(
-    "json", descr='Renders JSON document where each element corresponds to one of the tables in the datamodel.'
+    "json",
+    descr="Renders JSON document where each element corresponds to one of the tables in the datamodel.",
 )
 class JSONRenderer(Renderer):
 
@@ -45,12 +48,16 @@ class JSONRenderer(Renderer):
             # Model class associated with the table
             model = base.model_lookup_by_table_name(table_name)
             if (
-                not model or self.get_record_type() == const.RECORD_TYPE_INDEXED and 'id' not in model.__table__.columns
+                not model
+                or self.get_record_type() == const.RECORD_TYPE_INDEXED
+                and "id" not in model.__table__.columns
             ):  # In case of a junction table
                 continue
 
             # Retrieve data
-            records = session.query(model).filter(model.schema_id == schema.schema_id).all()
+            records = (
+                session.query(model).filter(model.schema_id == schema.schema_id).all()
+            )
             data = [object_as_dict(record) for record in records]
 
             # Filter columns based on included_columns, unless included_columns is empty
@@ -60,15 +67,18 @@ class JSONRenderer(Renderer):
                     filtered_record = {
                         key: value
                         for key, value in record.items()
-                        if key in included_columns and (empty_values or value is not None)
+                        if key in included_columns
+                        and (empty_values or value is not None)
                     }
                 else:
-                    filtered_record = record  # Include all columns if included_columns is empty
+                    filtered_record = (
+                        record  # Include all columns if included_columns is empty
+                    )
                 if len(filtered_record) > 0:
                     filtered_data.append(
                         filtered_record
                         if self.get_record_type() == const.RECORD_TYPE_RECORD
-                        else {record['id']: filtered_record}
+                        else {record["id"]: filtered_record}
                     )
 
             all_data[table_name] = filtered_data
@@ -82,7 +92,7 @@ class JSONRenderer(Renderer):
 
 @RendererRegistry.register(
     "i18n",
-    descr=f'Renders a i18n file containing all tables with keys to the translatable fields ({const.LANGUAGE_TRANSLATE_FIELDS}) Also translates to a specified language.',
+    descr=f"Renders a i18n file containing all tables with keys to the translatable fields ({const.LANGUAGE_TRANSLATE_FIELDS}) Also translates to a specified language.",
 )
 class I18nRenderer(JSONRenderer):
 
@@ -94,7 +104,7 @@ class I18nRenderer(JSONRenderer):
     def get_record_type(self):
         return const.RECORD_TYPE_INDEXED
 
-    def translate_data(self, data, to_language, from_language='auto'):
+    def translate_data(self, data, to_language, from_language="auto"):
         logger.info(
             f"Starting Translating data to language '{to_language}'. This may take a while: {util.count_dict_elements(data)} entries..."
         )
@@ -107,7 +117,10 @@ class I18nRenderer(JSONRenderer):
                 for key, record in entry.items():
                     for field, value in record.items():
                         translated_record[field] = lang.translate(  #
-                            value, to_language=to_language, from_language=from_language, max_retries=1
+                            value,
+                            to_language=to_language,
+                            from_language=from_language,
+                            max_retries=1,
                         )
                 translated_data[section].append({key: translated_record})
 
@@ -120,7 +133,9 @@ class I18nRenderer(JSONRenderer):
         # Retrieve all data
         all_data = self.get_all_data(args, schema, empty_values=False)
         if args.translate:
-            all_data = self.translate_data(all_data, args.language, from_language=args.from_language)
+            all_data = self.translate_data(
+                all_data, args.language, from_language=args.from_language
+            )
 
         # Initialize the i18n structure
         i18n_data = {}
@@ -131,17 +146,23 @@ class I18nRenderer(JSONRenderer):
                 try:
                     i18n_data = json.load(json_file)
                 except json.JSONDecodeError:
-                    raise ValueError(f"The file {args.outputfile} is not a valid JSON file.")
+                    raise ValueError(
+                        f"The file {args.outputfile} is not a valid JSON file."
+                    )
 
             if not isinstance(i18n_data, dict):
-                raise ValueError(f"The file {args.outputfile} does not contain a valid i18n structure.")
+                raise ValueError(
+                    f"The file {args.outputfile} does not contain a valid i18n structure."
+                )
 
         # Update the i18n data with the new language entry
         i18n_data[args.language] = all_data
 
         # Controleer of het bestand al bestaat
         if not os.path.exists(args.outputfile):
-            logger.info(f"Vertaalbestand {args.outputfile} bestaat niet, maak een nieuw bestand aan...")
+            logger.info(
+                f"Vertaalbestand {args.outputfile} bestaat niet, maak een nieuw bestand aan..."
+            )
 
         # Write the updated i18n data back to the file
         with open(args.outputfile, "w", encoding="utf-8") as json_file:
@@ -151,7 +172,8 @@ class I18nRenderer(JSONRenderer):
 
 
 @RendererRegistry.register(
-    "csv", descr='Renders multiple CSV files where each file corresponds to one of the tables in the datamodel.'
+    "csv",
+    descr="Renders multiple CSV files where each file corresponds to one of the tables in the datamodel.",
 )
 class CSVRenderer(Renderer):
     def render(self, args, schema: sch.Schema):
@@ -167,6 +189,8 @@ class CSVRenderer(Renderer):
                 continue
 
             # Retrieve data
-            records = session.query(model).filter(model.schema_id == schema.schema_id).all()
+            records = (
+                session.query(model).filter(model.schema_id == schema.schema_id).all()
+            )
             df = pd.DataFrame([object_as_dict(record) for record in records])
             df.to_csv(f"{args.outputfile}{table_name}.csv", index=False)

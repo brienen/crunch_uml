@@ -8,7 +8,14 @@ from crunch_uml import cli, const, db
 
 
 def test_import_schuldhulp():
-    test_args = ["import", "-f", "./test/data/Model Schuldhulpverlening.xml", "-t", "eaxmi", "-db_create"]
+    test_args = [
+        "import",
+        "-f",
+        "./test/data/Model Schuldhulpverlening.xml",
+        "-t",
+        "eaxmi",
+        "-db_create",
+    ]
     cli.main(test_args)
 
     database = db.Database(const.DATABASE_URL, db_create=False)
@@ -31,7 +38,7 @@ def test_import_schuldhulp():
     cli.main(test_args)
 
     database = db.Database(const.DATABASE_URL, db_create=False)
-    schema = sch.Schema(database, 'schuldhulp')
+    schema = sch.Schema(database, "schuldhulp")
     assert schema.count_package() == 1
     assert schema.count_enumeratie() == 5
     assert schema.count_class() == 32
@@ -52,13 +59,13 @@ def test_import_schuldhulp():
     cli.main(test_args)
 
     database = db.Database(const.DATABASE_URL, db_create=False)
-    schema = sch.Schema(database, 'schuldhulp')
+    schema = sch.Schema(database, "schuldhulp")
     assert schema.count_package() == 1
 
 
 def test_validate_json_schema():
     def load_json_file(file_path):
-        with open(file_path, 'r') as file:
+        with open(file_path, "r") as file:
             return json.load(file)
 
     # Path to the JSON schema file to be tested

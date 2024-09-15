@@ -11,36 +11,31 @@ import crunch_uml.transformers.transformer as transformers
 from crunch_uml import const
 from crunch_uml.db import Database
 from crunch_uml.parsers.eaxmiparser import EAXMIParser  # noqa: F401
-from crunch_uml.parsers.multiple_parsers import (  # noqa: F401
-    CSVParser,
-    I18nParser,
-    JSONParser,
-    XLXSParser,
-)
+from crunch_uml.parsers.multiple_parsers import (CSVParser,  # noqa: F401
+                                                 I18nParser, JSONParser,
+                                                 XLXSParser)
 from crunch_uml.parsers.xmiparser import XMIParser  # noqa: F401
 from crunch_uml.renderers.earepoupdater import EARepoUpdater  # noqa: F401
-from crunch_uml.renderers.jinja2renderer import (  # noqa: F401
-    GGM_MDRenderer,
-    Jinja2Renderer,
-    JSON_SchemaRenderer,
-)
-from crunch_uml.renderers.lodrenderer import (  # noqa: F401
-    JSONLDRenderer,
-    RDFRenderer,
-    TTLRenderer,
-)
+from crunch_uml.renderers.jinja2renderer import (GGM_MDRenderer,  # noqa: F401
+                                                 Jinja2Renderer,
+                                                 JSON_SchemaRenderer)
+from crunch_uml.renderers.lodrenderer import (JSONLDRenderer,  # noqa: F401
+                                              RDFRenderer, TTLRenderer)
 from crunch_uml.renderers.pandasrenderer import CSVRenderer  # noqa: F401
-from crunch_uml.renderers.pandasrenderer import I18nRenderer, JSONRenderer  # noqa: F401
+from crunch_uml.renderers.pandasrenderer import (I18nRenderer,  # noqa: F401
+                                                 JSONRenderer)
 from crunch_uml.renderers.sqlarenderer import SQLARenderer  # noqa: F401
 from crunch_uml.renderers.xlsxrenderer import XLSXRenderer  # noqa: F401
-from crunch_uml.transformers.copytransformer import CopyTransformer  # noqa: F401
-from crunch_uml.transformers.plugintransformer import PluginTransformer  # noqa: F401
+from crunch_uml.transformers.copytransformer import \
+    CopyTransformer  # noqa: F401
+from crunch_uml.transformers.plugintransformer import \
+    PluginTransformer  # noqa: F401
 
 # Configureer logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%d-%b-%y %H:%M:%S',
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%d-%b-%y %H:%M:%S",
     stream=sys.stderr,
 )
 logger = logging.getLogger()
@@ -49,28 +44,37 @@ logger = logging.getLogger()
 def main(args=None):
     """The main entrypoint for this script used in the setup.py file."""
     argumentparser = argparse.ArgumentParser(description=const.DESCRIPTION)
-    argumentparser.add_argument('-v', '--verbose', action='store_true', help='set log level INFO')
-    argumentparser.add_argument('-d', '--debug', action='store_true', help='set log level to DEBUG')
     argumentparser.add_argument(
-        '-w', '--do_not_suppress_warnings', action='store_true', help='do not suppress warnings.'
+        "-v", "--verbose", action="store_true", help="set log level INFO"
+    )
+    argumentparser.add_argument(
+        "-d", "--debug", action="store_true", help="set log level to DEBUG"
+    )
+    argumentparser.add_argument(
+        "-w",
+        "--do_not_suppress_warnings",
+        action="store_true",
+        help="do not suppress warnings.",
     )
 
     # Voeg subparsers toe aan het hoofdparser-object
-    subparsers = argumentparser.add_subparsers(dest="command", help="Available sub commands.")
+    subparsers = argumentparser.add_subparsers(
+        dest="command", help="Available sub commands."
+    )
     subparser_dict = {
         const.CMD_IMPORT: subparsers.add_parser(
             const.CMD_IMPORT,
-            help='Import datamodel to Crunch UML database into a schema',
+            help="Import datamodel to Crunch UML database into a schema",
             formatter_class=argparse.RawTextHelpFormatter,
         ),
         const.CMD_TRANSFORM: subparsers.add_parser(
             const.CMD_TRANSFORM,
-            help='Transform datamodel from one schema to another schema',
+            help="Transform datamodel from one schema to another schema",
             formatter_class=argparse.RawTextHelpFormatter,
         ),
         const.CMD_EXPORT: subparsers.add_parser(
             const.CMD_EXPORT,
-            help='Export datamodel from a schema in the Crunch UML database to various formats',
+            help="Export datamodel from a schema in the Crunch UML database to various formats",
             formatter_class=argparse.RawTextHelpFormatter,
         ),
     }
@@ -125,7 +129,9 @@ def main(args=None):
         database = Database(args.database_url, db_create=False)
         logger.info("Starting transformation ")
         try:
-            transformer = transformers.TransformerRegistry.getinstance(args.transformationtype)
+            transformer = transformers.TransformerRegistry.getinstance(
+                args.transformationtype
+            )
             transformer.transform(args, database)
             database.commit()
             logger.info(
@@ -154,5 +160,5 @@ def main(args=None):
         logger.error("Unknown command: this should never happen!")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

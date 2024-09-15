@@ -5,17 +5,21 @@ import sys
 
 from crunch_uml.exceptions import CrunchException
 from crunch_uml.transformers.plugin import Plugin
-from crunch_uml.transformers.transformer import Transformer, TransformerRegistry
+from crunch_uml.transformers.transformer import (Transformer,
+                                                 TransformerRegistry)
 
 logger = logging.getLogger()
 
 
 @TransformerRegistry.register(
-    "plugin", descr='Writes the content from one schema to another using a dynamicly loaded plugin.'
+    "plugin",
+    descr="Writes the content from one schema to another using a dynamicly loaded plugin.",
 )
 class PluginTransformer(Transformer):
     def load_plugin_dynamically(self, plugin_path, plugin_class_name):
-        logger.debug(f"Dynamically loading class {plugin_class_name} from module at {plugin_path}")
+        logger.debug(
+            f"Dynamically loading class {plugin_class_name} from module at {plugin_path}"
+        )
 
         if not os.path.exists(plugin_path):
             msg = f"Error: The module path '{plugin_path}' does not exist."
@@ -52,9 +56,15 @@ class PluginTransformer(Transformer):
 
     def transformLogic(self, args, root_package, schema_from, schema_to):
         if not args.plugin_file_name:
-            raise CrunchException("Error: no module provided for plugin, --plugin_file_name needs to have value.")
+            raise CrunchException(
+                "Error: no module provided for plugin, --plugin_file_name needs to have value."
+            )
         if not args.plugin_class_name:
-            raise CrunchException("Error: no class provided for plugin, --plugin_class_name needs to have value.")
-        MyPlugin = self.load_plugin_dynamically(args.plugin_file_name, args.plugin_class_name)
+            raise CrunchException(
+                "Error: no class provided for plugin, --plugin_class_name needs to have value."
+            )
+        MyPlugin = self.load_plugin_dynamically(
+            args.plugin_file_name, args.plugin_class_name
+        )
         plugin = MyPlugin()
         plugin.transformLogic(args, root_package, schema_from, schema_to)

@@ -18,46 +18,52 @@ def add_args(argumentparser, subparser_dict):
 
     # Creëer een mutually exclusive group en add options
     group = import_subparser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-f', '--inputfile', type=str, help="Path to import file")
-    group.add_argument('-url', type=str, help="URL to import file")
+    group.add_argument("-f", "--inputfile", type=str, help="Path to import file")
+    group.add_argument("-url", type=str, help="URL to import file")
 
     import_subparser.add_argument(
-        '-t',
-        '--inputtype',
+        "-t",
+        "--inputtype",
         type=str,
         choices=ParserRegistry.entries(),
-        help=f'geeft inputtype aan: {ParserRegistry.entries()}.',
+        help=f"geeft inputtype aan: {ParserRegistry.entries()}.",
     )
     import_subparser.add_argument(
-        '--skip_xmi_relations', default=False, action='store_true', help="Skip parsing relations for XMI files only)"
+        "--skip_xmi_relations",
+        default=False,
+        action="store_true",
+        help="Skip parsing relations for XMI files only)",
     )
     import_subparser.add_argument(
-        '-lan',
-        '--language',
+        "-lan",
+        "--language",
         type=str,
         default=const.DEFAULT_LANGUAGE,
-        help='Used only for i18n parser. Defines the language of the input file.'
-        + f' Default is {const.DEFAULT_LANGUAGE}.',
+        help="Used only for i18n parser. Defines the language of the input file."
+        + f" Default is {const.DEFAULT_LANGUAGE}.",
     )
 
     # Set the epilog help text
     entries = ParserRegistry.entries()
     items = [f'"{item}": {ParserRegistry.getDescription(item)}' for item in entries]
-    epilog = 'More informaation on the export types that are supported:\n\n' + '\n'.join(items)
+    epilog = (
+        "More informaation on the export types that are supported:\n\n"
+        + "\n".join(items)
+    )
     epilog = f"{epilog}\n\nThe following tables are suported: {db.getTables()}"
     import_subparser.epilog = epilog
 
 
 def fixtag(tag):
-    return tag.replace('-', '_').replace(' ', '_').lower()
+    return tag.replace("-", "_").replace(" ", "_").lower()
 
 
 def copy_values(node, obj):
-    '''
+    """
     Copies all values from attributes of node to obj,
     if obj has an attribute with the same name.
     Fix for '-' symbol to '_'
-    '''
+    """
     if node is not None:
         if isinstance(node, list):
             for item in node:

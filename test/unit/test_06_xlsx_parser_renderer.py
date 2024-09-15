@@ -37,7 +37,14 @@ def test_xlsx_parser_renderer():  # sourcery skip: extract-duplicate-method
     outputfile = "./test/output/Onderwijs_output.xlsx"
 
     # import monumenten into clean database
-    test_args = ["import", "-t", "xmi", "-f", "./test/data/GGM_Onderwijs_XMI.2.1.xml", "-db_create"]
+    test_args = [
+        "import",
+        "-t",
+        "xmi",
+        "-f",
+        "./test/data/GGM_Onderwijs_XMI.2.1.xml",
+        "-db_create",
+    ]
     cli.main(test_args)
 
     database = db.Database(const.DATABASE_URL, db_create=False)
@@ -120,7 +127,10 @@ def test_xlsx_parser_and_changes():  # sourcery skip: extract-duplicate-method
     assert (
         schema.get_session()
         .query(db.Attribute)
-        .filter(db.Attribute.definitie == "Test Descr", db.Attribute.schema_id == schema.schema_id)
+        .filter(
+            db.Attribute.definitie == "Test Descr",
+            db.Attribute.schema_id == schema.schema_id,
+        )
         .count()
         == 15
     )
@@ -129,7 +139,10 @@ def test_xlsx_parser_and_changes():  # sourcery skip: extract-duplicate-method
     assert (
         schema.get_session()
         .query(db.Generalization)
-        .filter(db.Generalization.definitie == "Test Descr", db.Generalization.schema_id == schema.schema_id)
+        .filter(
+            db.Generalization.definitie == "Test Descr",
+            db.Generalization.schema_id == schema.schema_id,
+        )
         .count()
         == 4
     )

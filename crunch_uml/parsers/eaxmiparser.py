@@ -9,16 +9,17 @@ logger = logging.getLogger()
 
 
 @ParserRegistry.register(
-    "eaxmi", descr='XMI-Parser that parses EA (Enterprise Architect) specific extensions. Tested on XMI v2.1 spec '
+    "eaxmi",
+    descr="XMI-Parser that parses EA (Enterprise Architect) specific extensions. Tested on XMI v2.1 spec ",
 )
 class EAXMIParser(XMIParser):
     def phase3_process_extra(self, node, ns, schema: sch.Schema):
-        '''
+        """
         third and last phase of parsing XMI-documents. Parsing extra propriatary data: addons to allready found data.
         Starts at <xmi:Extension extender="Enterprise Architect" extenderID="6.5">
-        '''
-        logger.info('Entering third phase parsing for EAParser: extras')
-        extensions = node.xpath('//xmi:Extension', namespaces=ns)
+        """
+        logger.info("Entering third phase parsing for EAParser: extras")
+        extensions = node.xpath("//xmi:Extension", namespaces=ns)
         if len(extensions) < 1:
             logger.warning(
                 "Trying to parse input as EA XMI, no 'Extensions' node was found. Appears to strict XMI file."
@@ -26,7 +27,7 @@ class EAXMIParser(XMIParser):
             return
         extension = extensions[0]  # type: ignore
 
-        '''
+        """
         First find all package modifiers that look like:
             <element xmi:idref="EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652" xmi:type="uml:Package" name="Diagram" scope="public">
                 <model package2="EAID_5B6708DC_CE09_4284_8DCE_DD1B744BB652" package="EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E" tpos="0" ea_localid="41" ea_eleType="package"/>
@@ -43,23 +44,23 @@ class EAXMIParser(XMIParser):
                 <flags iscontrolled="0" isprotected="0" batchsave="0" batchload="0" usedtd="0" logxml="0"/>
             </element>
         and set value
-        '''
-        logger.info('Processing references to packages')
+        """
+        logger.info("Processing references to packages")
         packagerefs = extension.xpath(".//element[@xmi:type='uml:Package' and @xmi:idref]", namespaces=ns)  # type: ignore
         for packageref in packagerefs:
-            idref = packageref.get('{' + ns['xmi'] + '}idref')
+            idref = packageref.get("{" + ns["xmi"] + "}idref")
             package = schema.get_package(idref)
-            project = packageref.xpath('./project')[0]
+            project = packageref.xpath("./project")[0]
             copy_values(project, package)
 
-            tags = packageref.xpath('./tags/tag')
+            tags = packageref.xpath("./tags/tag")
             for tag in tags:
-                if hasattr(package, fixtag(tag.get('name'))):
-                    setattr(package, fixtag(tag.get('name')), tag.get('value'))
+                if hasattr(package, fixtag(tag.get("name"))):
+                    setattr(package, fixtag(tag.get("name")), tag.get("value"))
 
             schema.save(package)
 
-        '''
+        """
         Second find all class modifiers, like:
             <element xmi:idref="EAID_54944273_F312_44b2_A78D_43488F915429" xmi:type="uml:Class" name="Ambacht" scope="public">
                 <model package="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" tpos="0" ea_localid="382" ea_eleType="element"/>
@@ -79,31 +80,31 @@ class EAXMIParser(XMIParser):
                 </tags>
                 <xrefs/>
                 <extendedProperties tagged="0" package_name="Model Monumenten"/>
-        '''
+        """
 
-        logger.info('Processing references to classes')
+        logger.info("Processing references to classes")
         clazzrefs = extension.xpath(".//element[@xmi:type='uml:Class' and @xmi:idref]", namespaces=ns)  # type: ignore
         for clazzref in clazzrefs:
-            idref = clazzref.get('{' + ns['xmi'] + '}idref')
+            idref = clazzref.get("{" + ns["xmi"] + "}idref")
             clazz = schema.get_class(idref)
 
             if clazz is not None:
-                properties = clazzref.xpath('./properties')[0]
+                properties = clazzref.xpath("./properties")[0]
                 if properties is not None:
-                    clazz.definitie = properties.get('documentation')
-                project = clazzref.xpath('./project')
+                    clazz.definitie = properties.get("documentation")
+                project = clazzref.xpath("./project")
                 copy_values(project, clazz)
-                stereotype = clazzref.xpath('./stereotype')
+                stereotype = clazzref.xpath("./stereotype")
                 copy_values(stereotype, clazz)
 
-                tags = clazzref.xpath('./tags/tag')
+                tags = clazzref.xpath("./tags/tag")
                 for tag in tags:
-                    if hasattr(clazz, fixtag(tag.get('name'))):
-                        setattr(clazz, fixtag(tag.get('name')), tag.get('value'))
+                    if hasattr(clazz, fixtag(tag.get("name"))):
+                        setattr(clazz, fixtag(tag.get("name")), tag.get("value"))
 
                 schema.save(clazz)
 
-        '''
+        """
         Third find all attributes, like
             <attribute xmi:idref="EAID_B2AE8AFC_C1D5_4d83_BFD3_EBF1663F3468" name="rijksmonument" scope="Public">
             <initial/>
@@ -120,49 +121,59 @@ class EAXMIParser(XMIParser):
             <tags/>
             <xrefs/>
             </attribute>
-        '''
-        logger.info('Processing references to attributes')
+        """
+        logger.info("Processing references to attributes")
         attrrefs = extension.xpath(".//attribute[@xmi:idref]", namespaces=ns)  # type: ignore
         for attrref in attrrefs:
-            idref = attrref.get('{' + ns['xmi'] + '}idref')
+            idref = attrref.get("{" + ns["xmi"] + "}idref")
             attr = schema.get_attribute(idref)
             if attr is not None:
-                properties = attrref.xpath('./properties')
+                properties = attrref.xpath("./properties")
                 copy_values(properties, attr)
                 documentation = attrref.xpath("./documentation")
-                attr.definitie = documentation[0].get('value') if documentation is not None else None
-                stereotype = attrref.xpath('./stereotype')
+                attr.definitie = (
+                    documentation[0].get("value") if documentation is not None else None
+                )
+                stereotype = attrref.xpath("./stereotype")
                 copy_values(stereotype, attr)
 
                 schema.save(attr)  # can also reference to enumeration literals
             else:
                 literal = schema.get_enumeration_literal(idref)
                 if literal is not None:
-                    properties = attrref.xpath('./properties')
+                    properties = attrref.xpath("./properties")
                     copy_values(properties, literal)
                     documentation = attrref.xpath("./documentation")
-                    literal.definitie = documentation[0].get('value') if documentation is not None else None
-                    stereotype = attrref.xpath('./stereotype')
+                    literal.definitie = (
+                        documentation[0].get("value")
+                        if documentation is not None
+                        else None
+                    )
+                    stereotype = attrref.xpath("./stereotype")
                     copy_values(stereotype, literal)
 
                     schema.save(literal)
 
-        logger.info('Processing references to associations')
+        logger.info("Processing references to associations")
         connectorrefs = extension.xpath(".//connector[@xmi:idref and properties/@ea_type='Association']", namespaces=ns)  # type: ignore
         for connectorref in connectorrefs:
-            idref = connectorref.get('{' + ns['xmi'] + '}idref')
+            idref = connectorref.get("{" + ns["xmi"] + "}idref")
             association = schema.get_association(idref)
             if association is not None:
-                association.src_role = connectorref.xpath('./source/role', namespaces=ns)[0].get('name')
-                association.dst_role = connectorref.xpath('./target/role', namespaces=ns)[0].get('name')
+                association.src_role = connectorref.xpath(
+                    "./source/role", namespaces=ns
+                )[0].get("name")
+                association.dst_role = connectorref.xpath(
+                    "./target/role", namespaces=ns
+                )[0].get("name")
 
-                documentation = connectorref.xpath('./documentation')
+                documentation = connectorref.xpath("./documentation")
                 if len(documentation) == 1:
-                    association.definitie = documentation[0].get('value')
+                    association.definitie = documentation[0].get("value")
 
                 schema.save(association)
 
-        '''
+        """
         Voorbeeld van Diagram
 
                     <diagram xmi:id="EAID_7429E175_1CBE_4336_BF92_6C5029395E69">
@@ -187,19 +198,19 @@ class EAXMIParser(XMIParser):
                             <element geometry="SCTR=1;SCME=1;SX=0;SY=0;EX=0;EY=0;EDGE=2;SCTR.LEFT=225;SCTR.TOP=-384;SCTR.RIGHT=256;SCTR.BOTTOM=-369;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=226:-384$256:-384$256:-369$226:-369$;" subject="EAID_9A56AD9F_136A_485a_93B1_7137FCC39416" style="Mode=3;EOID=6C964D59;SOID=6C964D59;Color=-1;LWidth=0;Hidden=1;"/>
                         </elements>
                     </diagram>
-        '''
+        """
 
-        logger.info('Processing references to attributes')
+        logger.info("Processing references to attributes")
         diagramrefs = extension.xpath(".//diagram[@xmi:id]", namespaces=ns)  # type: ignore
         for diagramref in diagramrefs:
-            idref = diagramref.get('{' + ns['xmi'] + '}id')
-            package_id = diagramref.xpath('./model')[0].get('package')
-            name = diagramref.xpath('./properties')[0].get('name')
-            author = diagramref.xpath('./project')[0].get('author')
-            version = diagramref.xpath('./project')[0].get('version')
-            created = diagramref.xpath('./project')[0].get('created')
-            modified = diagramref.xpath('./project')[0].get('modified')
-            documentation = diagramref.xpath('./properties')[0].get('documentation')
+            idref = diagramref.get("{" + ns["xmi"] + "}id")
+            package_id = diagramref.xpath("./model")[0].get("package")
+            name = diagramref.xpath("./properties")[0].get("name")
+            author = diagramref.xpath("./project")[0].get("author")
+            version = diagramref.xpath("./project")[0].get("version")
+            created = diagramref.xpath("./project")[0].get("created")
+            modified = diagramref.xpath("./project")[0].get("modified")
+            documentation = diagramref.xpath("./properties")[0].get("documentation")
             diagram = db.Diagram(
                 id=idref,
                 name=name,
@@ -212,33 +223,43 @@ class EAXMIParser(XMIParser):
             )
             schema.add(diagram)
 
-            for element in diagramref.xpath('./elements/element'):
-                element_id = element.get('subject')
-                logger.debug(f'Found element with id {element.get("subject")} in diagram {name}')
+            for element in diagramref.xpath("./elements/element"):
+                element_id = element.get("subject")
+                logger.debug(
+                    f'Found element with id {element.get("subject")} in diagram {name}'
+                )
                 if schema.get_class(element_id) is not None:
                     diagram.classes.append(schema.get_class(element_id))
                     logger.debug(
                         f'Element {element.get("subject")} in diagram {name} is een class met naam'
-                        f' {schema.get_class(element_id).name}'
+                        f" {schema.get_class(element_id).name}"
                     )
                 elif schema.get_association(element_id) is not None:
                     diagram.associations.append(schema.get_association(element_id))
-                    logger.debug(f'Element {element.get("subject")} in diagram {name} is een association')
+                    logger.debug(
+                        f'Element {element.get("subject")} in diagram {name} is een association'
+                    )
                 elif schema.get_enumeration(element_id) is not None:
                     diagram.enumerations.append(schema.get_enumeration(element_id))
                     logger.debug(
                         f'Element {element.get("subject")} in diagram {name} is een enumeration met naam'
-                        f' {schema.get_enumeration(element_id).name}'
+                        f" {schema.get_enumeration(element_id).name}"
                     )
                 elif schema.get_generalization(element_id) is not None:
-                    diagram.generalizations.append(schema.get_generalization(element_id))
-                    logger.debug(f'Element {element.get("subject")} in diagram {name} is een generalisatie')
+                    diagram.generalizations.append(
+                        schema.get_generalization(element_id)
+                    )
+                    logger.debug(
+                        f'Element {element.get("subject")} in diagram {name} is een generalisatie'
+                    )
                 else:
                     logger.debug(
                         f'Element {element.get("subject")} in diagram {name} is niet gevonden in de database. Kan een'
-                        ' niet geimplemneteerde type zijn zoals: Note of Constraint, of kan een relatie zij naar een'
-                        ' element buiten het model.'
+                        " niet geimplemneteerde type zijn zoals: Note of Constraint, of kan een relatie zij naar een"
+                        " element buiten het model."
                     )
 
-            logger.debug(f'Diagram {diagram.name} met id {diagram.id} ingelezen met inhoud: {diagram}')
+            logger.debug(
+                f"Diagram {diagram.name} met id {diagram.id} ingelezen met inhoud: {diagram}"
+            )
             schema.save(diagram)

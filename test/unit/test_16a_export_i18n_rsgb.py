@@ -6,7 +6,7 @@ import pytest
 
 from crunch_uml import cli
 
-EA_DB = './test/output/RSGBPlus.qea'
+EA_DB = "./test/output/RSGBPlus.qea"
 
 
 def getRecordFromEARepository(table, ea_guid):
@@ -32,11 +32,11 @@ def getRecordFromEARepository(table, ea_guid):
 def copy_test_files():
     # Pad naar de bronbestanden
     source_files = [
-        ('./test/data/RSGBPlus.qea', EA_DB),
+        ("./test/data/RSGBPlus.qea", EA_DB),
     ]
 
     # Zorg ervoor dat de testdata-map bestaat
-    os.makedirs('./test/output', exist_ok=True)
+    os.makedirs("./test/output", exist_ok=True)
 
     # Kopieer de bestanden naar de testdata-map
     for source, destination in source_files:
@@ -51,7 +51,14 @@ def copy_test_files():
 def test_import_monumenten():
     translate_file = "./test/data/RSGBPlus.i18n.json"
 
-    test_args = ["import", "-f", "./test/data/RSGBPlus.xml", "-t", "eaxmi", "-db_create"]
+    test_args = [
+        "import",
+        "-f",
+        "./test/data/RSGBPlus.xml",
+        "-t",
+        "eaxmi",
+        "-db_create",
+    ]
     cli.main(test_args)
 
     test_args = [
@@ -65,10 +72,30 @@ def test_import_monumenten():
     ]
     cli.main(test_args)
 
-    test_args = ["export", "-f", translate_file, "-t", "i18n", '--language', 'en', '--translate', 'True']
+    test_args = [
+        "export",
+        "-f",
+        translate_file,
+        "-t",
+        "i18n",
+        "--language",
+        "en",
+        "--translate",
+        "True",
+    ]
     # cli.main(test_args)
 
-    test_args = ["-sch", "lang_en", "import", "-f", translate_file, "-t", "i18n", '--language', 'en']
+    test_args = [
+        "-sch",
+        "lang_en",
+        "import",
+        "-f",
+        translate_file,
+        "-t",
+        "i18n",
+        "--language",
+        "en",
+    ]
     cli.main(test_args)
     print("data saved")
 
@@ -85,7 +112,17 @@ def test_import_monumenten():
 
     # Voer nu de changes door en kijk of de waarden zijn aangepast
     # export to json
-    test_args = ["-sch", "lang_en", "export", "-f", EA_DB, "-t", "earepo", "--tag_strategy", "update"]
+    test_args = [
+        "-sch",
+        "lang_en",
+        "export",
+        "-f",
+        EA_DB,
+        "-t",
+        "earepo",
+        "--tag_strategy",
+        "update",
+    ]
     cli.main(test_args)
     print("test_import_monumenten passed")
 

@@ -38,7 +38,9 @@ class DDASPluginInformatiemodel(Plugin):
         lst_enum = [enum for enum in kopie.enumerations]
         gsl_teller = 0
         for enum in lst_enum:
-            if enum.name == "geslacht" and gsl_teller < 1:  # Geslacht needs to stay exacly once
+            if (
+                enum.name == "geslacht" and gsl_teller < 1
+            ):  # Geslacht needs to stay exacly once
                 gsl_teller += 1
                 kopie.enumerations.remove(enum)
             if enum.name in [
