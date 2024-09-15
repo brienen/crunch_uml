@@ -137,16 +137,12 @@ def is_valid_i18n_file(file_path):
             # Controleer verwachte secties (bijvoorbeeld "packages", "classes", etc.)
             for section, entries in content.items():
                 if not isinstance(entries, list):
-                    print(
-                        f"Section '{section}' under language '{language}' is not a list."
-                    )
+                    print(f"Section '{section}' under language '{language}' is not a list.")
                     return False
 
                 for entry in entries:
                     if not isinstance(entry, dict):
-                        print(
-                            f"An entry in section '{section}' under language '{language}' is not a dictionary."
-                        )
+                        print(f"An entry in section '{section}' under language '{language}' is not a dictionary.")
                         return False
 
                     for key, value in entry.items():
@@ -178,14 +174,10 @@ def count_dict_elements(d):
     if isinstance(d, dict):
         for key, value in d.items():
             count += 1  # Tel de huidige key-value pair
-            count += count_dict_elements(
-                value
-            )  # Recursief tellen van geneste elementen
+            count += count_dict_elements(value)  # Recursief tellen van geneste elementen
     elif isinstance(d, list):
         for item in d:
-            count += count_dict_elements(
-                item
-            )  # Recursief tellen van elementen in de lijst
+            count += count_dict_elements(item)  # Recursief tellen van elementen in de lijst
     else:
         count += 1  # Als het een enkel element is (geen dict of lijst), tel het als 1
 

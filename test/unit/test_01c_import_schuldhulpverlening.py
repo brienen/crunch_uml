@@ -24,9 +24,7 @@ def test_import_schuldhulpverlening():
     assert schema.count_generalizations() == 4
     assert schema.count_diagrams() == 5
 
-    budgetcoaching = schema.get_enumeration_literal(
-        "EAID_8DAEAE4A_D0E0_46b8_8642_8D29EA4C39EE"
-    )
+    budgetcoaching = schema.get_enumeration_literal("EAID_8DAEAE4A_D0E0_46b8_8642_8D29EA4C39EE")
     assert budgetcoaching.name == "Budgetcoaching"
     assert budgetcoaching.type == "BC"
 

@@ -33,9 +33,7 @@ def test_markdown_monumenten_onderwijs():
 
     monfilename = f"{dir}GGM_Model Monumenten.md"
     assert os.path.exists(monfilename)
-    assert (
-        open(monfilename, "r").read().find("Status van de bescherming van een monument")
-    )
+    assert open(monfilename, "r").read().find("Status van de bescherming van een monument")
     assert open(monfilename, "r").read().find("## Objecttype: Bouwactiviteit")
 
     onderwfilename = f"{dir}GGM_Model Onderwijs.md"

@@ -73,9 +73,7 @@ def copy_test_files():
 
 def test_import_monumenten():
 
-    record = getRecordFromEARepository(
-        "t_object", "{54944273-F312-44b2-A78D-43488F915429}"
-    )
+    record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
     # Testen of de records schoon in de database staan
     assert record is not None, "Record met de naam 'MonumentNaam' niet gevonden."
     assert record[const.EA_REPO_MAPPER["name"]] == "Ambacht"
@@ -91,9 +89,7 @@ def test_import_monumenten():
     major_original, minor_original = map(int, version.split("."))
 
     # record ophalen wat niet aangepast wordt
-    unchange_bouwtype = getRecordFromEARepository(
-        "t_object", "{5E9DAFBB-C9B5-4706-A43D-07AD4979DED4}"
-    )
+    unchange_bouwtype = getRecordFromEARepository("t_object", "{5E9DAFBB-C9B5-4706-A43D-07AD4979DED4}")
     assert unchange_bouwtype is not None
 
     # Import Monumenten.json met changes
@@ -114,9 +110,7 @@ def test_import_monumenten():
     assert schema.count_enumeratieliteral() == 2
 
     database = db.Database(const.DATABASE_URL, db_create=False)
-    ambacht = schema.get_class(
-        "EAID_54944273_F312_44b2_A78D_43488F915429"
-    )  # Diagram Package
+    ambacht = schema.get_class("EAID_54944273_F312_44b2_A78D_43488F915429")  # Diagram Package
     assert ambacht is not None
     assert ambacht.name == "test-Ambacht"
 
@@ -126,9 +120,7 @@ def test_import_monumenten():
     cli.main(test_args)
 
     # Testen of het record voldoet aan bepaalde voorwaarden
-    record = getRecordFromEARepository(
-        "t_object", "{54944273-F312-44b2-A78D-43488F915429}"
-    )
+    record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
     assert record is not None, "Record met de naam 'MonumentNaam' niet gevonden."
     assert record[const.EA_REPO_MAPPER["name"]] == "test-Ambacht"
     assert (
@@ -138,101 +130,71 @@ def test_import_monumenten():
     assert record[const.EA_REPO_MAPPER["author"]] == "test-Arjen Brienen"
     assert record[const.EA_REPO_MAPPER["stereotype"]] == "test-"
     assert record[const.EA_REPO_MAPPER["alias"]] == "test-"
-    assert util.parse_date(
-        str(record[const.EA_REPO_MAPPER["modified"]])
-    ) > util.parse_date(str(modified))
+    assert util.parse_date(str(record[const.EA_REPO_MAPPER["modified"]])) > util.parse_date(str(modified))
     version = record[const.EA_REPO_MAPPER["version"]]
     major, minor = map(int, version.split("."))
     assert minor == minor_original + 1
     assert countTagsOfObject(record["Object_ID"]) == 17
 
     # Testen van tags
-    tag = getRecordFromEARepository(
-        "t_objectproperties", "{5BAA8E81-480F-405D-A818-A3F79725AFE3}"
-    )
+    tag = getRecordFromEARepository("t_objectproperties", "{5BAA8E81-480F-405D-A818-A3F79725AFE3}")
     assert tag is not None
     assert tag["Value"] == "test_"
 
     # Packages testen eerste
-    record = getRecordFromEARepository(
-        "t_object", "{F7651B45-2B64-4197-A6E5-BFC56EC98466}"
-    )
+    record = getRecordFromEARepository("t_object", "{F7651B45-2B64-4197-A6E5-BFC56EC98466}")
     assert record is not None
     assert record[const.EA_REPO_MAPPER["name"]] == "test-Model Monumenten"
 
     # Packages testen tweede
-    record = getRecordFromEARepository(
-        "t_package", "{F7651B45-2B64-4197-A6E5-BFC56EC98466}"
-    )
+    record = getRecordFromEARepository("t_package", "{F7651B45-2B64-4197-A6E5-BFC56EC98466}")
     assert record is not None
     assert record[const.EA_REPO_MAPPER["name"]] == "test-Model Monumenten"
 
     # Enumeratie testen
-    record = getRecordFromEARepository(
-        "t_object", "{5C808AC9-CB09-4f4d-813E-821829856BA8}"
-    )
+    record = getRecordFromEARepository("t_object", "{5C808AC9-CB09-4f4d-813E-821829856BA8}")
     assert record is not None
     assert record[const.EA_REPO_MAPPER["name"]] == "test-TypeMonument"
 
     # Literal testen
-    record = getRecordFromEARepository(
-        "t_attribute", "{B2AE8AFC-C1D5-4d83-BFD3-EBF1663F3468}"
-    )
+    record = getRecordFromEARepository("t_attribute", "{B2AE8AFC-C1D5-4d83-BFD3-EBF1663F3468}")
     assert record is not None
     assert record[const.EA_REPO_MAPPER_LITERALS["name"]] == "test-rijksmonument"
 
     # Attribute testen
-    record = getRecordFromEARepository(
-        "t_attribute", "{200B84E0-1D73-4608-9258-12338B5EC034}"
-    )
+    record = getRecordFromEARepository("t_attribute", "{200B84E0-1D73-4608-9258-12338B5EC034}")
     assert record is not None
     assert record[const.EA_REPO_MAPPER_ATTRIBUTES["name"]] == "test-verbijzondering"
     assert record[const.EA_REPO_MAPPER_ATTRIBUTES["definitie"]] == "test-"
     assert record[const.EA_REPO_MAPPER_ATTRIBUTES["primitive"]] == "test-AN200"
 
     # Associations testen
-    record = getRecordFromEARepository(
-        "t_connector", "{8E18F665-2A86-44fd-AD55-3E435A282BDF}"
-    )
+    record = getRecordFromEARepository("t_connector", "{8E18F665-2A86-44fd-AD55-3E435A282BDF}")
     assert record is not None
     assert record[const.EA_REPO_MAPPER_ATTRIBUTES["name"]] == "test-monument ambacht"
     assert record[const.EA_REPO_MAPPER_ATTRIBUTES["definitie"]] == "test-"
 
     # Associations testen
-    record = getRecordFromEARepository(
-        "t_diagram", "{7429E175-1CBE-4336-BF92-6C5029395E69}"
-    )
+    record = getRecordFromEARepository("t_diagram", "{7429E175-1CBE-4336-BF92-6C5029395E69}")
     assert record is not None
     assert record[const.EA_REPO_MAPPER_ATTRIBUTES["name"]] == "test-Diagram Monumenten"
 
     # record ophalen wat niet aangepast wordt
-    bouwtype = getRecordFromEARepository(
-        "t_object", "{5E9DAFBB-C9B5-4706-A43D-07AD4979DED4}"
-    )
+    bouwtype = getRecordFromEARepository("t_object", "{5E9DAFBB-C9B5-4706-A43D-07AD4979DED4}")
     assert bouwtype is not None
     assert unchange_bouwtype[const.EA_REPO_MAPPER["name"]] == "Bouwtype"
-    assert (
-        unchange_bouwtype[const.EA_REPO_MAPPER["modified"]]
-        == bouwtype[const.EA_REPO_MAPPER["modified"]]
-    )
-    assert (
-        unchange_bouwtype[const.EA_REPO_MAPPER["version"]]
-        == bouwtype[const.EA_REPO_MAPPER["version"]]
-    )
+    assert unchange_bouwtype[const.EA_REPO_MAPPER["modified"]] == bouwtype[const.EA_REPO_MAPPER["modified"]]
+    assert unchange_bouwtype[const.EA_REPO_MAPPER["version"]] == bouwtype[const.EA_REPO_MAPPER["version"]]
 
     # Nog even andere tag update strategien testen
     # export to json
     test_args = ["export", "-f", EA_DB, "-t", "earepo", "--tag_strategy", "upsert"]
     cli.main(test_args)
-    record = getRecordFromEARepository(
-        "t_object", "{54944273-F312-44b2-A78D-43488F915429}"
-    )
+    record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
     assert countTagsOfObject(record["Object_ID"]) == 26
 
     # Testen van tags
-    tag = getRecordFromEARepository(
-        "t_objectproperties", "{5BAA8E81-480F-405D-A818-A3F79725AFE3}"
-    )
+    tag = getRecordFromEARepository("t_objectproperties", "{5BAA8E81-480F-405D-A818-A3F79725AFE3}")
     assert tag is not None
     assert tag["Value"] == "test_"
 
@@ -240,14 +202,10 @@ def test_import_monumenten():
     # export to json
     test_args = ["export", "-f", EA_DB, "-t", "earepo", "--tag_strategy", "replace"]
     cli.main(test_args)
-    record = getRecordFromEARepository(
-        "t_object", "{54944273-F312-44b2-A78D-43488F915429}"
-    )
+    record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
     assert countTagsOfObject(record["Object_ID"]) == 11
 
     # Testen van tags
-    tag = getRecordFromEARepository(
-        "t_objectproperties", "{5BAA8E81-480F-405D-A818-A3F79725AFE3}"
-    )
+    tag = getRecordFromEARepository("t_objectproperties", "{5BAA8E81-480F-405D-A818-A3F79725AFE3}")
     assert tag is not None
     assert tag["Value"] == "test_"

@@ -42,14 +42,10 @@ class XLSXRenderer(Renderer):
             if model:  # Ensure there's an associated model class
                 # Data
                 for row_num, record in enumerate(
-                    session.query(model)
-                    .filter(model.schema_id == schema.schema_id)
-                    .all(),
+                    session.query(model).filter(model.schema_id == schema.schema_id).all(),
                     2,
                 ):
                     for col_num, column in enumerate(columns, 1):
-                        ws.cell(
-                            row=row_num, column=col_num, value=getattr(record, column)
-                        )
+                        ws.cell(row=row_num, column=col_num, value=getattr(record, column))
 
         wb.save(args.outputfile)

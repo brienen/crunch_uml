@@ -39,9 +39,7 @@ def add_args(argumentparser, subparser_dict):
         type=str,
         help="List of package ids separated by comma",
     )
-    output_subparser.add_argument(
-        "-ci", "--output_class_id", type=str, help="ID of class to be rendered."
-    )
+    output_subparser.add_argument("-ci", "--output_class_id", type=str, help="ID of class to be rendered.")
     output_subparser.add_argument(
         "-xpi",
         "--output_exclude_package_ids",
@@ -54,9 +52,7 @@ def add_args(argumentparser, subparser_dict):
         type=str,
         help="Jinja2 template directory",
     )
-    output_subparser.add_argument(
-        "-jt", "--output_jinja2_template", type=str, help="Jinja2 template"
-    )
+    output_subparser.add_argument("-jt", "--output_jinja2_template", type=str, help="Jinja2 template")
     output_subparser.add_argument(
         "-ldns",
         "--linked_data_namespace",
@@ -121,10 +117,7 @@ def add_args(argumentparser, subparser_dict):
     # Set the epilog help text
     entries = RendererRegistry.entries()
     items = [f'"{item}": {RendererRegistry.getDescription(item)}' for item in entries]
-    epilog = (
-        "More information on the imported types that are supported:\n\n"
-        + "\n".join(items)
-    )
+    epilog = "More information on the imported types that are supported:\n\n" + "\n".join(items)
     output_subparser.epilog = epilog
 
 
@@ -163,9 +156,7 @@ class ModelRenderer(Renderer):
                 schema.get_session()
                 .query(Package)
                 .join(Class)
-                .filter(
-                    Package.id.in_(packageids), Package.schema_id == schema.schema_id
-                )
+                .filter(Package.id.in_(packageids), Package.schema_id == schema.schema_id)
                 .distinct()
                 .all()
             )
@@ -204,13 +195,9 @@ class ClassRenderer:
 
     def getClass(self, args, schema: sch.Schema):
         if args.output_exclude_package_ids is not None:
-            logger.warning(
-                "Parameter --output_exclude_package_ids not valid for class renderer."
-            )
+            logger.warning("Parameter --output_exclude_package_ids not valid for class renderer.")
         if args.output_package_ids is not None:
-            logger.warning(
-                "Parameter --output_package_ids not valid for class renderer."
-            )
+            logger.warning("Parameter --output_package_ids not valid for class renderer.")
         if args.output_class_id is None:
             raise CrunchException(
                 "Error: no --output_class_id in arguments. --output_class_id is compulsary for ClassRenderer."
@@ -218,7 +205,5 @@ class ClassRenderer:
 
         clazz = schema.get_class(args.output_class_id)
         if not clazz:
-            logger.warning(
-                f"Rendering not possible: could not find any class with ID {args.output_class_id} "
-            )
+            logger.warning(f"Rendering not possible: could not find any class with ID {args.output_class_id} ")
         return clazz

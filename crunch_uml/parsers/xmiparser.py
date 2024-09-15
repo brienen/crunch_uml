@@ -23,9 +23,7 @@ def remove_EADatatype(input_string):
 )
 class XMIParser(Parser):
     # Recursieve functie om de parsetree te doorlopen
-    def phase1_process_packages_classes(
-        self, node, ns, schema: sch.Schema, parent_package_id=None
-    ):
+    def phase1_process_packages_classes(self, node, ns, schema: sch.Schema, parent_package_id=None):
         """
         First phase of parsing XMI-documents. Parsing recursively:
         - Packages
@@ -37,17 +35,13 @@ class XMIParser(Parser):
             id = node.get("{" + ns["xmi"] + "}id")
             name = node.get("name")
             if id:
-                package = db.Package(
-                    id=id, name=name, parent_package_id=parent_package_id
-                )
+                package = db.Package(id=id, name=name, parent_package_id=parent_package_id)
                 logger.info(f"Package {package.name} ingelezen met id {package.id}")
                 logger.debug(f"Package {package.name} met inhoud {vars(package)}")
 
                 schema.save(package)
                 for childnode in node:
-                    self.phase1_process_packages_classes(
-                        childnode, ns, schema, package.id
-                    )
+                    self.phase1_process_packages_classes(childnode, ns, schema, package.id)
             else:
                 logger.debug(f"Package with {name} does not have id value: discarded")
 
@@ -57,9 +51,7 @@ class XMIParser(Parser):
                 name=node.get("name"),
                 package_id=parent_package_id,
             )
-            logger.debug(
-                f"Class {clazz.name} met id {clazz.id} ingelezen met inhoud: {clazz}"
-            )
+            logger.debug(f"Class {clazz.name} met id {clazz.id} ingelezen met inhoud: {clazz}")
             schema.save(clazz)
 
             for childnode in node:
@@ -88,9 +80,7 @@ class XMIParser(Parser):
                 name=node.get("name"),
                 package_id=parent_package_id,
             )
-            logger.debug(
-                f"Enumeratie {enum.name} met id {enum.id} ingelezen met inhoud: {enum}"
-            )
+            logger.debug(f"Enumeratie {enum.name} met id {enum.id} ingelezen met inhoud: {enum}")
             schema.save(enum)
 
             for childnode in node:
@@ -109,12 +99,8 @@ class XMIParser(Parser):
 
         else:
             for childnode in node:
-                logger.debug(
-                    f"Parsing something with tag {node.tag}, no handling implemented yet values: {node}"
-                )
-                self.phase1_process_packages_classes(
-                    childnode, ns, schema, parent_package_id
-                )
+                logger.debug(f"Parsing something with tag {node.tag}, no handling implemented yet values: {node}")
+                self.phase1_process_packages_classes(childnode, ns, schema, parent_package_id)
 
     def phase2_process_connectors(self, node, ns, schema: sch.Schema):
         """
@@ -162,9 +148,7 @@ class XMIParser(Parser):
                         )
                         logger.debug(msg)
 
-                        clazz = db.Class(
-                            id=clsid, name=const.ORPHAN_CLASS, definitie=msg
-                        )
+                        clazz = db.Class(id=clsid, name=const.ORPHAN_CLASS, definitie=msg)
                         schema.save(clazz)
                         if "src" in id:
                             association.src_class_id = clsid  # type: ignore
@@ -179,9 +163,7 @@ class XMIParser(Parser):
 
                         endpoint = endpoints[0]
                         getval = lambda x, endpoint: (  # noqa
-                            endpoint.xpath(f"./{x}")[0].get("value")
-                            if len(endpoint.xpath(f"./{x}"))
-                            else None  # noqa
+                            endpoint.xpath(f"./{x}")[0].get("value") if len(endpoint.xpath(f"./{x}")) else None  # noqa
                         )  # noqa
                         typenode = endpoint.xpath("./type")
                         if len(typenode) == 0:
@@ -191,38 +173,26 @@ class XMIParser(Parser):
                                 f" edge: generating placeholder class with uudi {clsid}."
                             )
                             logger.debug(msg)
-                            cls = db.Class(
-                                id=clsid, name=const.ORPHAN_CLASS, definitie=msg
-                            )
+                            cls = db.Class(id=clsid, name=const.ORPHAN_CLASS, definitie=msg)
                             schema.save(cls)
                             if "src" in id:
                                 association.src_class_id = clsid  # type: ignore
                             else:
                                 association.dst_class_id = clsid  # type: ignore
                         else:
-                            clsid = endpoint.xpath("./type")[0].get(
-                                "{" + ns["xmi"] + "}idref"
-                            )
+                            clsid = endpoint.xpath("./type")[0].get("{" + ns["xmi"] + "}idref")
                             cls = schema.get_class(clsid)
                             if cls is None:
                                 clazz = db.Class(id=clsid, name=const.ORPHAN_CLASS)
                                 schema.save(clazz)
                             if "src" in id:
                                 association.src_class_id = clsid  # type: ignore
-                                association.src_mult_start = getval(
-                                    "lowerValue", endpoint
-                                )
-                                association.src_mult_end = getval(
-                                    "upperValue", endpoint
-                                )
+                                association.src_mult_start = getval("lowerValue", endpoint)
+                                association.src_mult_end = getval("upperValue", endpoint)
                             else:
                                 association.dst_class_id = clsid  # type: ignore
-                                association.dst_mult_start = getval(
-                                    "lowerValue", endpoint
-                                )
-                                association.dst_mult_end = getval(
-                                    "upperValue", endpoint
-                                )
+                                association.dst_mult_start = getval("lowerValue", endpoint)
+                                association.dst_mult_end = getval("upperValue", endpoint)
                     else:
                         err = f"Association {association.name} with {association.id} has more than two endpoints. panic"
                         logger.error(err)
@@ -241,9 +211,7 @@ class XMIParser(Parser):
                 id = generalisation_xmi.get("{" + ns["xmi"] + "}id")
                 superclass = generalisation_xmi.get("general")
                 subclass = generalisation_xmi.getparent().get("{" + ns["xmi"] + "}id")
-                generalization = db.Generalization(
-                    id=id, superclass_id=superclass, subclass_id=subclass
-                )
+                generalization = db.Generalization(id=id, superclass_id=superclass, subclass_id=subclass)
                 schema.save(generalization)
 
         except Exception as ex:
@@ -278,15 +246,10 @@ class XMIParser(Parser):
         # Last of all set enumerations
         enums = schema.get_all_enumerations()
         for enum in enums:
-            enumverws = node.xpath(
-                ".//type[@xmi:idref='" + enum.id + "']", namespaces=ns
-            )
+            enumverws = node.xpath(".//type[@xmi:idref='" + enum.id + "']", namespaces=ns)
             for enumverw in enumverws:
                 property = enumverw.getparent()
-                if (
-                    property.tag == "ownedAttribute"
-                    and property.get("{" + ns["xmi"] + "}type") == "uml:Property"
-                ):
+                if property.tag == "ownedAttribute" and property.get("{" + ns["xmi"] + "}type") == "uml:Property":
                     id = property.get("{" + ns["xmi"] + "}id")
                     attribute = schema.get_attribute(id)
                     if attribute is not None:
@@ -319,14 +282,10 @@ class XMIParser(Parser):
 
         ns = root.nsmap
         if "xmi" not in ns.keys():
-            logger.warning(
-                f'missing namespace "xmi" in file {args.inputfile}: trying "{const.NS_XMI}"'
-            )
+            logger.warning(f'missing namespace "xmi" in file {args.inputfile}: trying "{const.NS_XMI}"')
             ns["xmi"] = const.NS_XMI
         if "uml" not in ns.keys():
-            logger.warning(
-                f'missing namespace "uml" in file {args.inputfile}: trying "{const.NS_UML}"'
-            )
+            logger.warning(f'missing namespace "uml" in file {args.inputfile}: trying "{const.NS_UML}"')
             ns["xmi"] = const.NS_UML
 
         if root is not None:

@@ -135,8 +135,6 @@ def test_import_monumenten():
     print("test_import_monumenten passed")
 
     # Testen of het record voldoet aan bepaalde voorwaarden
-    record = getRecordFromEARepository(
-        "t_object", "{54944273-F312-44b2-A78D-43488F915429}"
-    )
+    record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
     assert record is not None, "Record met de naam 'MonumentNaam' niet gevonden."
     assert record[const.EA_REPO_MAPPER["name"]] == "Håndverk_name"

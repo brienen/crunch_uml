@@ -39,18 +39,13 @@ def getSQLADatatype(datatype):
         else:
             return "String"
     elif isinstance(datatype, db.Enumeratie):
-        return (
-            f"SAEnum({pythonize(inflection.camelize(datatype.name.replace(' ', '')))})"
-        )
+        return f"SAEnum({pythonize(inflection.camelize(datatype.name.replace(' ', '')))})"
     else:
         return "String"
 
 
 def getPackageLst(self, package: db.Package):
-    if (
-        package.parent_package is None
-        or getPackageLst(self, package.parent_package) == ""
-    ):
+    if package.parent_package is None or getPackageLst(self, package.parent_package) == "":
         return package.modelnaam_kort if package.modelnaam_kort is not None else ""
     else:
         return (
@@ -64,37 +59,21 @@ def getPackageImports(self: db.Package):
     imports = {}  # No error!
     for clazz in self.classes:
         for attr in clazz.attributes:
-            if (
-                attr.type_class
-                and attr.type_class.package
-                and attr.type_class.package != self
-            ):
+            if attr.type_class and attr.type_class.package and attr.type_class.package != self:
                 if attr.type_class.package not in imports:
                     imports[attr.type_class.package] = set()
                 imports[attr.type_class.package].add(attr.type_class)
-            if (
-                attr.enumeration
-                and attr.enumeration.package
-                and attr.enumeration.package != self
-            ):
+            if attr.enumeration and attr.enumeration.package and attr.enumeration.package != self:
                 if attr.enumeration.package not in imports:
                     imports[attr.enumeration.package] = set()
                 imports[attr.enumeration.package].add(attr.enumeration)
         for associatie in clazz.uitgaande_associaties:
-            if (
-                not associatie.hasOrphan()
-                and associatie.dst_class.package
-                and associatie.dst_class.package != self
-            ):
+            if not associatie.hasOrphan() and associatie.dst_class.package and associatie.dst_class.package != self:
                 if associatie.dst_class.package not in imports:
                     imports[associatie.dst_class.package] = set()
                 imports[associatie.dst_class.package].add(associatie.dst_class)
         for associatie in clazz.inkomende_associaties:
-            if (
-                not associatie.hasOrphan()
-                and associatie.src_class.package
-                and associatie.src_class.package != self
-            ):
+            if not associatie.hasOrphan() and associatie.src_class.package and associatie.src_class.package != self:
                 if associatie.src_class.package not in imports:
                     imports[associatie.src_class.package] = set()
                 imports[associatie.src_class.package].add(associatie.src_class)
@@ -103,19 +82,11 @@ def getPackageImports(self: db.Package):
 
 # SQLA methods to be used while rendering templates
 def nameSnakeCase(self):
-    return (
-        pythonize(inflection.underscore(self.name.replace(" ", "")))
-        if isinstance(self.name, str)
-        else ""
-    )
+    return pythonize(inflection.underscore(self.name.replace(" ", ""))) if isinstance(self.name, str) else ""
 
 
 def namePascalCase(self):
-    return (
-        pythonize(inflection.camelize(self.name.replace(" ", "")))
-        if isinstance(self.name, str)
-        else ""
-    )
+    return pythonize(inflection.camelize(self.name.replace(" ", ""))) if isinstance(self.name, str) else ""
 
 
 def tablename(
@@ -136,14 +107,8 @@ def packagename(self: db.Package):
 
 def getFilename(inputfilename: str, extension: str, package: db.Package):
     # Verwijder de substring case-insensitief
-    packagename = re.sub(
-        re.escape("model"), "", package.name, flags=re.IGNORECASE
-    )  # No error!
-    packagename = (
-        pythonize(inflection.underscore(packagename.replace(" ", "")))
-        if isinstance(packagename, str)
-        else ""
-    )
+    packagename = re.sub(re.escape("model"), "", package.name, flags=re.IGNORECASE)  # No error!
+    packagename = pythonize(inflection.underscore(packagename.replace(" ", ""))) if isinstance(packagename, str) else ""
     return f"{inputfilename}_{packagename}{extension}"
 
 
@@ -170,24 +135,16 @@ class SQLARenderer(Jinja2Renderer):
         env.filters["sqla_datatype"] = getSQLADatatype
         env.filters["meervoud"] = util.getMeervoud
         env.filters["snake_case"] = lambda s: (
-            pythonize(inflection.underscore(s.replace(" ", "")))
-            if isinstance(s, str)
-            else ""
+            pythonize(inflection.underscore(s.replace(" ", ""))) if isinstance(s, str) else ""
         )
         env.filters["pascal_case"] = lambda s: (
-            pythonize(inflection.camelize(s.replace(" ", "")))
-            if isinstance(s, str)
-            else ""
+            pythonize(inflection.camelize(s.replace(" ", ""))) if isinstance(s, str) else ""
         )
         env.filters["camel_case"] = lambda s: (
-            pythonize(inflection.camelize(s.replace(" ", "")), False)
-            if isinstance(s, str)
-            else ""
+            pythonize(inflection.camelize(s.replace(" ", "")), False) if isinstance(s, str) else ""
         )
         env.filters["pythonize"] = lambda s: (
-            pythonize(s.replace(" ", "").replace("-", "_"))
-            if isinstance(s, str)
-            else ""
+            pythonize(s.replace(" ", "").replace("-", "_")) if isinstance(s, str) else ""
         )
 
     def getFilename(self, inputfilename, extension, package):

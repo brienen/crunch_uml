@@ -9,8 +9,7 @@ from jinja2 import Environment, FileSystemLoader
 import crunch_uml.schema as sch
 from crunch_uml import const, db, util
 from crunch_uml.exceptions import CrunchException
-from crunch_uml.renderers.renderer import (ClassRenderer, ModelRenderer,
-                                           RendererRegistry)
+from crunch_uml.renderers.renderer import ClassRenderer, ModelRenderer, RendererRegistry
 
 logger = logging.getLogger()
 
@@ -65,26 +64,16 @@ class Jinja2Renderer(ModelRenderer):
 
     def addFilters(self, env):
         # Voeg het inflection filter toe
-        env.filters["snake_case"] = lambda s: (
-            inflection.underscore(s.replace(" ", "")) if isinstance(s, str) else ""
-        )
-        env.filters["pascal_case"] = lambda s: (
-            inflection.camelize(s.replace(" ", "")) if isinstance(s, str) else ""
-        )
+        env.filters["snake_case"] = lambda s: (inflection.underscore(s.replace(" ", "")) if isinstance(s, str) else "")
+        env.filters["pascal_case"] = lambda s: (inflection.camelize(s.replace(" ", "")) if isinstance(s, str) else "")
         env.filters["camel_case"] = lambda s: (
             inflection.camelize(s.replace(" ", ""), False) if isinstance(s, str) else ""
         )
-        env.filters["pythonize"] = lambda s: (
-            s.replace(" ", "").replace("-", "_") if isinstance(s, str) else ""
-        )
+        env.filters["pythonize"] = lambda s: (s.replace(" ", "").replace("-", "_") if isinstance(s, str) else "")
         env.filters["md_newline"] = lambda s: (
-            s.replace("\n", "\n> ").replace("\r\n", "\r\n> ")
-            if isinstance(s, str)
-            else ""
+            s.replace("\n", "\n> ").replace("\r\n", "\r\n> ") if isinstance(s, str) else ""
         )
-        env.filters["del_newline"] = lambda s: (
-            s.replace("\n", " ").replace("\r\n", " ") if isinstance(s, str) else ""
-        )
+        env.filters["del_newline"] = lambda s: (s.replace("\n", " ").replace("\r\n", " ") if isinstance(s, str) else "")
         env.filters["set_url"] = lambda s: f"[{s}]({s})" if validators.url(s) else s
         env.filters["reject_method"] = lambda iterable, method_name: [
             item for item in iterable if not getattr(item, method_name)()
@@ -161,9 +150,7 @@ def getJSONDatatype(
         elif str(self.primitive).lower() in ["datum", "date"]:
             return '"$ref": "#/$defs/datum"'  # Needs to be defined in Jinja2 template
         elif str(self.primitive).lower() in ["datumtijd", "datetime"]:
-            return (
-                '"$ref": "#/$defs/datum-tijd"'  # Needs to be defined in Jinja2 template
-            )
+            return '"$ref": "#/$defs/datum-tijd"'  # Needs to be defined in Jinja2 template
         else:
             return '"type": "string"'
     elif self.enumeration is not None:
@@ -223,14 +210,10 @@ class JSON_SchemaRenderer(Jinja2Renderer, ClassRenderer):
                 formatted_json = json.dumps(data, indent=4)
             except Exception as ex:
                 formatted_json = output
-                logger.warning(
-                    f"Exception Could not format JSON data with message {ex}"
-                )
+                logger.warning(f"Exception Could not format JSON data with message {ex}")
 
             outputfilename = (
-                self.getFilename(filename, extension, clazz)
-                if clazz.name is not None
-                else f"{filename}{extension}"
+                self.getFilename(filename, extension, clazz) if clazz.name is not None else f"{filename}{extension}"
             )
             with open(outputfilename, "w") as file:
                 file.write(formatted_json)

@@ -28,11 +28,7 @@ def store_data(entity_name, data, schema, update_only=False):
 
     # Als er een ID in de data aanwezig is, zoek dan naar een bestaand record
     if "id" in data:
-        if (
-            existing_entity := session.query(entity)
-            .filter_by(id=data["id"], schema_id=schema.schema_id)
-            .first()
-        ):
+        if existing_entity := session.query(entity).filter_by(id=data["id"], schema_id=schema.schema_id).first():
             for key, value in data.items():
                 if value is not None and value != "" and key != "id":
                     setattr(existing_entity, key, value)
@@ -41,9 +37,7 @@ def store_data(entity_name, data, schema, update_only=False):
         else:
             if not update_only:
                 # ID was aanwezig, maar geen overeenkomstige record werd gevonden
-                logger.debug(
-                    f"No {entity_name} found with ID {data['id']}, creating a new record."
-                )
+                logger.debug(f"No {entity_name} found with ID {data['id']}, creating a new record.")
                 new_entity = entity(**data)
                 schema.save(new_entity)
     else:
@@ -91,9 +85,7 @@ class JSONParser(Parser):
                 if entity_name in tables and entity_name != "schemas":
                     for record in records:
                         record = self.transform_record(record)
-                        store_data(
-                            entity_name, record, schema, update_only=self.update_only()
-                        )
+                        store_data(entity_name, record, schema, update_only=self.update_only())
         except json.JSONDecodeError as ex:
             msg = f"File with name {args.inputfile} is not a valid JSON-file, aborting with message {ex.msg}"
             logger.error(msg)
@@ -141,9 +133,7 @@ class XLXSParser(Parser):
 
         try:
             # Lees het Excel-bestand
-            xls = pd.ExcelFile(
-                args.inputfile if args.inputfile is not None else args.url
-            )
+            xls = pd.ExcelFile(args.inputfile if args.inputfile is not None else args.url)
 
             tables = db.getTables()
             # Loop door elk tabblad in het Excel-bestand
@@ -178,9 +168,7 @@ class CSVParser(Parser):
             tables = db.getTables()
             if entity_name in tables and entity_name != "schemas":
                 # Lees het CSV-bestand in een dataframe
-                df = pd.read_csv(
-                    args.inputfile if args.inputfile is not None else args.url
-                )
+                df = pd.read_csv(args.inputfile if args.inputfile is not None else args.url)
 
                 # Converteer het dataframe naar een lijst van woordenboeken (records)
                 records = df.to_dict(orient="records")
@@ -189,9 +177,7 @@ class CSVParser(Parser):
                     store_data(entity_name, record, schema)
 
             else:
-                logger.warning(
-                    f"Could not import file: no entity found with name {entity_name}"
-                )
+                logger.warning(f"Could not import file: no entity found with name {entity_name}")
 
         except Exception as ex:
             msg = f"Error while parsing the CSV file {args.inputfile}: {str(ex)}"

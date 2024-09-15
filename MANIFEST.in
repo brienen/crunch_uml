@@ -2,3 +2,4 @@ include test/data/*
 include test/output/.gitkeep
 recursive-include crunch_uml *
 include crunch_uml/templates/*
+include requirements.txt

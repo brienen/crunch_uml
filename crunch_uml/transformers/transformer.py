@@ -88,13 +88,8 @@ def add_args(argumentparser, subparser_dict):
 
     # Set the epilog help text
     entries = TransformerRegistry.entries()
-    items = [
-        f'"{item}": {TransformerRegistry.getDescription(item)}' for item in entries
-    ]
-    epilog = (
-        "More informaation on the transformation types that are supported:\n\n"
-        + "\n".join(items)
-    )
+    items = [f'"{item}": {TransformerRegistry.getDescription(item)}' for item in entries]
+    epilog = "More informaation on the transformation types that are supported:\n\n" + "\n".join(items)
     transformation_subparser.epilog = epilog
 
 

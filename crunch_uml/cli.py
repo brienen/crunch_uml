@@ -19,8 +19,7 @@ from crunch_uml.parsers.xmiparser import XMIParser  # noqa: F401
 from crunch_uml.renderers.earepoupdater import EARepoUpdater  # noqa: F401
 from crunch_uml.renderers.jinja2renderer import GGM_MDRenderer  # noqa: F401
 from crunch_uml.renderers.jinja2renderer import Jinja2Renderer  # noqa: F401
-from crunch_uml.renderers.jinja2renderer import \
-    JSON_SchemaRenderer  # noqa: F401
+from crunch_uml.renderers.jinja2renderer import JSON_SchemaRenderer  # noqa: F401
 from crunch_uml.renderers.lodrenderer import JSONLDRenderer  # noqa: F401
 from crunch_uml.renderers.lodrenderer import RDFRenderer  # noqa: F401
 from crunch_uml.renderers.lodrenderer import TTLRenderer  # noqa: F401
@@ -29,10 +28,8 @@ from crunch_uml.renderers.pandasrenderer import I18nRenderer  # noqa: F401
 from crunch_uml.renderers.pandasrenderer import JSONRenderer  # noqa: F401
 from crunch_uml.renderers.sqlarenderer import SQLARenderer  # noqa: F401
 from crunch_uml.renderers.xlsxrenderer import XLSXRenderer  # noqa: F401
-from crunch_uml.transformers.copytransformer import \
-    CopyTransformer  # noqa: F401
-from crunch_uml.transformers.plugintransformer import \
-    PluginTransformer  # noqa: F401
+from crunch_uml.transformers.copytransformer import CopyTransformer  # noqa: F401
+from crunch_uml.transformers.plugintransformer import PluginTransformer  # noqa: F401
 
 # Configureer logging
 logging.basicConfig(
@@ -47,12 +44,8 @@ logger = logging.getLogger()
 def main(args=None):
     """The main entrypoint for this script used in the setup.py file."""
     argumentparser = argparse.ArgumentParser(description=const.DESCRIPTION)
-    argumentparser.add_argument(
-        "-v", "--verbose", action="store_true", help="set log level INFO"
-    )
-    argumentparser.add_argument(
-        "-d", "--debug", action="store_true", help="set log level to DEBUG"
-    )
+    argumentparser.add_argument("-v", "--verbose", action="store_true", help="set log level INFO")
+    argumentparser.add_argument("-d", "--debug", action="store_true", help="set log level to DEBUG")
     argumentparser.add_argument(
         "-w",
         "--do_not_suppress_warnings",
@@ -61,9 +54,7 @@ def main(args=None):
     )
 
     # Voeg subparsers toe aan het hoofdparser-object
-    subparsers = argumentparser.add_subparsers(
-        dest="command", help="Available sub commands."
-    )
+    subparsers = argumentparser.add_subparsers(dest="command", help="Available sub commands.")
     subparser_dict = {
         const.CMD_IMPORT: subparsers.add_parser(
             const.CMD_IMPORT,
@@ -132,9 +123,7 @@ def main(args=None):
         database = Database(args.database_url, db_create=False)
         logger.info("Starting transformation ")
         try:
-            transformer = transformers.TransformerRegistry.getinstance(
-                args.transformationtype
-            )
+            transformer = transformers.TransformerRegistry.getinstance(args.transformationtype)
             transformer.transform(args, database)
             database.commit()
             logger.info(

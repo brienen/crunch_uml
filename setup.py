@@ -1,6 +1,4 @@
 import setuptools
-import os
-import crunch_uml.const as const
 
 long_description = None
 with open('README.md', 'r') as fh:
@@ -20,7 +18,7 @@ setuptools.setup(
     url='http://github.com/brienen/crunch_uml',
     author='Arjen Brienen',
     license='MIT',
-    include_package_data=True,
+    #include_package_data=True,
     packages=setuptools.find_packages(
         exclude=[
             'examples',
@@ -40,14 +38,15 @@ setuptools.setup(
     install_requires=parse_requirements('requirements.txt'),
     extras_require={
         'dev':[
+            'bandit == 1.7.*',
             'black == 24.*',
-            'build == 0.10.*',
-            'flake8 == 6.*',
+            'build == 1.1.*',
+            'flake8 == 7.*',
             'isort == 5.*',
-            'mypy == 1.2',
-            'pytest == 7.*',
-            'pytest-cov == 4.*',
-            'twine == 4.*'],
+            'mypy == 1.11.*',
+            'pytest == 8.*',
+            'pytest-cov == 5.*',
+            'twine == 5.*']
     },
     entry_points={
         'console_scripts': [

@@ -49,9 +49,7 @@ class LodRenderer(ModelRenderer):
         # First add all classes
         for model in models:
             modelname = util.remove_substring(model.name, "model")
-            ns = Namespace(
-                urljoin(str(args.linked_data_namespace), f"/{quote(modelname)}/")
-            )
+            ns = Namespace(urljoin(str(args.linked_data_namespace), f"/{quote(modelname)}/"))
 
             for cls in model.classes:
                 # Werk eerst de dict bij
@@ -103,9 +101,7 @@ class LodRenderer(ModelRenderer):
                         g.add((ns[assoc.id], RDFS.range, to_cls))
                         g.add((ns[assoc.id], RDFS.label, Literal(assoc.name)))
                         if assoc.definitie is not None:
-                            g.add(
-                                (ns[assoc.id], RDFS.comment, Literal(assoc.definitie))
-                            )
+                            g.add((ns[assoc.id], RDFS.comment, Literal(assoc.definitie)))
 
         self.writeToFile(g, args)
 

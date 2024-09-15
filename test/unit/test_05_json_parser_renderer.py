@@ -19,9 +19,7 @@ def are_json_files_equal(file1_path, file2_path):
         return data1 == data2
 
     except Exception as e:
-        print(
-            f"Er is een fout opgetreden tijdens het vergelijken van de bestanden: {str(e)}"
-        )
+        print(f"Er is een fout opgetreden tijdens het vergelijken van de bestanden: {str(e)}")
         return False
 
 

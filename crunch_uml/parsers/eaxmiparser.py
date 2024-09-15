@@ -131,9 +131,7 @@ class EAXMIParser(XMIParser):
                 properties = attrref.xpath("./properties")
                 copy_values(properties, attr)
                 documentation = attrref.xpath("./documentation")
-                attr.definitie = (
-                    documentation[0].get("value") if documentation is not None else None
-                )
+                attr.definitie = documentation[0].get("value") if documentation is not None else None
                 stereotype = attrref.xpath("./stereotype")
                 copy_values(stereotype, attr)
 
@@ -144,11 +142,7 @@ class EAXMIParser(XMIParser):
                     properties = attrref.xpath("./properties")
                     copy_values(properties, literal)
                     documentation = attrref.xpath("./documentation")
-                    literal.definitie = (
-                        documentation[0].get("value")
-                        if documentation is not None
-                        else None
-                    )
+                    literal.definitie = documentation[0].get("value") if documentation is not None else None
                     stereotype = attrref.xpath("./stereotype")
                     copy_values(stereotype, literal)
 
@@ -160,12 +154,8 @@ class EAXMIParser(XMIParser):
             idref = connectorref.get("{" + ns["xmi"] + "}idref")
             association = schema.get_association(idref)
             if association is not None:
-                association.src_role = connectorref.xpath(
-                    "./source/role", namespaces=ns
-                )[0].get("name")
-                association.dst_role = connectorref.xpath(
-                    "./target/role", namespaces=ns
-                )[0].get("name")
+                association.src_role = connectorref.xpath("./source/role", namespaces=ns)[0].get("name")
+                association.dst_role = connectorref.xpath("./target/role", namespaces=ns)[0].get("name")
 
                 documentation = connectorref.xpath("./documentation")
                 if len(documentation) == 1:
@@ -225,9 +215,7 @@ class EAXMIParser(XMIParser):
 
             for element in diagramref.xpath("./elements/element"):
                 element_id = element.get("subject")
-                logger.debug(
-                    f'Found element with id {element.get("subject")} in diagram {name}'
-                )
+                logger.debug(f'Found element with id {element.get("subject")} in diagram {name}')
                 if schema.get_class(element_id) is not None:
                     diagram.classes.append(schema.get_class(element_id))
                     logger.debug(
@@ -236,9 +224,7 @@ class EAXMIParser(XMIParser):
                     )
                 elif schema.get_association(element_id) is not None:
                     diagram.associations.append(schema.get_association(element_id))
-                    logger.debug(
-                        f'Element {element.get("subject")} in diagram {name} is een association'
-                    )
+                    logger.debug(f'Element {element.get("subject")} in diagram {name} is een association')
                 elif schema.get_enumeration(element_id) is not None:
                     diagram.enumerations.append(schema.get_enumeration(element_id))
                     logger.debug(
@@ -246,12 +232,8 @@ class EAXMIParser(XMIParser):
                         f" {schema.get_enumeration(element_id).name}"
                     )
                 elif schema.get_generalization(element_id) is not None:
-                    diagram.generalizations.append(
-                        schema.get_generalization(element_id)
-                    )
-                    logger.debug(
-                        f'Element {element.get("subject")} in diagram {name} is een generalisatie'
-                    )
+                    diagram.generalizations.append(schema.get_generalization(element_id))
+                    logger.debug(f'Element {element.get("subject")} in diagram {name} is een generalisatie')
                 else:
                     logger.debug(
                         f'Element {element.get("subject")} in diagram {name} is niet gevonden in de database. Kan een'
@@ -259,7 +241,5 @@ class EAXMIParser(XMIParser):
                         " element buiten het model."
                     )
 
-            logger.debug(
-                f"Diagram {diagram.name} met id {diagram.id} ingelezen met inhoud: {diagram}"
-            )
+            logger.debug(f"Diagram {diagram.name} met id {diagram.id} ingelezen met inhoud: {diagram}")
             schema.save(diagram)

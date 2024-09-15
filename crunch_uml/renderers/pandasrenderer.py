@@ -14,9 +14,7 @@ logger = logging.getLogger()
 
 def object_as_dict(obj):
     """Converts a SQLAlchemy model object to a dictionary, excluding private attributes."""
-    return {
-        c.key: getattr(obj, c.key) for c in sqlalchemy.inspect(obj).mapper.column_attrs
-    }
+    return {c.key: getattr(obj, c.key) for c in sqlalchemy.inspect(obj).mapper.column_attrs}
 
 
 @RendererRegistry.register(
@@ -48,16 +46,12 @@ class JSONRenderer(Renderer):
             # Model class associated with the table
             model = base.model_lookup_by_table_name(table_name)
             if (
-                not model
-                or self.get_record_type() == const.RECORD_TYPE_INDEXED
-                and "id" not in model.__table__.columns
+                not model or self.get_record_type() == const.RECORD_TYPE_INDEXED and "id" not in model.__table__.columns
             ):  # In case of a junction table
                 continue
 
             # Retrieve data
-            records = (
-                session.query(model).filter(model.schema_id == schema.schema_id).all()
-            )
+            records = session.query(model).filter(model.schema_id == schema.schema_id).all()
             data = [object_as_dict(record) for record in records]
 
             # Filter columns based on included_columns, unless included_columns is empty
@@ -67,13 +61,10 @@ class JSONRenderer(Renderer):
                     filtered_record = {
                         key: value
                         for key, value in record.items()
-                        if key in included_columns
-                        and (empty_values or value is not None)
+                        if key in included_columns and (empty_values or value is not None)
                     }
                 else:
-                    filtered_record = (
-                        record  # Include all columns if included_columns is empty
-                    )
+                    filtered_record = record  # Include all columns if included_columns is empty
                 if len(filtered_record) > 0:
                     filtered_data.append(
                         filtered_record
@@ -133,9 +124,7 @@ class I18nRenderer(JSONRenderer):
         # Retrieve all data
         all_data = self.get_all_data(args, schema, empty_values=False)
         if args.translate:
-            all_data = self.translate_data(
-                all_data, args.language, from_language=args.from_language
-            )
+            all_data = self.translate_data(all_data, args.language, from_language=args.from_language)
 
         # Initialize the i18n structure
         i18n_data = {}
@@ -146,23 +135,17 @@ class I18nRenderer(JSONRenderer):
                 try:
                     i18n_data = json.load(json_file)
                 except json.JSONDecodeError:
-                    raise ValueError(
-                        f"The file {args.outputfile} is not a valid JSON file."
-                    )
+                    raise ValueError(f"The file {args.outputfile} is not a valid JSON file.")
 
             if not isinstance(i18n_data, dict):
-                raise ValueError(
-                    f"The file {args.outputfile} does not contain a valid i18n structure."
-                )
+                raise ValueError(f"The file {args.outputfile} does not contain a valid i18n structure.")
 
         # Update the i18n data with the new language entry
         i18n_data[args.language] = all_data
 
         # Controleer of het bestand al bestaat
         if not os.path.exists(args.outputfile):
-            logger.info(
-                f"Vertaalbestand {args.outputfile} bestaat niet, maak een nieuw bestand aan..."
-            )
+            logger.info(f"Vertaalbestand {args.outputfile} bestaat niet, maak een nieuw bestand aan...")
 
         # Write the updated i18n data back to the file
         with open(args.outputfile, "w", encoding="utf-8") as json_file:
@@ -189,8 +172,6 @@ class CSVRenderer(Renderer):
                 continue
 
             # Retrieve data
-            records = (
-                session.query(model).filter(model.schema_id == schema.schema_id).all()
-            )
+            records = session.query(model).filter(model.schema_id == schema.schema_id).all()
             df = pd.DataFrame([object_as_dict(record) for record in records])
             df.to_csv(f"{args.outputfile}{table_name}.csv", index=False)
