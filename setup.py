@@ -6,6 +6,11 @@ long_description = None
 with open('README.md', 'r') as fh:
     long_description = fh.read()
 
+# Lees het requirements.txt bestand en gebruik het voor install_requires
+def parse_requirements(filename):
+    with open(filename, 'r') as f:
+        return f.read().splitlines()
+
 setuptools.setup(
     name='crunch_uml',
     version='0.2.12',
@@ -32,25 +37,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=[
-        'SQLAlchemy>=2.0.20,<3',
-        'lxml>=4.9.3,<5',
-        'lxml-stubs',
-        'openpyxl>=3.0.10,<4',
-        'types-openpyxl',
-        'numpy==1.26.4',
-        'pandas>=2.2.2,<3',
-        'pandas-stubs',
-        'jinja2>=3.1.2,<4',
-        'types-requests>=2.32.0,<3',
-        'rdflib>=7.0.0,<8',
-        'inflection>=0.5.1,<6',
-        'validators>=0.28.0,<1',
-        'requests>=2.32.3,<3',
-        'jsonschema>=4.22.0,<5',
-        'types-jsonschema>=4.22,<5',
-        'translators>=5.9.2,<6'
-        ],
+    install_requires=parse_requirements('requirements.txt'),
     extras_require={
         'dev':[
             'black == 24.*',

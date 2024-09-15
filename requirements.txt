@@ -1,0 +1,17 @@
+SQLAlchemy>=2.0.20,<3
+lxml>=4.9.3,<5
+lxml-stubs
+openpyxl>=3.0.10,<4
+types-openpyxl
+numpy==1.26.4
+pandas>=2.2.2,<3
+pandas-stubs
+jinja2>=3.1.2,<4
+types-requests>=2.32.0,<3
+rdflib>=7.0.0,<8
+inflection>=0.5.1,<6
+validators>=0.28.0,<1
+requests>=2.32.3,<3
+jsonschema>=4.22.0,<5
+types-jsonschema>=4.22,<5
+translators>=5.9.2,<6
