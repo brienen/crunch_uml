@@ -88,7 +88,7 @@ def getColumnNames(tablename):
     return [column.name for column in table.columns]
 
 
-# Koppeltabellen
+# Koppeltabellen en maak ze beter beschikbaar
 class DiagramClass(Base):  # type: ignore
     __tablename__ = "diagram_class"
     diagram_id = Column(String, nullable=False)
