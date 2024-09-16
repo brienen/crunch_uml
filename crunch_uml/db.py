@@ -27,7 +27,7 @@ suppress_warnings = True
 
 def add_args(argumentparser, subparser_dict):
     global suppress_warnings
-    # Rest of the code...
+    # Rest of the code....
     #    '--database_no_orphans',
     #    action='store_true',
     #    help='Do not create orphan classes when relations point to classes that are not found in the imported file.',
