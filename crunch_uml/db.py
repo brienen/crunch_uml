@@ -196,6 +196,18 @@ class UML_Generic:
         setattr(copy_instance, "kopie", True)
         return copy_instance
 
+    def get_efficient_copy(self, **overrides):
+        """
+        Maakt een efficiënte shallow copy van een instantie, waarbij optioneel velden overschreven kunnen worden.
+        """
+        cls = self.__class__
+        copy_instance = cls()
+        for attr in self.__table__.columns.keys():
+            setattr(copy_instance, attr, getattr(self, attr))
+        for key, value in overrides.items():
+            setattr(copy_instance, key, value)
+        return copy_instance
+
 
 class UMLBase(UML_Generic):
     author = Column(String)
