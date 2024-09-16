@@ -374,6 +374,8 @@ class Package(Base, UMLBase):  # type: ignore
 
         return copy_instance
 
+    def get_efficient_copy(self, **overrides):
+        return super().get_efficient_copy(**overrides)
 
 class Class(Base, UMLBase, UMLTags):  # type: ignore
     __tablename__ = "classes"
@@ -494,6 +496,9 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
 
         return copy_instance
 
+    def get_efficient_copy(self, **overrides):
+        return super().get_efficient_copy(**overrides)
+
 
 class Attribute(Base, UML_Generic):  # type: ignore
     __tablename__ = "attributes"
@@ -549,6 +554,29 @@ class Attribute(Base, UML_Generic):  # type: ignore
         # copy_instance.enumeration_id = None
         # copy_instance.type_class_id = None
         return copy_instance
+
+    def get_efficient_copy(self, **overrides):
+        return super().get_efficient_copy(**overrides)
+
+    def getType(self):
+        if self.primitive is not None:
+            return self.primitive
+        elif self.enumeration is not None:
+            return self.enumeration
+        elif self.type_class is not None:
+            return self.type_class
+        else:
+            return None
+        
+    def getTypeName(self):
+        if self.primitive is not None:
+            return self.primitive
+        elif self.enumeration is not None:
+            return self.enumeration.name
+        elif self.type_class is not None:
+            return self.type_class.name
+        else:
+            return None
 
     def getDatatype(self):
         if self.primitive is not None:
