@@ -24,7 +24,7 @@ def test_import_monumenten():
         "xmi",
     ]
     cli.main(test_args)
-
+    
     database = db.Database(const.DATABASE_URL, db_create=False)
     schema = sch.Schema(database, schema_name="monumenten")
     assert schema.count_package() == 3
