@@ -935,26 +935,16 @@ class Database:
             # If the database does not exist or is not reachable, create it
             Base.metadata.create_all(bind=self.engine)
 
-    def get_session(self):
-        return self.session
-
-    def commit(self):
-        self.session.commit()
-
-    def rollback(self):
-        self.session.rollback()
-
-    def close(self):
-        self.session.close()
-        self._instance = None
+    def save(self, obj):
+        self.session.merge(obj)
+        self.session.flush()
 
     def add(self, obj):
         self.session.add(obj)
         self.session.flush()
 
-    def save(self, obj):
-        self.session.merge(obj)
-        self.session.flush()
+    def count_package(self):
+        return self.session.query(Package).count()
 
     def get_package(self, id):
         return self.session.get(Package, id)
@@ -977,9 +967,6 @@ class Database:
     def get_all_enumerations(self):
         return self.session.query(Enumeratie).all()
 
-    def count_package(self):
-        return self.session.query(Package).count()
-
     def count_class(self):
         return self.session.query(Class).count()
 
@@ -1000,3 +987,16 @@ class Database:
 
     def count_diagrams(self):
         return self.session.query(Diagram).count()
+
+    def commit(self):
+        self.session.commit()
+
+    def rollback(self):
+        self.session.rollback()
+
+    def close(self):
+        self.session.close()
+        self._instance = None
+
+    def get_session(self):
+        return self.session
