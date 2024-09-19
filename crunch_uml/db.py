@@ -56,6 +56,46 @@ def add_args(argumentparser, subparser_dict):
 def getTables():
     return list(Base.metadata.tables.keys())
 
+def getTable(tablename):
+    """
+    Geeft een tabel-object terug voor een gegeven tabelnaam.
+    """
+    # Controleer of de tabelnaam bestaat in de Base's metadata
+    if tablename not in Base.metadata.tables:
+        raise ValueError(f"Tabelnaam '{tablename}' niet gevonden in de metadata.")
+
+    # Verkrijg de tabel-object
+    table = Base.metadata.tables[tablename]
+
+    # Retourneer het tabel-object
+    return table
+
+def getTableObject(tablename):  
+    """
+    Geeft een tabel-object terug voor een gegeven tabelnaam.
+    """
+    # Controleer of de tabelnaam bestaat in de Base's metadata
+    if tablename not in Base.metadata.tables:
+        raise ValueError(f"Tabelnaam '{tablename}' niet gevonden in de metadata.")
+
+    # Verkrijg de tabel-object
+    table = Base.metadata.tables[tablename]
+
+    # Retourneer het tabel-object
+    return table
+def getTableObject(tablename):  
+    """
+    Geeft een tabel-object terug voor een gegeven tabelnaam.
+    """     
+    # Controleer of de tabelnaam bestaat in de Base's metadata
+    if tablename not in Base.metadata.tables:
+        raise ValueError(f"Tabelnaam '{tablename}' niet gevonden in de metadata.")
+
+    # Verkrijg de tabel-object
+    table = Base.metadata.tables[tablename]
+
+    # Retourneer het tabel-object
+    return table
 
 # Get list of column names
 def getColumnNames(tablename):
