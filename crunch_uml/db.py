@@ -50,23 +50,8 @@ def add_args(argumentparser, subparser_dict):
         ),
         default=const.DATABASE_URL,
     )
-
-
-class BaseModel:
-    @classmethod
-    def model_lookup_by_table_name(cls, table_name):
-        registry_instance = getattr(cls, "registry")
-        for mapper_ in registry_instance.mappers:
-            model = mapper_.class_
-            model_class_name = model.__tablename__
-            if model_class_name == table_name:
-                return model
-        return None
-
-
-Base = declarative_base(cls=BaseModel)
-
-
+ 
+ 
 # Get list of tables defined in schema
 def getTables():
     return list(Base.metadata.tables.keys())
@@ -86,6 +71,24 @@ def getColumnNames(tablename):
 
     # Haal de kolomnamen op en retourneer ze
     return [column.name for column in table.columns]
+
+
+# Define BaseModel and Base
+class BaseModel:
+    @classmethod
+    def model_lookup_by_table_name(cls, table_name):
+        registry_instance = getattr(cls, "registry")
+        for mapper_ in registry_instance.mappers:
+            model = mapper_.class_
+            model_class_name = model.__tablename__
+            if model_class_name == table_name:
+                return model
+        return None
+
+
+Base = declarative_base(cls=BaseModel)
+ 
+ 
 
 
 # Koppeltabellen en maak ze beter beschikbaar
