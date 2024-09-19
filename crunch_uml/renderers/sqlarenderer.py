@@ -98,7 +98,9 @@ def tablename(
 def koppeltabelname(
     self,
 ):  # "koppel_{{ associatie.name | snake_case }}_{{ associatie.id}}"
-    return f"{getPackageLst(self.src_class.package, self.src_class.package).lower()}__koppel_{self.getSQLAName()}_{self.id}"
+    return (
+        f"{getPackageLst(self.src_class.package, self.src_class.package).lower()}__koppel_{self.getSQLAName()}_{self.id}"
+    )
 
 
 def packagename(self: db.Package):

@@ -69,13 +69,11 @@ class LodRenderer(ModelRenderer):
                         g.add((ns[attribute.id], RDFS.label, Literal(attribute.name)))
                         g.add((ns[attribute.id], RDFS.range, XSD.string))
                         if attribute.definitie is not None:
-                            g.add(
-                                (
-                                    ns[attribute.id],
-                                    RDFS.comment,
-                                    Literal(attribute.definitie),
-                                )
-                            )
+                            g.add((
+                                ns[attribute.id],
+                                RDFS.comment,
+                                Literal(attribute.definitie),
+                            ))
 
         # Then add all relations
         for model in models:

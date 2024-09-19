@@ -50,8 +50,8 @@ def add_args(argumentparser, subparser_dict):
         ),
         default=const.DATABASE_URL,
     )
- 
- 
+
+
 # Get list of tables defined in schema
 def getTables():
     return list(Base.metadata.tables.keys())
@@ -87,8 +87,6 @@ class BaseModel:
 
 
 Base = declarative_base(cls=BaseModel)
- 
- 
 
 
 # Koppeltabellen en maak ze beter beschikbaar
@@ -380,6 +378,7 @@ class Package(Base, UMLBase):  # type: ignore
     def get_efficient_copy(self, **overrides):
         return super().get_efficient_copy(**overrides)
 
+
 class Class(Base, UMLBase, UMLTags):  # type: ignore
     __tablename__ = "classes"
 
@@ -570,7 +569,7 @@ class Attribute(Base, UML_Generic):  # type: ignore
             return self.type_class
         else:
             return None
-        
+
     def getTypeName(self):
         if self.primitive is not None:
             return self.primitive

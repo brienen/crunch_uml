@@ -329,7 +329,8 @@ class EARepoUpdater(ModelRenderer):
                     logger.debug(f"No changes detected for record with GUID {guid_value}.")
             else:
                 logger.debug(
-                    f"No record found with GUID {guid_value} in table {table} and data dict {data_dict}. No update performed."
+                    f"No record found with GUID {guid_value} in table {table} and data dict {data_dict}. No update"
+                    " performed."
                 )
         except Exception as e:
             logger.error(f"Error while updating record with GUID {guid_value} with message: {e}")
@@ -374,7 +375,8 @@ class EARepoUpdater(ModelRenderer):
             version_type = args.version_type
             tag_strategy = args.tag_strategy
             logger.info(
-                f"Updating EA Repository {args.outputfile} with version type {version_type} and tag_strategy {tag_strategy}..."
+                f"Updating EA Repository {args.outputfile} with version type {version_type} and tag_strategy"
+                f" {tag_strategy}..."
             )
 
             try:

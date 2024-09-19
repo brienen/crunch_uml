@@ -55,7 +55,6 @@ def store_data(entity_name, data, schema, update_only=False):
     descr="Generic parser that parses JSON-files, and looks for table and column definitions.",
 )
 class JSONParser(Parser):
-
     def update_only(self):
         return False
 
@@ -95,10 +94,12 @@ class JSONParser(Parser):
 
 @ParserRegistry.register(
     "i18n",
-    descr=f"Parser that reads i18n file and stores the values in the database. Use --language to specify language. (default: {const.DEFAULT_LANGUAGE})",
+    descr=(
+        "Parser that reads i18n file and stores the values in the database. Use --language to specify language."
+        f" (default: {const.DEFAULT_LANGUAGE})"
+    ),
 )
 class I18nParser(JSONParser):
-
     def update_only(self):
         """Update only the records that already exist. do not add new ones to not get errors"""
         return True
