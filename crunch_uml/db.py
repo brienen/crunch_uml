@@ -272,6 +272,11 @@ class UMLTags:
     gemma_url = Column(String)
     gemma_definitie = Column(String)
     gemma_toelichting = Column(String)
+    gemma_definitie_english = Column(String)
+    gemma_toelichting_english = Column(String)
+    gemma_synoniemen = Column(String)
+    gemma_naam_english = Column(String)
+
 
 
 class Package(Base, UMLBase):  # type: ignore
