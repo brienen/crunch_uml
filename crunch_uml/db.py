@@ -262,20 +262,26 @@ class UMLBase(UML_Generic):
 
 class UMLTags:
     archimate_type = Column(String)
+    archimate_type_english = Column(String)
     datum_tijd_export = Column(String)
+    datum_tijd_export_english = Column(String)
     synoniemen = Column(String)
     domein_dcat = Column(String)
+    domein_dcat_english = Column(String)
     domein_iv3 = Column(String)
+    domein_iv3_english = Column(String)
     synoniemen = Column(String)
     gemma_naam = Column(String)
+    gemma_naam_english = Column(String)
     gemma_type = Column(String)
+    gemma_type_english = Column(String)
     gemma_url = Column(String)
+    gemma_url_english = Column(String)
     gemma_definitie = Column(String)
-    gemma_toelichting = Column(String)
     gemma_definitie_english = Column(String)
+    gemma_toelichting = Column(String)
     gemma_toelichting_english = Column(String)
     gemma_synoniemen = Column(String)
-    gemma_naam_english = Column(String)
 
 
 
