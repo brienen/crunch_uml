@@ -27,7 +27,7 @@ suppress_warnings = True
 
 def add_args(argumentparser, subparser_dict):
     global suppress_warnings
-    # Rest of the code....
+    # Rest of the code...
     #    '--database_no_orphans',
     #    action='store_true',
     #    help='Do not create orphan classes when relations point to classes that are not found in the imported file.',
@@ -52,50 +52,25 @@ def add_args(argumentparser, subparser_dict):
     )
 
 
+class BaseModel:
+    @classmethod
+    def model_lookup_by_table_name(cls, table_name):
+        registry_instance = getattr(cls, "registry")
+        for mapper_ in registry_instance.mappers:
+            model = mapper_.class_
+            model_class_name = model.__tablename__
+            if model_class_name == table_name:
+                return model
+        return None
+
+
+Base = declarative_base(cls=BaseModel)
+
+
 # Get list of tables defined in schema
 def getTables():
     return list(Base.metadata.tables.keys())
 
-def getTable(tablename):
-    """
-    Geeft een tabel-object terug voor een gegeven tabelnaam.
-    """
-    # Controleer of de tabelnaam bestaat in de Base's metadata
-    if tablename not in Base.metadata.tables:
-        raise ValueError(f"Tabelnaam '{tablename}' niet gevonden in de metadata.")
-
-    # Verkrijg de tabel-object
-    table = Base.metadata.tables[tablename]
-
-    # Retourneer het tabel-object
-    return table
-
-def getTableObject(tablename):  
-    """
-    Geeft een tabel-object terug voor een gegeven tabelnaam.
-    """
-    # Controleer of de tabelnaam bestaat in de Base's metadata
-    if tablename not in Base.metadata.tables:
-        raise ValueError(f"Tabelnaam '{tablename}' niet gevonden in de metadata.")
-
-    # Verkrijg de tabel-object
-    table = Base.metadata.tables[tablename]
-
-    # Retourneer het tabel-object
-    return table
-def getTableObject(tablename):  
-    """
-    Geeft een tabel-object terug voor een gegeven tabelnaam.
-    """     
-    # Controleer of de tabelnaam bestaat in de Base's metadata
-    if tablename not in Base.metadata.tables:
-        raise ValueError(f"Tabelnaam '{tablename}' niet gevonden in de metadata.")
-
-    # Verkrijg de tabel-object
-    table = Base.metadata.tables[tablename]
-
-    # Retourneer het tabel-object
-    return table
 
 # Get list of column names
 def getColumnNames(tablename):
@@ -113,23 +88,15 @@ def getColumnNames(tablename):
     return [column.name for column in table.columns]
 
 
-# Define BaseModel and Base
-class BaseModel:
-    @classmethod
-    def model_lookup_by_table_name(cls, table_name):
-        registry_instance = getattr(cls, "registry")
-        for mapper_ in registry_instance.mappers:
-            model = mapper_.class_
-            model_class_name = model.__tablename__
-            if model_class_name == table_name:
-                return model
-        return None
+# Model definitions
+# class Schema(Base):
+#    __tablename__ = 'schemas'
+
+#    id = Column(String, primary_key=True)  # Use the schema name as ID
+#    definitie = Column(Text)
 
 
-Base = declarative_base(cls=BaseModel)
-
-
-# Koppeltabellen en maak ze beter beschikbaar
+# Koppeltabellen
 class DiagramClass(Base):  # type: ignore
     __tablename__ = "diagram_class"
     diagram_id = Column(String, nullable=False)
@@ -237,18 +204,6 @@ class UML_Generic:
         setattr(copy_instance, "kopie", True)
         return copy_instance
 
-    def get_efficient_copy(self, **overrides):
-        """
-        Maakt een efficiënte shallow copy van een instantie, waarbij optioneel velden overschreven kunnen worden.
-        """
-        cls = self.__class__
-        copy_instance = cls()
-        for attr in self.__table__.columns.keys():
-            setattr(copy_instance, attr, getattr(self, attr))
-        for key, value in overrides.items():
-            setattr(copy_instance, key, value)
-        return copy_instance
-
 
 class UMLBase(UML_Generic):
     author = Column(String)
@@ -262,27 +217,16 @@ class UMLBase(UML_Generic):
 
 class UMLTags:
     archimate_type = Column(String)
-    archimate_type_english = Column(String)
     datum_tijd_export = Column(String)
-    datum_tijd_export_english = Column(String)
     synoniemen = Column(String)
     domein_dcat = Column(String)
-    domein_dcat_english = Column(String)
     domein_iv3 = Column(String)
-    domein_iv3_english = Column(String)
     synoniemen = Column(String)
     gemma_naam = Column(String)
-    gemma_naam_english = Column(String)
     gemma_type = Column(String)
-    gemma_type_english = Column(String)
     gemma_url = Column(String)
-    gemma_url_english = Column(String)
     gemma_definitie = Column(String)
-    gemma_definitie_english = Column(String)
     gemma_toelichting = Column(String)
-    gemma_toelichting_english = Column(String)
-    gemma_synoniemen = Column(String)
-
 
 
 class Package(Base, UMLBase):  # type: ignore
@@ -426,9 +370,6 @@ class Package(Base, UMLBase):  # type: ignore
 
         return copy_instance
 
-    def get_efficient_copy(self, **overrides):
-        return super().get_efficient_copy(**overrides)
-
 
 class Class(Base, UMLBase, UMLTags):  # type: ignore
     __tablename__ = "classes"
@@ -549,9 +490,6 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
 
         return copy_instance
 
-    def get_efficient_copy(self, **overrides):
-        return super().get_efficient_copy(**overrides)
-
 
 class Attribute(Base, UML_Generic):  # type: ignore
     __tablename__ = "attributes"
@@ -607,29 +545,6 @@ class Attribute(Base, UML_Generic):  # type: ignore
         # copy_instance.enumeration_id = None
         # copy_instance.type_class_id = None
         return copy_instance
-
-    def get_efficient_copy(self, **overrides):
-        return super().get_efficient_copy(**overrides)
-
-    def getType(self):
-        if self.primitive is not None:
-            return self.primitive
-        elif self.enumeration is not None:
-            return self.enumeration
-        elif self.type_class is not None:
-            return self.type_class
-        else:
-            return None
-
-    def getTypeName(self):
-        if self.primitive is not None:
-            return self.primitive
-        elif self.enumeration is not None:
-            return self.enumeration.name
-        elif self.type_class is not None:
-            return self.type_class.name
-        else:
-            return None
 
     def getDatatype(self):
         if self.primitive is not None:
