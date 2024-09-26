@@ -1,9 +1,10 @@
 import logging
 import os
 from urllib.parse import quote, urljoin, urlunparse
+
 from pyshacl import validate as shacl_validate
-from rdflib import Graph, Literal, Namespace, BNode
-from rdflib.namespace import OWL, RDF, RDFS, XSD, SH
+from rdflib import BNode, Graph, Literal, Namespace
+from rdflib.namespace import OWL, RDF, RDFS, SH, XSD
 
 import crunch_uml.schema as sch
 from crunch_uml import const, util
@@ -74,7 +75,9 @@ class LodRenderer(ModelRenderer):
                     g.add((ns[attribute.id], RDFS.label, Literal(attribute.name)))
                     g.add((ns[attribute.id], RDFS.range, datatype))
                     g.add((ns[attribute.id], Namespace("http://w3.org/ns/shacl#").datatype, datatype))  # sh:datatype
-                    g.add((ns[attribute.id], Namespace("http://w3.org/ns/shacl#").path, Literal(attribute.name)))  # sh:path
+                    g.add(
+                        (ns[attribute.id], Namespace("http://w3.org/ns/shacl#").path, Literal(attribute.name))
+                    )  # sh:path
                     g.add((ns[attribute.id], RDF.type, mim.Attribuutsoort))  # Add attribute stereotype
 
                     # SHACL property structure
