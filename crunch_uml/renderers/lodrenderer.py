@@ -1,6 +1,7 @@
 import logging
 import os
 from urllib.parse import quote, urljoin, urlunparse
+from pyshacl import validate as shacl_validate
 
 from rdflib import Graph, Literal, Namespace
 from rdflib.namespace import OWL, RDF, RDFS, XSD
@@ -101,6 +102,15 @@ class LodRenderer(ModelRenderer):
                         g.add((ns[assoc.id], RDF.type, mim.Relatiesoort))  # Add stereotype for relationship
                         if assoc.definitie is not None:
                             g.add((ns[assoc.id], RDFS.comment, Literal(assoc.definitie)))
+
+        conforms, results_graph, results_text = shacl_validate(
+            g,
+            inference='rdfs',
+            serialize_report_graph=True,
+        )
+        if not conforms:
+            logger.warning("SHACL validation failed:")
+            logger.warning(results_text)
 
         self.writeToFile(g, args)
 
