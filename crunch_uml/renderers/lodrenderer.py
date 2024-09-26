@@ -2,9 +2,8 @@ import logging
 import os
 from urllib.parse import quote, urljoin, urlunparse
 from pyshacl import validate as shacl_validate
-
-from rdflib import Graph, Literal, Namespace
-from rdflib.namespace import OWL, RDF, RDFS, XSD
+from rdflib import Graph, Literal, Namespace, BNode
+from rdflib.namespace import OWL, RDF, RDFS, XSD, SH
 
 import crunch_uml.schema as sch
 from crunch_uml import const, util
@@ -62,7 +61,13 @@ class LodRenderer(ModelRenderer):
                 if cls.definitie is not None:
                     g.add((ns[cls.id], RDFS.comment, Literal(cls.definitie)))
 
+                # SHACL NodeShape for the class
+                shape_uri = ns[cls.id + "_Shape"]
+                g.add((shape_uri, RDF.type, SH.NodeShape))
+                g.add((shape_uri, SH.targetNode, ns[cls.id]))
+
                 for attribute in cls.attributes:
+                    attribute_bnode = BNode()
                     datatype = XSD.string if attribute.primitive is None else attribute.primitive
                     g.add((ns[attribute.id], RDF.type, OWL.DatatypeProperty))
                     g.add((ns[attribute.id], RDFS.domain, ns[cls.id]))
@@ -70,6 +75,15 @@ class LodRenderer(ModelRenderer):
                     g.add((ns[attribute.id], RDFS.range, datatype))
                     g.add((ns[attribute.id], Namespace("http://w3.org/ns/shacl#").datatype, datatype))  # sh:datatype
                     g.add((ns[attribute.id], Namespace("http://w3.org/ns/shacl#").path, Literal(attribute.name)))  # sh:path
+                    g.add((ns[attribute.id], RDF.type, mim.Attribuutsoort))  # Add attribute stereotype
+
+                    # SHACL property structure
+                    g.add((shape_uri, SH.property, attribute_bnode))
+                    g.add((attribute_bnode, SH.path, ns[attribute.id]))
+                    g.add((attribute_bnode, SH.datatype, datatype))
+                    g.add((attribute_bnode, SH.minCount, Literal(1)))
+                    g.add((attribute_bnode, SH.maxCount, Literal(1)))
+
                     if attribute.definitie is not None:
                         g.add((
                             ns[attribute.id],
