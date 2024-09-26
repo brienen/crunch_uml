@@ -34,9 +34,10 @@ class LodRenderer(ModelRenderer):
         # sourcery skip: raise-specific-error
         MYNS = Namespace(args.linked_data_namespace)  # noqa: F841
         schema = Namespace("http://schema.org/")  # noqa: F841
-
-        # Create graph
+        mim = Namespace("http://www.geostandaarden.nl/mim#")  # MIM namespace
         g = Graph()
+        g.bind("mim", mim)
+        g.bind("sh", Namespace("http://www.w3.org/ns/shacl#"))
 
         # Get list of packages that are to be rendered
         models = self.getModels(args, zchema)
@@ -52,28 +53,28 @@ class LodRenderer(ModelRenderer):
             ns = Namespace(urljoin(str(args.linked_data_namespace), f"/{quote(modelname)}/"))
 
             for cls in model.classes:
-                # Werk eerst de dict bij
                 class_dict[cls.id] = ns[cls.id]
+                g.add((ns[cls.id], RDF.type, mim.Objecttype))  # Add stereotype
 
-                # Voeg de klasse toe
                 g.add((ns[cls.id], RDF.type, OWL.Class))
                 g.add((ns[cls.id], RDFS.label, Literal(cls.name)))
                 if cls.definitie is not None:
                     g.add((ns[cls.id], RDFS.comment, Literal(cls.definitie)))
 
                 for attribute in cls.attributes:
-                    # Voeg de attributen toe
-                    if attribute.name is not None and attribute.primitive is not None:
-                        g.add((ns[attribute.id], RDF.type, OWL.DatatypeProperty))
-                        g.add((ns[attribute.id], RDFS.domain, ns[cls.id]))
-                        g.add((ns[attribute.id], RDFS.label, Literal(attribute.name)))
-                        g.add((ns[attribute.id], RDFS.range, XSD.string))
-                        if attribute.definitie is not None:
-                            g.add((
-                                ns[attribute.id],
-                                RDFS.comment,
-                                Literal(attribute.definitie),
-                            ))
+                    datatype = XSD.string if attribute.primitive is None else attribute.primitive
+                    g.add((ns[attribute.id], RDF.type, OWL.DatatypeProperty))
+                    g.add((ns[attribute.id], RDFS.domain, ns[cls.id]))
+                    g.add((ns[attribute.id], RDFS.label, Literal(attribute.name)))
+                    g.add((ns[attribute.id], RDFS.range, datatype))
+                    g.add((ns[attribute.id], Namespace("http://w3.org/ns/shacl#").datatype, datatype))  # sh:datatype
+                    g.add((ns[attribute.id], Namespace("http://w3.org/ns/shacl#").path, Literal(attribute.name)))  # sh:path
+                    if attribute.definitie is not None:
+                        g.add((
+                            ns[attribute.id],
+                            RDFS.comment,
+                            Literal(attribute.definitie),
+                        ))
 
         # Then add all relations
         for model in models:
@@ -93,11 +94,11 @@ class LodRenderer(ModelRenderer):
                     to_cls = class_dict.get(assoc.dst_class.id)
 
                     if from_cls is not None and to_cls is not None:
-                        # Voeg properties toe
                         g.add((ns[assoc.id], RDF.type, OWL.ObjectProperty))
                         g.add((ns[assoc.id], RDFS.domain, from_cls))
                         g.add((ns[assoc.id], RDFS.range, to_cls))
                         g.add((ns[assoc.id], RDFS.label, Literal(assoc.name)))
+                        g.add((ns[assoc.id], RDF.type, mim.Relatiesoort))  # Add stereotype for relationship
                         if assoc.definitie is not None:
                             g.add((ns[assoc.id], RDFS.comment, Literal(assoc.definitie)))
 

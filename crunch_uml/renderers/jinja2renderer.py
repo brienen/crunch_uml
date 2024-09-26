@@ -78,6 +78,11 @@ class Jinja2Renderer(ModelRenderer):
         env.filters["reject_method"] = lambda iterable, method_name: [
             item for item in iterable if not getattr(item, method_name)()
         ]
+        env.filters["upper_first"] = lambda s: s[0].upper() + s[1:] if isinstance(s, str) and s else ""
+        env.filters["lower_first"] = lambda s: s[0].lower() + s[1:] if isinstance(s, str) and s else ""
+        env.filters["quote"] = lambda s: f'"{s}"' if isinstance(s, str) else s
+        env.filters["escape_md"] = lambda s: s.replace("_", "\\_") if isinstance(s, str) else s
+        env.filters["word_break"] = lambda s: " ".join(inflection.underscore(s).split("_")) if isinstance(s, str) else s
 
     def getFilename(self, inputfilename, extension, uml_generic):
         return f"{inputfilename}_{uml_generic.name}{extension}"
