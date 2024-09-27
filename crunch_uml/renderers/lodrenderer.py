@@ -199,3 +199,60 @@ class JSONLDRenderer(LodRenderer):
 
         with open(outputfile, "w") as file:
             file.write(graph.serialize(format="json-ld"))
+
+@RendererRegistry.register(
+    "trig",
+    descr="Renderer that renders Linked Data ontology in TriG format from the supplied models, " 
+         "where a model is a package that includes at least one Class. " 
+         'Needs parameter "output_lod_url".',
+)
+class TrigRenderer(LodRenderer):
+    """
+    Renders Linked Data ontology in TriG format.
+    A model package is a package with at least 1 class inside.
+    """
+
+    def writeToFile(self, graph, args):
+        base_name, ext = os.path.splitext(args.outputfile)
+        outputfile = f"{base_name}.trig"
+
+        with open(outputfile, "w") as file:
+            file.write(graph.serialize(format="trig"))
+
+@RendererRegistry.register(
+    "nquads",
+    descr="Renderer that renders Linked Data ontology in N-Quads format from the supplied models, " 
+         "where a model is a package that includes at least one Class. " 
+         'Needs parameter "output_lod_url".',
+)
+class NQuadsRenderer(LodRenderer):
+    """
+    Renders Linked Data ontology in N-Quads format.
+    A model package is a package with at least 1 class inside.
+    """
+
+    def writeToFile(self, graph, args):
+        base_name, ext = os.path.splitext(args.outputfile)
+        outputfile = f"{base_name}.nq"
+
+        with open(outputfile, "w") as file:
+            file.write(graph.serialize(format="nquads"))
+
+@RendererRegistry.register(
+    "nt",
+    descr="Renderer that renders Linked Data ontology in N-Triples format from the supplied models, " 
+          "where a model is a package that includes at least one Class. "
+          'Needs parameter "output_lod_url".',
+)
+class NTriplesRenderer(LodRenderer):
+    """
+    Renders Linked Data ontology in N-Triples format.
+    A model package is a package with at least 1 class inside.
+    """
+
+    def writeToFile(self, graph, args):
+        base_name, ext = os.path.splitext(args.outputfile)
+        outputfile = f"{base_name}.nt"
+
+        with open(outputfile, "w") as file:
+            file.write(graph.serialize(format="nt"))
