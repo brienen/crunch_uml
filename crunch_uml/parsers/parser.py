@@ -48,6 +48,17 @@ def add_args(argumentparser, subparser_dict):
         action="store_true",
         help="Only update records that already exist. Do not add new ones to avoid errors."
     )
+    import_subparser.add_argument(
+        "--mapper",
+        type=str,
+        default="{}",
+        help="JSON-string voor het hernoemen van kolommen, bijvoorbeeld: '{\"old_col\": \"new_col\"}'"
+    )
+    import_subparser.add_argument(
+        "--entity_name",
+        type=str,
+        help="Naam van de entiteit die wordt geïmporteerd. Alleen te gebruiken bioj CSV-parser."
+    )
 
     # Set the epilog help text
     entries = ParserRegistry.entries()

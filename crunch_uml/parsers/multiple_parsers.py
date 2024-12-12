@@ -13,55 +13,82 @@ from crunch_uml.parsers.parser import Parser, ParserRegistry
 logger = logging.getLogger()
 
 
-def store_data(entity_name, data, schema, update_only=False):
-    # session = SessionLocal()
-    # Retrieve all models dynamically
-    base = db.Base
-    session = schema.get_session()
+class TransformableParser(Parser):
+    column_mapper = {}
+    update_only = False
 
-    logger.debug(f"Parsing {len(data)} entities with name {entity_name}")
-    # Model class associated with the table
-    entity = base.model_lookup_by_table_name(entity_name)
-    if not entity:
-        logger.warning(f"Entity not found with tablename: {entity_name}.")
-        return
+    def store_data(self, entity_name, data, schema, update_only=False):
+        # session = SessionLocal()
+        # Retrieve all models dynamically
+        base = db.Base
+        session = schema.get_session()
 
-    # Als er een ID in de data aanwezig is, zoek dan naar een bestaand record
-    if "id" in data:
-        if existing_entity := session.query(entity).filter_by(id=data["id"], schema_id=schema.schema_id).first():
-            for key, value in data.items():
-                if value is not None and value != "" and key != "id":
-                    setattr(existing_entity, key, value)
-            logger.debug(f"Updated {entity_name} with ID {data['id']}.")
-            schema.save(existing_entity)
+        logger.debug(f"Parsing {len(data)} entities with name {entity_name}")
+        # Model class associated with the table
+        entity = base.model_lookup_by_table_name(entity_name)
+        if not entity:
+            logger.warning(f"Entity not found with tablename: {entity_name}.")
+            return
+
+        # Als er een ID in de data aanwezig is, zoek dan naar een bestaand record
+        if "id" in data:
+            if existing_entity := session.query(entity).filter_by(id=data["id"], schema_id=schema.schema_id).first():
+                for key, value in data.items():
+                    if value is not None and value != "" and key != "id":
+                        setattr(existing_entity, key, value)
+                logger.debug(f"Updated {entity_name} with ID {data['id']}.")
+                schema.save(existing_entity)
+            else:
+                if not update_only:
+                    # ID was aanwezig, maar geen overeenkomstige record werd gevonden
+                    logger.debug(f"No {entity_name} found with ID {data['id']}, creating a new record.")
+                    new_entity = entity(**data)
+                    schema.save(new_entity)
         else:
             if not update_only:
-                # ID was aanwezig, maar geen overeenkomstige record werd gevonden
-                logger.debug(f"No {entity_name} found with ID {data['id']}, creating a new record.")
+                logger.debug(
+                    f"Could not save entity with table '{entity_name}' to schema {schema.schema_id}: no column id present:"
+                    f" {data}."
+                )
                 new_entity = entity(**data)
                 schema.save(new_entity)
-    else:
-        if not update_only:
-            logger.debug(
-                f"Could not save entity with table '{entity_name}' to schema {schema.schema_id}: no column id present:"
-                f" {data}."
-            )
-            new_entity = entity(**data)
-            schema.save(new_entity)
+
+    def map_record(self, column_mapper, record):
+        """
+        Hernoem kolomnamen in het record volgens de opgegeven mapper.
+        :param record: Dictionary met originele data.
+        :return: Getransformeerd record met hernoemde kolommen.
+        """
+        if column_mapper:
+            try:
+                column_mapper = json.loads(column_mapper)
+            except json.JSONDecodeError as e:
+                raise ValueError(f"Invalid JSON for mapper: {column_mapper}. Error: {e}")
+
+            if len(column_mapper) > 0:
+                record = {column_mapper.get(k, k): v for k, v in record.items()}
+            else:
+                logger.warning("Empty mapper provided, no columns will be renamed and original record saved.")      
+
+        # Controleer en transformeer het 'id' veld
+        if "id" in record and isinstance(record["id"], str):
+            id_value = record["id"]
+            if id_value.startswith("{") and id_value.endswith("}"):
+                # Voer een transformatie uit (bijvoorbeeld: verwijder { en })
+                record["id"] = "EAID_" + (id_value[1:-1]).replace("-", "_")  # Verwijdert de { en }
+                logger.debug(f"Transformed 'id' field: {id_value} -> {record['id']}")
+
+        return record      
 
 
 @ParserRegistry.register(
     "json",
     descr="Generic parser that parses JSON-files, and looks for table and column definitions.",
 )
-class JSONParser(Parser):
+class JSONParser(TransformableParser):
 
     def get_data_subset(self, data, args):
         return data
-
-    def transform_record(self, record):
-        """Update or insert the record in the database"""
-        return record
 
     def parse(self, args, schema: sch.Schema):
         logger.info(f"Starting parsing JSON file {args.inputfile}")
@@ -81,8 +108,8 @@ class JSONParser(Parser):
             for entity_name, records in parsed_data.items():
                 if entity_name in tables and entity_name != "schemas":
                     for record in records:
-                        record = self.transform_record(record)
-                        store_data(entity_name, record, schema, update_only=args.update_only)
+                        record = self.map_record(args.mapper, record)
+                        self.store_data(entity_name, record, schema, update_only=args.update_only)
         except json.JSONDecodeError as ex:
             msg = f"File with name {args.inputfile} is not a valid JSON-file, aborting with message {ex.msg}"
             logger.error(msg)
@@ -96,9 +123,9 @@ class JSONParser(Parser):
 )
 class I18nParser(JSONParser):
 
-    def update_only(self):
-        """Update only the records that already exist. do not add new ones to not get errors"""
-        return True
+    def store_data(self, entity_name, data, schema, update_only=False):
+        update_only = True  # i18n records should always be updated
+        super().store_data(entity_name, data, schema, update_only)
 
     def get_data_subset(self, data, args):
         # Bepaal welke taal moet worden verwerkt
@@ -108,7 +135,9 @@ class I18nParser(JSONParser):
 
         return data[language]
 
-    def transform_record(self, record):
+    def map_record(self, column_mapper, record):
+        super().map_record(column_mapper, record)
+
         # i18n records always are in the form of RECORD_TYPE_INDEXED: key: {record}
         key, value = next(iter(record.items()))
         record = value
@@ -123,7 +152,7 @@ class I18nParser(JSONParser):
         " one or more of the tables."
     ),
 )
-class XLXSParser(Parser):
+class XLXSParser(TransformableParser):
     def parse(self, args, schema: sch.Schema):
         # sourcery skip: raise-specific-error
         logger.info(f"Starting parsing Excel file {args.inputfile}")
@@ -140,7 +169,8 @@ class XLXSParser(Parser):
                     records = xls.parse(sheet_name).to_dict(orient="records")
 
                     for record in records:
-                        store_data(sheet_name, record, schema, update_only=args.update_only)
+                        record = self.map_record(args.mapper, record)
+                        self.store_data(sheet_name, record, schema, update_only=args.update_only)
 
         except Exception as ex:
             msg = f"Error while parsing the Excel file {args.inputfile}: {str(ex)}"
@@ -154,13 +184,16 @@ class XLXSParser(Parser):
     "csv",
     descr="Generic parser that parses one CSV file, and excpect its name to be in the list of tables.",
 )
-class CSVParser(Parser):
+class CSVParser(TransformableParser):
     def parse(self, args, schema: sch.Schema):
         logger.info(f"Starting parsing CSV file {args.inputfile}")
 
         try:
             # Haal de entiteitsnaam uit de bestandsnaam (verwijder het .csv-deel)
-            entity_name = os.path.splitext(os.path.basename(args.inputfile))[0]
+            if not args.entity_name or args.entity_name == "":
+                entity_name = os.path.splitext(os.path.basename(args.inputfile))[0]
+            else:
+                entity_name = args.entity_name
 
             tables = db.getTables()
             if entity_name in tables and entity_name != "schemas":
@@ -171,7 +204,8 @@ class CSVParser(Parser):
                 records = df.to_dict(orient="records")
 
                 for record in records:
-                    store_data(entity_name, record, schema, update_only=args.update_only)
+                    record = self.map_record(args.mapper, record)
+                    self.store_data(entity_name, record, schema, update_only=args.update_only)
 
             else:
                 logger.warning(f"Could not import file: no entity found with name {entity_name}")
