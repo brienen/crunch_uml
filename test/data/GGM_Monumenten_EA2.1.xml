@@ -1,6 +1,6 @@
 <?xml  version='1.0' encoding='windows-1252' ?>
-<xmi:XMI xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmi:version="2.1" xmlns:uml="http://schema.omg.org/spec/UML/2.1" xmlns:thecustomprofile="http://www.sparxsystems.com/profiles/thecustomprofile/1.0" xmlns:SysPhS="http://www.sparxsystems.com/profiles/SysPhS/1.0">
-	<xmi:Documentation exporter="Enterprise Architect" exporterVersion="6.5" exporterID="1622"/>
+<xmi:XMI xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmi:version="2.1" xmlns:uml="http://schema.omg.org/spec/UML/2.1" xmlns:thecustomprofile="http://www.sparxsystems.com/profiles/thecustomprofile/1.0" xmlns:MIM="http://www.sparxsystems.com/profiles/MIM/1.1">
+	<xmi:Documentation exporter="Enterprise Architect" exporterVersion="6.5" exporterID="1704"/>
 	<uml:Model xmi:type="uml:Model" name="EA_Model" visibility="public">
 		<packagedElement xmi:type="uml:Package" xmi:id="EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E" name="Monumenten " visibility="public">
 			<packagedElement xmi:type="uml:Package" xmi:id="EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652" name="Diagram" visibility="public">
@@ -13,20 +13,20 @@
 			</packagedElement>
 			<packagedElement xmi:type="uml:Package" xmi:id="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" name="Model Monumenten" visibility="public">
 				<packagedElement xmi:type="uml:Class" xmi:id="EAID_54944273_F312_44b2_A78D_43488F915429" name="Ambacht" visibility="public">
-					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_97B64E49_D913_4648_985D_C2692F1EDC51" name="ambachtsoort" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000001_D913_4648_985D_C2692F1EDC51" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000002_D913_4648_985D_C2692F1EDC51" value="1"/>
-						<type xmi:idref="EAJava_AN300"/>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_6277018C_A2EC_4069_9625_487494821237" name="jaarAmbachtVanaf" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000001_A2EC_4069_9625_487494821237" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000002_A2EC_4069_9625_487494821237" value="1"/>
+						<type xmi:idref="EAJava_int"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_6FEBCD91_8B50_4942_A989_6C9B242CEBC2" name="jaarAmbachtTot" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
 						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000003_8B50_4942_A989_6C9B242CEBC2" value="1"/>
 						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000004_8B50_4942_A989_6C9B242CEBC2" value="1"/>
 						<type xmi:idref="EAJava_int"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_6277018C_A2EC_4069_9625_487494821237" name="jaarAmbachtVanaf" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000005_A2EC_4069_9625_487494821237" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000006_A2EC_4069_9625_487494821237" value="1"/>
-						<type xmi:idref="EAJava_int"/>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_97B64E49_D913_4648_985D_C2692F1EDC51" name="ambachtsoort" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000005_D913_4648_985D_C2692F1EDC51" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000006_D913_4648_985D_C2692F1EDC51" value="1"/>
+						<type xmi:idref="EAJava_AN300"/>
 					</ownedAttribute>
 				</packagedElement>
 				<packagedElement xmi:type="uml:Association" xmi:id="EAID_8E18F665_2A86_44fd_AD55_3E435A282BDF" name="monument ambacht" visibility="public">
@@ -38,56 +38,56 @@
 						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000008__2A86_44fd_AD55_3E435A282BDF" value="-1"/>
 					</ownedEnd>
 				</packagedElement>
-				<packagedElement xmi:type="uml:Class" xmi:id="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" name="BeschermdeStatus" visibility="public">
-					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_0E956D19_44D9_42f6_9C44_15FDAAF5AEF1" name="bronnen" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000009_44D9_42f6_9C44_15FDAAF5AEF1" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000010_44D9_42f6_9C44_15FDAAF5AEF1" value="1"/>
-						<type xmi:idref="EAJava_AN400"/>
+				<packagedElement xmi:type="uml:Class" xmi:id="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" name="Beschermde Status" visibility="public">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_658B0AAC_0653_4fa1_A6AD_DF1D656311BC" name="rijksmonumentcode" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000009_0653_4fa1_A6AD_DF1D656311BC" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000010_0653_4fa1_A6AD_DF1D656311BC" value="1"/>
+						<type xmi:idref="EAJava_AN80"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_04B5CEE9_8929_4729_A545_FEEB5604B5C8" name="complex" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000011_8929_4729_A545_FEEB5604B5C8" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000012_8929_4729_A545_FEEB5604B5C8" value="1"/>
-						<type xmi:idref="EAJava_AN200"/>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_CFD1E016_5347_4e65_9463_B06E114AE5C8" name="gemeentelijkMonumentCode" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000011_5347_4e65_9463_B06E114AE5C8" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000012_5347_4e65_9463_B06E114AE5C8" value="1"/>
+						<type xmi:idref="EAJava_AN80"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_B2A9E96D_DC0F_453b_99F3_D75390210700" name="datumInschrijvingRegister" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
 						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000013_DC0F_453b_99F3_D75390210700" value="1"/>
 						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000014_DC0F_453b_99F3_D75390210700" value="1"/>
 						<type xmi:idref="EAJava_Date"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_CFD1E016_5347_4e65_9463_B06E114AE5C8" name="gemeentelijkMonumentCode" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000015_5347_4e65_9463_B06E114AE5C8" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000016_5347_4e65_9463_B06E114AE5C8" value="1"/>
-						<type xmi:idref="EAJava_AN80"/>
-					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_399FC352_454E_478d_8129_4F6BBCE00ABE" name="gezichtscode" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000017_454E_478d_8129_4F6BBCE00ABE" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000018_454E_478d_8129_4F6BBCE00ABE" value="1"/>
-						<type xmi:idref="EAJava_AN20"/>
-					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_0637412A_E928_4608_969E_ACF9350F4594" name="naam" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000019_E928_4608_969E_ACF9350F4594" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000020_E928_4608_969E_ACF9350F4594" value="1"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000015_E928_4608_969E_ACF9350F4594" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000016_E928_4608_969E_ACF9350F4594" value="1"/>
 						<type xmi:idref="EAJava_AN200"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_7A602A0E_AC3C_4ce0_A81C_6812EE227662" name="omschrijving" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000021_AC3C_4ce0_A81C_6812EE227662" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000022_AC3C_4ce0_A81C_6812EE227662" value="1"/>
-						<type xmi:idref="EAJava_Text"/>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_EBD24559_2F60_43fb_B865_2A7AAA4E3001" name="type" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<type xmi:idref="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000017_2F60_43fb_B865_2A7AAA4E3001" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000018_2F60_43fb_B865_2A7AAA4E3001" value="1"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_399FC352_454E_478d_8129_4F6BBCE00ABE" name="gezichtscode" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000019_454E_478d_8129_4F6BBCE00ABE" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000020_454E_478d_8129_4F6BBCE00ABE" value="1"/>
+						<type xmi:idref="EAJava_AN20"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_04B5CEE9_8929_4729_A545_FEEB5604B5C8" name="complex" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000021_8929_4729_A545_FEEB5604B5C8" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000022_8929_4729_A545_FEEB5604B5C8" value="1"/>
+						<type xmi:idref="EAJava_AN200"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_38278B83_0BD7_4bba_A69E_1B6D519F95C9" name="opmerkingen" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
 						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000023_0BD7_4bba_A69E_1B6D519F95C9" value="1"/>
 						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000024_0BD7_4bba_A69E_1B6D519F95C9" value="1"/>
 						<type xmi:idref="EAJava_text"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_658B0AAC_0653_4fa1_A6AD_DF1D656311BC" name="rijksmonumentcode" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000025_0653_4fa1_A6AD_DF1D656311BC" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000026_0653_4fa1_A6AD_DF1D656311BC" value="1"/>
-						<type xmi:idref="EAJava_AN80"/>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_0E956D19_44D9_42f6_9C44_15FDAAF5AEF1" name="bronnen" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000025_44D9_42f6_9C44_15FDAAF5AEF1" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000026_44D9_42f6_9C44_15FDAAF5AEF1" value="1"/>
+						<type xmi:idref="EAJava_AN400"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_EBD24559_2F60_43fb_B865_2A7AAA4E3001" name="type" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<type xmi:idref="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8"/>
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000027_2F60_43fb_B865_2A7AAA4E3001" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000028_2F60_43fb_B865_2A7AAA4E3001" value="1"/>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_7A602A0E_AC3C_4ce0_A81C_6812EE227662" name="omschrijving" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000027_AC3C_4ce0_A81C_6812EE227662" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000028_AC3C_4ce0_A81C_6812EE227662" value="1"/>
+						<type xmi:idref="EAJava_Text"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_dst4ADF26_C2E9_4080_8F4F_32F9B255E4AE" visibility="public" association="EAID_144ADF26_C2E9_4080_8F4F_32F9B255E4AE" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
 						<type xmi:idref="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
@@ -205,25 +205,25 @@
 					</ownedEnd>
 				</packagedElement>
 				<packagedElement xmi:type="uml:Class" xmi:id="EAID_4AD539EC_A308_43da_B025_17A1647303F3" name="Bouwactiviteit" visibility="public">
-					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_9561214E_44CD_42e3_AC07_CD73506F1241" name="bouwjaarklasse" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000051_44CD_42e3_AC07_CD73506F1241" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000052_44CD_42e3_AC07_CD73506F1241" value="1"/>
-						<type xmi:idref="EAJava_AN80"/>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_60D6B0E6_F9D5_467c_8B02_4848752DC97C" name="bouwjaarVan" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000051_F9D5_467c_8B02_4848752DC97C" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000052_F9D5_467c_8B02_4848752DC97C" value="1"/>
+						<type xmi:idref="EAJava_int"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_CDFCF97C_39D8_410d_B591_D6FEF8CF41B1" name="bouwjaarTot" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
 						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000053_39D8_410d_B591_D6FEF8CF41B1" value="1"/>
 						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000054_39D8_410d_B591_D6FEF8CF41B1" value="1"/>
 						<type xmi:idref="EAJava_int"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_60D6B0E6_F9D5_467c_8B02_4848752DC97C" name="bouwjaarVan" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000055_F9D5_467c_8B02_4848752DC97C" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000056_F9D5_467c_8B02_4848752DC97C" value="1"/>
-						<type xmi:idref="EAJava_int"/>
-					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_AE9C37BF_B89D_49c7_B5AA_48F8D7329E8E" name="indicatie" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000057_B89D_49c7_B5AA_48F8D7329E8E" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000058_B89D_49c7_B5AA_48F8D7329E8E" value="1"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000055_B89D_49c7_B5AA_48F8D7329E8E" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000056_B89D_49c7_B5AA_48F8D7329E8E" value="1"/>
 						<type xmi:idref="EAJava_AN8"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_9561214E_44CD_42e3_AC07_CD73506F1241" name="bouwjaarklasse" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000057_44CD_42e3_AC07_CD73506F1241" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000058_44CD_42e3_AC07_CD73506F1241" value="1"/>
+						<type xmi:idref="EAJava_AN80"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_597FF0BC_0D0B_447a_B84C_77400DF2FADF" name="omschrijving" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
 						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000059_0D0B_447a_B84C_77400DF2FADF" value="1"/>
@@ -242,15 +242,15 @@
 						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000066_A509_4b7c_B481_BEB999EC1E3B" value="1"/>
 						<type xmi:idref="EAJava_AN200"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_491D0BF2_5FFE_446e_B90E_5267BE035670" name="toelichting" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000067_5FFE_446e_B90E_5267BE035670" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000068_5FFE_446e_B90E_5267BE035670" value="1"/>
-						<type xmi:idref="EAJava_text"/>
-					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_5B8476E8_9A80_4d9f_A8B3_ACFAF59A9C58" name="zuiverheid" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000069_9A80_4d9f_A8B3_ACFAF59A9C58" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000070_9A80_4d9f_A8B3_ACFAF59A9C58" value="1"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000067_9A80_4d9f_A8B3_ACFAF59A9C58" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000068_9A80_4d9f_A8B3_ACFAF59A9C58" value="1"/>
 						<type xmi:idref="EAJava_AN200"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_491D0BF2_5FFE_446e_B90E_5267BE035670" name="toelichting" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000069_5FFE_446e_B90E_5267BE035670" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000070_5FFE_446e_B90E_5267BE035670" value="1"/>
+						<type xmi:idref="EAJava_text"/>
 					</ownedAttribute>
 				</packagedElement>
 				<packagedElement xmi:type="uml:Class" xmi:id="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4" name="Bouwtype" visibility="public">
@@ -271,10 +271,10 @@
 					</ownedAttribute>
 				</packagedElement>
 				<packagedElement xmi:type="uml:Class" xmi:id="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D" name="OorspronkelijkeFunctie" visibility="public">
-					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_81A910B1_E4CE_4953_9FED_6AA16332E0C4" name="functie" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000081_E4CE_4953_9FED_6AA16332E0C4" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000082_E4CE_4953_9FED_6AA16332E0C4" value="1"/>
-						<type xmi:idref="EAJava_AN200"/>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_127EBC2C_5CBD_439f_8A06_13CEAE8EEF09" name="hoofdfunctie" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000081_5CBD_439f_8A06_13CEAE8EEF09" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000082_5CBD_439f_8A06_13CEAE8EEF09" value="1"/>
+						<type xmi:idref="EAJava_Boolean"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_9654B4C5_953E_4b72_96C6_C476A597CAEC" name="functiesoort" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
 						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000083_953E_4b72_96C6_C476A597CAEC" value="1"/>
@@ -286,25 +286,25 @@
 						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000086_353C_4399_9E00_BCC1FDB5DD61" value="1"/>
 						<type xmi:idref="EAJava_AN200"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_127EBC2C_5CBD_439f_8A06_13CEAE8EEF09" name="hoofdfunctie" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000087_5CBD_439f_8A06_13CEAE8EEF09" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000088_5CBD_439f_8A06_13CEAE8EEF09" value="1"/>
-						<type xmi:idref="EAJava_Boolean"/>
-					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_6556EB21_AE8A_475d_9B53_9A06409CAA07" name="subcategorie" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000089_AE8A_475d_9B53_9A06409CAA07" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000090_AE8A_475d_9B53_9A06409CAA07" value="1"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000087_AE8A_475d_9B53_9A06409CAA07" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000088_AE8A_475d_9B53_9A06409CAA07" value="1"/>
+						<type xmi:idref="EAJava_AN200"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_81A910B1_E4CE_4953_9FED_6AA16332E0C4" name="functie" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000089_E4CE_4953_9FED_6AA16332E0C4" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000090_E4CE_4953_9FED_6AA16332E0C4" value="1"/>
+						<type xmi:idref="EAJava_AN200"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_200B84E0_1D73_4608_9258_12338B5EC034" name="verbijzondering" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000091_1D73_4608_9258_12338B5EC034" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000092_1D73_4608_9258_12338B5EC034" value="1"/>
 						<type xmi:idref="EAJava_AN200"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_7E77EC52_B954_4e5d_BAAB_BDD88DFFB8CA" name="toelichting" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000091_B954_4e5d_BAAB_BDD88DFFB8CA" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000092_B954_4e5d_BAAB_BDD88DFFB8CA" value="1"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000093_B954_4e5d_BAAB_BDD88DFFB8CA" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000094_B954_4e5d_BAAB_BDD88DFFB8CA" value="1"/>
 						<type xmi:idref="EAJava_Text"/>
-					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_200B84E0_1D73_4608_9258_12338B5EC034" name="verbijzondering" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
-						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000093_1D73_4608_9258_12338B5EC034" value="1"/>
-						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000094_1D73_4608_9258_12338B5EC034" value="1"/>
-						<type xmi:idref="EAJava_AN200"/>
 					</ownedAttribute>
 				</packagedElement>
 				<packagedElement xmi:type="uml:Enumeration" xmi:id="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8" name="TypeMonument" visibility="public">
@@ -313,52 +313,56 @@
 				</packagedElement>
 			</packagedElement>
 		</packagedElement>
-		<thecustomprofile:datum-tijd-export base_Class="EAID_54944273_F312_44b2_A78D_43488F915429" datum-tijd-export="10-04-2024 17:26:26"/>
-		<SysPhS:ModelicaParameter base_Class="EAID_54944273_F312_44b2_A78D_43488F915429" name="Ambacht"/>
-		<thecustomprofile:GEMMA-URL base_Class="EAID_54944273_F312_44b2_A78D_43488F915429" GEMMA-URL="https://gemmaonline.nl/index.php/GEMMA2/0.9/id-bb9de7ad-7e7e-4b87-9968-046d9bedd6ef"/>
+		<MIM:Domein base_Package="EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E"/>
+		<thecustomprofile:datum-tijd-export base_Class="EAID_54944273_F312_44b2_A78D_43488F915429" datum-tijd-export="20-11-2024 15:32:03"/>
+		<thecustomprofile:GEMMA-URL base_Class="EAID_54944273_F312_44b2_A78D_43488F915429" GEMMA-URL="https://gemmaonline.nl/index.php/GEMMA/id-bb9de7ad-7e7e-4b87-9968-046d9bedd6ef"/>
 		<thecustomprofile:GEMMA-naam base_Class="EAID_54944273_F312_44b2_A78D_43488F915429" GEMMA-naam="Ambacht"/>
+		<MIM:Objecttype base_Class="EAID_54944273_F312_44b2_A78D_43488F915429"/>
 		<thecustomprofile:GEMMA-definitie base_Class="EAID_54944273_F312_44b2_A78D_43488F915429" GEMMA-definitie="Beroep waarbij een handwerker met gereedschap eindproducten maakt."/>
 		<thecustomprofile:GEMMA-guid base_Class="EAID_54944273_F312_44b2_A78D_43488F915429" GEMMA-guid="bb9de7ad-7e7e-4b87-9968-046d9bedd6ef"/>
 		<thecustomprofile:GEMMA-type base_Class="EAID_54944273_F312_44b2_A78D_43488F915429" GEMMA-type="business-object"/>
-		<thecustomprofile:datum-tijd-export base_Class="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" datum-tijd-export="10-04-2024 17:26:26"/>
-		<SysPhS:ModelicaParameter base_Class="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" name="Beschermde Status"/>
-		<thecustomprofile:GEMMA-URL base_Class="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" GEMMA-URL="https://gemmaonline.nl/index.php/GEMMA2/0.9/id-4ebf7f05-0ff1-4d2e-aa62-879be7565dd7"/>
-		<thecustomprofile:GEMMA-naam base_Class="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" GEMMA-naam="Beschermde Status"/>
+		<thecustomprofile:datum-tijd-export base_Class="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" datum-tijd-export="20-11-2024 15:32:03"/>
+		<thecustomprofile:GEMMA-URL base_Class="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" GEMMA-URL="https://gemmaonline.nl/index.php/GEMMA/id-4ebf7f05-0ff1-4d2e-aa62-879be7565dd7"/>
+		<thecustomprofile:GEMMA-naam base_Class="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" GEMMA-naam="BeschermdeStatus"/>
+		<MIM:Objecttype base_Class="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
 		<thecustomprofile:GEMMA-definitie base_Class="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" GEMMA-definitie="Status van de bescherming van een monument. Een monument / erfgoed is een overblijfsel van kunst, cultuur, architectuur of nijverheid dat van algemeen belang wordt geacht vanwege de historische, volkskundige, artistieke, wetenschappelijke, industrieel-archeologische of andere sociaal-culturele waarde. Vormen van monument / erfgoed met de status rijks- provinciaal- of gemeentelijke monument / erfgoed zijn beschermd op grond van een besluit van respectievelijk het Ministerie OCW, de provincie of de gemeente,"/>
 		<thecustomprofile:GEMMA-guid base_Class="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" GEMMA-guid="4ebf7f05-0ff1-4d2e-aa62-879be7565dd7"/>
 		<thecustomprofile:GEMMA-type base_Class="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" GEMMA-type="business-object"/>
-		<thecustomprofile:datum-tijd-export base_Class="EAID_4AD539EC_A308_43da_B025_17A1647303F3" datum-tijd-export="10-04-2024 17:26:26"/>
-		<SysPhS:ModelicaParameter base_Class="EAID_4AD539EC_A308_43da_B025_17A1647303F3" name="Bouwactiviteit"/>
-		<thecustomprofile:GEMMA-URL base_Class="EAID_4AD539EC_A308_43da_B025_17A1647303F3" GEMMA-URL="https://gemmaonline.nl/index.php/GEMMA2/0.9/id-2b2319c1-d5b9-43c6-87cb-43bb194c65c6"/>
+		<thecustomprofile:datum-tijd-export base_Class="EAID_4AD539EC_A308_43da_B025_17A1647303F3" datum-tijd-export="20-11-2024 15:32:03"/>
+		<thecustomprofile:GEMMA-URL base_Class="EAID_4AD539EC_A308_43da_B025_17A1647303F3" GEMMA-URL="https://gemmaonline.nl/index.php/GEMMA/id-2b2319c1-d5b9-43c6-87cb-43bb194c65c6"/>
 		<thecustomprofile:GEMMA-naam base_Class="EAID_4AD539EC_A308_43da_B025_17A1647303F3" GEMMA-naam="Bouwactiviteit"/>
+		<MIM:Objecttype base_Class="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
 		<thecustomprofile:GEMMA-definitie base_Class="EAID_4AD539EC_A308_43da_B025_17A1647303F3" GEMMA-definitie="Het bouwen van een bouwwerk."/>
 		<thecustomprofile:GEMMA-guid base_Class="EAID_4AD539EC_A308_43da_B025_17A1647303F3" GEMMA-guid="2b2319c1-d5b9-43c6-87cb-43bb194c65c6"/>
 		<thecustomprofile:GEMMA-type base_Class="EAID_4AD539EC_A308_43da_B025_17A1647303F3" GEMMA-type="business-object"/>
-		<thecustomprofile:datum-tijd-export base_Class="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA" datum-tijd-export="10-04-2024 17:26:26"/>
-		<SysPhS:ModelicaParameter base_Class="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA" name="Bouwstijl"/>
-		<thecustomprofile:GEMMA-URL base_Class="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA" GEMMA-URL="https://gemmaonline.nl/index.php/GEMMA2/0.9/id-b46a0ac4-5d5a-430a-be26-9b40cc3bb7af"/>
+		<thecustomprofile:datum-tijd-export base_Class="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA" datum-tijd-export="20-11-2024 15:32:03"/>
+		<thecustomprofile:GEMMA-URL base_Class="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA" GEMMA-URL="https://gemmaonline.nl/index.php/GEMMA/id-b46a0ac4-5d5a-430a-be26-9b40cc3bb7af"/>
 		<thecustomprofile:GEMMA-naam base_Class="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA" GEMMA-naam="Bouwstijl"/>
+		<MIM:Objecttype base_Class="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
 		<thecustomprofile:GEMMA-definitie base_Class="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA" GEMMA-definitie="Trant van bouwen met bepaalde kenmerken in een bepaalde periode. In de betrokken tijdperken waren het geen levende voorstellingen; het zijn later geformuleerde (generaliserende) geschiedkundige constructies. Doelbewust komt deze tendens op sedert c. 1830. (Haslinghuis)"/>
 		<thecustomprofile:GEMMA-guid base_Class="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA" GEMMA-guid="b46a0ac4-5d5a-430a-be26-9b40cc3bb7af"/>
 		<thecustomprofile:GEMMA-type base_Class="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA" GEMMA-type="business-object"/>
 		<thecustomprofile:datum-tijd-export base_Class="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4" datum-tijd-export="28062023-11:06:06"/>
+		<MIM:Objecttype base_Class="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4"/>
 		<thecustomprofile:datum-tijd-export base_Class="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D" datum-tijd-export="28062023-11:06:06"/>
+		<MIM:Objecttype base_Class="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D"/>
 		<thecustomprofile:datum-tijd-export base_Enumeration="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8" datum-tijd-export="28062023-11:06:06"/>
+		<MIM:Enumeratie base_Enumeration="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8"/>
 	</uml:Model>
 	<xmi:Extension extender="Enterprise Architect" extenderID="6.5">
 		<elements>
 			<element xmi:idref="EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E" xmi:type="uml:Package" name="Monumenten " scope="public">
 				<model package2="EAID_45B88627_6F44_4b6d_BE77_3EC51BBE679E" package="EAPK_44E38F87_AE1C_45c6_B0AB_1366F32ADB28" tpos="0" ea_localid="44" ea_eleType="package"/>
-				<properties isSpecification="false" sType="Package" nType="0" scope="public"/>
-				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 14:46:07" modified="2023-10-12 14:40:32" complexity="1" status="Proposed"/>
+				<properties isSpecification="false" sType="Package" nType="0" scope="public" stereotype="Domein"/>
+				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 14:46:07" modified="2024-11-21 23:10:21" complexity="1" status="Proposed"/>
 				<code gentype="Java"/>
 				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
 				<tags/>
-				<xrefs/>
+				<xrefs value="$XREFPROP=$XID={08C7EC6A-1948-4f3e-9C84-B01588A97158}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Domein;FQName=MIM::Domein;@ENDSTEREO;$DES;$CLT={45B88627-6F44-4b6d-BE77-3EC51BBE679E}$CLT;$SUP=&lt;none&gt;$SUP;$ENDXREF;"/>
 				<extendedProperties tagged="0" package_name="Erfgoed"/>
 				<packageproperties version="1.0" tpos="0"/>
 				<paths/>
-				<times created="2019-07-03 14:46:07" modified="2024-04-17 13:34:26" lastloaddate="2019-07-06 17:08:07" lastsavedate="2019-07-06 17:08:07"/>
+				<times created="2019-07-03 14:46:07" modified="2024-11-21 23:10:21" lastloaddate="2019-07-06 17:08:07" lastsavedate="2019-07-06 17:08:07"/>
 				<flags iscontrolled="0" isprotected="0" batchsave="0" batchload="0" usedtd="0" logxml="0"/>
 			</element>
 			<element xmi:idref="EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652" xmi:type="uml:Package" name="Diagram" scope="public">
@@ -417,39 +421,38 @@
 			</element>
 			<element xmi:idref="EAID_54944273_F312_44b2_A78D_43488F915429" xmi:type="uml:Class" name="Ambacht" scope="public">
 				<model package="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" tpos="0" ea_localid="211" ea_eleType="element"/>
-				<properties documentation="Beroep waarbij een handwerker met gereedschap eindproducten maakt." isSpecification="false" sType="Class" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
-				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 15:42:28" modified="2024-04-17 13:34:26" complexity="1" status="Proposed"/>
+				<properties documentation="Beroep waarbij een handwerker met gereedschap eindproducten maakt." isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Objecttype" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Arjen Brienen" version="1.5" phase="1.0" created="2019-07-03 15:42:28" modified="2024-11-21 23:01:52" complexity="1" status="Proposed"/>
 				<code gentype="Java"/>
 				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
 				<tags>
-					<tag xmi:id="EAID_E2E678F4_875A_4E50_BC63_5435CC5F2D81" name="datum-tijd-export" value="10-04-2024 17:26:26" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+					<tag xmi:id="EAID_E2E678F4_875A_4E50_BC63_5435CC5F2D81" name="datum-tijd-export" value="20-11-2024 15:32:03" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
 					<tag xmi:id="EAID_E1D2C27C_DD10_44E5_B239_0983E7D8D9DE" name="domein-dcat" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
 					<tag xmi:id="EAID_6AF40D04_7F3E_4BC7_A6C1_9B5A727A8476" name="domein-gemma" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
 					<tag xmi:id="EAID_97EADD28_4BB9_4D52_9981_7F576D2BCDDF" name="domein-iv3" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
-					<tag xmi:id="EAID_62475AC6_F697_4E93_AFFD_FD173925EC9E" name="GEMMA-alternate-name" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
-					<tag xmi:id="EAID_3E723F06_030D_488B_898B_3225A788A6DC" name="GEMMA-bron" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
-					<tag xmi:id="EAID_82F1D3CB_E7CF_4545_AD24_47D18F6869B4" name="GEMMA-definitie" value="Beroep waarbij een handwerker met gereedschap eindproducten maakt." modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
-					<tag xmi:id="EAID_CD6D8E45_AF1A_4E34_ABFA_BB9AD65F4234" name="GEMMA-guid" value="bb9de7ad-7e7e-4b87-9968-046d9bedd6ef" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
-					<tag xmi:id="EAID_2C97433C_661B_4C27_9709_3B467DCD1ED4" name="GEMMA-naam" value="Ambacht" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
-					<tag xmi:id="EAID_2DBC211C_2388_43A2_BC7A_B9C73400BD93" name="GEMMA-synoniemen" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
-					<tag xmi:id="EAID_C7326ADF_4FD7_4F89_BA3D_CBD98F99EE06" name="GEMMA-toelichting" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
-					<tag xmi:id="EAID_85B60C1E_3107_4144_9FF7_FA19CA737950" name="GEMMA-type" value="business-object" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
-					<tag xmi:id="EAID_41769E88_906D_41FC_9428_22E3BD9788B9" name="GEMMA-URL" value="https://gemmaonline.nl/index.php/GEMMA2/0.9/id-bb9de7ad-7e7e-4b87-9968-046d9bedd6ef" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+					<tag xmi:id="EAID_886ED713_4CBB_4BF8_B3AA_978A266F9FBD" name="GEMMA-alternate-name" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+					<tag xmi:id="EAID_AA36B0C0_6516_42FE_99FA_95C0866729F0" name="GEMMA-bron" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+					<tag xmi:id="EAID_B6EFEF51_9F4B_4907_B82A_171DC6D8A2F2" name="GEMMA-definitie" value="Beroep waarbij een handwerker met gereedschap eindproducten maakt." modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+					<tag xmi:id="EAID_CECDB6B0_79CF_4B81_9309_54D82FCC87AB" name="GEMMA-guid" value="bb9de7ad-7e7e-4b87-9968-046d9bedd6ef" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+					<tag xmi:id="EAID_1D932A85_C2E8_404C_99C8_6AEE60F7E9BE" name="GEMMA-naam" value="Ambacht" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+					<tag xmi:id="EAID_C4794120_13C8_4F2A_9A1F_DA57E0EC347E" name="GEMMA-synoniemen" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+					<tag xmi:id="EAID_1F7C4AD1_FE79_4ABA_B426_2A5FB156A868" name="GEMMA-toelichting" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+					<tag xmi:id="EAID_8BFD8058_3FC0_4159_BB6E_F84019ED3439" name="GEMMA-type" value="business-object" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
+					<tag xmi:id="EAID_FAB05C20_9D4E_4873_8DF6_EBB2FBCF539F" name="GEMMA-URL" value="https://gemmaonline.nl/index.php/GEMMA/id-bb9de7ad-7e7e-4b87-9968-046d9bedd6ef" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
 					<tag xmi:id="EAID_82D9CB55_64DE_48E5_AD1A_AC26F471D774" name="herkomst" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
-					<tag xmi:id="EAID_E8348AFC_515E_47B4_BDC5_305A3F8BD0B2" name="name" value="Ambacht" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
 					<tag xmi:id="EAID_5BAA8E81_480F_405D_A818_A3F79725AFE3" name="synoniemen" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
 					<tag xmi:id="EAID_839E4F81_C5F6_4E22_B1BD_583FA27B30CD" name="toelichting" modelElement="EAID_54944273_F312_44b2_A78D_43488F915429"/>
 				</tags>
-				<xrefs/>
+				<xrefs value="$XREFPROP=$XID={0692A29E-7F75-4629-8E63-E34E20D8288B}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Objecttype;FQName=MIM::Objecttype;@ENDSTEREO;$DES;$CLT={54944273-F312-44b2-A78D-43488F915429}$CLT;$ENDXREF;"/>
 				<extendedProperties tagged="0" package_name="Model Monumenten"/>
 				<attributes>
-					<attribute xmi:idref="EAID_97B64E49_D913_4648_985D_C2692F1EDC51" name="ambachtsoort" scope="Public">
+					<attribute xmi:idref="EAID_6277018C_A2EC_4069_9625_487494821237" name="jaarAmbachtVanaf" scope="Public">
 						<initial/>
 						<documentation/>
-						<model ea_localid="632" ea_guid="{97B64E49-D913-4648-985D-C2692F1EDC51}"/>
-						<properties type="AN300" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<model ea_localid="631" ea_guid="{6277018C-A2EC-4069-9625-487494821237}"/>
+						<properties type="int" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
 						<coords ordered="0" scale="0"/>
-						<containment containment="Not Specified" position="2"/>
+						<containment containment="Not Specified" position="0"/>
 						<stereotype/>
 						<bounds lower="1" upper="1"/>
 						<options/>
@@ -473,13 +476,13 @@
 						<tags/>
 						<xrefs/>
 					</attribute>
-					<attribute xmi:idref="EAID_6277018C_A2EC_4069_9625_487494821237" name="jaarAmbachtVanaf" scope="Public">
+					<attribute xmi:idref="EAID_97B64E49_D913_4648_985D_C2692F1EDC51" name="ambachtsoort" scope="Public">
 						<initial/>
 						<documentation/>
-						<model ea_localid="631" ea_guid="{6277018C-A2EC-4069-9625-487494821237}"/>
-						<properties type="int" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<model ea_localid="632" ea_guid="{97B64E49-D913-4648-985D-C2692F1EDC51}"/>
+						<properties type="AN300" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
 						<coords ordered="0" scale="0"/>
-						<containment containment="Not Specified" position="0"/>
+						<containment containment="Not Specified" position="2"/>
 						<stereotype/>
 						<bounds lower="1" upper="1"/>
 						<options/>
@@ -493,71 +496,40 @@
 					<Association xmi:id="EAID_8E18F665_2A86_44fd_AD55_3E435A282BDF" start="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" end="EAID_54944273_F312_44b2_A78D_43488F915429"/>
 				</links>
 			</element>
-			<element xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" xmi:type="uml:Class" name="BeschermdeStatus" scope="public">
+			<element xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" xmi:type="uml:Class" name="Beschermde Status" scope="public">
 				<model package="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" tpos="0" ea_localid="212" ea_eleType="element"/>
-				<properties documentation="Status van de bescherming van een monument. Een monument / erfgoed is een overblijfsel van kunst, cultuur, architectuur of nijverheid dat van algemeen belang wordt geacht vanwege de historische, volkskundige, artistieke, wetenschappelijke, industrieel-archeologische of andere sociaal-culturele waarde. Vormen van monument / erfgoed met de status rijks- provinciaal- of gemeentelijke monument / erfgoed zijn beschermd op grond van een besluit van respectievelijk het Ministerie OCW, de provincie of de gemeente," isSpecification="false" sType="Class" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
-				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 15:12:51" modified="2024-04-17 13:34:26" complexity="1" status="Proposed"/>
+				<properties documentation="Status van de bescherming van een monument. Een monument / erfgoed is een overblijfsel van kunst, cultuur, architectuur of nijverheid dat van algemeen belang wordt geacht vanwege de historische, volkskundige, artistieke, wetenschappelijke, industrieel-archeologische of andere sociaal-culturele waarde. Vormen van monument / erfgoed met de status rijks- provinciaal- of gemeentelijke monument / erfgoed zijn beschermd op grond van een besluit van respectievelijk het Ministerie OCW, de provincie of de gemeente," isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Objecttype" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Arjen Brienen" version="1.5" phase="1.0" created="2019-07-03 15:12:51" modified="2024-11-21 23:01:52" complexity="1" status="Proposed"/>
 				<code product_name="Java" gentype="Java"/>
 				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
 				<tags>
-					<tag xmi:id="EAID_8CC07B77_8D34_4E35_BD21_AF436EADDFB4" name="datum-tijd-export" value="10-04-2024 17:26:26" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+					<tag xmi:id="EAID_8CC07B77_8D34_4E35_BD21_AF436EADDFB4" name="datum-tijd-export" value="20-11-2024 15:32:03" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
 					<tag xmi:id="EAID_3CFBD7D0_263C_4610_8EE8_9360B637162E" name="domein-dcat" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
 					<tag xmi:id="EAID_C04E8251_798C_4AFA_9646_223CD5004172" name="domein-gemma" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
 					<tag xmi:id="EAID_B8066A97_252E_48F3_8D6B_59FBDD7EC45C" name="domein-iv3" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
-					<tag xmi:id="EAID_27152E92_FCCA_4670_B251_C2A555640171" name="GEMMA-alternate-name" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
-					<tag xmi:id="EAID_438101B4_214D_4435_AB49_A7B2EF78108A" name="GEMMA-bron" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
-					<tag xmi:id="EAID_89E18CC5_B41D_4BF2_9A49_585DA1BE884C" name="GEMMA-definitie" value="Status van de bescherming van een monument. Een monument / erfgoed is een overblijfsel van kunst, cultuur, architectuur of nijverheid dat van algemeen belang wordt geacht vanwege de historische, volkskundige, artistieke, wetenschappelijke, industrieel-archeologische of andere sociaal-culturele waarde. Vormen van monument / erfgoed met de status rijks- provinciaal- of gemeentelijke monument / erfgoed zijn beschermd op grond van een besluit van respectievelijk het Ministerie OCW, de provincie of de gemeente," modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
-					<tag xmi:id="EAID_86793F80_C09F_4827_9A3C_FF03997388EA" name="GEMMA-guid" value="4ebf7f05-0ff1-4d2e-aa62-879be7565dd7" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
-					<tag xmi:id="EAID_6F826D6E_6D78_4A80_ACC4_BDCB8CEF0311" name="GEMMA-naam" value="Beschermde Status" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
-					<tag xmi:id="EAID_C2679B91_A692_4976_BEBA_277DB004ECBF" name="GEMMA-synoniemen" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
-					<tag xmi:id="EAID_98FA6726_D9EE_4133_B19A_1CF3F88A82D6" name="GEMMA-toelichting" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
-					<tag xmi:id="EAID_C652B24D_2D3E_4CEB_B704_C31AE489AE3C" name="GEMMA-type" value="business-object" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
-					<tag xmi:id="EAID_EB8536C2_6345_4510_980B_0EDA86F962D0" name="GEMMA-URL" value="https://gemmaonline.nl/index.php/GEMMA2/0.9/id-4ebf7f05-0ff1-4d2e-aa62-879be7565dd7" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+					<tag xmi:id="EAID_B0DF57AD_29A5_4F43_8D55_CA0273CC54A4" name="GEMMA-alternate-name" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+					<tag xmi:id="EAID_5694914C_627B_45A1_8AC0_1A819AB89F18" name="GEMMA-bron" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+					<tag xmi:id="EAID_3F4F1360_47A3_4B6E_A4B0_189206991080" name="GEMMA-definitie" value="Status van de bescherming van een monument. Een monument / erfgoed is een overblijfsel van kunst, cultuur, architectuur of nijverheid dat van algemeen belang wordt geacht vanwege de historische, volkskundige, artistieke, wetenschappelijke, industrieel-archeologische of andere sociaal-culturele waarde. Vormen van monument / erfgoed met de status rijks- provinciaal- of gemeentelijke monument / erfgoed zijn beschermd op grond van een besluit van respectievelijk het Ministerie OCW, de provincie of de gemeente," modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+					<tag xmi:id="EAID_1617D424_7525_4552_912F_C6F9B338D6B5" name="GEMMA-guid" value="4ebf7f05-0ff1-4d2e-aa62-879be7565dd7" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+					<tag xmi:id="EAID_A4DB2139_D33E_4116_A6A0_44A60E430B6E" name="GEMMA-naam" value="BeschermdeStatus" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+					<tag xmi:id="EAID_D0593462_E675_4760_9B5B_4523C2C19412" name="GEMMA-synoniemen" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+					<tag xmi:id="EAID_5F8E1AA3_8D82_4A4C_B8A2_A755B920BCAB" name="GEMMA-toelichting" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+					<tag xmi:id="EAID_573C5D6C_0107_44E3_89D3_D1BCA549308C" name="GEMMA-type" value="business-object" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
+					<tag xmi:id="EAID_5C8E38E8_0A02_421D_95E0_E867D0BA3BF3" name="GEMMA-URL" value="https://gemmaonline.nl/index.php/GEMMA/id-4ebf7f05-0ff1-4d2e-aa62-879be7565dd7" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
 					<tag xmi:id="EAID_7177E6FC_F2E4_4D24_A0B9_B83CD078D8CD" name="herkomst" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
-					<tag xmi:id="EAID_873B216B_F7F0_4E2A_A521_63C49EEBB893" name="name" value="Beschermde Status" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
 					<tag xmi:id="EAID_B342F096_24EB_4B56_9DFA_CCEFB3EBFAB1" name="synoniemen" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
 					<tag xmi:id="EAID_90F68DBD_531E_4182_87BC_6496F2044DE7" name="toelichting" modelElement="EAID_32C02923_EE3A_4553_B94B_31E0C273A829"/>
 				</tags>
-				<xrefs/>
+				<xrefs value="$XREFPROP=$XID={AC4297E5-805C-41BA-A345-EB846B68FC64}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Objecttype;FQName=MIM::Objecttype;@ENDSTEREO;$DES;$CLT={32C02923-EE3A-4553-B94B-31E0C273A829}$CLT;$ENDXREF;"/>
 				<extendedProperties tagged="0" package_name="Model Monumenten"/>
 				<attributes>
-					<attribute xmi:idref="EAID_0E956D19_44D9_42f6_9C44_15FDAAF5AEF1" name="bronnen" scope="Public">
+					<attribute xmi:idref="EAID_658B0AAC_0653_4fa1_A6AD_DF1D656311BC" name="rijksmonumentcode" scope="Public">
 						<initial/>
 						<documentation/>
-						<model ea_localid="633" ea_guid="{0E956D19-44D9-42f6-9C44-15FDAAF5AEF1}"/>
-						<properties type="AN400" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<model ea_localid="641" ea_guid="{658B0AAC-0653-4fa1-A6AD-DF1D656311BC}"/>
+						<properties type="AN80" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
 						<coords ordered="0" scale="0"/>
-						<containment containment="Not Specified" position="8"/>
-						<stereotype/>
-						<bounds lower="1" upper="1"/>
-						<options/>
-						<style/>
-						<styleex value="volatile=0;"/>
-						<tags/>
-						<xrefs/>
-					</attribute>
-					<attribute xmi:idref="EAID_04B5CEE9_8929_4729_A545_FEEB5604B5C8" name="complex" scope="Public">
-						<initial/>
-						<documentation/>
-						<model ea_localid="634" ea_guid="{04B5CEE9-8929-4729-A545-FEEB5604B5C8}"/>
-						<properties type="AN200" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
-						<coords ordered="0" scale="0"/>
-						<containment containment="Not Specified" position="6"/>
-						<stereotype/>
-						<bounds lower="1" upper="1"/>
-						<options/>
-						<style/>
-						<styleex value="volatile=0;"/>
-						<tags/>
-						<xrefs/>
-					</attribute>
-					<attribute xmi:idref="EAID_B2A9E96D_DC0F_453b_99F3_D75390210700" name="datumInschrijvingRegister" scope="Public">
-						<initial/>
-						<documentation/>
-						<model ea_localid="635" ea_guid="{B2A9E96D-DC0F-453b-99F3-D75390210700}"/>
-						<properties type="Date" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
-						<coords ordered="0" scale="0"/>
-						<containment containment="Not Specified" position="2"/>
+						<containment containment="Not Specified" position="0"/>
 						<stereotype/>
 						<bounds lower="1" upper="1"/>
 						<options/>
@@ -581,13 +553,13 @@
 						<tags/>
 						<xrefs/>
 					</attribute>
-					<attribute xmi:idref="EAID_399FC352_454E_478d_8129_4F6BBCE00ABE" name="gezichtscode" scope="Public">
+					<attribute xmi:idref="EAID_B2A9E96D_DC0F_453b_99F3_D75390210700" name="datumInschrijvingRegister" scope="Public">
 						<initial/>
 						<documentation/>
-						<model ea_localid="637" ea_guid="{399FC352-454E-478d-8129-4F6BBCE00ABE}"/>
-						<properties type="AN20" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<model ea_localid="635" ea_guid="{B2A9E96D-DC0F-453b-99F3-D75390210700}"/>
+						<properties type="Date" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
 						<coords ordered="0" scale="0"/>
-						<containment containment="Not Specified" position="5"/>
+						<containment containment="Not Specified" position="2"/>
 						<stereotype/>
 						<bounds lower="1" upper="1"/>
 						<options/>
@@ -611,13 +583,43 @@
 						<tags/>
 						<xrefs/>
 					</attribute>
-					<attribute xmi:idref="EAID_7A602A0E_AC3C_4ce0_A81C_6812EE227662" name="omschrijving" scope="Public">
+					<attribute xmi:idref="EAID_EBD24559_2F60_43fb_B865_2A7AAA4E3001" name="type" scope="Public">
 						<initial/>
 						<documentation/>
-						<model ea_localid="639" ea_guid="{7A602A0E-AC3C-4ce0-A81C-6812EE227662}"/>
-						<properties type="Text" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<model ea_localid="642" ea_guid="{EBD24559-2F60-43fb-B865-2A7AAA4E3001}"/>
+						<properties derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
 						<coords ordered="0" scale="0"/>
-						<containment containment="Not Specified" position="9"/>
+						<containment containment="Not Specified" position="4"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_399FC352_454E_478d_8129_4F6BBCE00ABE" name="gezichtscode" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="637" ea_guid="{399FC352-454E-478d-8129-4F6BBCE00ABE}"/>
+						<properties type="AN20" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="5"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_04B5CEE9_8929_4729_A545_FEEB5604B5C8" name="complex" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="634" ea_guid="{04B5CEE9-8929-4729-A545-FEEB5604B5C8}"/>
+						<properties type="AN200" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="6"/>
 						<stereotype/>
 						<bounds lower="1" upper="1"/>
 						<options/>
@@ -641,13 +643,13 @@
 						<tags/>
 						<xrefs/>
 					</attribute>
-					<attribute xmi:idref="EAID_658B0AAC_0653_4fa1_A6AD_DF1D656311BC" name="rijksmonumentcode" scope="Public">
+					<attribute xmi:idref="EAID_0E956D19_44D9_42f6_9C44_15FDAAF5AEF1" name="bronnen" scope="Public">
 						<initial/>
 						<documentation/>
-						<model ea_localid="641" ea_guid="{658B0AAC-0653-4fa1-A6AD-DF1D656311BC}"/>
-						<properties type="AN80" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<model ea_localid="633" ea_guid="{0E956D19-44D9-42f6-9C44-15FDAAF5AEF1}"/>
+						<properties type="AN400" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
 						<coords ordered="0" scale="0"/>
-						<containment containment="Not Specified" position="0"/>
+						<containment containment="Not Specified" position="8"/>
 						<stereotype/>
 						<bounds lower="1" upper="1"/>
 						<options/>
@@ -656,13 +658,13 @@
 						<tags/>
 						<xrefs/>
 					</attribute>
-					<attribute xmi:idref="EAID_EBD24559_2F60_43fb_B865_2A7AAA4E3001" name="type" scope="Public">
+					<attribute xmi:idref="EAID_7A602A0E_AC3C_4ce0_A81C_6812EE227662" name="omschrijving" scope="Public">
 						<initial/>
 						<documentation/>
-						<model ea_localid="642" ea_guid="{EBD24559-2F60-43fb-B865-2A7AAA4E3001}"/>
-						<properties type="TypeMonument" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<model ea_localid="639" ea_guid="{7A602A0E-AC3C-4ce0-A81C-6812EE227662}"/>
+						<properties type="Text" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
 						<coords ordered="0" scale="0"/>
-						<containment containment="Not Specified" position="4"/>
+						<containment containment="Not Specified" position="9"/>
 						<stereotype/>
 						<bounds lower="1" upper="1"/>
 						<options/>
@@ -688,39 +690,38 @@
 			</element>
 			<element xmi:idref="EAID_4AD539EC_A308_43da_B025_17A1647303F3" xmi:type="uml:Class" name="Bouwactiviteit" scope="public">
 				<model package="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" tpos="0" ea_localid="213" ea_eleType="element"/>
-				<properties documentation="Het bouwen van een bouwwerk." isSpecification="false" sType="Class" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
-				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 15:45:18" modified="2024-04-17 13:34:26" complexity="1" status="Proposed"/>
+				<properties documentation="Het bouwen van een bouwwerk." isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Objecttype" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Arjen Brienen" version="1.5" phase="1.0" created="2019-07-03 15:45:18" modified="2024-11-21 23:01:52" complexity="1" status="Proposed"/>
 				<code gentype="Java"/>
 				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
 				<tags>
-					<tag xmi:id="EAID_6F9184E3_905C_4C41_B9B5_8602BEEA0F65" name="datum-tijd-export" value="10-04-2024 17:26:26" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+					<tag xmi:id="EAID_6F9184E3_905C_4C41_B9B5_8602BEEA0F65" name="datum-tijd-export" value="20-11-2024 15:32:03" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
 					<tag xmi:id="EAID_C73E2E57_7EA2_4B75_9B05_07D18E9538DF" name="domein-dcat" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
 					<tag xmi:id="EAID_DA291E08_7F97_4AE7_8021_78C597A95A80" name="domein-gemma" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
 					<tag xmi:id="EAID_14E85758_B95E_4D4F_8AF9_E2BBBE8FAFED" name="domein-iv3" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
-					<tag xmi:id="EAID_1D3BDF14_AC92_417E_9E38_F5A1EED1DCCE" name="GEMMA-alternate-name" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
-					<tag xmi:id="EAID_C9B5BF09_D3A6_4743_8EE0_673D5E6313FC" name="GEMMA-bron" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
-					<tag xmi:id="EAID_B8B0EA73_EBCD_47CB_A373_B6D47E31A737" name="GEMMA-definitie" value="Het bouwen van een bouwwerk." modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
-					<tag xmi:id="EAID_49637327_F10C_4C03_9C0C_2C03AE57480B" name="GEMMA-guid" value="2b2319c1-d5b9-43c6-87cb-43bb194c65c6" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
-					<tag xmi:id="EAID_EEC55380_18DF_475A_997B_7A2AC13DFBD1" name="GEMMA-naam" value="Bouwactiviteit" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
-					<tag xmi:id="EAID_B8A01A9E_ED01_4AF4_907A_8DCAF7F017AC" name="GEMMA-synoniemen" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
-					<tag xmi:id="EAID_16CBC8F7_B1AA_4ECF_8FC8_7F53A4535D39" name="GEMMA-toelichting" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
-					<tag xmi:id="EAID_AC5C933B_B3C1_4A25_A1B9_2165B8796E2E" name="GEMMA-type" value="business-object" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
-					<tag xmi:id="EAID_77ED9835_7ADA_4534_B485_9C0112F1AAA6" name="GEMMA-URL" value="https://gemmaonline.nl/index.php/GEMMA2/0.9/id-2b2319c1-d5b9-43c6-87cb-43bb194c65c6" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+					<tag xmi:id="EAID_224BB4C7_17D0_4B02_BD7A_307329863EAC" name="GEMMA-alternate-name" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+					<tag xmi:id="EAID_2532C4FC_C9D5_45AF_9F91_EC118F843733" name="GEMMA-bron" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+					<tag xmi:id="EAID_B57FE54A_E0F0_4B1F_841F_DEB7F541C2AF" name="GEMMA-definitie" value="Het bouwen van een bouwwerk." modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+					<tag xmi:id="EAID_97549B8C_D33E_4EE2_8905_689F852E05CA" name="GEMMA-guid" value="2b2319c1-d5b9-43c6-87cb-43bb194c65c6" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+					<tag xmi:id="EAID_765E6B1F_7527_4588_8398_343FC12C4954" name="GEMMA-naam" value="Bouwactiviteit" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+					<tag xmi:id="EAID_6A65CD10_1A80_42B9_BEA6_73DC19765E4B" name="GEMMA-synoniemen" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+					<tag xmi:id="EAID_322CFF7A_672C_4985_BE95_429F63956AF7" name="GEMMA-toelichting" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+					<tag xmi:id="EAID_7C733143_312C_4744_957C_316CFFD7899B" name="GEMMA-type" value="business-object" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
+					<tag xmi:id="EAID_4FD63F91_76F7_4F2E_8859_CA7011D4D79B" name="GEMMA-URL" value="https://gemmaonline.nl/index.php/GEMMA/id-2b2319c1-d5b9-43c6-87cb-43bb194c65c6" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
 					<tag xmi:id="EAID_A45773F7_16EC_475E_A3F1_3157DB9B7165" name="herkomst" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
-					<tag xmi:id="EAID_21CCBCB2_8D7E_48EE_9461_2815DC6A4871" name="name" value="Bouwactiviteit" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
 					<tag xmi:id="EAID_289C7971_0799_47F5_8DA5_0D3C18B437BF" name="synoniemen" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
 					<tag xmi:id="EAID_6B6644E4_A131_4307_B3C1_CAC70937A017" name="toelichting" modelElement="EAID_4AD539EC_A308_43da_B025_17A1647303F3"/>
 				</tags>
-				<xrefs/>
+				<xrefs value="$XREFPROP=$XID={4463B54D-E4BB-4F8F-BE16-F5C9F9B765EC}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Objecttype;FQName=MIM::Objecttype;@ENDSTEREO;$DES;$CLT={4AD539EC-A308-43da-B025-17A1647303F3}$CLT;$ENDXREF;"/>
 				<extendedProperties tagged="0" package_name="Model Monumenten"/>
 				<attributes>
-					<attribute xmi:idref="EAID_9561214E_44CD_42e3_AC07_CD73506F1241" name="bouwjaarklasse" scope="Public">
+					<attribute xmi:idref="EAID_60D6B0E6_F9D5_467c_8B02_4848752DC97C" name="bouwjaarVan" scope="Public">
 						<initial/>
 						<documentation/>
-						<model ea_localid="643" ea_guid="{9561214E-44CD-42e3-AC07-CD73506F1241}"/>
-						<properties type="AN80" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<model ea_localid="645" ea_guid="{60D6B0E6-F9D5-467c-8B02-4848752DC97C}"/>
+						<properties type="int" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
 						<coords ordered="0" scale="0"/>
-						<containment containment="Not Specified" position="3"/>
+						<containment containment="Not Specified" position="0"/>
 						<stereotype/>
 						<bounds lower="1" upper="1"/>
 						<options/>
@@ -744,13 +745,13 @@
 						<tags/>
 						<xrefs/>
 					</attribute>
-					<attribute xmi:idref="EAID_60D6B0E6_F9D5_467c_8B02_4848752DC97C" name="bouwjaarVan" scope="Public">
+					<attribute xmi:idref="EAID_AE9C37BF_B89D_49c7_B5AA_48F8D7329E8E" name="indicatie" scope="Public">
 						<initial/>
 						<documentation/>
-						<model ea_localid="645" ea_guid="{60D6B0E6-F9D5-467c-8B02-4848752DC97C}"/>
-						<properties type="int" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<model ea_localid="646" ea_guid="{AE9C37BF-B89D-49c7-B5AA-48F8D7329E8E}"/>
+						<properties type="AN8" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
 						<coords ordered="0" scale="0"/>
-						<containment containment="Not Specified" position="0"/>
+						<containment containment="Not Specified" position="2"/>
 						<stereotype/>
 						<bounds lower="1" upper="1"/>
 						<options/>
@@ -759,13 +760,13 @@
 						<tags/>
 						<xrefs/>
 					</attribute>
-					<attribute xmi:idref="EAID_AE9C37BF_B89D_49c7_B5AA_48F8D7329E8E" name="indicatie" scope="Public">
+					<attribute xmi:idref="EAID_9561214E_44CD_42e3_AC07_CD73506F1241" name="bouwjaarklasse" scope="Public">
 						<initial/>
 						<documentation/>
-						<model ea_localid="646" ea_guid="{AE9C37BF-B89D-49c7-B5AA-48F8D7329E8E}"/>
-						<properties type="AN8" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<model ea_localid="643" ea_guid="{9561214E-44CD-42e3-AC07-CD73506F1241}"/>
+						<properties type="AN80" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
 						<coords ordered="0" scale="0"/>
-						<containment containment="Not Specified" position="2"/>
+						<containment containment="Not Specified" position="3"/>
 						<stereotype/>
 						<bounds lower="1" upper="1"/>
 						<options/>
@@ -796,30 +797,29 @@
 			</element>
 			<element xmi:idref="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA" xmi:type="uml:Class" name="Bouwstijl" scope="public">
 				<model package="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" tpos="0" ea_localid="214" ea_eleType="element"/>
-				<properties documentation="Trant van bouwen met bepaalde kenmerken in een bepaalde periode. In de betrokken tijdperken waren het geen levende voorstellingen; het zijn later geformuleerde (generaliserende) geschiedkundige constructies. Doelbewust komt deze tendens op sedert c. 1830. (Haslinghuis)" isSpecification="false" sType="Class" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
-				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 15:39:34" modified="2024-04-17 13:34:26" complexity="1" status="Proposed"/>
+				<properties documentation="Trant van bouwen met bepaalde kenmerken in een bepaalde periode. In de betrokken tijdperken waren het geen levende voorstellingen; het zijn later geformuleerde (generaliserende) geschiedkundige constructies. Doelbewust komt deze tendens op sedert c. 1830. (Haslinghuis)" isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Objecttype" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Arjen Brienen" version="1.5" phase="1.0" created="2019-07-03 15:39:34" modified="2024-11-21 23:01:52" complexity="1" status="Proposed"/>
 				<code gentype="Java"/>
 				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
 				<tags>
-					<tag xmi:id="EAID_696B3745_2FDF_4E28_BCCB_6F6FD24D36A1" name="datum-tijd-export" value="10-04-2024 17:26:26" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+					<tag xmi:id="EAID_696B3745_2FDF_4E28_BCCB_6F6FD24D36A1" name="datum-tijd-export" value="20-11-2024 15:32:03" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
 					<tag xmi:id="EAID_E9202B62_2721_455C_AC71_DB8745081CDF" name="domein-dcat" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
 					<tag xmi:id="EAID_36E9E172_F629_401F_9A80_A9735BAEA951" name="domein-gemma" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
 					<tag xmi:id="EAID_FA5A678C_F38E_4314_81B9_0D71B0223B2A" name="domein-iv3" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
-					<tag xmi:id="EAID_70CA5366_5959_4367_8189_58FCE45CA5C4" name="GEMMA-alternate-name" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
-					<tag xmi:id="EAID_8CD3B61E_28A5_47A1_A957_808FD75301AF" name="GEMMA-bron" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
-					<tag xmi:id="EAID_412C777D_1116_465A_AB4B_605337561EDE" name="GEMMA-definitie" value="Trant van bouwen met bepaalde kenmerken in een bepaalde periode. In de betrokken tijdperken waren het geen levende voorstellingen; het zijn later geformuleerde (generaliserende) geschiedkundige constructies. Doelbewust komt deze tendens op sedert c. 1830. (Haslinghuis)" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
-					<tag xmi:id="EAID_C4F6A665_8C04_4ABE_A460_AA960A72C1FD" name="GEMMA-guid" value="b46a0ac4-5d5a-430a-be26-9b40cc3bb7af" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
-					<tag xmi:id="EAID_C964C327_B2C5_43C5_B6EA_0ABCFD4F1CB5" name="GEMMA-naam" value="Bouwstijl" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
-					<tag xmi:id="EAID_98508067_B2F3_43DC_AC2B_D79DC99DCC6F" name="GEMMA-synoniemen" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
-					<tag xmi:id="EAID_C07190A2_EC5C_4144_A4D2_5DF0A87DD93F" name="GEMMA-toelichting" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
-					<tag xmi:id="EAID_E86B422D_4924_4EAC_9D91_323A537D4E42" name="GEMMA-type" value="business-object" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
-					<tag xmi:id="EAID_E4107760_09EA_4509_AA34_6379C77A0EFD" name="GEMMA-URL" value="https://gemmaonline.nl/index.php/GEMMA2/0.9/id-b46a0ac4-5d5a-430a-be26-9b40cc3bb7af" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+					<tag xmi:id="EAID_C2563228_DAA5_4C73_9DF1_7423EB20DBFB" name="GEMMA-alternate-name" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+					<tag xmi:id="EAID_D08BD853_CB14_4C43_8A20_4B1D8FC50451" name="GEMMA-bron" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+					<tag xmi:id="EAID_AD2106F5_CFA8_41BE_9EBE_4FCA2D36D864" name="GEMMA-definitie" value="Trant van bouwen met bepaalde kenmerken in een bepaalde periode. In de betrokken tijdperken waren het geen levende voorstellingen; het zijn later geformuleerde (generaliserende) geschiedkundige constructies. Doelbewust komt deze tendens op sedert c. 1830. (Haslinghuis)" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+					<tag xmi:id="EAID_6067BCA5_B7B1_49CB_8163_A069EFE7FF5B" name="GEMMA-guid" value="b46a0ac4-5d5a-430a-be26-9b40cc3bb7af" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+					<tag xmi:id="EAID_12CBD8FD_0A99_4BF8_B962_FCA259B0DE39" name="GEMMA-naam" value="Bouwstijl" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+					<tag xmi:id="EAID_75520390_92D3_462B_847C_553F454E7EA3" name="GEMMA-synoniemen" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+					<tag xmi:id="EAID_071CE3FA_4300_45D3_A315_54E47F945BAC" name="GEMMA-toelichting" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+					<tag xmi:id="EAID_0EF1E8CC_F345_479F_A929_B74499762103" name="GEMMA-type" value="business-object" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
+					<tag xmi:id="EAID_EDB7DB71_D31C_473E_B515_DBE9BF94D5D3" name="GEMMA-URL" value="https://gemmaonline.nl/index.php/GEMMA/id-b46a0ac4-5d5a-430a-be26-9b40cc3bb7af" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
 					<tag xmi:id="EAID_21D53DF9_EE72_4672_9897_85927A57AFA6" name="herkomst" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
-					<tag xmi:id="EAID_0882C732_F6AB_4D6E_9B59_28CBE1F5EC2A" name="name" value="Bouwstijl" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
 					<tag xmi:id="EAID_FB0B677E_9577_41B4_9ACC_1DE95AA61942" name="synoniemen" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
 					<tag xmi:id="EAID_43A30D5B_5835_48D5_A5C8_547D36218E35" name="toelichting" modelElement="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
 				</tags>
-				<xrefs/>
+				<xrefs value="$XREFPROP=$XID={68C16B05-685D-4217-A144-1370ADFCCDB2}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Objecttype;FQName=MIM::Objecttype;@ENDSTEREO;$DES;$CLT={8C0888C9-7B2E-4fcb-AEFF-E1733875CDCA}$CLT;$ENDXREF;"/>
 				<extendedProperties tagged="0" package_name="Model Monumenten"/>
 				<attributes>
 					<attribute xmi:idref="EAID_44497CB2_F315_4af5_8119_A10357D8EBEA" name="hoofdstijl" scope="Public">
@@ -852,21 +852,6 @@
 						<tags/>
 						<xrefs/>
 					</attribute>
-					<attribute xmi:idref="EAID_491D0BF2_5FFE_446e_B90E_5267BE035670" name="toelichting" scope="Public">
-						<initial/>
-						<documentation/>
-						<model ea_localid="650" ea_guid="{491D0BF2-5FFE-446e-B90E-5267BE035670}"/>
-						<properties type="text" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
-						<coords ordered="0" scale="0"/>
-						<containment containment="Not Specified" position="3"/>
-						<stereotype/>
-						<bounds lower="1" upper="1"/>
-						<options/>
-						<style/>
-						<styleex value="volatile=0;"/>
-						<tags/>
-						<xrefs/>
-					</attribute>
 					<attribute xmi:idref="EAID_5B8476E8_9A80_4d9f_A8B3_ACFAF59A9C58" name="zuiverheid" scope="Public">
 						<initial/>
 						<documentation/>
@@ -882,6 +867,21 @@
 						<tags/>
 						<xrefs/>
 					</attribute>
+					<attribute xmi:idref="EAID_491D0BF2_5FFE_446e_B90E_5267BE035670" name="toelichting" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="650" ea_guid="{491D0BF2-5FFE-446e-B90E-5267BE035670}"/>
+						<properties type="text" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="3"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
 				</attributes>
 				<links>
 					<Association xmi:id="EAID_144ADF26_C2E9_4080_8F4F_32F9B255E4AE" start="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" end="EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA"/>
@@ -889,8 +889,8 @@
 			</element>
 			<element xmi:idref="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4" xmi:type="uml:Class" name="Bouwtype" scope="public">
 				<model package="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" tpos="0" ea_localid="215" ea_eleType="element"/>
-				<properties documentation="Typering van een bouwstijl" isSpecification="false" sType="Class" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
-				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 15:39:43" modified="2024-04-17 13:34:26" complexity="1" status="Proposed"/>
+				<properties documentation="Typering van een bouwstijl" isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Objecttype" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Arjen Brienen" version="1.5" phase="1.0" created="2019-07-03 15:39:43" modified="2024-11-21 23:01:52" complexity="1" status="Proposed"/>
 				<code gentype="Java"/>
 				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
 				<tags>
@@ -900,7 +900,7 @@
 					<tag xmi:id="EAID_A30D813A_42E4_48ED_94FA_BB5EF1DB4EFC" name="synoniemen" modelElement="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4"/>
 					<tag xmi:id="EAID_F9224F7F_46AF_44F6_A37D_3CD0D9C7A5A2" name="toelichting" modelElement="EAID_5E9DAFBB_C9B5_4706_A43D_07AD4979DED4"/>
 				</tags>
-				<xrefs/>
+				<xrefs value="$XREFPROP=$XID={EB4C8D67-2851-4423-B626-B4830AECC33A}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Objecttype;FQName=MIM::Objecttype;@ENDSTEREO;$DES;$CLT={5E9DAFBB-C9B5-4706-A43D-07AD4979DED4}$CLT;$ENDXREF;"/>
 				<extendedProperties tagged="0" package_name="Model Monumenten"/>
 				<attributes>
 					<attribute xmi:idref="EAID_7DA39723_70C0_40cf_AE51_E7769275DC7F" name="hoofdcategorie" scope="Public">
@@ -955,8 +955,8 @@
 			</element>
 			<element xmi:idref="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D" xmi:type="uml:Class" name="OorspronkelijkeFunctie" scope="public">
 				<model package="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" tpos="0" ea_localid="216" ea_eleType="element"/>
-				<properties documentation="De functie van een object na bouw of oplevering" isSpecification="false" sType="Class" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
-				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 15:39:16" modified="2024-04-17 13:34:26" complexity="1" status="Proposed"/>
+				<properties documentation="De functie van een object na bouw of oplevering" isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Objecttype" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Arjen Brienen" version="1.5" phase="1.0" created="2019-07-03 15:39:16" modified="2024-11-21 23:01:52" complexity="1" status="Proposed"/>
 				<code gentype="Java"/>
 				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
 				<tags>
@@ -966,16 +966,16 @@
 					<tag xmi:id="EAID_A2A55584_EE9D_4FAF_A6F8_73F62646E420" name="synoniemen" modelElement="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D"/>
 					<tag xmi:id="EAID_69EB53B8_4A37_4DC2_9837_C4BE144C7757" name="toelichting" modelElement="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D"/>
 				</tags>
-				<xrefs/>
+				<xrefs value="$XREFPROP=$XID={B8D11E53-A96F-4990-8AE8-2165B073F636}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Objecttype;FQName=MIM::Objecttype;@ENDSTEREO;$DES;$CLT={49993EF9-ED8B-49e0-B8F7-FC7C8C28669D}$CLT;$ENDXREF;"/>
 				<extendedProperties tagged="0" package_name="Model Monumenten"/>
 				<attributes>
-					<attribute xmi:idref="EAID_81A910B1_E4CE_4953_9FED_6AA16332E0C4" name="functie" scope="Public">
+					<attribute xmi:idref="EAID_127EBC2C_5CBD_439f_8A06_13CEAE8EEF09" name="hoofdfunctie" scope="Public">
 						<initial/>
 						<documentation/>
-						<model ea_localid="655" ea_guid="{81A910B1-E4CE-4953-9FED-6AA16332E0C4}"/>
-						<properties type="AN200" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<model ea_localid="658" ea_guid="{127EBC2C-5CBD-439f-8A06-13CEAE8EEF09}"/>
+						<properties type="Boolean" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
 						<coords ordered="0" scale="0"/>
-						<containment containment="Not Specified" position="6"/>
+						<containment containment="Not Specified" position="2"/>
 						<stereotype/>
 						<bounds lower="1" upper="1"/>
 						<options/>
@@ -1014,21 +1014,6 @@
 						<tags/>
 						<xrefs/>
 					</attribute>
-					<attribute xmi:idref="EAID_127EBC2C_5CBD_439f_8A06_13CEAE8EEF09" name="hoofdfunctie" scope="Public">
-						<initial/>
-						<documentation/>
-						<model ea_localid="658" ea_guid="{127EBC2C-5CBD-439f-8A06-13CEAE8EEF09}"/>
-						<properties type="Boolean" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
-						<coords ordered="0" scale="0"/>
-						<containment containment="Not Specified" position="2"/>
-						<stereotype/>
-						<bounds lower="1" upper="1"/>
-						<options/>
-						<style/>
-						<styleex value="volatile=0;"/>
-						<tags/>
-						<xrefs/>
-					</attribute>
 					<attribute xmi:idref="EAID_6556EB21_AE8A_475d_9B53_9A06409CAA07" name="subcategorie" scope="Public">
 						<initial/>
 						<documentation/>
@@ -1044,13 +1029,13 @@
 						<tags/>
 						<xrefs/>
 					</attribute>
-					<attribute xmi:idref="EAID_7E77EC52_B954_4e5d_BAAB_BDD88DFFB8CA" name="toelichting" scope="Public">
+					<attribute xmi:idref="EAID_81A910B1_E4CE_4953_9FED_6AA16332E0C4" name="functie" scope="Public">
 						<initial/>
 						<documentation/>
-						<model ea_localid="660" ea_guid="{7E77EC52-B954-4e5d-BAAB-BDD88DFFB8CA}"/>
-						<properties type="Text" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<model ea_localid="655" ea_guid="{81A910B1-E4CE-4953-9FED-6AA16332E0C4}"/>
+						<properties type="AN200" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
 						<coords ordered="0" scale="0"/>
-						<containment containment="Not Specified" position="8"/>
+						<containment containment="Not Specified" position="6"/>
 						<stereotype/>
 						<bounds lower="1" upper="1"/>
 						<options/>
@@ -1074,6 +1059,21 @@
 						<tags/>
 						<xrefs/>
 					</attribute>
+					<attribute xmi:idref="EAID_7E77EC52_B954_4e5d_BAAB_BDD88DFFB8CA" name="toelichting" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="660" ea_guid="{7E77EC52-B954-4e5d-BAAB-BDD88DFFB8CA}"/>
+						<properties type="Text" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="8"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
 				</attributes>
 				<links>
 					<Association xmi:id="EAID_FD27EB67_1CFA_4f40_AE79_329DE9DE6754" start="EAID_32C02923_EE3A_4553_B94B_31E0C273A829" end="EAID_49993EF9_ED8B_49e0_B8F7_FC7C8C28669D"/>
@@ -1082,7 +1082,7 @@
 			<element xmi:idref="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8" xmi:type="uml:Enumeration" name="TypeMonument" scope="public">
 				<model package="EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466" tpos="0" ea_localid="217" ea_eleType="element"/>
 				<properties isSpecification="false" sType="Enumeration" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false"/>
-				<project author="Arjen Brienen" version="1.0" phase="1.0" created="2019-07-03 15:31:50" modified="2024-04-17 13:34:26" complexity="1" status="Proposed"/>
+				<project version="1.4" phase="1.0" modified="2024-11-21 23:01:54" complexity="1" status="Proposed"/>
 				<code gentype="Java"/>
 				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
 				<tags>
@@ -1092,7 +1092,7 @@
 					<tag xmi:id="EAID_72C0AF8F_7DA7_4787_8307_1F13D05FDA04" name="synoniemen" modelElement="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8"/>
 					<tag xmi:id="EAID_051B94D5_D735_48D3_A4AA_C42E51DD32C2" name="toelichting" modelElement="EAID_5C808AC9_CB09_4f4d_813E_821829856BA8"/>
 				</tags>
-				<xrefs/>
+				<xrefs value="$XREFPROP=$XID={BA982F91-3409-4F8A-A720-AFE45766614F}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Enumeratie;FQName=MIM::Enumeratie;@ENDSTEREO;$DES;$CLT={5C808AC9-CB09-4f4d-813E-821829856BA8}$CLT;$ENDXREF;"/>
 				<extendedProperties tagged="0" package_name="Model Monumenten"/>
 				<attributes>
 					<attribute xmi:idref="EAID_B2AE8AFC_C1D5_4d83_BFD3_EBF1663F3468" name="rijksmonument" scope="Public">
@@ -1176,7 +1176,7 @@
 					<tags/>
 				</source>
 				<target xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
-					<model ea_localid="212" type="Class" name="BeschermdeStatus"/>
+					<model ea_localid="212" type="Class" name="Beschermde Status"/>
 					<role visibility="Public"/>
 					<type aggregation="none"/>
 					<constraints/>
@@ -1199,7 +1199,7 @@
 			</connector>
 			<connector xmi:idref="EAID_8E18F665_2A86_44fd_AD55_3E435A282BDF" name="monument ambacht">
 				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
-					<model ea_localid="212" type="Class" name="BeschermdeStatus"/>
+					<model ea_localid="212" type="Class" name="Beschermde Status"/>
 					<role visibility="Public" targetScope="instance"/>
 					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
 					<constraints/>
@@ -1234,17 +1234,17 @@
 					<tag xmi:id="EAID_78BC714C_8390_4B18_A832_D72FDA925C0C" name="GEMMA-naam" value="monument ambacht"/>
 					<tag xmi:id="EAID_AB493FCC_3E3F_41D4_9B72_A83A876B4FD0" name="GEMMA-guid" value="e0f90c75-0b61-49a9-9dba-a52749a1382e"/>
 					<tag xmi:id="EAID_4B3671D3_B50C_41DE_985F_4E69BBE0261B" name="GEMMA-type" value="association-relationship"/>
-					<tag xmi:id="EAID_B3C030CA_3C42_4689_B580_06661FE9A023" name="GEMMA-definitie"/>
-					<tag xmi:id="EAID_69BF8DE1_4DD0_4A50_8716_EA735B5039AB" name="toelichting"/>
-					<tag xmi:id="EAID_5DA25CE6_4F40_4686_9CF0_27EAD518DC8B" name="GEMMA-toelichting"/>
+					<tag xmi:id="EAID_B3C030CA_3C42_4689_B580_06661FE9A023" name="GEMMA-definitie" value="nan"/>
+					<tag xmi:id="EAID_69BF8DE1_4DD0_4A50_8716_EA735B5039AB" name="toelichting" value="nan"/>
+					<tag xmi:id="EAID_5DA25CE6_4F40_4686_9CF0_27EAD518DC8B" name="GEMMA-toelichting" value="nan"/>
 					<tag xmi:id="EAID_7530BB26_16B0_4BBB_BEDB_DB387BB3116B" name="GEMMA-source-guid" value="4ebf7f05-0ff1-4d2e-aa62-879be7565dd7"/>
 					<tag xmi:id="EAID_8BC65773_B716_48E9_82FE_DA63B985892F" name="GEMMA-target-guid" value="bb9de7ad-7e7e-4b87-9968-046d9bedd6ef"/>
-					<tag xmi:id="EAID_DD08E900_E038_439D_9A7F_CD0CB958688B" name="datum-tijd-export" value="17042024-12:23:10"/>
+					<tag xmi:id="EAID_DD08E900_E038_439D_9A7F_CD0CB958688B" name="datum-tijd-export" value="22112024-11:45:45"/>
 				</tags>
 			</connector>
 			<connector xmi:idref="EAID_144ADF26_C2E9_4080_8F4F_32F9B255E4AE" name="monument bouwstijl">
 				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
-					<model ea_localid="212" type="Class" name="BeschermdeStatus"/>
+					<model ea_localid="212" type="Class" name="Beschermde Status"/>
 					<role visibility="Public" targetScope="instance"/>
 					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
 					<constraints/>
@@ -1279,17 +1279,17 @@
 					<tag xmi:id="EAID_04C59D0D_3FE8_4E73_9143_70AD6360A024" name="GEMMA-naam" value="monument bouwstijl"/>
 					<tag xmi:id="EAID_D4679543_2A3E_4647_B719_781B43BD9878" name="GEMMA-guid" value="d2d29d92-77fb-49a7-ab49-12b6cd92e217"/>
 					<tag xmi:id="EAID_0E7F9328_D866_4F27_833D_2C61DBB5A7EA" name="GEMMA-type" value="association-relationship"/>
-					<tag xmi:id="EAID_4781831F_0863_4335_B424_4FC3FE1111F6" name="GEMMA-definitie"/>
-					<tag xmi:id="EAID_10B2C8CB_0FAA_4188_A611_261D8EC51E16" name="toelichting"/>
-					<tag xmi:id="EAID_16E24AE6_EC17_4D0F_A1C4_A39CBC53B07B" name="GEMMA-toelichting"/>
+					<tag xmi:id="EAID_4781831F_0863_4335_B424_4FC3FE1111F6" name="GEMMA-definitie" value="nan"/>
+					<tag xmi:id="EAID_10B2C8CB_0FAA_4188_A611_261D8EC51E16" name="toelichting" value="nan"/>
+					<tag xmi:id="EAID_16E24AE6_EC17_4D0F_A1C4_A39CBC53B07B" name="GEMMA-toelichting" value="nan"/>
 					<tag xmi:id="EAID_0B54238E_D7E2_40F8_A77D_6EBBEC8B77D0" name="GEMMA-source-guid" value="4ebf7f05-0ff1-4d2e-aa62-879be7565dd7"/>
 					<tag xmi:id="EAID_57A34415_925F_4405_9CD5_7FF75A7085CA" name="GEMMA-target-guid" value="b46a0ac4-5d5a-430a-be26-9b40cc3bb7af"/>
-					<tag xmi:id="EAID_6E1DE02B_B858_48C3_8F36_54CA548C5A1D" name="datum-tijd-export" value="17042024-12:23:10"/>
+					<tag xmi:id="EAID_6E1DE02B_B858_48C3_8F36_54CA548C5A1D" name="datum-tijd-export" value="22112024-11:45:45"/>
 				</tags>
 			</connector>
 			<connector xmi:idref="EAID_1ED1613A_DE5F_4ee2_8356_4BB729911C69" name="documentatie">
 				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
-					<model ea_localid="212" type="Class" name="BeschermdeStatus"/>
+					<model ea_localid="212" type="Class" name="Beschermde Status"/>
 					<role visibility="Public" targetScope="instance"/>
 					<type multiplicity="0..1" aggregation="none" containment="Unspecified"/>
 					<constraints/>
@@ -1323,7 +1323,7 @@
 			</connector>
 			<connector xmi:idref="EAID_1F08C810_A491_4e07_B859_C3D4EDEBA557" name="monument fotos">
 				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
-					<model ea_localid="212" type="Class" name="BeschermdeStatus"/>
+					<model ea_localid="212" type="Class" name="Beschermde Status"/>
 					<role visibility="Public" targetScope="instance"/>
 					<type multiplicity="1" aggregation="none" containment="Unspecified"/>
 					<constraints/>
@@ -1358,17 +1358,17 @@
 					<tag xmi:id="EAID_1B339F27_F169_430D_9595_29854B8E36FE" name="GEMMA-naam" value="monument fotos"/>
 					<tag xmi:id="EAID_54DDCC34_49C8_41D4_BEAE_471EE45D44B1" name="GEMMA-guid" value="12b60afd-2e12-4c61-bd9d-1427d3355679"/>
 					<tag xmi:id="EAID_E8988D33_9D2B_45B4_9B95_0627AB6182A6" name="GEMMA-type" value="association-relationship"/>
-					<tag xmi:id="EAID_508C1E9A_F0D4_4FB1_B5B0_4E8E26479145" name="GEMMA-definitie"/>
-					<tag xmi:id="EAID_0E5C01C3_7491_4DDB_B23B_B8338BA554F6" name="toelichting"/>
-					<tag xmi:id="EAID_7E1FE393_01DC_4739_9DCB_8EFAEC2759E2" name="GEMMA-toelichting"/>
+					<tag xmi:id="EAID_508C1E9A_F0D4_4FB1_B5B0_4E8E26479145" name="GEMMA-definitie" value="nan"/>
+					<tag xmi:id="EAID_0E5C01C3_7491_4DDB_B23B_B8338BA554F6" name="toelichting" value="nan"/>
+					<tag xmi:id="EAID_7E1FE393_01DC_4739_9DCB_8EFAEC2759E2" name="GEMMA-toelichting" value="nan"/>
 					<tag xmi:id="EAID_92CA15A1_98F1_4F8D_A37B_694A71D5652C" name="GEMMA-source-guid" value="4ebf7f05-0ff1-4d2e-aa62-879be7565dd7"/>
 					<tag xmi:id="EAID_3F68F91A_36D3_451D_BE1A_EA1043135083" name="GEMMA-target-guid" value="b285df90-a239-4757-b78e-a281744f89cb"/>
-					<tag xmi:id="EAID_921EDEDC_B180_4518_A396_7AA62DEFDD73" name="datum-tijd-export" value="17042024-12:23:10"/>
+					<tag xmi:id="EAID_921EDEDC_B180_4518_A396_7AA62DEFDD73" name="datum-tijd-export" value="22112024-11:45:45"/>
 				</tags>
 			</connector>
 			<connector xmi:idref="EAID_44E4F035_7E96_48df_B6CF_93C945FF97C3" name="betreft">
 				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
-					<model ea_localid="212" type="Class" name="BeschermdeStatus"/>
+					<model ea_localid="212" type="Class" name="Beschermde Status"/>
 					<role visibility="Public" targetScope="instance"/>
 					<type multiplicity="0..1" aggregation="none" containment="Unspecified"/>
 					<constraints/>
@@ -1403,17 +1403,17 @@
 					<tag xmi:id="EAID_9D357B65_907C_4E12_A630_E68C62CD9D1E" name="GEMMA-naam" value="betreft"/>
 					<tag xmi:id="EAID_13E3E42E_B4CE_44B0_B8BC_A10083477362" name="GEMMA-guid" value="e6876aef-8291-4b3a-888a-9ed7850d942a"/>
 					<tag xmi:id="EAID_A04FD83A_EB74_440E_81E0_BD9AD4165EF8" name="GEMMA-type" value="association-relationship"/>
-					<tag xmi:id="EAID_CDCE0AD5_EC85_4B15_BF3F_517D43D606EA" name="GEMMA-definitie"/>
-					<tag xmi:id="EAID_301418D0_23CC_4A0B_87AB_9E707A4FF555" name="toelichting"/>
-					<tag xmi:id="EAID_86D0DB84_481D_41ED_BEA0_A71150DFCB0C" name="GEMMA-toelichting"/>
+					<tag xmi:id="EAID_CDCE0AD5_EC85_4B15_BF3F_517D43D606EA" name="GEMMA-definitie" value="nan"/>
+					<tag xmi:id="EAID_301418D0_23CC_4A0B_87AB_9E707A4FF555" name="toelichting" value="nan"/>
+					<tag xmi:id="EAID_86D0DB84_481D_41ED_BEA0_A71150DFCB0C" name="GEMMA-toelichting" value="nan"/>
 					<tag xmi:id="EAID_BEA2136E_F9D2_4AAF_A763_D2AD81136D52" name="GEMMA-source-guid" value="4ebf7f05-0ff1-4d2e-aa62-879be7565dd7"/>
 					<tag xmi:id="EAID_9EBA3860_CB78_48D6_ACC4_AD11C57B2413" name="GEMMA-target-guid" value="bb6b6dd2-7b6a-4146-afc0-c5647256ef11"/>
-					<tag xmi:id="EAID_4E312980_FB7C_41F5_BE38_38E503107E36" name="datum-tijd-export" value="17042024-12:23:10"/>
+					<tag xmi:id="EAID_4E312980_FB7C_41F5_BE38_38E503107E36" name="datum-tijd-export" value="22112024-11:45:45"/>
 				</tags>
 			</connector>
 			<connector xmi:idref="EAID_55585CB9_E569_47ca_9EFE_B9D5CF46BCBD" name="monument bouwactiviteit">
 				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
-					<model ea_localid="212" type="Class" name="BeschermdeStatus"/>
+					<model ea_localid="212" type="Class" name="Beschermde Status"/>
 					<role visibility="Public" targetScope="instance"/>
 					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
 					<constraints/>
@@ -1448,17 +1448,17 @@
 					<tag xmi:id="EAID_05FDE501_60A5_4C4D_9176_9C7DBBE71D13" name="GEMMA-naam" value="monument bouwactiviteit"/>
 					<tag xmi:id="EAID_25658A70_DEE0_4106_AFD1_53EDDF75FACB" name="GEMMA-guid" value="f24b1d87-3295-4cc5-bfd6-1a1ea0dac0c0"/>
 					<tag xmi:id="EAID_1C60AF5C_1188_47D1_8FA2_6E070DDC6A59" name="GEMMA-type" value="association-relationship"/>
-					<tag xmi:id="EAID_1846FD7F_86A6_448F_8826_999D9C4340E7" name="GEMMA-definitie"/>
-					<tag xmi:id="EAID_4621670C_53CB_4D95_8E74_FA2D44CF3321" name="toelichting"/>
-					<tag xmi:id="EAID_6833B318_9CBF_46BD_A168_3DD71790EA90" name="GEMMA-toelichting"/>
+					<tag xmi:id="EAID_1846FD7F_86A6_448F_8826_999D9C4340E7" name="GEMMA-definitie" value="nan"/>
+					<tag xmi:id="EAID_4621670C_53CB_4D95_8E74_FA2D44CF3321" name="toelichting" value="nan"/>
+					<tag xmi:id="EAID_6833B318_9CBF_46BD_A168_3DD71790EA90" name="GEMMA-toelichting" value="nan"/>
 					<tag xmi:id="EAID_A4C7D315_77A3_4432_8FA5_8D97EA48313A" name="GEMMA-source-guid" value="4ebf7f05-0ff1-4d2e-aa62-879be7565dd7"/>
 					<tag xmi:id="EAID_6431F78D_8593_4262_B6AA_724E24DD019E" name="GEMMA-target-guid" value="2b2319c1-d5b9-43c6-87cb-43bb194c65c6"/>
-					<tag xmi:id="EAID_2E45F921_F3E7_410B_AF0D_C8B76772E9C1" name="datum-tijd-export" value="17042024-12:23:10"/>
+					<tag xmi:id="EAID_2E45F921_F3E7_410B_AF0D_C8B76772E9C1" name="datum-tijd-export" value="22112024-11:45:45"/>
 				</tags>
 			</connector>
 			<connector xmi:idref="EAID_59A9090E_CF7A_4e6f_91E1_592085B0DA94" name="betreft">
 				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
-					<model ea_localid="212" type="Class" name="BeschermdeStatus"/>
+					<model ea_localid="212" type="Class" name="Beschermde Status"/>
 					<role visibility="Public" targetScope="instance"/>
 					<type aggregation="none" containment="Unspecified"/>
 					<constraints/>
@@ -1493,17 +1493,17 @@
 					<tag xmi:id="EAID_22E537FD_12EC_404A_8043_8136E152AFEE" name="GEMMA-naam" value="betreft"/>
 					<tag xmi:id="EAID_AD1DCB50_1436_4B6C_A0D9_38DC6AA5854A" name="GEMMA-guid" value="e445dffc-eb7f-45c7-b262-d941c4425496"/>
 					<tag xmi:id="EAID_233E8B54_72C8_405B_829F_CE8F4E57BB62" name="GEMMA-type" value="association-relationship"/>
-					<tag xmi:id="EAID_53BA5C8A_1638_46E9_B08A_18A0CF514E8F" name="GEMMA-definitie"/>
-					<tag xmi:id="EAID_CEBBBC73_BD20_4344_8B5B_1E7075C21DFD" name="toelichting"/>
-					<tag xmi:id="EAID_2E4DDD92_52D8_4CB6_B534_D9DDC4A7955A" name="GEMMA-toelichting"/>
+					<tag xmi:id="EAID_53BA5C8A_1638_46E9_B08A_18A0CF514E8F" name="GEMMA-definitie" value="nan"/>
+					<tag xmi:id="EAID_CEBBBC73_BD20_4344_8B5B_1E7075C21DFD" name="toelichting" value="nan"/>
+					<tag xmi:id="EAID_2E4DDD92_52D8_4CB6_B534_D9DDC4A7955A" name="GEMMA-toelichting" value="nan"/>
 					<tag xmi:id="EAID_04DF7901_50F9_4C55_A482_380E4F9B0088" name="GEMMA-source-guid" value="4ebf7f05-0ff1-4d2e-aa62-879be7565dd7"/>
 					<tag xmi:id="EAID_773B3F44_CC11_4FB5_BBC6_AE1F8F8BFF2C" name="GEMMA-target-guid" value="8155eb9b-eb9e-4eec-a850-80c185983a9f"/>
-					<tag xmi:id="EAID_FA942BFF_4E0A_47E9_8A77_1B12A826087D" name="datum-tijd-export" value="17042024-12:23:10"/>
+					<tag xmi:id="EAID_FA942BFF_4E0A_47E9_8A77_1B12A826087D" name="datum-tijd-export" value="22112024-11:45:45"/>
 				</tags>
 			</connector>
 			<connector xmi:idref="EAID_D9634EAD_2869_40a1_B243_805897E4B1B3" name="monument bouwtype">
 				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
-					<model ea_localid="212" type="Class" name="BeschermdeStatus"/>
+					<model ea_localid="212" type="Class" name="Beschermde Status"/>
 					<role visibility="Public" targetScope="instance"/>
 					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
 					<constraints/>
@@ -1538,7 +1538,7 @@
 			</connector>
 			<connector xmi:idref="EAID_F7893BFE_1A66_4760_9124_B62A81F45997" name="betreft">
 				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
-					<model ea_localid="212" type="Class" name="BeschermdeStatus"/>
+					<model ea_localid="212" type="Class" name="Beschermde Status"/>
 					<role visibility="Public" targetScope="instance"/>
 					<type multiplicity="0..1" aggregation="none" containment="Unspecified"/>
 					<constraints/>
@@ -1573,17 +1573,17 @@
 					<tag xmi:id="EAID_8A10EC8E_FAA3_47ED_A5DE_9BBD939BACE2" name="GEMMA-naam" value="betreft"/>
 					<tag xmi:id="EAID_2838E053_B610_4A8F_B122_05648A3774DD" name="GEMMA-guid" value="74aa12a8-e685-4ce6-aea2-f1b9f0cc6f03"/>
 					<tag xmi:id="EAID_311916C8_7191_4FC9_BA02_2DB9B8646F78" name="GEMMA-type" value="association-relationship"/>
-					<tag xmi:id="EAID_160A7AE7_93E2_4EEB_A8D8_55187C9D0812" name="GEMMA-definitie"/>
-					<tag xmi:id="EAID_0C1A3A91_1AED_4150_9A99_12C7AE05573D" name="toelichting"/>
-					<tag xmi:id="EAID_B1BE30AE_9678_48CD_BE24_38979C2A912F" name="GEMMA-toelichting"/>
+					<tag xmi:id="EAID_160A7AE7_93E2_4EEB_A8D8_55187C9D0812" name="GEMMA-definitie" value="nan"/>
+					<tag xmi:id="EAID_0C1A3A91_1AED_4150_9A99_12C7AE05573D" name="toelichting" value="nan"/>
+					<tag xmi:id="EAID_B1BE30AE_9678_48CD_BE24_38979C2A912F" name="GEMMA-toelichting" value="nan"/>
 					<tag xmi:id="EAID_6A00F7F8_849A_4F2A_AE2B_28A0CF8548FB" name="GEMMA-source-guid" value="4ebf7f05-0ff1-4d2e-aa62-879be7565dd7"/>
 					<tag xmi:id="EAID_FA0A3B6A_08F4_4AE4_BDDC_64209ED3F121" name="GEMMA-target-guid" value="1affb298-091d-452a-83bd-29638650afb5"/>
-					<tag xmi:id="EAID_BD9710D2_20E7_4BB7_91D9_6E6B6FDB3C13" name="datum-tijd-export" value="17042024-12:23:10"/>
+					<tag xmi:id="EAID_BD9710D2_20E7_4BB7_91D9_6E6B6FDB3C13" name="datum-tijd-export" value="22112024-11:45:45"/>
 				</tags>
 			</connector>
 			<connector xmi:idref="EAID_FD27EB67_1CFA_4f40_AE79_329DE9DE6754" name="monument functie">
 				<source xmi:idref="EAID_32C02923_EE3A_4553_B94B_31E0C273A829">
-					<model ea_localid="212" type="Class" name="BeschermdeStatus"/>
+					<model ea_localid="212" type="Class" name="Beschermde Status"/>
 					<role visibility="Public" targetScope="instance"/>
 					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
 					<constraints/>
@@ -1620,26 +1620,26 @@
 		<primitivetypes>
 			<packagedElement xmi:type="uml:Package" xmi:id="EAPrimitiveTypesPackage" name="EA_PrimitiveTypes_Package" visibility="public">
 				<packagedElement xmi:type="uml:Package" xmi:id="EAJavaTypesPackage" name="EA_Java_Types_Package" visibility="public">
-					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN300" name="AN300" visibility="public"/>
 					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_int" name="int" visibility="public">
 						<generalization xmi:type="uml:Generalization" xmi:id="EAJava_int_General">
 							<general href="http://schema.omg.org/spec/UML/2.1/uml.xml#Integer"/>
 						</generalization>
 					</packagedElement>
-					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN400" name="AN400" visibility="public"/>
-					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN200" name="AN200" visibility="public"/>
-					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_Date" name="Date" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN300" name="AN300" visibility="public"/>
 					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN80" name="AN80" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_Date" name="Date" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN200" name="AN200" visibility="public"/>
 					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN20" name="AN20" visibility="public"/>
-					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_Text" name="Text" visibility="public"/>
 					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_text" name="text" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN400" name="AN400" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_Text" name="Text" visibility="public"/>
 					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN8" name="AN8" visibility="public"/>
-					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_An200" name="An200" visibility="public"/>
 					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_Boolean" name="Boolean" visibility="public">
 						<generalization xmi:type="uml:Generalization" xmi:id="EAJava_Boolean_General">
 							<general href="http://schema.omg.org/spec/UML/2.1/uml.xml#Boolean"/>
 						</generalization>
 					</packagedElement>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_An200" name="An200" visibility="public"/>
 					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava__" name="1" visibility="public"/>
 				</packagedElement>
 			</packagedElement>
@@ -1719,124 +1719,478 @@
 					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_datum-tijd-export" name="extension_datum-tijd-export" type="datum-tijd-export" isComposite="true" lower="0" upper="1" memberEnd="extension_datum-tijd-export datum-tijd-export-base_Class"/>
 				</packagedElement>
 			</uml:Profile>
-			<uml:Profile xmlns:uml="http://schema.omg.org/spec/UML/2.1/" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmi:version="2.1" xmi:id="21AEC04F-C" nsPrefix="SysPhS" name="SysPhS" metamodelReference="mmref01">
-				<ownedComment xmi:type="uml:Comment" xmi:id="comment01" annotatedElement="21AEC04F-C">
-					<body>UML Profile for SysPhS Version:1.0</body>
+			<uml:Profile xmlns:uml="http://schema.omg.org/spec/UML/2.1/" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmi:version="2.1" xmi:id="EDFDE9C6-3" nsPrefix="MIM" name="MIM" metamodelReference="mmref01">
+				<ownedComment xmi:type="uml:Comment" xmi:id="comment01" annotatedElement="EDFDE9C6-3">
+					<body>Alt 1 en Alt 2 gecombineerd. Version:1.1</body>
 				</ownedComment>
 				<packageImport xmi:id="mmref01">
 					<importedPackage href="http://schema.omg.org/spec/UML/2.1/"/>
 				</packageImport>
-				<packagedElement xmi:type="uml:Stereotype" xmi:id="PhSVariable" name="PhSVariable">
-					<ownedAttribute xmi:type="uml:Property" xmi:id="PhSVariable-base_Part" name="base_Part" association="Part_PhSVariable">
-						<type href="http://schema.omg.org/spec/UML/2.1/Part"/>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Enumeratiewaarde" name="Enumeratiewaarde">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Enumeratiewaarde-base_Attribute" name="base_Attribute" association="Attribute_Enumeratiewaarde">
+						<type href="http://schema.omg.org/spec/UML/2.1/Attribute"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="PhSVariable-isInitialValueFixed" name="isInitialValueFixed">
-						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
-					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="PhSVariable-isContinuous" name="isContinuous">
-						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
-					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="PhSVariable-changeCycle" name="changeCycle">
-						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
-					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="PhSVariable-isConserved" name="isConserved">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Enumeratiewaarde-Begrip" name="Begrip">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 				</packagedElement>
-				<packagedElement xmi:type="uml:Extension" xmi:id="Part_PhSVariable" name="A_Part_PhSVariable" memberEnd="extension_PhSVariable PhSVariable-base_Part">
-					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_PhSVariable" name="extension_PhSVariable" type="PhSVariable" isComposite="true" lower="0" upper="1" memberEnd="extension_PhSVariable PhSVariable-base_Part"/>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Attribute_Enumeratiewaarde" name="A_Attribute_Enumeratiewaarde" memberEnd="extension_Enumeratiewaarde Enumeratiewaarde-base_Attribute">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Enumeratiewaarde" name="extension_Enumeratiewaarde" type="Enumeratiewaarde" isComposite="true" lower="0" upper="1" memberEnd="extension_Enumeratiewaarde Enumeratiewaarde-base_Attribute"/>
 				</packagedElement>
-				<packagedElement xmi:type="uml:Stereotype" xmi:id="ModelicaParameter" name="ModelicaParameter">
-					<generalization xmi:type="uml:Generalization" xmi:id="ModelicaParameter_PhSConstant_generalization" general="PhSConstant"/>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="ModelicaParameter-name" name="name">
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Relatierol" name="Relatierol">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatierol-base_AssociationEnd" name="base_AssociationEnd" association="AssociationEnd_Relatierol">
+						<type href="http://schema.omg.org/spec/UML/2.1/AssociationEnd"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatierol-Mogelijk geen waarde" name="Mogelijk geen waarde">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="ModelicaParameter-value" name="value">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatierol-Indicatie materiële historie" name="Indicatie materiële historie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatierol-Authentiek" name="Authentiek">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatierol-Herkomst" name="Herkomst">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatierol-Herkomst defintie" name="Herkomst defintie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatierol-Begrip" name="Begrip">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatierol-Indicatie formele historie" name="Indicatie formele historie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatierol-Datum opname" name="Datum opname">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatierol-Toelichting" name="Toelichting">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 				</packagedElement>
-				<packagedElement xmi:type="uml:Stereotype" xmi:id="ModelicaBlock" name="ModelicaBlock">
-					<generalization xmi:type="uml:Generalization" xmi:id="ModelicaBlock_SysML1.4::Block_generalization" general="SysML1.4::Block"/>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="ModelicaBlock-base_Class" name="base_Class" association="Class_ModelicaBlock">
+				<packagedElement xmi:type="uml:Extension" xmi:id="AssociationEnd_Relatierol" name="A_AssociationEnd_Relatierol" memberEnd="extension_Relatierol Relatierol-base_AssociationEnd">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Relatierol" name="extension_Relatierol" type="Relatierol" isComposite="true" lower="0" upper="1" memberEnd="extension_Relatierol Relatierol-base_AssociationEnd"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Relatieklasse" name="Relatieklasse">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatieklasse-base_AssociationClass" name="base_AssociationClass" association="AssociationClass_Relatieklasse">
+						<type href="http://schema.omg.org/spec/UML/2.1/AssociationClass"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatieklasse-Begrip" name="Begrip">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="AssociationClass_Relatieklasse" name="A_AssociationClass_Relatieklasse" memberEnd="extension_Relatieklasse Relatieklasse-base_AssociationClass">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Relatieklasse" name="extension_Relatieklasse" type="Relatieklasse" isComposite="true" lower="0" upper="1" memberEnd="extension_Relatieklasse Relatieklasse-base_AssociationClass"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Relatiesoort" name="Relatiesoort">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatiesoort-base_Association" name="base_Association" association="Association_Relatiesoort">
+						<type href="http://schema.omg.org/spec/UML/2.1/Association"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatiesoort-Mogelijk geen waarde" name="Mogelijk geen waarde">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatiesoort-Indicatie materiële historie" name="Indicatie materiële historie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatiesoort-Authentiek" name="Authentiek">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatiesoort-Herkomst definitie" name="Herkomst definitie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatiesoort-Herkomst" name="Herkomst">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatiesoort-Begrip" name="Begrip">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatiesoort-Indicatie formele historie" name="Indicatie formele historie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatiesoort-Datum opname" name="Datum opname">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatiesoort-Toelichting" name="Toelichting">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Association_Relatiesoort" name="A_Association_Relatiesoort" memberEnd="extension_Relatiesoort Relatiesoort-base_Association">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Relatiesoort" name="extension_Relatiesoort" type="Relatiesoort" isComposite="true" lower="0" upper="1" memberEnd="extension_Relatiesoort Relatiesoort-base_Association"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Gegevensgroep" name="Gegevensgroep">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep-base_Attribute" name="base_Attribute" association="Attribute_Gegevensgroep">
+						<type href="http://schema.omg.org/spec/UML/2.1/Attribute"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep-Indicatie materiële historie" name="Indicatie materiële historie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep-Authentiek" name="Authentiek">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep-Herkomst definitie" name="Herkomst definitie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep-Herkomst" name="Herkomst">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep-Begrip" name="Begrip">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep-Indicatie formele historie" name="Indicatie formele historie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep-Datum opname" name="Datum opname">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep-Toelichting" name="Toelichting">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Attribute_Gegevensgroep" name="A_Attribute_Gegevensgroep" memberEnd="extension_Gegevensgroep Gegevensgroep-base_Attribute">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Gegevensgroep" name="extension_Gegevensgroep" type="Gegevensgroep" isComposite="true" lower="0" upper="1" memberEnd="extension_Gegevensgroep Gegevensgroep-base_Attribute"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Objecttype" name="Objecttype">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Objecttype-base_Class" name="base_Class" association="Class_Objecttype">
 						<type href="http://schema.omg.org/spec/UML/2.1/Class"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="ModelicaBlock-name" name="name">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Objecttype-Herkomst definitie" name="Herkomst definitie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Objecttype-Herkomst" name="Herkomst">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Objecttype-Kwaliteit" name="Kwaliteit">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Objecttype-Begrip" name="Begrip">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Objecttype-Datum opname" name="Datum opname">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Objecttype-Toelichting" name="Toelichting">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Objecttype-Populatie" name="Populatie">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 				</packagedElement>
-				<packagedElement xmi:type="uml:Extension" xmi:id="Class_ModelicaBlock" name="A_Class_ModelicaBlock" memberEnd="extension_ModelicaBlock ModelicaBlock-base_Class">
-					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_ModelicaBlock" name="extension_ModelicaBlock" type="ModelicaBlock" isComposite="true" lower="0" upper="1" memberEnd="extension_ModelicaBlock ModelicaBlock-base_Class"/>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Class_Objecttype" name="A_Class_Objecttype" memberEnd="extension_Objecttype Objecttype-base_Class">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Objecttype" name="extension_Objecttype" type="Objecttype" isComposite="true" lower="0" upper="1" memberEnd="extension_Objecttype Objecttype-base_Class"/>
 				</packagedElement>
-				<packagedElement xmi:type="uml:Stereotype" xmi:id="SimulinkBlock" name="SimulinkBlock">
-					<generalization xmi:type="uml:Generalization" xmi:id="SimulinkBlock_SysML1.4::Block_generalization" general="SysML1.4::Block"/>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="SimulinkBlock-base_Class" name="base_Class" association="Class_SimulinkBlock">
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Referentie element" name="Referentie element">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Referentie element-base_Attribute" name="base_Attribute" association="Attribute_Referentie element">
+						<type href="http://schema.omg.org/spec/UML/2.1/Attribute"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Referentie element-Lengte" name="Lengte">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Referentie element-Formeel patroon" name="Formeel patroon">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Referentie element-Begrip" name="Begrip">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Referentie element-Datum opname" name="Datum opname">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Referentie element-Patroon" name="Patroon">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Referentie element-Toelichting" name="Toelichting">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Attribute_Referentie element" name="A_Attribute_Referentie element" memberEnd="extension_Referentie element Referentie element-base_Attribute">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Referentie element" name="extension_Referentie element" type="Referentie element" isComposite="true" lower="0" upper="1" memberEnd="extension_Referentie element Referentie element-base_Attribute"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Data element" name="Data element">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Data element-base_Attribute" name="base_Attribute" association="Attribute_Data element">
+						<type href="http://schema.omg.org/spec/UML/2.1/Attribute"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Data element-Lengte" name="Lengte">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Data element-Herkomst" name="Herkomst">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Data element-Formeel patroon" name="Formeel patroon">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Data element-Begrip" name="Begrip">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Data element-Patroon" name="Patroon">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Attribute_Data element" name="A_Attribute_Data element" memberEnd="extension_Data element Data element-base_Attribute">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Data element" name="extension_Data element" type="Data element" isComposite="true" lower="0" upper="1" memberEnd="extension_Data element Data element-base_Attribute"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Codelijst" name="Codelijst">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Codelijst-base_DataType" name="base_DataType" association="DataType_Codelijst">
+						<type href="http://schema.omg.org/spec/UML/2.1/DataType"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Codelijst-Herkomst" name="Herkomst">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Codelijst-Locatie" name="Locatie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Codelijst-Begrip" name="Begrip">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Codelijst-Datum opname" name="Datum opname">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Codelijst-Toelichting" name="Toelichting">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="DataType_Codelijst" name="A_DataType_Codelijst" memberEnd="extension_Codelijst Codelijst-base_DataType">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Codelijst" name="extension_Codelijst" type="Codelijst" isComposite="true" lower="0" upper="1" memberEnd="extension_Codelijst Codelijst-base_DataType"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Generalisatie" name="Generalisatie">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Generalisatie-base_Generalization" name="base_Generalization" association="Generalization_Generalisatie">
+						<type href="http://schema.omg.org/spec/UML/2.1/Generalization"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Generalisatie-Datum opname" name="Datum opname">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Generalization_Generalisatie" name="A_Generalization_Generalisatie" memberEnd="extension_Generalisatie Generalisatie-base_Generalization">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Generalisatie" name="extension_Generalisatie" type="Generalisatie" isComposite="true" lower="0" upper="1" memberEnd="extension_Generalisatie Generalisatie-base_Generalization"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Gegevensgroeptype" name="Gegevensgroeptype">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroeptype-base_Class" name="base_Class" association="Class_Gegevensgroeptype">
 						<type href="http://schema.omg.org/spec/UML/2.1/Class"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="SimulinkBlock-name" name="name">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroeptype-Herkomst definitie" name="Herkomst definitie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroeptype-Begrip" name="Begrip">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroeptype-Datum opname" name="Datum opname">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroeptype-Toelichting" name="Toelichting">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 				</packagedElement>
-				<packagedElement xmi:type="uml:Extension" xmi:id="Class_SimulinkBlock" name="A_Class_SimulinkBlock" memberEnd="extension_SimulinkBlock SimulinkBlock-base_Class">
-					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_SimulinkBlock" name="extension_SimulinkBlock" type="SimulinkBlock" isComposite="true" lower="0" upper="1" memberEnd="extension_SimulinkBlock SimulinkBlock-base_Class"/>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Class_Gegevensgroeptype" name="A_Class_Gegevensgroeptype" memberEnd="extension_Gegevensgroeptype Gegevensgroeptype-base_Class">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Gegevensgroeptype" name="extension_Gegevensgroeptype" type="Gegevensgroeptype" isComposite="true" lower="0" upper="1" memberEnd="extension_Gegevensgroeptype Gegevensgroeptype-base_Class"/>
 				</packagedElement>
-				<packagedElement xmi:type="uml:Stereotype" xmi:id="SimulinkPort" name="SimulinkPort">
-					<ownedAttribute xmi:type="uml:Property" xmi:id="SimulinkPort-base_Port" name="base_Port" association="Port_SimulinkPort">
-						<type href="http://schema.omg.org/spec/UML/2.1/Port"/>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Externe koppeling" name="Externe koppeling">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Externe koppeling-base_Association" name="base_Association" association="Association_Externe koppeling">
+						<type href="http://schema.omg.org/spec/UML/2.1/Association"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="SimulinkPort-edge" name="edge">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Externe koppeling-Begrip" name="Begrip">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="SimulinkPort-name" name="name">
-						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
-					</ownedAttribute>
-				</packagedElement>
-				<packagedElement xmi:type="uml:Extension" xmi:id="Port_SimulinkPort" name="A_Port_SimulinkPort" memberEnd="extension_SimulinkPort SimulinkPort-base_Port">
-					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_SimulinkPort" name="extension_SimulinkPort" type="SimulinkPort" isComposite="true" lower="0" upper="1" memberEnd="extension_SimulinkPort SimulinkPort-base_Port"/>
-				</packagedElement>
-				<packagedElement xmi:type="uml:Stereotype" xmi:id="MultidimensionalElement" name="MultidimensionalElement">
-					<ownedAttribute xmi:type="uml:Property" xmi:id="MultidimensionalElement-base_MultiplicityElement" name="base_MultiplicityElement" association="MultiplicityElement_MultidimensionalElement">
-						<type href="http://schema.omg.org/spec/UML/2.1/MultiplicityElement"/>
-					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="MultidimensionalElement-base_Slot" name="base_Slot" association="Slot_MultidimensionalElement">
-						<type href="http://schema.omg.org/spec/UML/2.1/Slot"/>
-					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="MultidimensionalElement-dimension" name="dimension">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Externe koppeling-Datum opname" name="Datum opname">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 				</packagedElement>
-				<packagedElement xmi:type="uml:Extension" xmi:id="MultiplicityElement_MultidimensionalElement" name="A_MultiplicityElement_MultidimensionalElement" memberEnd="extension_MultidimensionalElement MultidimensionalElement-base_MultiplicityElement">
-					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_MultidimensionalElement" name="extension_MultidimensionalElement" type="MultidimensionalElement" isComposite="true" lower="0" upper="1" memberEnd="extension_MultidimensionalElement MultidimensionalElement-base_MultiplicityElement"/>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Association_Externe koppeling" name="A_Association_Externe koppeling" memberEnd="extension_Externe koppeling Externe koppeling-base_Association">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Externe koppeling" name="extension_Externe koppeling" type="Externe koppeling" isComposite="true" lower="0" upper="1" memberEnd="extension_Externe koppeling Externe koppeling-base_Association"/>
 				</packagedElement>
-				<packagedElement xmi:type="uml:Extension" xmi:id="Slot_MultidimensionalElement" name="A_Slot_MultidimensionalElement" memberEnd="extension_MultidimensionalElement MultidimensionalElement-base_Slot">
-					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_MultidimensionalElement" name="extension_MultidimensionalElement" type="MultidimensionalElement" isComposite="true" lower="0" upper="1" memberEnd="extension_MultidimensionalElement MultidimensionalElement-base_Slot"/>
-				</packagedElement>
-				<packagedElement xmi:type="uml:Stereotype" xmi:id="ModelicaPort" name="ModelicaPort">
-					<ownedAttribute xmi:type="uml:Property" xmi:id="ModelicaPort-base_Port" name="base_Port" association="Port_ModelicaPort">
-						<type href="http://schema.omg.org/spec/UML/2.1/Port"/>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="View" name="View">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="View-base_Package" name="base_Package" association="Package_View">
+						<type href="http://schema.omg.org/spec/UML/2.1/Package"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="ModelicaPort-name" name="name">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="View-Herkomst" name="Herkomst">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="View-Locatie" name="Locatie">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 				</packagedElement>
-				<packagedElement xmi:type="uml:Extension" xmi:id="Port_ModelicaPort" name="A_Port_ModelicaPort" memberEnd="extension_ModelicaPort ModelicaPort-base_Port">
-					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_ModelicaPort" name="extension_ModelicaPort" type="ModelicaPort" isComposite="true" lower="0" upper="1" memberEnd="extension_ModelicaPort ModelicaPort-base_Port"/>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Package_View" name="A_Package_View" memberEnd="extension_View View-base_Package">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_View" name="extension_View" type="View" isComposite="true" lower="0" upper="1" memberEnd="extension_View View-base_Package"/>
 				</packagedElement>
-				<packagedElement xmi:type="uml:Stereotype" xmi:id="PhSConstant" name="PhSConstant">
-					<ownedAttribute xmi:type="uml:Property" xmi:id="PhSConstant-base_Part" name="base_Part" association="Part_PhSConstant">
-						<type href="http://schema.omg.org/spec/UML/2.1/Part"/>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Domein" name="Domein">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Domein-base_Package" name="base_Package" association="Package_Domein">
+						<type href="http://schema.omg.org/spec/UML/2.1/Package"/>
 					</ownedAttribute>
 				</packagedElement>
-				<packagedElement xmi:type="uml:Extension" xmi:id="Part_PhSConstant" name="A_Part_PhSConstant" memberEnd="extension_PhSConstant PhSConstant-base_Part">
-					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_PhSConstant" name="extension_PhSConstant" type="PhSConstant" isComposite="true" lower="0" upper="1" memberEnd="extension_PhSConstant PhSConstant-base_Part"/>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Package_Domein" name="A_Package_Domein" memberEnd="extension_Domein Domein-base_Package">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Domein" name="extension_Domein" type="Domein" isComposite="true" lower="0" upper="1" memberEnd="extension_Domein Domein-base_Package"/>
 				</packagedElement>
-				<packagedElement xmi:type="uml:Stereotype" xmi:id="SimulinkParameter" name="SimulinkParameter">
-					<generalization xmi:type="uml:Generalization" xmi:id="SimulinkParameter_PhSConstant_generalization" general="PhSConstant"/>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="SimulinkParameter-name" name="name">
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Gestructureerd datatype" name="Gestructureerd datatype">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gestructureerd datatype-base_DataType" name="base_DataType" association="DataType_Gestructureerd datatype">
+						<type href="http://schema.omg.org/spec/UML/2.1/DataType"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gestructureerd datatype-Herkomst" name="Herkomst">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="SimulinkParameter-value" name="value">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gestructureerd datatype-Formeel patroon" name="Formeel patroon">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gestructureerd datatype-Begrip" name="Begrip">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gestructureerd datatype-Datum opname" name="Datum opname">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gestructureerd datatype-Patroon" name="Patroon">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="DataType_Gestructureerd datatype" name="A_DataType_Gestructureerd datatype" memberEnd="extension_Gestructureerd datatype Gestructureerd datatype-base_DataType">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Gestructureerd datatype" name="extension_Gestructureerd datatype" type="Gestructureerd datatype" isComposite="true" lower="0" upper="1" memberEnd="extension_Gestructureerd datatype Gestructureerd datatype-base_DataType"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Informatiemodel" name="Informatiemodel">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Informatiemodel-base_Package" name="base_Package" association="Package_Informatiemodel">
+						<type href="http://schema.omg.org/spec/UML/2.1/Package"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Informatiemodel-MIM extensie" name="MIM extensie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Informatiemodel-Relatiemodelleringstype" name="Relatiemodelleringstype">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Informatiemodel-MIM versie" name="MIM versie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Informatiemodel-Herkomst" name="Herkomst">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Informatiemodel-Informatiemodeltype" name="Informatiemodeltype">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Informatiemodel-MIM taal" name="MIM taal">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Informatiemodel-Informatiedomein" name="Informatiedomein">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Package_Informatiemodel" name="A_Package_Informatiemodel" memberEnd="extension_Informatiemodel Informatiemodel-base_Package">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Informatiemodel" name="extension_Informatiemodel" type="Informatiemodel" isComposite="true" lower="0" upper="1" memberEnd="extension_Informatiemodel Informatiemodel-base_Package"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Keuzerelatie" name="Keuzerelatie"/>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Primitief datatype" name="Primitief datatype">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Primitief datatype-base_PrimitiveType" name="base_PrimitiveType" association="PrimitiveType_Primitief datatype">
+						<type href="http://schema.omg.org/spec/UML/2.1/PrimitiveType"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Primitief datatype-Lengte" name="Lengte">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Primitief datatype-Herkomst" name="Herkomst">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Primitief datatype-Formeel patroon" name="Formeel patroon">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Primitief datatype-Begrip" name="Begrip">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Primitief datatype-Datum opname" name="Datum opname">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Primitief datatype-Patroon" name="Patroon">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="PrimitiveType_Primitief datatype" name="A_PrimitiveType_Primitief datatype" memberEnd="extension_Primitief datatype Primitief datatype-base_PrimitiveType">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Primitief datatype" name="extension_Primitief datatype" type="Primitief datatype" isComposite="true" lower="0" upper="1" memberEnd="extension_Primitief datatype Primitief datatype-base_PrimitiveType"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Extern" name="Extern">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Extern-base_Package" name="base_Package" association="Package_Extern">
+						<type href="http://schema.omg.org/spec/UML/2.1/Package"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Extern-Herkomst" name="Herkomst">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Extern-Locatie" name="Locatie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Package_Extern" name="A_Package_Extern" memberEnd="extension_Extern Extern-base_Package">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Extern" name="extension_Extern" type="Extern" isComposite="true" lower="0" upper="1" memberEnd="extension_Extern Extern-base_Package"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Attribuutsoort" name="Attribuutsoort">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-base_Attribute" name="base_Attribute" association="Attribute_Attribuutsoort">
+						<type href="http://schema.omg.org/spec/UML/2.1/Attribute"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Mogelijk geen waarde" name="Mogelijk geen waarde">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Indicatie materiële historie" name="Indicatie materiële historie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Authentiek" name="Authentiek">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Lengte" name="Lengte">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Indicatie classificerend" name="Indicatie classificerend">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Herkomst definitie" name="Herkomst definitie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Herkomst" name="Herkomst">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Formeel patroon" name="Formeel patroon">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Begrip" name="Begrip">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Indicatie formele historie" name="Indicatie formele historie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Datum opname" name="Datum opname">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Patroon" name="Patroon">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Toelichting" name="Toelichting">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Attribute_Attribuutsoort" name="A_Attribute_Attribuutsoort" memberEnd="extension_Attribuutsoort Attribuutsoort-base_Attribute">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Attribuutsoort" name="extension_Attribuutsoort" type="Attribuutsoort" isComposite="true" lower="0" upper="1" memberEnd="extension_Attribuutsoort Attribuutsoort-base_Attribute"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Enumeratie" name="Enumeratie">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Enumeratie-base_Enumeration" name="base_Enumeration" association="Enumeration_Enumeratie">
+						<type href="http://schema.omg.org/spec/UML/2.1/Enumeration"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Enumeratie-Begrip" name="Begrip">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Enumeration_Enumeratie" name="A_Enumeration_Enumeratie" memberEnd="extension_Enumeratie Enumeratie-base_Enumeration">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Enumeratie" name="extension_Enumeratie" type="Enumeratie" isComposite="true" lower="0" upper="1" memberEnd="extension_Enumeratie Enumeratie-base_Enumeration"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Referentielijst" name="Referentielijst">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Referentielijst-base_DataType" name="base_DataType" association="DataType_Referentielijst">
+						<type href="http://schema.omg.org/spec/UML/2.1/DataType"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Referentielijst-Herkomst" name="Herkomst">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Referentielijst-Locatie" name="Locatie">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Referentielijst-Begrip" name="Begrip">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Referentielijst-Datum opname" name="Datum opname">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Referentielijst-Toelichting" name="Toelichting">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="DataType_Referentielijst" name="A_DataType_Referentielijst" memberEnd="extension_Referentielijst Referentielijst-base_DataType">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Referentielijst" name="extension_Referentielijst" type="Referentielijst" isComposite="true" lower="0" upper="1" memberEnd="extension_Referentielijst Referentielijst-base_DataType"/>
 				</packagedElement>
 			</uml:Profile>
 		</profiles>
