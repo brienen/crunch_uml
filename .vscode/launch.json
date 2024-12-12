@@ -336,6 +336,17 @@
             "justMyCode": false
         },
         {
+            "name": "Python: pytest test_06a_xlsx_parse_partial",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/pytest",  // Pas aan naar je lokale pytest pad
+            "args": [
+                "${workspaceFolder}/test/unit/test_06a_xlsx_parse_partial.py"  // Pas aan naar je testmap
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
             "name": "Python: pytest test_09_lod_renderer",
             "type": "python",
             "request": "launch",

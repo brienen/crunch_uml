@@ -42,6 +42,12 @@ def add_args(argumentparser, subparser_dict):
         help="Used only for i18n parser. Defines the language of the input file."
         + f" Default is {const.DEFAULT_LANGUAGE}.",
     )
+    import_subparser.add_argument(
+        "--update_only",
+        default=False,
+        action="store_true",
+        help="Only update records that already exist. Do not add new ones to avoid errors."
+    )
 
     # Set the epilog help text
     entries = ParserRegistry.entries()

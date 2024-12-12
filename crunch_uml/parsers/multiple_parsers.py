@@ -56,9 +56,6 @@ def store_data(entity_name, data, schema, update_only=False):
 )
 class JSONParser(Parser):
 
-    def update_only(self):
-        return False
-
     def get_data_subset(self, data, args):
         return data
 
@@ -85,7 +82,7 @@ class JSONParser(Parser):
                 if entity_name in tables and entity_name != "schemas":
                     for record in records:
                         record = self.transform_record(record)
-                        store_data(entity_name, record, schema, update_only=self.update_only())
+                        store_data(entity_name, record, schema, update_only=args.update_only)
         except json.JSONDecodeError as ex:
             msg = f"File with name {args.inputfile} is not a valid JSON-file, aborting with message {ex.msg}"
             logger.error(msg)
@@ -143,7 +140,7 @@ class XLXSParser(Parser):
                     records = xls.parse(sheet_name).to_dict(orient="records")
 
                     for record in records:
-                        store_data(sheet_name, record, schema)
+                        store_data(sheet_name, record, schema, update_only=args.update_only)
 
         except Exception as ex:
             msg = f"Error while parsing the Excel file {args.inputfile}: {str(ex)}"
@@ -174,7 +171,7 @@ class CSVParser(Parser):
                 records = df.to_dict(orient="records")
 
                 for record in records:
-                    store_data(entity_name, record, schema)
+                    store_data(entity_name, record, schema, update_only=args.update_only)
 
             else:
                 logger.warning(f"Could not import file: no entity found with name {entity_name}")
