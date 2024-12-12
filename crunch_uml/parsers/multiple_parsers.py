@@ -74,8 +74,14 @@ class TransformableParser(Parser):
         if "id" in record and isinstance(record["id"], str):
             id_value = record["id"]
             if id_value.startswith("{") and id_value.endswith("}"):
+                # Eerst testen of het om een package gaat
+                if "parent_package_id" in record:
+                    suffix = "EAPK_"
+                else:
+                    suffix = "EAID_"
+
                 # Voer een transformatie uit (bijvoorbeeld: verwijder { en })
-                record["id"] = "EAID_" + (id_value[1:-1]).replace("-", "_")  # Verwijdert de { en }
+                record["id"] = suffix + (id_value[1:-1]).replace("-", "_")  # Verwijdert de { en }
                 logger.debug(f"Transformed 'id' field: {id_value} -> {record['id']}")
 
         return record      

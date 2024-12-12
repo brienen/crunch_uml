@@ -57,7 +57,7 @@ def add_args(argumentparser, subparser_dict):
     import_subparser.add_argument(
         "--entity_name",
         type=str,
-        help="Naam van de entiteit die wordt geïmporteerd. Alleen te gebruiken bioj CSV-parser."
+        help=f"Naam van de entiteit die wordt geïmporteerd. Alleen te gebruiken bij CSV-parser. Mogelijke waarden: {db.getTables()}"
     )
 
     # Set the epilog help text

@@ -75,10 +75,42 @@ class JSONRenderer(Renderer):
             all_data[table_name] = filtered_data
         return all_data
 
+
+    def rename_keys(self, input_dict, key_mapper):
+        """
+        Hernoem keys in een dictionary (inclusief geneste dictionaries) volgens een gegeven mapper.
+        :param input_dict: De originele dictionary waarvan de keys moeten worden hernoemd.
+        :param key_mapper: Een dictionary waarin oude keys worden gekoppeld aan nieuwe keys.
+        :return: Een nieuwe dictionary met hernoemde keys.
+        """
+        if key_mapper is None or len(key_mapper) == 0:
+            return input_dict
+
+        renamed_dict = {}
+        for k, v in input_dict.items():
+            # Hernoem de key volgens de mapper
+            new_key = key_mapper.get(k, k)
+
+            # Controleer of de waarde een geneste dictionary is
+            if isinstance(v, dict):
+                # Roep de functie recursief aan voor de geneste dictionary
+                renamed_dict[new_key] = self.rename_keys(v, key_mapper)
+            elif isinstance(v, list):
+                # Als de waarde een lijst is, controleer of elementen dictionaries zijn
+                renamed_dict[new_key] = [
+                    self.rename_keys(item, key_mapper) if isinstance(item, dict) else item for item in v
+                ]
+            else:
+                # Anders gebruik de originele waarde
+                renamed_dict[new_key] = v
+        return renamed_dict
+
+
     def render(self, args, schema: sch.Schema):
         all_data = self.get_all_data(args, schema)
+        all_data = self.rename_keys(all_data, json.loads(args.mapper))
         with open(args.outputfile, "w") as json_file:
-            json.dump(all_data, json_file, default=str)
+            json.dump(all_data, json_file, default=str, indent=4, sort_keys=True)
 
 
 @RendererRegistry.register(
@@ -143,6 +175,9 @@ class I18nRenderer(JSONRenderer):
         # Update the i18n data with the new language entry
         i18n_data[args.language] = all_data
 
+        # Map fields
+        i18n_data = self.rename_keys(i18n_data, json.loads(args.mapper))
+
         # Controleer of het bestand al bestaat
         if not os.path.exists(args.outputfile):
             logger.info(f"Vertaalbestand {args.outputfile} bestaat niet, maak een nieuw bestand aan...")
@@ -164,6 +199,7 @@ class CSVRenderer(Renderer):
         base = db.Base
         models = base.metadata.tables
         session = schema.get_session()
+        entity_name = args.entity_name
 
         for table_name, table in models.items():
             # Model class associated with the table
@@ -171,7 +207,17 @@ class CSVRenderer(Renderer):
             if not model:  # In geval van koppeltabel
                 continue
 
+            # check of entity_name is gegeven en niet gelijk is aan table_name
+            if entity_name is not None and entity_name != table_name:
+                continue
+
             # Retrieve data
             records = session.query(model).filter(model.schema_id == schema.schema_id).all()
             df = pd.DataFrame([object_as_dict(record) for record in records])
-            df.to_csv(f"{args.outputfile}{table_name}.csv", index=False)
+
+            # Map columns
+            mapper = json.loads(args.mapper)
+            if mapper is not None and len(mapper) > 0:
+                df = df.rename(columns=mapper)
+
+            df.to_csv(f"{args.outputfile}_{table_name}.csv", index=False)

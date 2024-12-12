@@ -2,6 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 
 import crunch_uml.schema as sch
+import crunch_uml.db as db
 from crunch_uml import const, util
 from crunch_uml.db import Class, Package
 from crunch_uml.exceptions import CrunchException
@@ -112,6 +113,17 @@ def add_args(argumentparser, subparser_dict):
         default=False,
         help="Used only for i18n renderer. When set to true the input values will be translated using automatic translating."
         + f" Default is {const.DEFAULT_LANGUAGE}.",
+    )
+    output_subparser.add_argument(
+        "--mapper",
+        type=str,
+        default="{}",
+        help="JSON-string voor het hernoemen van kolommen, bijvoorbeeld: '{\"old_col\": \"new_col\"}'"
+    )
+    output_subparser.add_argument(
+        "--entity_name",
+        type=str,
+        help=f"Naam van de entiteit die wordt geëxporteerd. Alleen te gebruiken bij CSV-renderer. Mogelijke waarden: {db.getTables()}"
     )
 
     # Set the epilog help text

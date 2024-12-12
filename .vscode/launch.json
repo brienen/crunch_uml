@@ -336,6 +336,28 @@
             "justMyCode": false
         },
         {
+            "name": "Python: pytest test_05a_json_parser_renderer_mapper",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/pytest",  // Pas aan naar je lokale pytest pad
+            "args": [
+                "${workspaceFolder}/test/unit/test_05a_json_parser_renderer_mapper.py"  // Pas aan naar je testmap
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: pytest test_05b_csv_parser_renderer_mapper",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/pytest",  // Pas aan naar je lokale pytest pad
+            "args": [
+                "${workspaceFolder}/test/unit/test_05b_csv_parser_renderer_mapper.py"  // Pas aan naar je testmap
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
             "name": "Python: pytest test_06a_xlsx_parse_partial",
             "type": "python",
             "request": "launch",
@@ -353,6 +375,17 @@
             "program": "${workspaceFolder}/.venv/bin/pytest",  // Pas aan naar je lokale pytest pad
             "args": [
                 "${workspaceFolder}/test/unit/test_06b_csv_parse_mapper.py"  // Pas aan naar je testmap
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: pytest test_06d_xlsx_parser_renderer_mapper",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/pytest",  // Pas aan naar je lokale pytest pad
+            "args": [
+                "${workspaceFolder}/test/unit/test_06d_xlsx_parser_renderer_mapper.py"  // Pas aan naar je testmap
             ],
             "console": "integratedTerminal",
             "justMyCode": false

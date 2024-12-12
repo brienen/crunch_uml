@@ -1,4 +1,5 @@
 import logging
+import json
 
 from openpyxl import Workbook
 
@@ -24,17 +25,22 @@ class XLSXRenderer(Renderer):
         models = base.metadata.tables
         session = schema.get_session()
 
+        # Laad de mapper (bijvoorbeeld als een JSON-string via args)
+        column_mapper = json.loads(args.mapper) if args.mapper else {}
+
         for table_name, table in models.items():
             ws = wb.create_sheet(title=table_name)
 
             # Headers
-            # columns = [c.name for c in table.columns]
-            # Sort columns: 'id' first, then others alphabetically
             columns = ["id"] if "id" in table.columns else []
             columns.extend(sorted([c.name for c in table.columns if c.name != "id"]))
 
-            for col_num, column in enumerate(columns, 1):
-                ws.cell(row=1, column=col_num, value=column)
+            # Pas de mapper toe op de kolomnamen
+            mapped_columns = [column_mapper.get(col, col) for col in columns]
+
+            # Schrijf de gemapte kolomnamen in de header
+            for col_num, mapped_column in enumerate(mapped_columns, 1):
+                ws.cell(row=1, column=col_num, value=mapped_column)
 
             # Model class associated with the table
             model = base.model_lookup_by_table_name(table_name)
@@ -46,6 +52,8 @@ class XLSXRenderer(Renderer):
                     2,
                 ):
                     for col_num, column in enumerate(columns, 1):
-                        ws.cell(row=row_num, column=col_num, value=getattr(record, column))
+                        # Pas de mapper toe op de waarde als nodig
+                        value = getattr(record, column)
+                        ws.cell(row=row_num, column=col_num, value=value)
 
         wb.save(args.outputfile)
