@@ -204,6 +204,20 @@ class UML_Generic:
         setattr(copy_instance, "kopie", True)
         return copy_instance
 
+    def make_copy_to_schema(self, sch, parent=None, recursive=True, materialize_generalizations=False):
+        cls = self.__class__
+        # Maak een nieuwe instantie van de klasse
+        rel_keys = self.to_dict_rel().keys()
+        copy_instance = cls()
+        for attr, column in self.__table__.columns.items():
+            if attr not in rel_keys:
+                setattr(copy_instance, attr, getattr(self, attr))
+
+        setattr(copy_instance, "kopie", True)
+        sch.save(copy_instance)
+        return copy_instance
+
+
 
 class UMLBase(UML_Generic):
     author = Column(String)
@@ -370,6 +384,36 @@ class Package(Base, UMLBase):  # type: ignore
 
         return copy_instance
 
+    def make_copy_to_schema(self, sch, parent=None, recursive=True, materialize_generalizations=False):
+        if parent and not isinstance(parent, Package):
+            raise CrunchException(
+                f"Error: wrong parent type for package while copying. Parent cannot be of type {type(parent)}"
+            )
+
+        # Roep de get_copy methode van de superklasse aan
+        copy_instance = super().make_copy_to_schema(sch, parent=parent, materialize_generalizations=materialize_generalizations)
+        if parent is not None:
+            copy_instance.parent_package_id = parent.id
+
+        # Voer eventuele extra stappen uit voor de literals
+        if recursive:
+            for subpackage in self.subpackages:
+                subpackage_copy = subpackage.make_copy_to_schema(sch, parent=copy_instance, recursive=recursive, materialize_generalizations=materialize_generalizations)
+            for clazz in self.classes:
+                if clazz.name != const.ORPHAN_CLASS:
+                    clazz_copy = clazz.make_copy_to_schema(sch,
+                        parent=copy_instance,
+                        recursive=recursive,
+                        materialize_generalizations=materialize_generalizations,
+                    )
+            for enum in self.enumerations:
+                enum_copy = enum.make_copy_to_schema(sch, parent=copy_instance)
+                copy_instance.enumerations.append(enum_copy)
+            for diagram in self.diagrams:
+                diagram_copy = diagram.make_copy_to_schema(sch, parent=copy_instance)
+                copy_instance.diagrams.append(diagram_copy)
+        return sch.save(copy_instance)
+
 
 class Class(Base, UMLBase, UMLTags):  # type: ignore
     __tablename__ = "classes"
@@ -491,6 +535,27 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
         return copy_instance
 
 
+    def make_copy_to_schema(self, sch, parent=None, recursive=True, materialize_generalizations=False):
+        if parent is not None or isinstance(parent, Package):
+            raise CrunchException(
+                f"Error: wrong parent type for package while copying. Parent cannot be of type {type(parent)}"
+            )
+
+        # Roep de get_copy methode van de superklasse aan
+        copy_instance = super().make_copy_to_schema(sch)
+        copy_instance.package = parent
+
+        # Voer eventuele extra stappen uit voor de literals
+        if recursive:
+            for attr in self.attributes:
+                attr_copy = attr.make_copy_to_schema(sch, parent=copy_instance)
+                copy_instance.attributes.append(attr_copy)
+
+        sch.save(copy_instance)
+        return copy_instance
+
+
+
 class Attribute(Base, UML_Generic):  # type: ignore
     __tablename__ = "attributes"
 
@@ -556,6 +621,27 @@ class Attribute(Base, UML_Generic):  # type: ignore
         else:
             return None
 
+    def make_copy_to_schema(self, sch, parent=None, recursive=True, materialize_generalizations=False):
+        if not isinstance(parent, Class):
+            raise CrunchException(
+                f"Error: wrong parent type for package while copying. Parent cannot be of type {type(parent)}"
+            )
+
+        # Roep de get_copy methode van de superklasse aan
+        copy_instance = super().make_copy_to_schema(sch)
+        copy_instance.clazz = parent
+
+        # Voer eventuele extra stappen uit voor de literals
+        if recursive:
+            if self.enumeration:
+                copy_instance.enumeration = self.enumeration.make_copy_to_schema(sch, parent=None)
+            if self.type_class:
+                copy_instance.type_class = self.type_class.make_copy_to_schema(sch, parent=None)
+
+        sch.save(copy_instance)
+        return copy_instance
+
+
 
 class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
     __tablename__ = "enumerations"
@@ -595,6 +681,27 @@ class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
             literal_copy.enumeratie_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
             copy_instance.literals.append(literal_copy)
         return copy_instance
+
+
+    def make_copy_to_schema(self, sch, parent=None, recursive=True, materialize_generalizations=False):
+        if parent is not None or isinstance(parent, Package):
+            raise CrunchException(
+                f"Error: wrong parent type for package while copying. Parent cannot be of type {type(parent)}"
+            )
+
+        # Roep de get_copy methode van de superklasse aan
+        copy_instance = super().make_copy_to_schema(sch)
+        copy_instance.package = parent
+
+        # Voer eventuele extra stappen uit voor de literals
+        if recursive:
+            for literal in self.literals:
+                literal_copy = literal.make_copy_to_schema(sch, parent=copy_instance)
+                copy_instance.literals.append(literal_copy)
+
+        sch.save(copy_instance)
+        return copy_instance
+
 
 
 class EnumerationLiteral(Base, UML_Generic):  # type: ignore
@@ -904,12 +1011,14 @@ class Database:
             Base.metadata.create_all(bind=self.engine)
 
     def save(self, obj):
-        self.session.merge(obj)
+        merged_obj = self.session.merge(obj)
         self.session.flush()
+        return merged_obj
 
     def add(self, obj):
-        self.session.add(obj)
+        added_obj = self.session.add(obj)
         self.session.flush()
+        return added_obj
 
     def count_package(self):
         return self.session.query(Package).count()

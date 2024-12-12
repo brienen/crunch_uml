@@ -57,7 +57,7 @@ python ./crunch_uml/cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] [-sch] {import,
   - `-db_create, --database_create_new`: Create a new database and discard the existing one.
   - `-f INPUTFILE, --inputfile INPUTFILE`: Path to import file.
   - `-url URL`: URL for import
-  - `-t INPUTTYPE, --inputtype INPUTTYPE`: Specifies input type from the following: ['xmi', 'eaxmi', 'json', 'xlsx', 'csv'].
+  - `-t INPUTTYPE, --inputtype INPUTTYPE`: Specifies input type from the following: ['xmi', 'eaxmi', 'json', 'xlsx', 'csv', 'i18n'].
   - `--skip_xmi_relations`: Skip parsing relations for XMI files only.
   
   **Supported Input Types**:
@@ -73,7 +73,7 @@ python ./crunch_uml/cli.py [-h] [-v] [-d] [-db_url DATABASE_URL] [-sch] {import,
 - `export`: Export data from the Crunch UML database.
   - `-h, --help`: Show this help message and exit.
   - `-f OUTPUTFILE, --outputfile OUTPUTFILE`: Specify the output file.
-  - `-t OUTPUTTYPE, --outputtype OUTPUTTYPE`: Specifies output type from the following: ['jinja2', 'ggm_md', 'json', 'csv', 'xlsx'].
+  - `-t OUTPUTTYPE, --outputtype OUTPUTTYPE`: Specifies output type from the following: ['jinja2', 'ggm_md', 'json', 'csv', 'xlsx', 'ttl', 'rdf', 'json-ld, 'json-schema', 'earepo', 'i18n'].
   - `-pi OUTPUT_PACKAGE_IDS, --output_package_ids OUTPUT_PACKAGE_IDS`: List of package IDs separated by commas.
   - `-xpi OUTPUT_EXCLUDE_PACKAGE_IDS, --output_exclude_package_ids OUTPUT_EXCLUDE_PACKAGE_IDS`: List of package IDs to be excluded from the output, separated by commas.
   - `-jtd OUTPUT_JINJA2_TEMPLATEDIR, --output_jinja2_templatedir OUTPUT_JINJA2_TEMPLATEDIR`: Directory for Jinja2 templates.

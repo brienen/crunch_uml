@@ -204,7 +204,7 @@ class EARepoUpdater(ModelRenderer):
 
             # Check of GUID aanwezig is in de data
             if ea_guid not in data_dict:
-                logger.error(f"Kan record nu updaten, {ea_guid} is vereist in de data dictionary")
+                logger.error(f"Kan record niet updaten, {ea_guid} is vereist in de data dictionary")
                 return
 
             guid_value = util.fromEAGuid(data_dict[ea_guid])
@@ -214,7 +214,7 @@ class EARepoUpdater(ModelRenderer):
 
             if existing_record:
                 # Filter de data_dict om alleen kolommen in te voegen die bestaan in de tabel
-                valid_data = {col: data_dict[col] for col in data_dict if col in table.columns.keys()}
+                valid_data = {col: data_dict[col] for col in data_dict if col in table.columns.keys() and data_dict[col] is not None}
 
                 changed = False
                 (

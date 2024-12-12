@@ -90,67 +90,76 @@ def main(args=None):
     # Show help if no command is given
     if args.command is None:
         argumentparser.print_help()
-        sys.exit(1)
+        return 1
 
-    # Parse input
-    if args.command == const.CMD_IMPORT:
-        if args.inputfile is not None and not os.path.exists(args.inputfile):
-            logger.error(f"Inputfile with {args.inputfile} does not exist, stopping.")
-            return
+    try:
+        # Parse input
+        if args.command == const.CMD_IMPORT:
+            if args.inputfile is not None and not os.path.exists(args.inputfile):
+                logger.error(f"Inputfile with {args.inputfile} does not exist, stopping.")
+                return
 
-        # Get daatbase and optionaly create new one
-        database = Database(args.database_url, db_create=args.database_create_new)
-        schema = sch.Schema(database, schema_name=args.schema_name)
-        try:
-            # First open database, select parser and parse into database
-            logger.info(f"Starting parsing with inputtype {args.inputtype}")
-            parser = parsers.ParserRegistry.getinstance(args.inputtype)
-            parser.parse(args, schema)
-            database.commit()
-            logger.info("Succes! parsed all data and saved it in database")
-        except Exception as ex:
-            logger.error(
-                f"Error while parsing file, writing data to database with message: {ex}. Exiting and"
-                " descarding all changes to database."
-            )
-            database.rollback()
-            raise
-        finally:
-            database.close()
+            # Get daatbase and optionaly create new one
+            database = Database(args.database_url, db_create=args.database_create_new)
+            schema = sch.Schema(database, schema_name=args.schema_name)
+            try:
+                # First open database, select parser and parse into database
+                logger.info(f"Starting parsing with inputtype {args.inputtype}")
+                parser = parsers.ParserRegistry.getinstance(args.inputtype)
+                parser.parse(args, schema)
+                database.commit()
+                logger.info("Succes! parsed all data and saved it in database")
+            except Exception as ex:
+                logger.error(
+                    f"Error while parsing file, writing data to database with message: {ex}. Exiting and"
+                    " descarding all changes to database."
+                )
+                database.rollback()
+                raise
+            finally:
+                database.close()
 
-    # Do transformation
-    elif args.command == const.CMD_TRANSFORM:
-        database = Database(args.database_url, db_create=False)
-        logger.info("Starting transformation ")
-        try:
-            transformer = transformers.TransformerRegistry.getinstance(args.transformationtype)
-            transformer.transform(args, database)
-            database.commit()
-            logger.info(
-                f"Succes! transformed input with transformer {transformer} from schema {args.schema_from} to schema"
-                f" {args.schema_to}"
-            )
-        except Exception as ex:
-            logger.error(
-                f"Error while performing transformation with message: {ex}. Exiting and"
-                " descarding all changes to datbase."
-            )
-            database.rollback()
-            raise
-        finally:
-            database.close()
+        # Do transformation
+        elif args.command == const.CMD_TRANSFORM:
+            database = Database(args.database_url, db_create=False)
+            logger.info("Starting transformation ")
+            try:
+                transformer = transformers.TransformerRegistry.getinstance(args.transformationtype)
+                transformer.transform(args, database)
+                database.commit()
+                logger.info(
+                    f"Succes! transformed input with transformer {transformer} from schema {args.schema_from} to schema"
+                    f" {args.schema_to}"
+                )
+            except Exception as ex:
+                logger.error(
+                    f"Error while performing transformation with message: {ex}. Exiting and"
+                    " descarding all changes to datbase."
+                )
+                database.rollback()
+                raise
+            finally:
+                database.close()
 
-    # Render Output
-    elif args.command == const.CMD_EXPORT:
-        database = Database(args.database_url, db_create=False)
-        schema = sch.Schema(database, schema_name=args.schema_name)
-        logger.info(f"Starting rendering with outputtype {args.outputtype}")
-        renderer = renderers.RendererRegistry.getinstance(args.outputtype)
-        renderer.render(args, schema)
-        logger.info(f"Succes! rendered output from database wtih renderer {renderer}")
-    else:
-        logger.error("Unknown command: this should never happen!")
+        # Render Output
+        elif args.command == const.CMD_EXPORT:
+            database = Database(args.database_url, db_create=False)
+            schema = sch.Schema(database, schema_name=args.schema_name)
+            logger.info(f"Starting rendering with outputtype {args.outputtype}")
+            renderer = renderers.RendererRegistry.getinstance(args.outputtype)
+            renderer.render(args, schema)
+            logger.info(f"Succes! rendered output from database wtih renderer {renderer}")
+        else:
+            logger.error("Unknown command: this should never happen!")
+            return 1
 
+    except Exception as e:
+        logger.error(f"An unexpected error occurred: {e}")
+        return 1
+
+    # Als alles goed gaat, retourneer een succesvolle exit-status
+    return 0
 
 if __name__ == "__main__":
-    main()
+    import sys
+    sys.exit(main())
