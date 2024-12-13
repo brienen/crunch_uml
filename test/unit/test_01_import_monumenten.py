@@ -23,5 +23,5 @@ def test_import_monumenten():
 
     clazz = schema.get_class("EAID_4AD539EC_A308_43da_B025_17A1647303F3")
     assert clazz.gemma_type == "business-object"
-    assert clazz.gemma_url == "https://gemmaonline.nl/index.php/GEMMA2/0.9/id-2b2319c1-d5b9-43c6-87cb-43bb194c65c6"
+    assert clazz.gemma_url == "https://gemmaonline.nl/index.php/GEMMA/id-2b2319c1-d5b9-43c6-87cb-43bb194c65c6"
     assert clazz.definitie == "Het bouwen van een bouwwerk."

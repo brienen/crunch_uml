@@ -4,6 +4,7 @@ import os
 
 import pandas as pd
 import sqlalchemy
+from sqlalchemy.ext.hybrid import hybrid_property
 
 import crunch_uml.schema as sch
 from crunch_uml import const, db, lang, util

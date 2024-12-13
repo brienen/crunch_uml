@@ -16,6 +16,7 @@ from sqlalchemy import inspect
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy.orm.relationships import RelationshipProperty
+from sqlalchemy.ext.hybrid import hybrid_property
 
 import crunch_uml.const as const
 import crunch_uml.util as util
@@ -254,6 +255,21 @@ class Package(Base, UMLBase):  # type: ignore
     diagrams = relationship("Diagram", back_populates="package", cascade="all, delete-orphan")
     modelnaam_kort = Column(String)
 
+    @hybrid_property
+    def is_domain(self):
+        return self.stereotype == "Domein"
+
+    @hybrid_property
+    def domain(self):
+        if self.is_domain:
+            return self
+        else:
+            if self.parent_package:
+                return self.parent_package.domain
+            else:
+                return None
+
+
     __table_args__ = (
         ForeignKeyConstraint(
             ["parent_package_id", "schema_id"],
@@ -460,6 +476,10 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
     authentiek = Column(String)
     nullable = Column(String)
 
+    @hybrid_property
+    def domain(self):
+        return self.package.domain
+
     __table_args__ = (
         ForeignKeyConstraint(
             ["package_id", "schema_id"],
@@ -655,6 +675,10 @@ class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
         cascade="all, delete-orphan",
     )
     diagrams = relationship("Diagram", secondary="diagram_enumeration", back_populates="enumerations")
+
+    @hybrid_property
+    def domain(self):
+        return self.package.domain
 
     __table_args__ = (
         ForeignKeyConstraint(

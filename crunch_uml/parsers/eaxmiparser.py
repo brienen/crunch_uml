@@ -48,15 +48,19 @@ class EAXMIParser(XMIParser):
         logger.info("Processing references to packages")
         packagerefs = extension.xpath(".//element[@xmi:type='uml:Package' and @xmi:idref]", namespaces=ns)  # type: ignore
         for packageref in packagerefs:
+            # First set tags that might be overridden
+            tags = packageref.xpath("./tags/tag")
+            for tag in tags:
+                if hasattr(package, fixtag(tag.get("name"))):
+                    setattr(package, fixtag(tag.get("name")), tag.get("value"))
+
             idref = packageref.get("{" + ns["xmi"] + "}idref")
             package = schema.get_package(idref)
             project = packageref.xpath("./project")[0]
             copy_values(project, package)
 
-            tags = packageref.xpath("./tags/tag")
-            for tag in tags:
-                if hasattr(package, fixtag(tag.get("name"))):
-                    setattr(package, fixtag(tag.get("name")), tag.get("value"))
+            properties = packageref.xpath("./properties")[0]
+            copy_values(properties, package)
 
             schema.save(package)
 
@@ -89,20 +93,44 @@ class EAXMIParser(XMIParser):
             clazz = schema.get_class(idref)
 
             if clazz is not None:
-                properties = clazzref.xpath("./properties")[0]
-                if properties is not None:
-                    clazz.definitie = properties.get("documentation")
-                project = clazzref.xpath("./project")
-                copy_values(project, clazz)
-                stereotype = clazzref.xpath("./stereotype")
-                copy_values(stereotype, clazz)
-
+                # First set tags that might be overridden
                 tags = clazzref.xpath("./tags/tag")
                 for tag in tags:
                     if hasattr(clazz, fixtag(tag.get("name"))):
                         setattr(clazz, fixtag(tag.get("name")), tag.get("value"))
 
+                properties = clazzref.xpath("./properties")[0]
+                if properties is not None:
+                    clazz.definitie = properties.get("documentation")
+                project = clazzref.xpath("./project")
+                copy_values(project, clazz)
+                copy_values(properties, clazz)
+
                 schema.save(clazz)
+
+
+        logger.info("Processing references to enumerations")
+        enumrefs = extension.xpath(".//element[@xmi:type='uml:Enumeration' and @xmi:idref]", namespaces=ns)  # type: ignore
+        for enumref in enumrefs:
+            idref = enumref.get("{" + ns["xmi"] + "}idref")
+            enum = schema.get_enumeration(idref)
+
+            if enum is not None:
+                # First set tags that might be overridden
+                tags = enumref.xpath("./tags/tag")
+                for tag in tags:
+                    if hasattr(enum, fixtag(tag.get("name"))):
+                        setattr(enum, fixtag(tag.get("name")), tag.get("value"))
+
+                properties = enumref.xpath("./properties")[0]
+                if properties is not None:
+                    enum.definitie = properties.get("documentation")
+                project = enumref.xpath("./project")
+                copy_values(project, enum)
+                copy_values(properties, enum)
+                
+                schema.save(enum)
+
 
         """
         Third find all attributes, like
