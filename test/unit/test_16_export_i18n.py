@@ -49,7 +49,7 @@ def copy_test_files():
     # Opruimen na de test als dat nodig is
     # Bijvoorbeeld: os.remove(destination)
 
-
+@pytest.mark.slow
 def test_import_monumenten():
     outputfile = "./test/output/Monumenten.i18n.json"
     duitse_vertaling = "./test/data/Monumenten.i18n.json"

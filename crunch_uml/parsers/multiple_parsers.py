@@ -29,12 +29,13 @@ class TransformableParser(Parser):
         if not entity:
             logger.warning(f"Entity not found with tablename: {entity_name}.")
             return
+        columns = db.getColumnNames(entity_name)
 
         # Als er een ID in de data aanwezig is, zoek dan naar een bestaand record
         if "id" in data:
             if existing_entity := session.query(entity).filter_by(id=data["id"], schema_id=schema.schema_id).first():
                 for key, value in data.items():
-                    if value is not None and value != "" and key != "id":
+                    if value is not None and value != "" and key != "id" and key in columns:
                         setattr(existing_entity, key, value)
                 logger.debug(f"Updated {entity_name} with ID {data['id']}.")
                 schema.save(existing_entity)
@@ -42,7 +43,8 @@ class TransformableParser(Parser):
                 if not update_only:
                     # ID was aanwezig, maar geen overeenkomstige record werd gevonden
                     logger.debug(f"No {entity_name} found with ID {data['id']}, creating a new record.")
-                    new_entity = entity(**data)
+                    filtered_data = {k: v for k, v in data.items() if k in columns}
+                    new_entity = entity(**filtered_data)
                     schema.save(new_entity)
         else:
             if not update_only:

@@ -14,8 +14,19 @@ logger = logging.getLogger()
 
 
 def object_as_dict(obj):
-    """Converts a SQLAlchemy model object to a dictionary, excluding private attributes."""
-    return {c.key: getattr(obj, c.key) for c in sqlalchemy.inspect(obj).mapper.column_attrs}
+    """
+    Converteert een SQLAlchemy-modelobject naar een dictionary, inclusief hybride attributen en kolommen.
+    :param obj: Het SQLAlchemy-object.
+    :return: Dictionary met alle kolom- en hybride attributen.
+    """
+    # Haal kolom-attributen op
+    col_attrs = {attr.key for attr in sqlalchemy.inspect(obj).mapper.column_attrs}
+    hyb_attrs = {attr for attr in dir(obj.__class__) if hasattr(getattr(obj.__class__, attr), 'descriptor') and isinstance(getattr(obj.__class__, attr).descriptor, hybrid_property)}
+    attrs = col_attrs | hyb_attrs
+
+    #dict_obj = {c.key: getattr(obj, c.key) for c in sqlalchemy.inspect(obj).mapper.attrs if c.key in attrs}   
+    dict_obj = {key: getattr(obj, key) for key in dir(obj) if key in attrs and hasattr(obj, key)}   
+    return dict_obj
 
 
 @RendererRegistry.register(

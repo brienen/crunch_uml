@@ -1,5 +1,6 @@
 import logging
 import warnings
+import re
 
 import inflection
 from sqlalchemy import (
@@ -12,6 +13,7 @@ from sqlalchemy import (
     create_engine,
 )
 from sqlalchemy import exc as sa_exc
+from sqlalchemy.sql.expression import case
 from sqlalchemy import inspect
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
@@ -248,7 +250,7 @@ class Package(Base, UMLBase):  # type: ignore
     __tablename__ = "packages"
 
     parent_package_id = Column(String, index=True)
-    parent_package = relationship("Package", back_populates="subpackages", remote_side="Package.id")
+    parent_package = relationship("Package", back_populates="subpackages", remote_side="Package.id", lazy="joined")
     subpackages = relationship("Package", back_populates="parent_package", cascade="all, delete-orphan")
     classes = relationship("Class", back_populates="package", cascade="all, delete-orphan")
     enumerations = relationship("Enumeratie", back_populates="package", cascade="all, delete-orphan")
@@ -268,6 +270,20 @@ class Package(Base, UMLBase):  # type: ignore
                 return self.parent_package.domain
             else:
                 return None
+
+    @hybrid_property
+    def domain_name(self):
+        """
+        Verwijder getallen aan het begin van een string en trim 
+        leidende en afsluitende spaties.
+        
+        :param input_string: De originele string
+        :return: De opgeschoonde string
+        """
+        name = str(self.domain.name)
+        name = re.sub(r'^\d+', '', name)
+        name = name.strip() 
+        return name
 
 
     __table_args__ = (
@@ -435,7 +451,7 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
     __tablename__ = "classes"
 
     package_id = Column(String, index=True)
-    package = relationship("Package", back_populates="classes")
+    package = relationship("Package", back_populates="classes", lazy="joined")
     attributes = relationship(
         "Attribute",
         back_populates="clazz",
@@ -476,9 +492,15 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
     authentiek = Column(String)
     nullable = Column(String)
 
-    @hybrid_property
-    def domain(self):
-        return self.package.domain
+    #@hybrid_property
+    #def domain(self):
+    #    if self.package:
+    #        package = self.package
+    #        while package.stereotype != "Domein":
+    #            package = package.parent_package
+    #            if not package:
+    #                return None
+    #        return package
 
     __table_args__ = (
         ForeignKeyConstraint(
@@ -676,9 +698,9 @@ class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
     )
     diagrams = relationship("Diagram", secondary="diagram_enumeration", back_populates="enumerations")
 
-    @hybrid_property
-    def domain(self):
-        return self.package.domain
+    #@hybrid_property
+    #def domain(self):
+    #    return self.package.domain
 
     __table_args__ = (
         ForeignKeyConstraint(

@@ -5,7 +5,7 @@ from crunch_uml import cli
 
 
 def test_relations_export_json():
-    outputfile = "./test/data/test.json"
+    outputfile = "./test/output/test.json"
 
     # Import Data
     test_args = [
