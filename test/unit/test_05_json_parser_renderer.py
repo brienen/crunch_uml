@@ -105,6 +105,7 @@ def test_json_parser_and_changes():
     # Check if changes are correctly loaded
     clazz = schema.get_class("EAID_54944273_F312_44b2_A78D_43488F915429")
     assert clazz.toelichting == "Hallo Test"
+    assert clazz.domein_iv3 == "Monumenten"
     package = schema.get_package("EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E")
     assert package.definitie == "Hallo Test"
 

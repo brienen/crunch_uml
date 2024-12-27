@@ -1,11 +1,13 @@
-import os
 import json
-import crunch_uml.schema as sch
-from crunch_uml import cli, const, db
+import os
 
 import pandas as pd
 
-def are_csv_files_equal(file1: str, file2: str, ignore_whitespace: bool = True) -> bool:
+import crunch_uml.schema as sch
+from crunch_uml import cli, const, db
+
+
+def are_csv_files_equal(file1: str, file2: str, ignore_whitespace: bool = True, ignore_columns=[]) -> bool:
     """
     Vergelijk twee CSV-bestanden efficiënt met Pandas.
     :param file1: Pad naar het eerste CSV-bestand.
@@ -16,6 +18,11 @@ def are_csv_files_equal(file1: str, file2: str, ignore_whitespace: bool = True) 
     # Laad de CSV-bestanden als DataFrames
     df1 = pd.read_csv(file1)
     df2 = pd.read_csv(file2)
+
+    # Optioneel: Verwijder kolommen die genegeerd moeten
+    if len(ignore_columns) > 0:
+        df1 = df1.drop(columns=ignore_columns, errors='ignore')
+        df2 = df2.drop(columns=ignore_columns, errors='ignore')
 
     # Optioneel: Verwijder witruimte van alle cellen
     if ignore_whitespace:
@@ -64,8 +71,15 @@ def test_csv_parser_renderer():
     # sourcery skip: extract-duplicate-method, move-assign-in-block
     inputfile = "./test/output/Monumenten_import"
     outputfile = "./test/output/Monumenten_export"
-    mapper = {"id": "GGM-guid", "gemma_url": "GEMMA-URL", "gemma_type": "GEMMA-type", "gemma_naam": "GEMMA-naam", "definitie": "definitie_aangepast", "name": "name_aangepast"}
-    mapper_reverse = {v:k for k,v in mapper.items()}
+    mapper = {
+        "id": "GGM-guid",
+        "gemma_url": "GEMMA-URL",
+        "gemma_type": "GEMMA-type",
+        "gemma_naam": "GEMMA-naam",
+        "definitie": "definitie_aangepast",
+        "name": "name_aangepast",
+    }
+    mapper_reverse = {v: k for k, v in mapper.items()}
 
     # import monumenten into clean database
     test_args = [
@@ -89,17 +103,44 @@ def test_csv_parser_renderer():
     assert schema.count_enumeratieliteral() == 2
 
     # export to csv
-    test_args = ["export", "-f", inputfile, "-t", "csv", "--mapper", str(json.dumps(mapper)), "--entity_name", "classes"]
+    test_args = [
+        "export",
+        "-f",
+        inputfile,
+        "-t",
+        "csv",
+        "--mapper",
+        str(json.dumps(mapper)),
+        "--entity_name",
+        "classes",
+    ]
     cli.main(test_args)
     assert os.path.exists(f"{inputfile}_classes.csv")
 
     # Test of de mappings goed zijn weggeschreeven
-    assert check_value_in_csv(f"{inputfile}_classes.csv", "EAID_54944273_F312_44b2_A78D_43488F915429", "definitie_aangepast", "Beroep waarbij een handwerker met gereedschap eindproducten maakt.")
-    assert check_value_in_csv(f"{inputfile}_classes.csv", "EAID_54944273_F312_44b2_A78D_43488F915429", "name_aangepast", "Ambacht")
-
+    assert check_value_in_csv(
+        f"{inputfile}_classes.csv",
+        "EAID_54944273_F312_44b2_A78D_43488F915429",
+        "definitie_aangepast",
+        "Beroep waarbij een handwerker met gereedschap eindproducten maakt.",
+    )
+    assert check_value_in_csv(
+        f"{inputfile}_classes.csv", "EAID_54944273_F312_44b2_A78D_43488F915429", "name_aangepast", "Ambacht"
+    )
 
     # import csv to clean database
-    test_args = ["import", "-f", f"{inputfile}_classes.csv", "-t", "csv", "-db_create", "--mapper", str(json.dumps(mapper_reverse)), "--entity_name", "classes"]
+    test_args = [
+        "import",
+        "-f",
+        f"{inputfile}_classes.csv",
+        "-t",
+        "csv",
+        "-db_create",
+        "--mapper",
+        str(json.dumps(mapper_reverse)),
+        "--entity_name",
+        "classes",
+    ]
     cli.main(test_args)
 
     # Check if content is correctly loaded
@@ -113,4 +154,4 @@ def test_csv_parser_renderer():
     assert os.path.exists(f"{outputfile}_classes.csv")
 
     # Check if the contents of the files are equal
-    assert are_csv_files_equal(f"{outputfile}_classes.csv", f"{inputfile}_classes.csv")
+    assert are_csv_files_equal(f"{outputfile}_classes.csv", f"{inputfile}_classes.csv", ignore_columns=["domein_iv3"])

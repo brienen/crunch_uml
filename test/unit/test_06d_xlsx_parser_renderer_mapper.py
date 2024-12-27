@@ -1,9 +1,11 @@
-import os
 import json
+import os
+
+import pandas as pd
+
 import crunch_uml.schema as sch
 from crunch_uml import cli, const, db
 
-import pandas as pd
 
 def are_xlsx_files_equal(file1: str, file2: str, ignore_whitespace: bool = True) -> bool:
     """
@@ -64,8 +66,15 @@ def test_csv_parser_renderer():
     # sourcery skip: extract-duplicate-method, move-assign-in-block
     inputfile = "./test/output/Monumenten_import.xlsx"
     outputfile = "./test/output/Monumenten_export.xlsx"
-    mapper = {"id": "GGM-guid", "gemma_url": "GEMMA-URL", "gemma_type": "GEMMA-type", "gemma_naam": "GEMMA-naam", "definitie": "definitie_aangepast", "name": "name_aangepast"}
-    mapper_reverse = {v:k for k,v in mapper.items()}
+    mapper = {
+        "id": "GGM-guid",
+        "gemma_url": "GEMMA-URL",
+        "gemma_type": "GEMMA-type",
+        "gemma_naam": "GEMMA-naam",
+        "definitie": "definitie_aangepast",
+        "name": "name_aangepast",
+    }
+    mapper_reverse = {v: k for k, v in mapper.items()}
 
     # import monumenten into clean database
     test_args = [
@@ -94,9 +103,13 @@ def test_csv_parser_renderer():
     assert os.path.exists(inputfile)
 
     # Test of de mappings goed zijn weggeschreeven
-    assert check_value_in_xlsx(inputfile, "EAID_54944273_F312_44b2_A78D_43488F915429", "definitie_aangepast", "Beroep waarbij een handwerker met gereedschap eindproducten maakt.")
+    assert check_value_in_xlsx(
+        inputfile,
+        "EAID_54944273_F312_44b2_A78D_43488F915429",
+        "definitie_aangepast",
+        "Beroep waarbij een handwerker met gereedschap eindproducten maakt.",
+    )
     assert check_value_in_xlsx(inputfile, "EAID_54944273_F312_44b2_A78D_43488F915429", "name_aangepast", "Ambacht")
-
 
     # import csv to clean database
     test_args = ["import", "-f", inputfile, "-t", "xlsx", "-db_create", "--mapper", str(json.dumps(mapper_reverse))]

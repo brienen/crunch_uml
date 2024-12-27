@@ -214,7 +214,11 @@ class EARepoUpdater(ModelRenderer):
 
             if existing_record:
                 # Filter de data_dict om alleen kolommen in te voegen die bestaan in de tabel
-                valid_data = {col: data_dict[col] for col in data_dict if col in table.columns.keys() and data_dict[col] is not None}
+                valid_data = {
+                    col: data_dict[col]
+                    for col in data_dict
+                    if col in table.columns.keys() and data_dict[col] is not None
+                }
 
                 changed = False
                 (

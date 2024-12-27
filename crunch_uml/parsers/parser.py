@@ -46,18 +46,18 @@ def add_args(argumentparser, subparser_dict):
         "--update_only",
         default=False,
         action="store_true",
-        help="Only update records that already exist. Do not add new ones to avoid errors."
+        help="Only update records that already exist. Do not add new ones to avoid errors.",
     )
     import_subparser.add_argument(
         "--mapper",
         type=str,
         default="{}",
-        help="JSON-string voor het hernoemen van kolommen, bijvoorbeeld: '{\"old_col\": \"new_col\"}'"
+        help="JSON-string voor het hernoemen van kolommen, bijvoorbeeld: '{\"old_col\": \"new_col\"}'",
     )
     import_subparser.add_argument(
         "--entity_name",
         type=str,
-        help=f"Naam van de entiteit die wordt geïmporteerd. Alleen te gebruiken bij CSV-parser. Mogelijke waarden: {db.getTables()}"
+        help=f"Naam van de entiteit die wordt geïmporteerd. Alleen te gebruiken bij CSV-parser. Mogelijke waarden: {db.getTables()}",
     )
 
     # Set the epilog help text

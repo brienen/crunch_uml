@@ -14,7 +14,7 @@ logger = logging.getLogger()
 
 
 class TransformableParser(Parser):
-    column_mapper = {}
+    column_mapper: dict[str, str] = {}
     update_only = False
 
     def store_data(self, entity_name, data, schema, update_only=False):
@@ -70,7 +70,7 @@ class TransformableParser(Parser):
             if len(column_mapper) > 0:
                 record = {column_mapper.get(k, k): v for k, v in record.items()}
             else:
-                logger.warning("Empty mapper provided, no columns will be renamed and original record saved.")      
+                logger.warning("Empty mapper provided, no columns will be renamed and original record saved.")
 
         # Controleer en transformeer het 'id' veld
         if "id" in record and isinstance(record["id"], str):
@@ -86,7 +86,7 @@ class TransformableParser(Parser):
                 record["id"] = suffix + (id_value[1:-1]).replace("-", "_")  # Verwijdert de { en }
                 logger.debug(f"Transformed 'id' field: {id_value} -> {record['id']}")
 
-        return record      
+        return record
 
 
 @ParserRegistry.register(

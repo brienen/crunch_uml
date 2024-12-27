@@ -1198,5 +1198,25 @@
                 }
             }
         ]
+    },
+    "en": {
+        "packages": [
+            {
+                "EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E": {
+                    "alias": null,
+                    "name": "Testnaam package",
+                    "definitie": null,
+                    "toelichting": null,
+                    "stereotype": null
+                }
+            }
+        ],
+        "classes": [
+            {
+                "EAID_54944273_F312_44b2_A78D_43488F915429": {
+                    "name": "Testnaam class"
+                }
+            }       
+        ]
     }
 }

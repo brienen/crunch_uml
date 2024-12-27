@@ -35,6 +35,7 @@ def copy_test_files():
     # Pad naar de bronbestanden
     source_files = [
         ("./test/data/Monumenten.qea", EA_DB),
+        ("./test/data/Monumenten.i18n.json", "./test/output/Monumenten.i18n.json"),
     ]
 
     # Zorg ervoor dat de testdata-map bestaat
@@ -48,6 +49,7 @@ def copy_test_files():
 
     # Opruimen na de test als dat nodig is
     # Bijvoorbeeld: os.remove(destination)
+
 
 @pytest.mark.slow
 def test_import_monumenten():
@@ -87,6 +89,8 @@ def test_import_monumenten():
         "True",
         "--from_language",
         "nl",
+        "--update_i18n",
+        "False",
     ]
     cli.main(test_args)
     assert os.path.exists(outputfile)
@@ -138,3 +142,59 @@ def test_import_monumenten():
     record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
     assert record is not None, "Record met de naam 'MonumentNaam' niet gevonden."
     assert record[const.EA_REPO_MAPPER["name"]] == "Håndverk_name"
+
+
+@pytest.mark.slow
+def test_import_monumenten_met_update():
+    outputfile = "./test/output/Monumenten.i18n.json"
+
+    test_args = [
+        "import",
+        "-f",
+        "./test/data/GGM_Monumenten_EA2.1.xml",
+        "-t",
+        "eaxmi",
+        "-db_create",
+    ]
+    cli.main(test_args)
+
+    # export to json
+    test_args = [
+        "export",
+        "-f",
+        outputfile,
+        "-t",
+        "i18n",
+        "--language",
+        "en",
+        "--translate",
+        "True",
+        "--from_language",
+        "nl",
+        "--update_i18n",
+        "True",
+    ]
+    cli.main(test_args)
+    assert os.path.exists(outputfile)
+    assert util.is_valid_i18n_file(outputfile)
+
+    # Open en laad het eerste JSON-bestand
+    data = None
+    with open(outputfile, "r") as file1:
+        data = json.load(file1)
+        package = [
+            package for package in data["en"]["packages"] if "EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E" in package
+        ][0]
+        package = package.get("EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E")
+        assert package["name"] == "Testnaam package"
+
+        clazz = [clazz for clazz in data["en"]["classes"] if "EAID_54944273_F312_44b2_A78D_43488F915429" in clazz][0]
+        clazz = clazz.get("EAID_54944273_F312_44b2_A78D_43488F915429")
+        assert clazz["name"] == "Testnaam class"
+        assert len(clazz["definitie"]) > 0
+
+        # Eclazz = data["en"]["classes"][2]["EAID_4AD539EC_A308_43da_B025_17A1647303F3"]
+        clazz = [clazz for clazz in data["en"]["classes"] if "EAID_4AD539EC_A308_43da_B025_17A1647303F3" in clazz][0]
+        clazz = clazz.get("EAID_4AD539EC_A308_43da_B025_17A1647303F3")
+        assert clazz["name"] == 'Construction activity'
+        assert len(clazz["definitie"]) > 0

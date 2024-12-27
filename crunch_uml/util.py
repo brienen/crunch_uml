@@ -182,3 +182,36 @@ def count_dict_elements(d):
         count += 1  # Als het een enkel element is (geen dict of lijst), tel het als 1
 
     return count
+
+
+def nested_get(d, keys, default=None):
+    """
+    Safely get a value from a nested dictionary.
+
+    Args:
+        d (dict): The dictionary to search in.
+        keys (list): A list of keys defining the path to the value.
+        default: A default value if the key path does not exist.
+
+    Returns:
+        The value at the nested key path, or the default value.
+    """
+    for key in keys:
+        if isinstance(d, dict):
+            d = d.get(key, default)
+        else:
+            return default
+    return d
+
+
+def is_empty_or_none(value: str) -> bool:
+    """
+    Check if a string is None or empty.
+
+    Args:
+        value (str): The string to check.
+
+    Returns:
+        bool: True if the string is None or empty, False otherwise.
+    """
+    return value is None or value.strip() == ""

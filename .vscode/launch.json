@@ -369,6 +369,17 @@
             "justMyCode": false
         },
         {
+            "name": "Python: pytest test_06_xlsx_parser_renderer",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/pytest",  // Pas aan naar je lokale pytest pad
+            "args": [
+                "${workspaceFolder}/test/unit/test_06_xlsx_parser_renderer.py"  // Pas aan naar je testmap
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
             "name": "Python: pytest test_06b_csv_parse_mapper",
             "type": "python",
             "request": "launch",
@@ -419,6 +430,17 @@
             "program": "${workspaceFolder}/.venv/bin/pytest",  // Pas aan naar je lokale pytest pad
             "args": [
                 "${workspaceFolder}/test/unit/test_12_copy_structure.py"  // Pas aan naar je testmap
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: pytest test_16_export_i18n",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/pytest",  // Pas aan naar je lokale pytest pad
+            "args": [
+                "${workspaceFolder}/test/unit/test_16_export_i18n.py"  // Pas aan naar je testmap
             ],
             "console": "integratedTerminal",
             "justMyCode": false

@@ -1,6 +1,6 @@
 import logging
-import warnings
 import re
+import warnings
 
 import inflection
 from sqlalchemy import (
@@ -13,12 +13,11 @@ from sqlalchemy import (
     create_engine,
 )
 from sqlalchemy import exc as sa_exc
-from sqlalchemy.sql.expression import case
 from sqlalchemy import inspect
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy.orm.relationships import RelationshipProperty
-from sqlalchemy.ext.hybrid import hybrid_property
 
 import crunch_uml.const as const
 import crunch_uml.util as util
@@ -221,7 +220,6 @@ class UML_Generic:
         return copy_instance
 
 
-
 class UMLBase(UML_Generic):
     author = Column(String)
     version = Column(String)
@@ -274,17 +272,19 @@ class Package(Base, UMLBase):  # type: ignore
     @hybrid_property
     def domain_name(self):
         """
-        Verwijder getallen aan het begin van een string en trim 
+        Verwijder getallen aan het begin van een string en trim
         leidende en afsluitende spaties.
-        
+
         :param input_string: De originele string
         :return: De opgeschoonde string
         """
+        if self.domain is None:
+            return None
+
         name = str(self.domain.name)
         name = re.sub(r'^\d+', '', name)
-        name = name.strip() 
+        name = name.strip()
         return name
-
 
     __table_args__ = (
         ForeignKeyConstraint(
@@ -423,17 +423,25 @@ class Package(Base, UMLBase):  # type: ignore
             )
 
         # Roep de get_copy methode van de superklasse aan
-        copy_instance = super().make_copy_to_schema(sch, parent=parent, materialize_generalizations=materialize_generalizations)
+        copy_instance = super().make_copy_to_schema(
+            sch, parent=parent, materialize_generalizations=materialize_generalizations
+        )
         if parent is not None:
             copy_instance.parent_package_id = parent.id
 
         # Voer eventuele extra stappen uit voor de literals
         if recursive:
             for subpackage in self.subpackages:
-                subpackage_copy = subpackage.make_copy_to_schema(sch, parent=copy_instance, recursive=recursive, materialize_generalizations=materialize_generalizations)
+                subpackage.make_copy_to_schema(
+                    sch,
+                    parent=copy_instance,
+                    recursive=recursive,
+                    materialize_generalizations=materialize_generalizations,
+                )
             for clazz in self.classes:
                 if clazz.name != const.ORPHAN_CLASS:
-                    clazz_copy = clazz.make_copy_to_schema(sch,
+                    clazz.make_copy_to_schema(
+                        sch,
                         parent=copy_instance,
                         recursive=recursive,
                         materialize_generalizations=materialize_generalizations,
@@ -492,8 +500,8 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
     authentiek = Column(String)
     nullable = Column(String)
 
-    #@hybrid_property
-    #def domain(self):
+    # @hybrid_property
+    # def domain(self):
     #    if self.package:
     #        package = self.package
     #        while package.stereotype != "Domein":
@@ -576,7 +584,6 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
 
         return copy_instance
 
-
     def make_copy_to_schema(self, sch, parent=None, recursive=True, materialize_generalizations=False):
         if parent is not None or isinstance(parent, Package):
             raise CrunchException(
@@ -595,7 +602,6 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
 
         sch.save(copy_instance)
         return copy_instance
-
 
 
 class Attribute(Base, UML_Generic):  # type: ignore
@@ -684,7 +690,6 @@ class Attribute(Base, UML_Generic):  # type: ignore
         return copy_instance
 
 
-
 class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
     __tablename__ = "enumerations"
 
@@ -698,8 +703,8 @@ class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
     )
     diagrams = relationship("Diagram", secondary="diagram_enumeration", back_populates="enumerations")
 
-    #@hybrid_property
-    #def domain(self):
+    # @hybrid_property
+    # def domain(self):
     #    return self.package.domain
 
     __table_args__ = (
@@ -728,7 +733,6 @@ class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
             copy_instance.literals.append(literal_copy)
         return copy_instance
 
-
     def make_copy_to_schema(self, sch, parent=None, recursive=True, materialize_generalizations=False):
         if parent is not None or isinstance(parent, Package):
             raise CrunchException(
@@ -747,7 +751,6 @@ class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
 
         sch.save(copy_instance)
         return copy_instance
-
 
 
 class EnumerationLiteral(Base, UML_Generic):  # type: ignore

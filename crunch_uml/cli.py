@@ -160,6 +160,8 @@ def main(args=None):
     # Als alles goed gaat, retourneer een succesvolle exit-status
     return 0
 
+
 if __name__ == "__main__":
     import sys
+
     sys.exit(main())

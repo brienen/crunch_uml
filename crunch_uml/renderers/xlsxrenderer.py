@@ -1,5 +1,5 @@
-import logging
 import json
+import logging
 
 from openpyxl import Workbook
 
@@ -53,7 +53,11 @@ class XLSXRenderer(Renderer):
                 ):
                     for col_num, column in enumerate(columns, 1):
                         # Pas de mapper toe op de waarde als nodig
-                        value = getattr(record, column)
+                        if column == 'domein_iv3' and (isinstance(model, db.Class) or isinstance(model, db.Enumeratie)):
+                            package = session.query(db.Package).filter(db.Package.id == record.package_id).one_or_none()
+                            value = package.domain_name if package is not None else None
+                        else:
+                            value = getattr(record, column)
                         ws.cell(row=row_num, column=col_num, value=value)
 
         wb.save(args.outputfile)

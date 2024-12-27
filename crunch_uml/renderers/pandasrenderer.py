@@ -13,7 +13,7 @@ from crunch_uml.renderers.renderer import Renderer, RendererRegistry
 logger = logging.getLogger()
 
 
-def object_as_dict(obj):
+def object_as_dict(obj, session):
     """
     Converteert een SQLAlchemy-modelobject naar een dictionary, inclusief hybride attributen en kolommen.
     :param obj: Het SQLAlchemy-object.
@@ -21,11 +21,21 @@ def object_as_dict(obj):
     """
     # Haal kolom-attributen op
     col_attrs = {attr.key for attr in sqlalchemy.inspect(obj).mapper.column_attrs}
-    hyb_attrs = {attr for attr in dir(obj.__class__) if hasattr(getattr(obj.__class__, attr), 'descriptor') and isinstance(getattr(obj.__class__, attr).descriptor, hybrid_property)}
+    hyb_attrs = {
+        attr
+        for attr in dir(obj.__class__)
+        if hasattr(getattr(obj.__class__, attr), 'descriptor')
+        and isinstance(getattr(obj.__class__, attr).descriptor, hybrid_property)
+    }
     attrs = col_attrs | hyb_attrs
 
-    #dict_obj = {c.key: getattr(obj, c.key) for c in sqlalchemy.inspect(obj).mapper.attrs if c.key in attrs}   
-    dict_obj = {key: getattr(obj, key) for key in dir(obj) if key in attrs and hasattr(obj, key)}   
+    dict_obj = {key: getattr(obj, key) for key in dir(obj) if key in attrs and hasattr(obj, key)}
+
+    # Dirty hack, but only way: set package domain name to domain_iv3
+    if 'domein_iv3' in attrs and (isinstance(obj, db.Class) or isinstance(obj, db.Enumeratie)):
+        package = session.query(db.Package).filter(db.Package.id == obj.package_id).one_or_none()
+        dict_obj['domein_iv3'] = package.domain_name if package is not None else None
+
     return dict_obj
 
 
@@ -62,9 +72,8 @@ class JSONRenderer(Renderer):
             ):  # In case of a junction table
                 continue
 
-            # Retrieve data
             records = session.query(model).filter(model.schema_id == schema.schema_id).all()
-            data = [object_as_dict(record) for record in records]
+            data = [object_as_dict(record, session) for record in records]
 
             # Filter columns based on included_columns, unless included_columns is empty
             filtered_data = []
@@ -86,7 +95,6 @@ class JSONRenderer(Renderer):
 
             all_data[table_name] = filtered_data
         return all_data
-
 
     def rename_keys(self, input_dict, key_mapper):
         """
@@ -117,7 +125,6 @@ class JSONRenderer(Renderer):
                 renamed_dict[new_key] = v
         return renamed_dict
 
-
     def render(self, args, schema: sch.Schema):
         all_data = self.get_all_data(args, schema)
         all_data = self.rename_keys(all_data, json.loads(args.mapper))
@@ -139,7 +146,7 @@ class I18nRenderer(JSONRenderer):
     def get_record_type(self):
         return const.RECORD_TYPE_INDEXED
 
-    def translate_data(self, data, to_language, from_language="auto"):
+    def translate_data(self, data, to_language, from_language="auto", update_i18n=True, original_i18n={}):
         logger.info(
             f"Starting Translating data to language '{to_language}'. This may take a while: {util.count_dict_elements(data)} entries..."
         )
@@ -147,16 +154,36 @@ class I18nRenderer(JSONRenderer):
         for section, entries in data.items():
             logger.info(f"Translating section {section}...")
             translated_data[section] = []
+            original_i18n_section = original_i18n.get(to_language, {}).get(section, [])
             for entry in entries:
                 translated_record = {}
                 for key, record in entry.items():
+                    original_record = [record for record in original_i18n_section if key in record]
+                    original_record = original_record[0] if len(original_record) > 0 else {}
+                    original_record = original_record.get(key, {})
                     for field, value in record.items():
-                        translated_record[field] = lang.translate(  #
-                            value,
-                            to_language=to_language,
-                            from_language=from_language,
-                            max_retries=1,
-                        )
+                        if not isinstance(value, str):
+                            next
+                        if not (util.is_empty_or_none(value)):
+                            if update_i18n:
+                                # Check if the field is already translated
+                                translated_value = original_record.get(field, None)
+                                if translated_value is None:
+                                    # Translate the value
+                                    translated_value = lang.translate(
+                                        value,
+                                        to_language=to_language,
+                                        from_language=from_language,
+                                        max_retries=1,
+                                    )
+                                translated_record[field] = translated_value
+                            else:
+                                translated_record[field] = lang.translate(  #
+                                    value,
+                                    to_language=to_language,
+                                    from_language=from_language,
+                                    max_retries=1,
+                                )
                 translated_data[section].append({key: translated_record})
 
         logger.info(f"Finished translating data to language '{to_language}'.")
@@ -165,14 +192,9 @@ class I18nRenderer(JSONRenderer):
     def render(self, args, schema: sch.Schema):
 
         logger.info(f"Starting rendering i18n file {args.outputfile}...")
-        # Retrieve all data
-        all_data = self.get_all_data(args, schema, empty_values=False)
-        if args.translate:
-            all_data = self.translate_data(all_data, args.language, from_language=args.from_language)
 
         # Initialize the i18n structure
         i18n_data = {}
-
         if os.path.exists(args.outputfile):
             # If the file exists, check if it's a valid JSON (i18n) file and load it
             with open(args.outputfile, "r", encoding="utf-8") as json_file:
@@ -183,6 +205,13 @@ class I18nRenderer(JSONRenderer):
 
             if not isinstance(i18n_data, dict):
                 raise ValueError(f"The file {args.outputfile} does not contain a valid i18n structure.")
+
+        # Retrieve all data
+        all_data = self.get_all_data(args, schema, empty_values=False)
+        if args.translate:
+            all_data = self.translate_data(
+                all_data, args.language, from_language=args.from_language, update_i18n=True, original_i18n=i18n_data
+            )
 
         # Update the i18n data with the new language entry
         i18n_data[args.language] = all_data
@@ -225,7 +254,7 @@ class CSVRenderer(Renderer):
 
             # Retrieve data
             records = session.query(model).filter(model.schema_id == schema.schema_id).all()
-            df = pd.DataFrame([object_as_dict(record) for record in records])
+            df = pd.DataFrame([object_as_dict(record, session) for record in records])
 
             # Map columns
             mapper = json.loads(args.mapper)

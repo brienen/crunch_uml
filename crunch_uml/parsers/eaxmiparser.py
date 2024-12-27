@@ -49,13 +49,14 @@ class EAXMIParser(XMIParser):
         packagerefs = extension.xpath(".//element[@xmi:type='uml:Package' and @xmi:idref]", namespaces=ns)  # type: ignore
         for packageref in packagerefs:
             # First set tags that might be overridden
+            idref = packageref.get("{" + ns["xmi"] + "}idref")
+            package = schema.get_package(idref)
+
             tags = packageref.xpath("./tags/tag")
             for tag in tags:
                 if hasattr(package, fixtag(tag.get("name"))):
                     setattr(package, fixtag(tag.get("name")), tag.get("value"))
 
-            idref = packageref.get("{" + ns["xmi"] + "}idref")
-            package = schema.get_package(idref)
             project = packageref.xpath("./project")[0]
             copy_values(project, package)
 
@@ -108,7 +109,6 @@ class EAXMIParser(XMIParser):
 
                 schema.save(clazz)
 
-
         logger.info("Processing references to enumerations")
         enumrefs = extension.xpath(".//element[@xmi:type='uml:Enumeration' and @xmi:idref]", namespaces=ns)  # type: ignore
         for enumref in enumrefs:
@@ -128,9 +128,8 @@ class EAXMIParser(XMIParser):
                 project = enumref.xpath("./project")
                 copy_values(project, enum)
                 copy_values(properties, enum)
-                
-                schema.save(enum)
 
+                schema.save(enum)
 
         """
         Third find all attributes, like

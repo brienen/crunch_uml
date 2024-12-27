@@ -22,17 +22,16 @@ def test_import_monumenten():
     assert schema.count_enumeratieliteral() == 2
     assert schema.count_association() == 9
 
-    #root = schema.get_package("EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E")  # Main Package
-    #kopie_schema = sch.Schema(database, "kopie")
-    #root.make_copy_to_schema(kopie_schema)
-    #database.commit()
-    
-    #assert kopie_schema.get_package("EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E") is not None
-    #assert kopie_schema.get_package("EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652") is not None
-    #assert kopie_schema.get_package("EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466") is not None
-    #assert kopie_schema.get_class("EAID_54944273_F312_44b2_A78D_43488F915429") is not None
-    #assert kopie_schema.get_class("EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA") is not None
-    
+    # root = schema.get_package("EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E")  # Main Package
+    # kopie_schema = sch.Schema(database, "kopie")
+    # root.make_copy_to_schema(kopie_schema)
+    # database.commit()
+
+    # assert kopie_schema.get_package("EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E") is not None
+    # assert kopie_schema.get_package("EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652") is not None
+    # assert kopie_schema.get_package("EAPK_F7651B45_2B64_4197_A6E5_BFC56EC98466") is not None
+    # assert kopie_schema.get_class("EAID_54944273_F312_44b2_A78D_43488F915429") is not None
+    # assert kopie_schema.get_class("EAID_8C0888C9_7B2E_4fcb_AEFF_E1733875CDCA") is not None
 
     root = schema.get_package("EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E")  # Main Package
     kopie_schema = sch.Schema(database, "kopie")

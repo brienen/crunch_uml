@@ -27,8 +27,15 @@ def test_json_parser_renderer():
     # sourcery skip: extract-duplicate-method, move-assign-in-block
     inputfile = "./test/output/Monumenten_import.json"
     outputfile = "./test/output/Monumenten_export.json"
-    mapper = {"id": "GGM-guid", "gemma_url": "GEMMA-URL", "gemma_type": "GEMMA-type", "gemma_naam": "GEMMA-naam", "definitie": "definitie_aangepast", "name": "name_aangepast"}
-    mapper_reverse = {v:k for k,v in mapper.items()}
+    mapper = {
+        "id": "GGM-guid",
+        "gemma_url": "GEMMA-URL",
+        "gemma_type": "GEMMA-type",
+        "gemma_naam": "GEMMA-naam",
+        "definitie": "definitie_aangepast",
+        "name": "name_aangepast",
+    }
+    mapper_reverse = {v: k for k, v in mapper.items()}
 
     # import monumenten into clean database
     test_args = [
@@ -59,11 +66,15 @@ def test_json_parser_renderer():
     # Test of de mappings goed zijn weggeschreeven
     with open(inputfile, "r") as file:
         data = json.load(file)
-        ambacht = [item for item in data['classes'] if item.get("GGM-guid") == "EAID_54944273_F312_44b2_A78D_43488F915429"]
+        ambacht = [
+            item for item in data['classes'] if item.get("GGM-guid") == "EAID_54944273_F312_44b2_A78D_43488F915429"
+        ]
         assert ambacht is not None
-        assert ambacht[0].get("definitie_aangepast") == "Beroep waarbij een handwerker met gereedschap eindproducten maakt."
+        assert (
+            ambacht[0].get("definitie_aangepast")
+            == "Beroep waarbij een handwerker met gereedschap eindproducten maakt."
+        )
         assert ambacht[0].get("name_aangepast") == "Ambacht"
-
 
     # import json to clean database
     test_args = ["import", "-f", inputfile, "-t", "json", "-db_create", "--mapper", str(json.dumps(mapper_reverse))]
