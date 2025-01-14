@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from datetime import datetime
 
 import pandas as pd
 import sqlalchemy
@@ -32,10 +33,15 @@ def object_as_dict(obj, session):
     dict_obj = {key: getattr(obj, key) for key in dir(obj) if key in attrs and hasattr(obj, key)}
 
     # Dirty hack, but only way: set package domain name to domain_iv3
-    if 'domein_iv3' in attrs and (isinstance(obj, db.Class) or isinstance(obj, db.Enumeratie)):
-        package = session.query(db.Package).filter(db.Package.id == obj.package_id).one_or_none()
-        dict_obj['domein_iv3'] = package.domain_name if package is not None else None
-
+    if const.COLUMN_DOMEIN_IV3 in attrs and (isinstance(obj, db.Class) or isinstance(obj, db.Enumeratie)):
+        package = session.query(db.Package).filter(
+            db.Package.id == obj.package_id,
+            db.Package.schema_id == obj.schema_id 
+        ).one_or_none()
+        dict_obj[const.COLUMN_DOMEIN_IV3] = package.domain_name if package is not None else obj.domein_iv3
+    dict_obj[const.COLUMN_DOMEIN_GGM_UML_TYPE] = obj.__class__.__name__
+    dict_obj[const.COLUMN_DOMEIN_DATUM_TIJD_EXPORT] = util.current_time_export()
+    
     return dict_obj
 
 

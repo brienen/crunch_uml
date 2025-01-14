@@ -5,7 +5,15 @@ import crunch_uml.schema as sch
 from crunch_uml import cli, const, db
 
 
-def are_json_files_equal(file1_path, file2_path):
+def are_json_files_equal(file1_path, file2_path, exclude_keys=None):
+    """
+    Vergelijk twee JSON-bestanden en negeer specifieke velden tijdens de vergelijking.
+
+    :param file1_path: Pad naar het eerste JSON-bestand.
+    :param file2_path: Pad naar het tweede JSON-bestand.
+    :param exclude_keys: Lijst van velden die moeten worden uitgesloten van de vergelijking.
+    :return: True als de JSON-bestanden gelijk zijn (met uitgesloten velden), anders False.
+    """
     try:
         # Open en laad het eerste JSON-bestand
         with open(file1_path, "r") as file1:
@@ -15,13 +23,29 @@ def are_json_files_equal(file1_path, file2_path):
         with open(file2_path, "r") as file2:
             data2 = json.load(file2)
 
-        # Vergelijk de twee JSON-structuren
-        return data1 == data2
+        # Als geen exclusielijst is opgegeven, stel deze in als lege lijst
+        if exclude_keys is None:
+            exclude_keys = []
+
+        def remove_keys(data, keys):
+            """Verwijder opgegeven sleutels uit een JSON-structuur."""
+            if isinstance(data, dict):
+                return {k: remove_keys(v, keys) for k, v in data.items() if k not in keys}
+            elif isinstance(data, list):
+                return [remove_keys(item, keys) for item in data]
+            else:
+                return data
+
+        # Verwijder uitgesloten velden uit beide JSON-structuren
+        filtered_data1 = remove_keys(data1, exclude_keys)
+        filtered_data2 = remove_keys(data2, exclude_keys)
+
+        # Vergelijk de twee gefilterde JSON-structuren
+        return filtered_data1 == filtered_data2
 
     except Exception as e:
         print(f"Er is een fout opgetreden tijdens het vergelijken van de bestanden: {str(e)}")
         return False
-
 
 def test_json_parser_renderer():
     # sourcery skip: extract-duplicate-method, move-assign-in-block
@@ -96,4 +120,4 @@ def test_json_parser_renderer():
     assert os.path.exists(outputfile)
 
     # Check if the contents of the files are equal
-    assert are_json_files_equal(inputfile, outputfile)
+    assert are_json_files_equal(inputfile, outputfile, exclude_keys=[const.COLUMN_DOMEIN_DATUM_TIJD_EXPORT, const.COLUMN_DOMEIN_IV3, const.COLUMN_DOMEIN_GGM_UML_TYPE])

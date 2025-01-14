@@ -248,8 +248,13 @@ class Package(Base, UMLBase):  # type: ignore
     __tablename__ = "packages"
 
     parent_package_id = Column(String, index=True)
-    parent_package = relationship("Package", back_populates="subpackages", remote_side="Package.id", lazy="joined")
+    parent_package = relationship(
+        "Package", 
+        back_populates="subpackages", 
+        remote_side="[Package.id, Package.schema_id]", 
+        lazy="joined")
     subpackages = relationship("Package", back_populates="parent_package", cascade="all, delete-orphan")
+    
     classes = relationship("Class", back_populates="package", cascade="all, delete-orphan")
     enumerations = relationship("Enumeratie", back_populates="package", cascade="all, delete-orphan")
     diagrams = relationship("Diagram", back_populates="package", cascade="all, delete-orphan")

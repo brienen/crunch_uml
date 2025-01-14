@@ -4,7 +4,7 @@ import logging
 from openpyxl import Workbook
 
 import crunch_uml.schema as sch
-from crunch_uml import db
+from crunch_uml import db, const
 from crunch_uml.renderers.renderer import Renderer, RendererRegistry
 
 logger = logging.getLogger()
@@ -53,7 +53,7 @@ class XLSXRenderer(Renderer):
                 ):
                     for col_num, column in enumerate(columns, 1):
                         # Pas de mapper toe op de waarde als nodig
-                        if column == 'domein_iv3' and (isinstance(model, db.Class) or isinstance(model, db.Enumeratie)):
+                        if column == const.COLUMN_DOMEIN_IV3 and (isinstance(model, db.Class) or isinstance(model, db.Enumeratie)):
                             package = session.query(db.Package).filter(db.Package.id == record.package_id).one_or_none()
                             value = package.domain_name if package is not None else None
                         else:

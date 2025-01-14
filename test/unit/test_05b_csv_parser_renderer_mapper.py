@@ -76,8 +76,22 @@ def test_csv_parser_renderer():
         "gemma_url": "GEMMA-URL",
         "gemma_type": "GEMMA-type",
         "gemma_naam": "GEMMA-naam",
-        "definitie": "definitie_aangepast",
-        "name": "name_aangepast",
+        "gemma_guid": "GEMMA-guid",
+        "gemma_definitie": "GEMMA-definitie",
+        "gemma_toelichting": "GEMMA-toelichting",
+        "gemma_synoniemen": "GEMMA-synoniemen",
+        "gemma_bron": "GEMMA-bron",
+        "gemma_url": "GEMMA-url",
+        "gemma_alternate_name": "GEMMA-alternate-name",
+        "synoniemen": "GGM-synoniemen",
+        "ggm_uml_type": "GGM-uml-type",
+        "name": "GGM-naam",
+        "definition": "GGM-definitie",
+        "toelichting": "GGM-toelichting",
+        "bron": "GGM-bron",
+        "domein_iv3": "domein-iv3",
+        "domein_dcat": "domein-dcat",
+        "Datum-tijd-export": "Datum-tijd-export"
     }
     mapper_reverse = {v: k for k, v in mapper.items()}
 
@@ -121,11 +135,11 @@ def test_csv_parser_renderer():
     assert check_value_in_csv(
         f"{inputfile}_classes.csv",
         "EAID_54944273_F312_44b2_A78D_43488F915429",
-        "definitie_aangepast",
+        "definitie",
         "Beroep waarbij een handwerker met gereedschap eindproducten maakt.",
     )
     assert check_value_in_csv(
-        f"{inputfile}_classes.csv", "EAID_54944273_F312_44b2_A78D_43488F915429", "name_aangepast", "Ambacht"
+        f"{inputfile}_classes.csv", "EAID_54944273_F312_44b2_A78D_43488F915429", "GGM-naam", "Ambacht"
     )
 
     # import csv to clean database
@@ -154,4 +168,5 @@ def test_csv_parser_renderer():
     assert os.path.exists(f"{outputfile}_classes.csv")
 
     # Check if the contents of the files are equal
-    assert are_csv_files_equal(f"{outputfile}_classes.csv", f"{inputfile}_classes.csv", ignore_columns=["domein_iv3"])
+    assert are_csv_files_equal(f"{outputfile}_classes.csv", f"{inputfile}_classes.csv", ignore_columns=["Datum-tijd-export"])
+

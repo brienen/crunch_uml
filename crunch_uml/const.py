@@ -18,6 +18,7 @@ VERSION_STEP_MINOR = "minor"
 VERSION_STEP_MAJOR = "major"
 VERSION_STEP_NONE = "none"
 DEFAULT_DATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+DEFAULT_DATE_TIME_EXPORT_FORMAT = "%d%m%Y-%H:%M:%S"
 
 DESCRIPTION = "Crunch_uml reads UML Class model from multiple formats (including XMI, Enterprise Architect XMI, Excel, Json, and others), can perform transformations and renders them to other formats (including Markdown, json, json schema and many others)."
 
@@ -62,3 +63,7 @@ LANGUAGE_TRANSLATE_FIELDS = [
     "src_documentation",
     "dst_documentation",
 ]
+
+COLUMN_DOMEIN_IV3 = 'domein_iv3'
+COLUMN_DOMEIN_GGM_UML_TYPE = 'ggm_uml_type'
+COLUMN_DOMEIN_DATUM_TIJD_EXPORT = 'Datum-tijd-export'

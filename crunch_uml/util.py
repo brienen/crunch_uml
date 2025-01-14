@@ -215,3 +215,6 @@ def is_empty_or_none(value: str) -> bool:
         bool: True if the string is None or empty, False otherwise.
     """
     return value is None or value.strip() == ""
+
+def current_time_export():
+    return datetime.now().strftime(const.DEFAULT_DATE_TIME_EXPORT_FORMAT)

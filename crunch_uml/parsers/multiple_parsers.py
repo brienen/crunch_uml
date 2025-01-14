@@ -52,7 +52,8 @@ class TransformableParser(Parser):
                     f"Could not save entity with table '{entity_name}' to schema {schema.schema_id}: no column id present:"
                     f" {data}."
                 )
-                new_entity = entity(**data)
+                filtered_data = {k: v for k, v in data.items() if k in columns}
+                new_entity = entity(**filtered_data)
                 schema.save(new_entity)
 
     def map_record(self, column_mapper, record):

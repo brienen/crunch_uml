@@ -12,6 +12,9 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Import Onderwijs",
@@ -24,7 +27,10 @@
                 "-t", "eaxmi",
                 "-f", "./test/data/GGM_Onderwijs_XMI.2.1.xml",
                 "-db_create"
-            ]
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Import Monumenten",
@@ -37,7 +43,10 @@
                 "-t", "eaxmi",
                 "-f", "./test/data/GGM_Monumenten_EA2.1.xml",
                 "-db_create"
-            ]
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Import Schuldhulpverlening",
@@ -50,7 +59,10 @@
                 "-t", "eaxmi",
                 "-f", "./test/data/Model Schuldhulpverlening.xml",
                 "-db_create"
-            ]
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Add Monumenten",
@@ -62,7 +74,10 @@
             "args": ["import",
                 "-t", "eaxmi",
                 "-f", "./test/data/GGM_Monumenten_EA2.1.xml"
-            ]
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Import GGM",
@@ -76,7 +91,10 @@
                 "-f", "/Users/arjen/Dropbox/Development/Gemeentelijk-Gegevensmodel/Gemeentelijk Gegevensmodel XMI2.1.xml",
                 "-db_create" //,
                 //"--skip_xmi_relations"
-            ]
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         }, 
         {
             "name": "Import GGM Sociaal Domein",
@@ -90,7 +108,10 @@
                 "-f", "/Users/arjen/Dropbox/Development/GGM-Sociaal-Domein/Gemeentelijk Gegevensmodel XMI2.1.xml",
                 "-db_create" //,
                 //"--skip_xmi_relations"
-            ]
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         }, //Dropbox\Development\GGM-Sociaal-Domein\Gemeentelijk Gegevensmodel XMI2.1.xml
         {
             "name": "Import GGM Monumenten",
@@ -100,10 +121,15 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                "-it", "eaxmi",
-                "-if", "./test/data/GGM_Monumenten_EA2.1.xml",
-                "-db_create"
-            ]
+                "import",
+                "-t", "eaxmi",
+                "-f", "./test/data/GGM_Monumenten_EA2.1.xml",
+                "-db_create" //,
+                //"--skip_xmi_relations"
+                ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Import Alle relatiesituaties",
@@ -115,7 +141,10 @@
             "args": ["import",
                 "-f", "./test/data/AlleRelatieSitiuaties.xml", 
                 "-t", "xmi", 
-                "-db_create"]
+                "-db_create"],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Import Erfgoed",
@@ -127,7 +156,10 @@
             "args": ["-d", "import",
                 "-f", "./test/data/GGM_Erfgoed.xml", 
                 "-t", "eaxmi", 
-                "-db_create"]
+                "-db_create"],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Export XLSX",
@@ -139,7 +171,44 @@
             "args": ["export",
                 "-t", "xlsx",
                 "-f", "./test/output/ggm.xlsx"
-            ]
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
+        },
+        {
+            "name": "Export CSV Mapper",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "export",
+                "-t", "csv",
+                "-f", "./test/output/GEMMA-classes.csv",
+                "--entity_name", "classes",
+                "--mapper", "{\"id\": \"GGM-guid\", \"gemma_url\": \"GEMMA-URL\", \"gemma_type\": \"GEMMA-type\", \"gemma_naam\": \"GEMMA-naam\"}"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
+        },
+        {
+            "name": "Export CSV Zonder Mapper",
+            "type": "python",
+            "request": "launch",
+            "program": "./crunch_uml/cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "export",
+                "-t", "csv",
+                "-f", "./test/output/GEMMA-classes.csv",
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Export JSON",
@@ -151,7 +220,10 @@
             "args": ["export",
                 "-t", "json",
                 "-f", "./test/output/export.json"
-            ]
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Export Markdown",
@@ -163,7 +235,10 @@
             "args": ["export",
                 "-t", "ggm_md",
                 "-f", "./test/output/def.json"
-            ]
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Export JSON Schema",
@@ -176,7 +251,10 @@
                 "-t", "json_schema",
                 "-f", "./test/output/schema.json",
                 "--output_class_id", "EAID_6b4326e3_eb4e_41d2_902b_0bff06604f63"
-            ]
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Export JSON Schema DDAS",
@@ -191,7 +269,10 @@
                 "-f", "./test/output/schema.json",
                 "--output_class_id", "EAID_6b4326e3_eb4e_41d2_902b_0bff06604f63",
                 "-js_url", "https://raw.githubusercontent.com/brienen/ddas/main/json_schema_Uitwisselmodel.json"
-            ]
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Export Markdown DDAS",
@@ -205,7 +286,10 @@
                 "-t", "jinja2",
                 "--output_jinja2_template", "ddas_markdown.j2",
                 "-f", "./test/output/def.md"
-            ]
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Export Turtle",
@@ -218,7 +302,10 @@
                 "-t", "ttl",
                 "-f", "./test/output/output.ttl",
                 "--linked_data_namespace", "https://www.gemeentelijkgegevensmodel.nl/"
-            ]
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Export Turtle Schema Financien",
@@ -232,7 +319,10 @@
                 "-t", "ttl",
                 "-f", "./test/output/output.ttl",
                 "--linked_data_namespace", "https://www.gemeentelijkgegevensmodel.nl/"
-            ]
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Export JSON-LD form Schema Financien",
@@ -246,7 +336,10 @@
                 "-t", "json-ld",
                 "-f", "./test/output/output.json",
                 "--linked_data_namespace", "https://www.gemeentelijkgegevensmodel.nl/"
-            ]
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Export SQLA",
@@ -258,7 +351,10 @@
             "args": ["export",
                 "-t", "sqla",
                 "-f", "../ggm_alembic/app/model.py"
-            ]
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Copy Onderwijs",
@@ -267,7 +363,10 @@
             "program": "./crunch_uml/cli.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["transform", "-ttp", "copy", "-sch_to", "onderwijs", "-rt_pkg", "EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E", "-m_gen", "True"]
+            "args": ["transform", "-ttp", "copy", "-sch_to", "onderwijs", "-rt_pkg", "EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E", "-m_gen", "True"],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Copy Financien",
@@ -276,7 +375,10 @@
             "program": "./crunch_uml/cli.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["transform", "-ttp", "copy", "-sch_to", "financien", "-rt_pkg", "EAPK_4F010A09_D9D0_4bcf_A233_8430F8EFE54A", "-m_gen", "True"]
+            "args": ["transform", "-ttp", "copy", "-sch_to", "financien", "-rt_pkg", "EAPK_4F010A09_D9D0_4bcf_A233_8430F8EFE54A", "-m_gen", "True"],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Test Plugin",
@@ -285,7 +387,10 @@
             "program": "./crunch_uml/cli.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["transform", "-ttp", "plugin", "-sch_to", "test", "-rt_pkg", "EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E", "--plugin_class_name", "TestPlugin", "--plugin_file_name", "./test/data/testplugin.py"]
+            "args": ["transform", "-ttp", "plugin", "-sch_to", "test", "-rt_pkg", "EAPK_CD9BF007_85C6_4af9_B3F4_2CAB5BF26B5E", "--plugin_class_name", "TestPlugin", "--plugin_file_name", "./test/data/testplugin.py"],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "DDAS Plugin",
@@ -294,7 +399,10 @@
             "program": "./crunch_uml/cli.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["transform", "-ttp", "plugin", "-sch_to", "schuldhulp", "-rt_pkg", "EAPK_06C51790_1F81_4ac4_8E16_5177352EF2E1", "--plugin_class_name", "DDASPlugin", "--plugin_file_name", "./test/data/ddasplugin.py"]
+            "args": ["transform", "-ttp", "plugin", "-sch_to", "schuldhulp", "-rt_pkg", "EAPK_06C51790_1F81_4ac4_8E16_5177352EF2E1", "--plugin_class_name", "DDASPlugin", "--plugin_file_name", "./test/data/ddasplugin.py"],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "DDAS Informatiemodel Plugin",
@@ -308,7 +416,10 @@
                     "-sch_to", "schuldhulp_informatiemodel", 
                     "-rt_pkg", "EAPK_06C51790_1F81_4ac4_8E16_5177352EF2E1", 
                     "--plugin_class_name", "DDASPluginInformatiemodel", 
-                    "--plugin_file_name", "./test/data/ddasplugin_informatiemodel.py"]
+                    "--plugin_file_name", "./test/data/ddasplugin_informatiemodel.py"],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "DDAS Uitwisselmodel Plugin",
@@ -322,7 +433,10 @@
                     "-sch_to", "schuldhulp_uitwisselmodel", 
                     "-rt_pkg", "EAPK_06C51790_1F81_4ac4_8E16_5177352EF2E1", 
                     "--plugin_class_name", "DDASPluginUitwisselmodel", 
-                    "--plugin_file_name", "./test/data/ddasplugin_uitwisselmodel.py"]
+                    "--plugin_file_name", "./test/data/ddasplugin_uitwisselmodel.py"],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Python: pytest",
@@ -333,7 +447,10 @@
                 "${workspaceFolder}/test/unit"  // Pas aan naar je testmap
             ],
             "console": "integratedTerminal",
-            "justMyCode": false
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Python: pytest test_05a_json_parser_renderer_mapper",
@@ -344,7 +461,10 @@
                 "${workspaceFolder}/test/unit/test_05a_json_parser_renderer_mapper.py"  // Pas aan naar je testmap
             ],
             "console": "integratedTerminal",
-            "justMyCode": false
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Python: pytest test_05b_csv_parser_renderer_mapper",
@@ -355,7 +475,10 @@
                 "${workspaceFolder}/test/unit/test_05b_csv_parser_renderer_mapper.py"  // Pas aan naar je testmap
             ],
             "console": "integratedTerminal",
-            "justMyCode": false
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Python: pytest test_06a_xlsx_parse_partial",
@@ -366,7 +489,10 @@
                 "${workspaceFolder}/test/unit/test_06a_xlsx_parse_partial.py"  // Pas aan naar je testmap
             ],
             "console": "integratedTerminal",
-            "justMyCode": false
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Python: pytest test_06_xlsx_parser_renderer",
@@ -377,7 +503,10 @@
                 "${workspaceFolder}/test/unit/test_06_xlsx_parser_renderer.py"  // Pas aan naar je testmap
             ],
             "console": "integratedTerminal",
-            "justMyCode": false
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Python: pytest test_06b_csv_parse_mapper",
@@ -388,7 +517,10 @@
                 "${workspaceFolder}/test/unit/test_06b_csv_parse_mapper.py"  // Pas aan naar je testmap
             ],
             "console": "integratedTerminal",
-            "justMyCode": false
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Python: pytest test_06d_xlsx_parser_renderer_mapper",
@@ -399,7 +531,10 @@
                 "${workspaceFolder}/test/unit/test_06d_xlsx_parser_renderer_mapper.py"  // Pas aan naar je testmap
             ],
             "console": "integratedTerminal",
-            "justMyCode": false
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Python: pytest test_07_relations_test_json",
@@ -410,7 +545,10 @@
                 "${workspaceFolder}/test/unit/test_07_relations_test_json.py"  // Pas aan naar je testmap
             ],
             "console": "integratedTerminal",
-            "justMyCode": false
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Python: pytest test_09_lod_renderer",
@@ -421,7 +559,10 @@
                 "${workspaceFolder}/test/unit/test_09_lod_renderer.py"  // Pas aan naar je testmap
             ],
             "console": "integratedTerminal",
-            "justMyCode": false
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Python: pytest test_12_copy_structure",
@@ -432,7 +573,10 @@
                 "${workspaceFolder}/test/unit/test_12_copy_structure.py"  // Pas aan naar je testmap
             ],
             "console": "integratedTerminal",
-            "justMyCode": false
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Python: pytest test_16_export_i18n",
@@ -443,7 +587,10 @@
                 "${workspaceFolder}/test/unit/test_16_export_i18n.py"  // Pas aan naar je testmap
             ],
             "console": "integratedTerminal",
-            "justMyCode": false
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         },
         {
             "name": "Python: pytest test_16a_export_i18n_rsgb",
@@ -454,7 +601,10 @@
                 "${workspaceFolder}/test/unit/test_16a_export_i18n_rsgb.py"  // Pas aan naar je testmap
             ],
             "console": "integratedTerminal",
-            "justMyCode": false
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
         }
 
         
