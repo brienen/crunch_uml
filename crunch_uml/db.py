@@ -11,14 +11,16 @@ from sqlalchemy import (
     String,
     Text,
     create_engine,
-)
-from sqlalchemy import exc as sa_exc
-from sqlalchemy import (
     inspect,
 )
+from sqlalchemy import exc as sa_exc
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import declarative_base, relationship, sessionmaker
+from sqlalchemy.orm import (
+    declarative_base,
+    relationship,
+    sessionmaker,
+)
 from sqlalchemy.orm.relationships import RelationshipProperty
 
 import crunch_uml.const as const
