@@ -58,7 +58,7 @@ def add_args(argumentparser, subparser_dict):
         default="False",
         help=(
             'Copies all attributes of parent classes to the child classes. All strings other than "True" are'
-            " interpreted as False."
+            ' interpreted as False.'
         ),
     )
     transformation_subparser.add_argument(

@@ -39,7 +39,8 @@ def test_xlsx_parser_renderer():  # sourcery skip: extract-duplicate-method
     assert schema.get_class("EAID_266057AF_58BD_42e1_B4D5_16EB266B9B7A").name == "Leerling"
     assert (
         schema.get_class("EAID_266057AF_58BD_42e1_B4D5_16EB266B9B7A").definitie
-        == "Mens die een opleiding volgt, heeft gevolgd of gaat volgen of opgaat of is opgegaan voor een toets. (Bron: KOI)"
+        == "Mens die een opleiding volgt, heeft gevolgd of gaat volgen of opgaat of is opgegaan voor een toets. (Bron:"
+        " KOI)"
     )
     assert schema.get_class("EAID_266057AF_58BD_42e1_B4D5_16EB266B9B7A").bron is None
     assert (

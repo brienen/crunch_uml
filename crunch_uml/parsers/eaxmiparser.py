@@ -249,7 +249,7 @@ class EAXMIParser(XMIParser):
                     diagram.classes.append(schema.get_class(element_id))
                     logger.debug(
                         f'Element {element.get("subject")} in diagram {name} is een class met naam'
-                        f" {schema.get_class(element_id).name}"
+                        f' {schema.get_class(element_id).name}'
                     )
                 elif schema.get_association(element_id) is not None:
                     diagram.associations.append(schema.get_association(element_id))
@@ -258,7 +258,7 @@ class EAXMIParser(XMIParser):
                     diagram.enumerations.append(schema.get_enumeration(element_id))
                     logger.debug(
                         f'Element {element.get("subject")} in diagram {name} is een enumeration met naam'
-                        f" {schema.get_enumeration(element_id).name}"
+                        f' {schema.get_enumeration(element_id).name}'
                     )
                 elif schema.get_generalization(element_id) is not None:
                     diagram.generalizations.append(schema.get_generalization(element_id))
@@ -266,8 +266,8 @@ class EAXMIParser(XMIParser):
                 else:
                     logger.debug(
                         f'Element {element.get("subject")} in diagram {name} is niet gevonden in de database. Kan een'
-                        " niet geimplemneteerde type zijn zoals: Note of Constraint, of kan een relatie zij naar een"
-                        " element buiten het model."
+                        ' niet geimplemneteerde type zijn zoals: Note of Constraint, of kan een relatie zij naar een'
+                        ' element buiten het model.'
                     )
 
             logger.debug(f"Diagram {diagram.name} met id {diagram.id} ingelezen met inhoud: {diagram}")

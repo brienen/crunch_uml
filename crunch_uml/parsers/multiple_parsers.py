@@ -49,8 +49,8 @@ class TransformableParser(Parser):
         else:
             if not update_only:
                 logger.debug(
-                    f"Could not save entity with table '{entity_name}' to schema {schema.schema_id}: no column id present:"
-                    f" {data}."
+                    f"Could not save entity with table '{entity_name}' to schema {schema.schema_id}: no column id"
+                    f" present: {data}."
                 )
                 filtered_data = {k: v for k, v in data.items() if k in columns}
                 new_entity = entity(**filtered_data)
@@ -95,7 +95,6 @@ class TransformableParser(Parser):
     descr="Generic parser that parses JSON-files, and looks for table and column definitions.",
 )
 class JSONParser(TransformableParser):
-
     def get_data_subset(self, data, args):
         return data
 
@@ -128,10 +127,12 @@ class JSONParser(TransformableParser):
 
 @ParserRegistry.register(
     "i18n",
-    descr=f"Parser that reads i18n file and stores the values in the database. Use --language to specify language. (default: {const.DEFAULT_LANGUAGE})",
+    descr=(
+        "Parser that reads i18n file and stores the values in the database. Use --language to specify language."
+        f" (default: {const.DEFAULT_LANGUAGE})"
+    ),
 )
 class I18nParser(JSONParser):
-
     def store_data(self, entity_name, data, schema, update_only=False):
         update_only = True  # i18n records should always be updated
         super().store_data(entity_name, data, schema, update_only)

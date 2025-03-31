@@ -28,7 +28,8 @@ def translate(value, to_language, from_language, max_retries=3, sleep_between_re
         except Exception:
             try:
                 logger.warning(
-                    f"Fout opgetreden bij vertalen van tekst '{value}', probeer alternatieve vertaalmachine {ALTERNATIVE_TRANSLATOR}..."
+                    f"Fout opgetreden bij vertalen van tekst '{value}', probeer alternatieve vertaalmachine"
+                    f" {ALTERNATIVE_TRANSLATOR}..."
                 )
                 # Probeer de vertaling uit te voeren
                 translated_text = ts.translate_text(
@@ -47,6 +48,7 @@ def translate(value, to_language, from_language, max_retries=3, sleep_between_re
                     time.sleep(sleep_between_retries)
                 else:
                     logger.warning(
-                        f"Laatste herhaling na fout bij vertalen mislukt met fout {e}. Vertalen mislukt, originele tekst wordt gehanfhaafd..."
+                        f"Laatste herhaling na fout bij vertalen mislukt met fout {e}. Vertalen mislukt, originele"
+                        " tekst wordt gehanfhaafd..."
                     )
                     return value

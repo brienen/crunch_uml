@@ -76,7 +76,11 @@ def add_args(argumentparser, subparser_dict):
             const.VERSION_STEP_MAJOR,
             const.VERSION_STEP_NONE,
         ],
-        help=f"Used only for Enterprise Architect Repository Updater! After update should the version be updated? {const.VERSION_STEP_MINOR} for minnor increments or {const.VERSION_STEP_MAJOR} for major increments, None for no version update.",
+        help=(
+            "Used only for Enterprise Architect Repository Updater! After update should the version be updated?"
+            f" {const.VERSION_STEP_MINOR} for minnor increments or {const.VERSION_STEP_MAJOR} for major increments,"
+            " None for no version update."
+        ),
     )
     output_subparser.add_argument(
         "-ts",
@@ -88,8 +92,12 @@ def add_args(argumentparser, subparser_dict):
             const.TAG_STRATEGY_UPSERT,
             const.TAG_STRATEGY_REPLACE,
         ],
-        help="Used only for Enterprise Architect Repository Updater! Defines how changing tags of Classes, Enumerations, Attributes, Literals and Packages should be updated."
-        + f"{const.TAG_STRATEGY_UPDATE} for updating only existing tags, {const.TAG_STRATEGY_UPSERT} for updating existing tags and adding new tags, {const.TAG_STRATEGY_REPLACE} for replacing all tags.",
+        help=(
+            "Used only for Enterprise Architect Repository Updater! Defines how changing tags of Classes, Enumerations,"
+            " Attributes, Literals and Packages should be updated."
+        )
+        + f"{const.TAG_STRATEGY_UPDATE} for updating only existing tags, {const.TAG_STRATEGY_UPSERT} for updating"
+        f" existing tags and adding new tags, {const.TAG_STRATEGY_REPLACE} for replacing all tags.",
     )
     output_subparser.add_argument(
         "-lan",
@@ -111,14 +119,20 @@ def add_args(argumentparser, subparser_dict):
         "--translate",
         type=bool,
         default=False,
-        help="Used only for i18n renderer. When set to true the input values will be translated using automatic translating."
+        help=(
+            "Used only for i18n renderer. When set to true the input values will be translated using automatic"
+            " translating."
+        )
         + f" Default is {const.DEFAULT_LANGUAGE}.",
     )
     output_subparser.add_argument(
         "--update_i18n",
         type=bool,
         default=True,
-        help="Used only for i18n renderer in conjunction with '--translate' option. When set to true only missing value sin i18n file will be translated. Default is True.",
+        help=(
+            "Used only for i18n renderer in conjunction with '--translate' option. When set to true only missing value"
+            " sin i18n file will be translated. Default is True."
+        ),
     )
     output_subparser.add_argument(
         "--mapper",
@@ -130,12 +144,18 @@ def add_args(argumentparser, subparser_dict):
         "--filter",
         type=str,
         default="[]",
-        help="Kommagescheiden lijst met kolommen die geëxporteerd moeten worden, waarbij de volgrorde ook bij de export wordt gehandhaafd, bijvoorbeeld: '[\"col1\", \"col2\"], \"col3\"'",
+        help=(
+            "Kommagescheiden lijst met kolommen die geëxporteerd moeten worden, waarbij de volgrorde ook bij de export"
+            " wordt gehandhaafd, bijvoorbeeld: '[\"col1\", \"col2\"], \"col3\"'"
+        ),
     )
     output_subparser.add_argument(
         "--entity_name",
         type=str,
-        help=f"Naam van de entiteit die wordt geëxporteerd. Alleen te gebruiken bij CSV-renderer. Mogelijke waarden: {db.getTables()}",
+        help=(
+            "Naam van de entiteit die wordt geëxporteerd. Alleen te gebruiken bij CSV-renderer. Mogelijke waarden:"
+            f" {db.getTables()}"
+        ),
     )
 
     # Set the epilog help text

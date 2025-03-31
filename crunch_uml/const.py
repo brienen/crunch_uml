@@ -20,7 +20,11 @@ VERSION_STEP_NONE = "none"
 DEFAULT_DATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 DEFAULT_DATE_TIME_EXPORT_FORMAT = "%d%m%Y-%H:%M:%S"
 
-DESCRIPTION = "Crunch_uml reads UML Class model from multiple formats (including XMI, Enterprise Architect XMI, Excel, Json, and others), can perform transformations and renders them to other formats (including Markdown, json, json schema and many others)."
+DESCRIPTION = (
+    "Crunch_uml reads UML Class model from multiple formats (including XMI, Enterprise Architect XMI, Excel, Json, and"
+    " others), can perform transformations and renders them to other formats (including Markdown, json, json schema and"
+    " many others)."
+)
 
 EA_REPO_MAPPER = {
     "id": "ea_guid",

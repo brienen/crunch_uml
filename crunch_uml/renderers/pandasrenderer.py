@@ -50,7 +50,6 @@ def object_as_dict(obj, session):
     descr="Renders JSON document where each element corresponds to one of the tables in the datamodel.",
 )
 class JSONRenderer(Renderer):
-
     def get_record_type(self):
         return const.RECORD_TYPE_RECORD
 
@@ -136,10 +135,12 @@ class JSONRenderer(Renderer):
 
 @RendererRegistry.register(
     "i18n",
-    descr=f"Renders a i18n file containing all tables with keys to the translatable fields ({const.LANGUAGE_TRANSLATE_FIELDS}) Also translates to a specified language.",
+    descr=(
+        "Renders a i18n file containing all tables with keys to the translatable fields"
+        f" ({const.LANGUAGE_TRANSLATE_FIELDS}) Also translates to a specified language."
+    ),
 )
 class I18nRenderer(JSONRenderer):
-
     def get_included_columns(self, args):
         # Define the list of column names to include in the output
         # If this list is empty, all columns will be included
@@ -150,7 +151,8 @@ class I18nRenderer(JSONRenderer):
 
     def translate_data(self, data, to_language, from_language="auto", update_i18n=True, original_i18n={}):
         logger.info(
-            f"Starting Translating data to language '{to_language}'. This may take a while: {util.count_dict_elements(data)} entries..."
+            f"Starting Translating data to language '{to_language}'. This may take a while:"
+            f" {util.count_dict_elements(data)} entries..."
         )
         translated_data = {}
         for section, entries in data.items():

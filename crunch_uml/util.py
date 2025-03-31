@@ -153,7 +153,8 @@ def is_valid_i18n_file(file_path):
                             return False
                         if "name" not in value:
                             print(
-                                f"Entry '{key}' in section '{section}' under language '{language}' does not have a 'name' key."
+                                f"Entry '{key}' in section '{section}' under language '{language}' does not have a"
+                                " 'name' key."
                             )
                             return False
 
