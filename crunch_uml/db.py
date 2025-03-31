@@ -13,7 +13,9 @@ from sqlalchemy import (
     create_engine,
 )
 from sqlalchemy import exc as sa_exc
-from sqlalchemy import inspect
+from sqlalchemy import (
+    inspect,
+)
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
@@ -29,6 +31,7 @@ suppress_warnings = True
 
 def add_args(argumentparser, subparser_dict):
     global suppress_warnings
+    suppress_warnings = True
     # Rest of the code...
     #    '--database_no_orphans',
     #    action='store_true',

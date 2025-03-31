@@ -187,12 +187,12 @@ class XMIParser(Parser):
                                 schema.save(clazz)
                             if "src" in id:
                                 association.src_class_id = clsid  # type: ignore
-                                association.src_mult_start = getval("lowerValue", endpoint)
-                                association.src_mult_end = getval("upperValue", endpoint)
+                                association.src_mult_start = str(getval("lowerValue", endpoint))  # type: ignore
+                                association.src_mult_end = str(getval("upperValue", endpoint))  # type: ignore
                             else:
                                 association.dst_class_id = clsid  # type: ignore
-                                association.dst_mult_start = getval("lowerValue", endpoint)
-                                association.dst_mult_end = getval("upperValue", endpoint)
+                                association.dst_mult_start = str(getval("lowerValue", endpoint))  # type: ignore
+                                association.dst_mult_end = str(getval("upperValue", endpoint))  # type: ignore
                     else:
                         err = f"Association {association.name} with {association.id} has more than two endpoints. panic"
                         logger.error(err)
