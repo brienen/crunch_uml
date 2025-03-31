@@ -127,6 +127,12 @@ def add_args(argumentparser, subparser_dict):
         help="JSON-string voor het hernoemen van kolommen, bijvoorbeeld: '{\"old_col\": \"new_col\"}'",
     )
     output_subparser.add_argument(
+        "--filter",
+        type=str,
+        default="[]",
+        help="Kommagescheiden lijst met kolommen die geëxporteerd moeten worden, waarbij de volgrorde ook bij de export wordt gehandhaafd, bijvoorbeeld: '[\"col1\", \"col2\"], \"col3\"'",
+    )
+    output_subparser.add_argument(
         "--entity_name",
         type=str,
         help=f"Naam van de entiteit die wordt geëxporteerd. Alleen te gebruiken bij CSV-renderer. Mogelijke waarden: {db.getTables()}",
@@ -143,6 +149,14 @@ class Renderer(ABC):
     @abstractmethod
     def render(self, args, schema: sch.Schema):
         pass
+
+    def get_included_columns(self, args):
+        # Define the list of column names to include in the output
+        # If this list is empty, all columns will be included
+        if args and args.filter and len(args.filter) > 0:
+            return util.parse_string_to_list(args.filter)
+
+        return []
 
 
 class ModelRenderer(Renderer):

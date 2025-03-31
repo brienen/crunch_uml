@@ -4,7 +4,7 @@ import logging
 from openpyxl import Workbook
 
 import crunch_uml.schema as sch
-from crunch_uml import db, const
+from crunch_uml import const, db, util
 from crunch_uml.renderers.renderer import Renderer, RendererRegistry
 
 logger = logging.getLogger()
@@ -28,6 +28,9 @@ class XLSXRenderer(Renderer):
         # Laad de mapper (bijvoorbeeld als een JSON-string via args)
         column_mapper = json.loads(args.mapper) if args.mapper else {}
 
+        # Bepaal welke kolommen moeten worden opgenomen in de uitvoer
+        included_columns = self.get_included_columns(args)
+
         for table_name, table in models.items():
             ws = wb.create_sheet(title=table_name)
 
@@ -37,6 +40,12 @@ class XLSXRenderer(Renderer):
 
             # Pas de mapper toe op de kolomnamen
             mapped_columns = [column_mapper.get(col, col) for col in columns]
+
+            # Pas de mapper toe op de kolomnamen
+            mapped_columns = [col for col in mapped_columns if col in included_columns or not included_columns]
+
+            # Sorteer de kolommen op basis van de volgorde van de inbegrepen kolommen
+            mapped_columns = util.sort_by_reference(mapped_columns, included_columns)
 
             # Schrijf de gemapte kolomnamen in de header
             for col_num, mapped_column in enumerate(mapped_columns, 1):
@@ -53,7 +62,9 @@ class XLSXRenderer(Renderer):
                 ):
                     for col_num, column in enumerate(columns, 1):
                         # Pas de mapper toe op de waarde als nodig
-                        if column == const.COLUMN_DOMEIN_IV3 and (isinstance(model, db.Class) or isinstance(model, db.Enumeratie)):
+                        if column == const.COLUMN_DOMEIN_IV3 and (
+                            isinstance(model, db.Class) or isinstance(model, db.Enumeratie)
+                        ):
                             package = session.query(db.Package).filter(db.Package.id == record.package_id).one_or_none()
                             value = package.domain_name if package is not None else None
                         else:

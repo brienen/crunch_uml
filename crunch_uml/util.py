@@ -216,5 +216,59 @@ def is_empty_or_none(value: str) -> bool:
     """
     return value is None or value.strip() == ""
 
+
 def current_time_export():
     return datetime.now().strftime(const.DEFAULT_DATE_TIME_EXPORT_FORMAT)
+
+
+def parse_string_to_list(input_string):
+    """
+    Parse een string in de vorm '[elem1, elem2]' of 'elem1, elem2' naar een lijst.
+    :param input_string: De invoerstring
+    :return: Een lijst van strings
+    """
+    # Verwijder blokhaken als deze aanwezig zijn
+    cleaned_string = input_string.strip("[]")
+
+    # Splits de string op komma's en verwijder extra spaties rondom de elementen
+    result = [item.strip() for item in cleaned_string.split(",") if item.strip()]
+
+    return result
+
+
+def sort_by_reference(lst, reference_order):
+    """
+    Sorteer een lijst op basis van de volgorde in een andere lijst.
+
+    :param lst: De lijst die moet worden gesorteerd.
+    :param reference_order: De lijst die de gewenste volgorde definieert.
+    :return: Een nieuw gesorteerde lijst.
+    """
+    if not lst or not reference_order or len(reference_order) == 0:
+        return lst
+
+    # Maak een mapping van waarden naar hun index in de referentielijst
+    order_map = {value: index for index, value in enumerate(reference_order)}
+
+    # Gebruik de mapping om de lijst te sorteren
+    return sorted(lst, key=lambda x: order_map.get(x, float('inf')))
+
+
+def reorder_dict(original_dict, order_list):
+    """
+    Wijzig de volgorde van een dictionary volgens de volgorde in een lijst.
+    Sleutels die niet in de lijst staan, worden achteraan toegevoegd in de oorspronkelijke volgorde.
+
+    :param original_dict: De oorspronkelijke dictionary.
+    :param order_list: De gewenste volgorde van de sleutels.
+    :return: Een nieuwe dictionary met de gewenste volgorde.
+    """
+    # Eerst de sleutels in de gewenste volgorde
+    reordered = {key: original_dict[key] for key in order_list if key in original_dict}
+
+    # Vervolgens de overgebleven sleutels in de oorspronkelijke volgorde
+    remaining = {key: original_dict[key] for key in original_dict if key not in order_list}
+
+    # Combineer beide
+    reordered.update(remaining)
+    return reordered

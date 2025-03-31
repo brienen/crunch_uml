@@ -47,6 +47,7 @@ def are_json_files_equal(file1_path, file2_path, exclude_keys=None):
         print(f"Er is een fout opgetreden tijdens het vergelijken van de bestanden: {str(e)}")
         return False
 
+
 def test_json_parser_renderer():
     # sourcery skip: extract-duplicate-method, move-assign-in-block
     inputfile = "./test/output/Monumenten_import.json"
@@ -120,4 +121,8 @@ def test_json_parser_renderer():
     assert os.path.exists(outputfile)
 
     # Check if the contents of the files are equal
-    assert are_json_files_equal(inputfile, outputfile, exclude_keys=[const.COLUMN_DOMEIN_DATUM_TIJD_EXPORT, const.COLUMN_DOMEIN_IV3, const.COLUMN_DOMEIN_GGM_UML_TYPE])
+    assert are_json_files_equal(
+        inputfile,
+        outputfile,
+        exclude_keys=[const.COLUMN_DOMEIN_DATUM_TIJD_EXPORT, const.COLUMN_DOMEIN_IV3, const.COLUMN_DOMEIN_GGM_UML_TYPE],
+    )

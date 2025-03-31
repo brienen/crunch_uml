@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-from datetime import datetime
 
 import pandas as pd
 import sqlalchemy
@@ -34,14 +33,15 @@ def object_as_dict(obj, session):
 
     # Dirty hack, but only way: set package domain name to domain_iv3
     if const.COLUMN_DOMEIN_IV3 in attrs and (isinstance(obj, db.Class) or isinstance(obj, db.Enumeratie)):
-        package = session.query(db.Package).filter(
-            db.Package.id == obj.package_id,
-            db.Package.schema_id == obj.schema_id 
-        ).one_or_none()
+        package = (
+            session.query(db.Package)
+            .filter(db.Package.id == obj.package_id, db.Package.schema_id == obj.schema_id)
+            .one_or_none()
+        )
         dict_obj[const.COLUMN_DOMEIN_IV3] = package.domain_name if package is not None else obj.domein_iv3
     dict_obj[const.COLUMN_DOMEIN_GGM_UML_TYPE] = obj.__class__.__name__
     dict_obj[const.COLUMN_DOMEIN_DATUM_TIJD_EXPORT] = util.current_time_export()
-    
+
     return dict_obj
 
 
@@ -50,11 +50,6 @@ def object_as_dict(obj, session):
     descr="Renders JSON document where each element corresponds to one of the tables in the datamodel.",
 )
 class JSONRenderer(Renderer):
-
-    def get_included_columns(self):
-        # Define the list of column names to include in the output
-        # If this list is empty, all columns will be included
-        return []
 
     def get_record_type(self):
         return const.RECORD_TYPE_RECORD
@@ -68,7 +63,7 @@ class JSONRenderer(Renderer):
 
         # Define the list of column names to include in the output
         # If this list is empty, all columns will be included
-        included_columns = self.get_included_columns()
+        included_columns = self.get_included_columns(args)
 
         for table_name, table in models.items():
             # Model class associated with the table
@@ -90,6 +85,7 @@ class JSONRenderer(Renderer):
                         for key, value in record.items()
                         if key in included_columns and (empty_values or value is not None)
                     }
+                    filtered_record = util.reorder_dict(filtered_record, included_columns)
                 else:
                     filtered_record = record  # Include all columns if included_columns is empty
                 if len(filtered_record) > 0:
@@ -144,7 +140,7 @@ class JSONRenderer(Renderer):
 )
 class I18nRenderer(JSONRenderer):
 
-    def get_included_columns(self):
+    def get_included_columns(self, args):
         # Define the list of column names to include in the output
         # If this list is empty, all columns will be included
         return const.LANGUAGE_TRANSLATE_FIELDS

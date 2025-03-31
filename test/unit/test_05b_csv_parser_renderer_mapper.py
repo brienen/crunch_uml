@@ -81,7 +81,6 @@ def test_csv_parser_renderer():
         "gemma_toelichting": "GEMMA-toelichting",
         "gemma_synoniemen": "GEMMA-synoniemen",
         "gemma_bron": "GEMMA-bron",
-        "gemma_url": "GEMMA-url",
         "gemma_alternate_name": "GEMMA-alternate-name",
         "synoniemen": "GGM-synoniemen",
         "ggm_uml_type": "GGM-uml-type",
@@ -91,7 +90,7 @@ def test_csv_parser_renderer():
         "bron": "GGM-bron",
         "domein_iv3": "domein-iv3",
         "domein_dcat": "domein-dcat",
-        "Datum-tijd-export": "Datum-tijd-export"
+        "Datum-tijd-export": "Datum-tijd-export",
     }
     mapper_reverse = {v: k for k, v in mapper.items()}
 
@@ -168,5 +167,6 @@ def test_csv_parser_renderer():
     assert os.path.exists(f"{outputfile}_classes.csv")
 
     # Check if the contents of the files are equal
-    assert are_csv_files_equal(f"{outputfile}_classes.csv", f"{inputfile}_classes.csv", ignore_columns=["Datum-tijd-export"])
-
+    assert are_csv_files_equal(
+        f"{outputfile}_classes.csv", f"{inputfile}_classes.csv", ignore_columns=["Datum-tijd-export"]
+    )

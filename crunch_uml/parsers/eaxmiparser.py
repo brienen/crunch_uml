@@ -61,6 +61,8 @@ class EAXMIParser(XMIParser):
             copy_values(project, package)
 
             properties = packageref.xpath("./properties")[0]
+            if properties is not None:
+                package.definitie = properties.get("documentation")
             copy_values(properties, package)
 
             schema.save(package)
