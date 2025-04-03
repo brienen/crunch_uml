@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import re
 
 import inflection
 import validators
@@ -66,7 +67,6 @@ class Jinja2Renderer(ModelRenderer):
     def addFilters(self, env):
         def fix_and_format(s):
             if isinstance(s, bytes):
-                # Probeer encoding te detecteren en te decoderen
                 result = from_bytes(s).best()
                 if result:
                     s = str(result)
@@ -75,8 +75,17 @@ class Jinja2Renderer(ModelRenderer):
             elif not isinstance(s, str):
                 return ""
 
-            # Strip en vervang newlines met <br>
-            return "<br>".join(line.strip() for line in s.strip().splitlines())
+            def normalize_bullet(line):
+                # Check op opsommingsteken na eventuele inspringing
+                match = re.match(r"^(\s*)([-■•*·●◦‣›»▪–—])(\s+)(.*)", line)
+                if match:
+                    indent, _, spacing, rest = match.groups()
+                    return f"{indent}•{spacing}{rest}"
+                return line
+
+            lines = s.strip().splitlines()
+            lines = [normalize_bullet(line.rstrip()) for line in lines if line.strip() != ""]
+            return "<br>".join(lines)
 
         # Voeg het inflection filter toe
         env.filters["snake_case"] = lambda s: (inflection.underscore(s.replace(" ", "")) if isinstance(s, str) else "")

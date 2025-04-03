@@ -29,7 +29,7 @@ Attributen van objecttype {{ class.name }}:
 
 {% for enumeration in package.enumerations|sort(attribute='name') %}
 ### {{ enumeration.name }}
-{{ enumeration.definitie|default("Geen Definitie", true)|md_newline() }}
+{{ enumeration.definitie|default("Geen Definitie", true)|fix_and_format()|set_url() }}
 
 Het enumeratie {{ enumeration.name }} kent de volgende waarden:
 
