@@ -4,6 +4,7 @@ import os
 
 import inflection
 import validators
+from charset_normalizer import from_bytes
 from jinja2 import Environment, FileSystemLoader
 
 import crunch_uml.schema as sch
@@ -63,6 +64,20 @@ class Jinja2Renderer(ModelRenderer):
         return template, templatedir
 
     def addFilters(self, env):
+        def fix_and_format(s):
+            if isinstance(s, bytes):
+                # Probeer encoding te detecteren en te decoderen
+                result = from_bytes(s).best()
+                if result:
+                    s = str(result)
+                else:
+                    return ""
+            elif not isinstance(s, str):
+                return ""
+
+            # Strip en vervang newlines met <br>
+            return "<br>".join(line.strip() for line in s.strip().splitlines())
+
         # Voeg het inflection filter toe
         env.filters["snake_case"] = lambda s: (inflection.underscore(s.replace(" ", "")) if isinstance(s, str) else "")
         env.filters["pascal_case"] = lambda s: (inflection.camelize(s.replace(" ", "")) if isinstance(s, str) else "")
@@ -78,6 +93,10 @@ class Jinja2Renderer(ModelRenderer):
         env.filters["reject_method"] = lambda iterable, method_name: [
             item for item in iterable if not getattr(item, method_name)()
         ]
+        env.filters["mdonize"] = lambda s: (
+            "<br>".join(line.strip() for line in s.strip().splitlines()) if isinstance(s, str) else ""
+        )
+        env.filters["fix_and_format"] = fix_and_format
 
     def getFilename(self, inputfilename, extension, uml_generic):
         return f"{inputfilename}_{uml_generic.name}{extension}"
