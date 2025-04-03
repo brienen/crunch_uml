@@ -121,8 +121,8 @@ def test_json_parser_renderer():
     assert os.path.exists(outputfile)
 
     # Check if the contents of the files are equal
-    #assert are_json_files_equal(
+    # assert are_json_files_equal(
     #    inputfile,
     #    outputfile,
     #    exclude_keys=[const.COLUMN_DOMEIN_DATUM_TIJD_EXPORT, const.COLUMN_DOMEIN_IV3, const.COLUMN_DOMEIN_GGM_UML_TYPE],
-    #)
+    # )
