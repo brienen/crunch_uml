@@ -1,6 +1,7 @@
 import logging
 import re
 
+import chardet
 import requests
 from lxml import etree
 
@@ -10,6 +11,26 @@ from crunch_uml.exceptions import CrunchException
 from crunch_uml.parsers.parser import Parser, ParserRegistry
 
 logger = logging.getLogger()
+
+
+def load_xmi(source):
+    if source.startswith("http://") or source.startswith("https://"):
+        response = requests.get(source)
+        raw = response.content
+    else:
+        with open(source, "rb") as f:
+            raw = f.read()
+    detected = chardet.detect(raw)
+    original_encoding = detected["encoding"] or const.ENCODING
+    try:
+        # Decode altijd naar unicode string
+        text = raw.decode(original_encoding).lstrip('\ufeff')
+        # Encode daarna expliciet naar utf-8
+        utf8_bytes = text.encode(const.ENCODING)
+        parser = etree.XMLParser(recover=True, encoding=const.ENCODING)
+        return etree.fromstring(utf8_bytes, parser)
+    except Exception as e:
+        raise RuntimeError(f"Probleem met XMI inlezen (oorspronkelijke encoding: {original_encoding}): {e}")
 
 
 def remove_EADatatype(input_string):
@@ -22,6 +43,7 @@ def remove_EADatatype(input_string):
     descr="XMI-Parser for strict XMI files. No extensions (like EA extensions) are parsed. Tested on XMI v2.1 spec ",
 )
 class XMIParser(Parser):
+
     # Recursieve functie om de parsetree te doorlopen
     def phase1_process_packages_classes(self, node, ns, schema: sch.Schema, parent_package_id=None):
         """
@@ -269,16 +291,16 @@ class XMIParser(Parser):
         if args.inputfile is not None:
             # Parseer het XML-bestand
             logger.info(f"Parsing file with name {args.inputfile}")
-            tree = etree.parse(args.inputfile)
-            root = tree.getroot()
+            source = args.inputfile
         elif args.url is not None:
             # Haal de inhoud van de URL op
             logger.info(f"Parsing url: {args.url}")
-            response = requests.get(args.url)
-            response.raise_for_status()  # controleer of het verzoek succesvol was
+            source = args.url
+        else:
+            raise CrunchException("No input file or URL provided for parsing.")
 
-            # Gebruik lxml.etree om de inhoud te parsen
-            root = etree.fromstring(response.content)
+        logger.info(f"Parsing from source {source}")
+        root = load_xmi(source)
 
         ns = root.nsmap
         if "xmi" not in ns.keys():
