@@ -1,3 +1,4 @@
+import html
 import json
 import logging
 import os
@@ -74,6 +75,8 @@ class Jinja2Renderer(ModelRenderer):
                     return ""
             elif not isinstance(s, str):
                 return ""
+
+            s = html.unescape(s)
 
             def normalize_bullet(line):
                 # Check op opsommingsteken na eventuele inspringing
@@ -162,8 +165,8 @@ class GGM_MDRenderer(Jinja2Renderer):
 
 
 def getJSONDatatype(
-    self,
-):  # "koppel_{{ associatie.name | snake_case }}_{{ associatie.id}}"
+    self,  # "koppel_{{ associatie.name | snake_case }}_{{ associatie.id}}"
+):
     if self.primitive is not None:
         if str(self.primitive).lower().startswith("bool"):
             return '"type": "boolean"'
