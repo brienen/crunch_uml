@@ -14,6 +14,18 @@ UITWISSELMODEL_ID = "EAID_6b4326e3_eb4e_41d2_902b_0bff06604f63"
 CLIENT_ID = "EAID_DAF09055_A5A6_4ff4_A158_21B20567B296"
 LEVERING_ID = "EAID_DAB09055_A5A6_4ff4_A158_21B20567B888"
 SCHULDEN_ID = "EAID_93E12A3E_71E3_431e_9871_BF6075EAAEF1"
+Trajecten_sort_order = [
+    'client',
+    'aanmelding',
+    'intake',
+    'planVanAanpak',
+    'stabilisatie',
+    'schuldregeling',
+    'begeleiding',
+    'oplossing',
+    'nazorg',
+    'uitstroom',
+]
 
 
 class DDASPlugin(Plugin):
@@ -69,6 +81,19 @@ class DDASPlugin(Plugin):
                 "Ondernemer",
             ]:  # or str(clazz.name).strip() == "Projectsoort" or str(clazz.name).strip() == "Notariele status"
                 kopie.classes.remove(clazz)
+
+        # Zet de onderdelen van het traject in de juiste volgorde
+        sort_order = [item.lower() for item in Trajecten_sort_order if isinstance(item, str)]
+        for clazz in kopie.classes:
+            if str(clazz.name).strip() == "Schuldhulptraject":
+                for association in clazz.uitgaande_associaties:
+                    dst_class = schema_from.get_class(association.dst_class_id)
+                    if dst_class:
+                        dst_name = str(dst_class.name).strip().lower()
+                        if dst_name in sort_order:
+                            association.order = sort_order.index(dst_name) + 1
+                        else:
+                            association.order = 100
 
         # Now add the Class Uitwisselmodel
         uitwisselmodel = Class(
@@ -133,6 +158,7 @@ class DDASPlugin(Plugin):
             dst_mult_end="-1",
             src_role="leveringen",
             definitie="De leveringen die in het uitwisselmodel zijn opgenomen.",
+            order=1,
         )
         uitwisselmodel.uitgaande_associaties.append(assoc_uitmod_to_levering)
         assoc_uitmod_to_levering.dst_class = levering
@@ -147,6 +173,7 @@ class DDASPlugin(Plugin):
             dst_mult_end="1",
             src_role="aanleverende_organisatie",
             definitie="De organisatie die het uitwisselmodel aanlevert.",
+            order=1,
         )
         assoc_levering_to_trajecten = Association(
             id=util.getEAGuid(),
@@ -158,6 +185,7 @@ class DDASPlugin(Plugin):
             dst_mult_end="-1",
             src_role="schuldhulptrajecten",
             definitie="De aan te leveren trajecten.",
+            order=2,
         )
         levering.uitgaande_associaties.append(assoc_levering_to_organisatie)
         levering.uitgaande_associaties.append(assoc_levering_to_trajecten)

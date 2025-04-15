@@ -15,6 +15,7 @@ CLIENT_ID = "EAID_DAF09055_A5A6_4ff4_A158_21B20567B296"
 PARTNER_ID = "EAID_093B2482_D72E_4f88_931C_75C9DABED007"
 LEVERING_ID = "EAID_DAB09055_A5A6_4ff4_A158_21B20567B888"
 SCHULDEN_ID = "EAID_93E12A3E_71E3_431e_9871_BF6075EAAEF1"
+CONTACTPERSOON_ID = "EAID_B9287881_AD66_4396_A629_ED5FE9196316"
 
 
 class DDASPluginInformatiemodel(Plugin):
@@ -49,6 +50,8 @@ class DDASPluginInformatiemodel(Plugin):
                 "Boolean",
                 "Gezinsrelatie",
                 "soortRechtsvorm",
+                "EnumWoningbezit",
+                "EnumHuishoudenssoort",
             ]:
                 kopie.enumerations.remove(enum)
 
@@ -79,7 +82,7 @@ class DDASPluginInformatiemodel(Plugin):
                 id=util.getEAGuid(),
                 name="gemeentecode",
                 schema_id=schema_to.schema_id,
-                primitive="AN2",
+                primitive="AN4",
                 verplicht=False,
                 definitie="De gemeentecode als de aanleverende organisatie een gemeente is.",
             )
@@ -96,6 +99,8 @@ class DDASPluginInformatiemodel(Plugin):
                 verplicht=False,
             )
         )
+        contactpersoon = schema_to.get_class(CONTACTPERSOON_ID)
+        contactpersoon.definitie = "Contactpersoon van de organisatie waarvan de gegevens worden aangeleverd."
 
         traject = schema_to.get_class(TRAJECT_ID)
         traject.attributes.append(
@@ -103,7 +108,7 @@ class DDASPluginInformatiemodel(Plugin):
                 id=util.getEAGuid(),
                 name="gemeentecode",
                 schema_id=schema_to.schema_id,
-                primitive="AN2",
+                primitive="AN4",
                 verplicht=True,
                 definitie=(
                     "De gemeentecode van de gemeente onder wiens verantwoordelijkheid het schuldhulptraject wordt"

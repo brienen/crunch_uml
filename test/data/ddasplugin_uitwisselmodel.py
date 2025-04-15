@@ -119,7 +119,9 @@ class DDASPluginUitwisselmodel(Plugin):
             dst_mult_end="-1",
             src_role="leveringen",
             definitie="De leveringen die in het uitwisselmodel zijn opgenomen.",
+            order=1,
         )
+        assoc_uitmod_to_levering.order = 1
         uitwisselmodel.uitgaande_associaties.append(assoc_uitmod_to_levering)
         assoc_uitmod_to_levering.dst_class = levering
 
@@ -133,7 +135,9 @@ class DDASPluginUitwisselmodel(Plugin):
             dst_mult_end="1",
             src_role="aanleverende_organisatie",
             definitie="De organisatie die het uitwisselmodel aanlevert.",
+            order=2,
         )
+        assoc_levering_to_organisatie.order = 2
         assoc_levering_to_trajecten = Association(
             id=util.getEAGuid(),
             name="trajecten",
@@ -144,6 +148,7 @@ class DDASPluginUitwisselmodel(Plugin):
             dst_mult_end="-1",
             src_role="schuldhulptrajecten",
             definitie="De aan te leveren trajecten.",
+            order=1,
         )
         levering.uitgaande_associaties.append(assoc_levering_to_organisatie)
         levering.uitgaande_associaties.append(assoc_levering_to_trajecten)

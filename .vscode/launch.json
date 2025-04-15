@@ -565,6 +565,20 @@
             }
         },
         {
+            "name": "Python: pytest test_14_transform_plugin",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/pytest",  // Pas aan naar je lokale pytest pad
+            "args": [
+                "${workspaceFolder}/test/unit/test_14_transform_plugin.py"  // Pas aan naar je testmap
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
+        }, // test_14_transform_plugin.py
+        {
             "name": "Python: pytest test_12_copy_structure",
             "type": "python",
             "request": "launch",

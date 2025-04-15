@@ -105,6 +105,9 @@ class Jinja2Renderer(ModelRenderer):
         env.filters["reject_method"] = lambda iterable, method_name: [
             item for item in iterable if not getattr(item, method_name)()
         ]
+        env.filters["sort_order"] = lambda rels: sorted(
+            rels if rels else [], key=lambda rel: float('inf') if rel.order is None else rel.order
+        )
         env.filters["mdonize"] = lambda s: (
             "<br>".join(line.strip() for line in s.strip().splitlines()) if isinstance(s, str) else ""
         )

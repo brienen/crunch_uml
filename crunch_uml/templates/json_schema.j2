@@ -18,7 +18,7 @@
     {{ attribute.getJSONDatatype() }}
     }{% if not loop.last %},{% endif %}
 {%- endfor %}
-{%- set assocs = clazz.uitgaande_associaties|reject_method('hasOrphan')|list %}
+{%- set assocs = clazz.uitgaande_associaties|reject_method('hasOrphan')|sort_order|list %}
 {%- for assoc in assocs %}
     {%- if assoc.dst_class.name not in rendered_classes %}
         {% if loop.first %},{% endif %}

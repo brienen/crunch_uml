@@ -7,6 +7,7 @@ from sqlalchemy import (
     Boolean,
     Column,
     ForeignKeyConstraint,
+    Integer,
     PrimaryKeyConstraint,
     String,
     Text,
@@ -812,6 +813,7 @@ class Association(Base, UML_Generic):  # type: ignore
     dst_multiplicity = Column(String)
     dst_documentation = Column(Text)
     dst_role = Column(String)
+    order = Column(Integer)
     diagrams = relationship("Diagram", secondary="diagram_association", back_populates="associations")
 
     __table_args__ = (
