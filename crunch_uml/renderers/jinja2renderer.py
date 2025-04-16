@@ -198,9 +198,13 @@ def getJSONDatatype(
 def getVerplichteAttributen(self):
     set_verplicht = {attr.name for attr in self.attributes if attr.verplicht}
     set_verplichr_rel = {
-        assoc.name
+        (
+            assoc.src_role.lower()
+            if assoc.src_role is not None and assoc.src_role != ""
+            else assoc.dst_class.name.lower()
+        )
         for assoc in self.uitgaande_associaties
-        if assoc.isEnkelvoudig(dst=True) and assoc.isVerplicht(dst=True)
+        if assoc.isEnkelvoudig(dst=True) and assoc.isVerplicht(dst=True) and assoc.dst_class.name is not None
     }
     return list(set_verplicht.union(set_verplichr_rel))
 

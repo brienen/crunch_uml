@@ -122,13 +122,39 @@ class DDASPluginInformatiemodel(Plugin):
             lst_attr = [attr for attr in schema_to.get_class(person_id).attributes]
             person = schema_to.get_class(person_id)
             for attr in lst_attr:
-                if not str(attr.name).strip().lower() in [
-                    "geslachtsaanduiding",
-                    "burgerservicenummer",
-                    "geboortedatum",
-                ]:
-                    person.attributes.remove(attr)
-                    attr.clazz_id = None
+                person.attributes.remove(attr)
+                attr.clazz_id = None
+
+            person.attributes.append(
+                Attribute(
+                    id=util.getEAGuid(),
+                    name="Geboortedatum",
+                    schema_id=schema_to.schema_id,
+                    verplicht=False,
+                    primitive="AN22",
+                    definitie="De datum waarop de ander natuurljjk persoon is geboren.",
+                )
+            )
+            person.attributes.append(
+                Attribute(
+                    id=util.getEAGuid(),
+                    name="Burgerservicenummer",
+                    schema_id=schema_to.schema_id,
+                    verplicht=False,
+                    primitive="AN9",
+                )
+            )
+            person.attributes.append(
+                Attribute(
+                    id=util.getEAGuid(),
+                    name="Geslachtsaanduiding",
+                    schema_id=schema_to.schema_id,
+                    verplicht=False,
+                    enumeration_id="EAID_4205481c_3884_466f_b3f1_7b82a29c3fd1",
+                    definitie="Een aanduiding die aangeeft dat de ingeschrevene een man of een vrouw is, of dat het geslacht (nog) onbekend is.",
+                    stereotype="enum",
+                )
+            )
             person.attributes.append(
                 Attribute(
                     id=util.getEAGuid(),

@@ -851,11 +851,29 @@ class Association(Base, UML_Generic):  # type: ignore
         else:
             return True if self.src_mult_end in ["0", "1"] else False
 
+    def isGelimiteerdMeervoudig(self, dst: True):  # type: ignore
+        if dst:
+            try:
+                return int(self.dst_mult_end) > 1
+            except (ValueError, TypeError):
+                return False
+        else:
+            try:
+                return int(self.src_mult_start) > 1
+            except (ValueError, TypeError):
+                return False
+
     def isVerplicht(self, dst: True):  # type: ignore
         if dst:
-            return True if isinstance(self.dst_mult_start, int) and int(self.dst_mult_start) > 0 else False
+            try:
+                return int(self.dst_mult_start) > 0
+            except (ValueError, TypeError):
+                return False
         else:
-            return True if isinstance(self.src_mult_start, int) and int(self.src_mult_start) > 0 else False
+            try:
+                return int(self.src_mult_start) > 0
+            except (ValueError, TypeError):
+                return False
 
     def getRole(self, view="src"):
         if view == "src":
