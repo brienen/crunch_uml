@@ -11,7 +11,7 @@ def parse_requirements(filename):
 
 setuptools.setup(
     name='crunch_uml',
-    version='0.2.21',
+    version='0.2.22',
     description="Crunch_uml reads UML Class model from multiple formats (including XMI, Enterprise Architect XMI, Excel, Json, and others), can perform transformations and renders them to other formats (including Markdown, json, json schema and many others).",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -25,9 +25,11 @@ setuptools.setup(
             'test',
         ]
     ),
+    include_package_data=True,
     package_data={
         'crunch_uml': [
             'py.typed',
+            '**/templates/*.j2',
         ]
     },
     classifiers=[

@@ -218,43 +218,86 @@ class JSON_SchemaRenderer(Jinja2Renderer, ClassRenderer):
     enforce_output_package_ids = True  # Enforce list of Package ids
 
     def render(self, args, schema: sch.Schema):
+        logger.info("Start rendering JSON schema met Jinja2")
         try:
-            # Add mthod to ger Correct JSON Datatypes from class instance
+            # Add methods for correct JSON datatype handling
             db.Attribute.getJSONDatatype = getJSONDatatype  # No error!
             db.Class.getVerplichteAttributen = getVerplichteAttributen  # No error!
-            # setup output filename
+
+            # Setup output filename
             filename, extension = os.path.splitext(args.outputfile)
+            logger.debug(f"Output file split into filename: {filename} and extension: {extension}")
 
-            # get template and templatedir
-            template, templatedir = self.getTemplateAndDir(args)
-
-            # sourcery skip: raise-specific-error
-            # Settup environment for rendering using Jinja2
-            file_loader = FileSystemLoader(templatedir)
-            env = Environment(loader=file_loader)
-            self.addFilters(env)
-
-            # Get list of packages that are to be rendered
-            clazz = self.getClass(args, schema)
-
-            # Render output
-            template = env.get_template(template)
-            output = template.render(clazz=clazz, args=args)
-
-            # JSON-gegevens formatteren
+            # Obtain template and templatedir with error handling
             try:
-                # Stap 1: Laad de JSON-string in een Python dictionary
+                template, templatedir = self.getTemplateAndDir(args)
+                logger.info(f"Obtained template: {template} and templatedir: {templatedir}")
+            except Exception as e:
+                logger.error(f"Fout bij ophalen template of template directory: {e}")
+                raise
+
+            # Setup Jinja2 environment
+            try:
+                file_loader = FileSystemLoader(templatedir)
+                env = Environment(loader=file_loader)
+                self.addFilters(env)
+                logger.debug("Jinja2 environment setup complete")
+            except Exception as e:
+                logger.error(f"Fout bij opzetten van de Jinja2 omgeving: {e}")
+                raise
+
+            # Retrieve the class to render
+            try:
+                clazz = self.getClass(args, schema)
+                if clazz is None:
+                    raise CrunchException("Geen class gevonden om te renderen")
+                logger.info(f"Class geladen: {clazz.name}")
+            except Exception as e:
+                logger.error(f"Fout bij ophalen van class: {e}")
+                raise
+
+            # Load template
+            try:
+                template_obj = env.get_template(template)
+                logger.info(f"Template {template} succesvol geladen")
+            except Exception as e:
+                logger.error(f"Fout bij laden van Jinja2 template: {e}")
+                raise
+
+            # Render the template
+            try:
+                output = template_obj.render(clazz=clazz, args=args)
+                logger.info("Template succesvol gerenderd")
+            except Exception as e:
+                logger.error(f"Fout bij renderen van template: {e}")
+                raise
+
+            # Format JSON output
+            try:
                 data = json.loads(output)
                 formatted_json = json.dumps(data, indent=4)
+                logger.info("JSON output succesvol geformatteerd")
             except Exception as ex:
                 formatted_json = output
-                logger.warning(f"Exception Could not format JSON data with message {ex}")
+                logger.warning(f"Kon JSON niet formatteren: {ex}")
 
+            # Determine output filename and write to file
             outputfilename = (
                 self.getFilename(filename, extension, clazz) if clazz.name is not None else f"{filename}{extension}"
             )
-            with open(outputfilename, "w") as file:
-                file.write(formatted_json)
+            try:
+                with open(outputfilename, "w") as file:
+                    file.write(formatted_json)
+                logger.info(f"JSON schema geschreven naar: {outputfilename}")
+            except Exception as e:
+                logger.error(f"Fout bij schrijven naar bestand: {e}")
+                raise
+
+        except Exception as overall_exception:
+            logger.error(f"Rendering mislukt: {overall_exception}")
+            raise
         finally:
-            del db.Attribute.getJSONDatatype  # No error!
-            del db.Class.getVerplichteAttributen  # No error!
+            if hasattr(db.Attribute, "getJSONDatatype"):
+                del db.Attribute.getJSONDatatype
+            if hasattr(db.Class, "getVerplichteAttributen"):
+                del db.Class.getVerplichteAttributen
