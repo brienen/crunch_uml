@@ -351,6 +351,45 @@ class Package(Base, UMLBase):  # type: ignore
         packages = self.get_packages_in_model()
         return {diagram for package in packages for diagram in package.diagrams}
 
+    def get_class_by_name(self, name):
+        """
+        Get class by name from the model
+        """
+        if name is None:
+            return None
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore" if suppress_warnings else "default", category=sa_exc.SAWarning)
+            for clazz in self.get_classes_in_model():
+                if clazz.name.lower() == name.lower():
+                    return clazz
+            return None
+
+    def get_enumeration_by_name(self, name):
+        """
+        Get enumeration by name from the model
+        """
+        if name is None:
+            return None
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore" if suppress_warnings else "default", category=sa_exc.SAWarning)
+            for enum in self.get_enumerations_in_model():
+                if enum.name.lower() == name.lower():
+                    return enum
+            return None
+
+    def get_diagram_by_name(self, name):
+        """
+        Get diagram by name from the model
+        """
+        if name is None:
+            return None
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore" if suppress_warnings else "default", category=sa_exc.SAWarning)
+            for diagram in self.get_diagrams_in_model():
+                if diagram.name.lower() == name.lower():
+                    return diagram
+            return None
+
     # End of logic for models
 
     def get_root_package(self):
@@ -522,6 +561,19 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
             deferrable=True,
         ),
     )
+
+    def get_attribute_by_name(self, name):
+        """
+        Get attribute by name from the class
+        """
+        if name is None:
+            return None
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore" if suppress_warnings else "default", category=sa_exc.SAWarning)
+            for attr in self.attributes:
+                if attr.name.lower() == name.lower():
+                    return attr
+            return None
 
     def copy_attributes(self, copy_instance, materialize_generalizations=False):
         with warnings.catch_warnings():

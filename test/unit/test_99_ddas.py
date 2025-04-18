@@ -102,8 +102,6 @@ def test_importAndTransform_schuldhulp():
     cli.main(test_args)
     validate_json_schema(dir)
 
-    test_volgorde_trajecten_in_schema()
-
     # Exporteer JSON-definitie van schuldhulp
     test_args = [
         "-sch",
@@ -164,18 +162,11 @@ def validate_json_schema(dir):
     else:
         assert True
 
-
-def test_volgorde_trajecten_in_schema():
-    dir = "./test/output/"
+    # Check whether the JSON schema contains the expected properties in the excpected order
     from test.data.ddasplugin_uitwisselmodel import TRAJECTEN_SORT_ORDER as verwacht
 
-    # Laad het schema
-    with open(dir + "schema_Uitwisselmodel.json", "r", encoding="utf-8") as f:
-        schema = json.load(f)
-
-    traject_props = schema["properties"]["leveringen"]["items"]["properties"]["schuldhulptrajecten"]["items"][
+    traject_props = json_schema["properties"]["leveringen"]["items"]["properties"]["schuldhulptrajecten"]["items"][
         "properties"
     ]
-
     gevonden = [p for p in traject_props.keys() if p in verwacht]
     assert gevonden == verwacht, f"Volgorde wijkt af: {gevonden}"
