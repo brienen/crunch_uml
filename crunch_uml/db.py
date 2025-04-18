@@ -88,14 +88,6 @@ def getColumnNames(tablename):
     return [column.name for column in table.columns]
 
 
-# Model definitions
-# class Schema(Base):
-#    __tablename__ = 'schemas'
-
-#    id = Column(String, primary_key=True)  # Use the schema name as ID
-#    definitie = Column(Text)
-
-
 # Koppeltabellen
 class DiagramClass(Base):  # type: ignore
     __tablename__ = "diagram_class"
