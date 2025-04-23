@@ -266,3 +266,100 @@ class CSVRenderer(Renderer):
                 df = df.rename(columns=mapper)
 
             df.to_csv(f"{args.outputfile}_{table_name}.csv", index=False)
+
+@RendererRegistry.register(
+    "shex",
+    descr="Renderer that generates Shape Expressions (ShEx) schema from the model.",
+)
+class SHexRenderer(Renderer):
+    def render(self, args, schema: sch.Schema):
+        filename, _ = os.path.splitext(args.outputfile)
+        with open(f"{filename}.shex", "w") as f:
+            for pkg in schema.get_packages():
+                for clazz in pkg.classes:
+                    f.write(f"<{clazz.name}> {{\n")
+                    for attr in clazz.attributes:
+                        f.write(f"  {attr.name} xsd:{attr.datatype} ;\n")
+                    f.write("}\n\n")
+
+
+@RendererRegistry.register(
+    "profile",
+    descr="Renderer that generates a simple data profile (per class) from the database.",
+)
+class DataProfilerRenderer(Renderer):
+    def render(self, args, schema: sch.Schema):
+        session = schema.get_session()
+        base = db.Base
+        models = base.metadata.tables
+        with open(args.outputfile, "w") as out:
+            for table_name in models:
+                model = base.model_lookup_by_table_name(table_name)
+                if not model:
+                    continue
+                count = session.query(model).filter(model.schema_id == schema.schema_id).count()
+                out.write(f"{table_name}: {count} records\n")
+
+
+@RendererRegistry.register(
+    "uml_mmd",
+    descr="Renderer that generates UML-style class diagram using Mermaid.js syntax.",
+)
+class UMLClassDiagramRenderer(Renderer):
+    def render(self, args, schema: sch.Schema):
+        filename, _ = os.path.splitext(args.outputfile)
+        with open(f"{filename}.mmd", "w") as f:
+            f.write("classDiagram\n")
+            for pkg in schema.get_packages():
+                for clazz in pkg.classes:
+                    f.write(f"  class {clazz.name} {{\n")
+                    for attr in clazz.attributes:
+                        f.write(f"    +{attr.name}: {attr.datatype}\n")
+                    f.write("  }\n")
+                for clazz in pkg.classes:
+                    for assoc in getattr(clazz, "uitgaande_associaties", []):
+                        if getattr(assoc, "dst_class", None):
+                            f.write(f"  {clazz.name} --> {assoc.dst_class.name}\n")
+@RendererRegistry.register(
+    "model_stats_md",
+    descr="Renderer that outputs extended model statistics in Markdown format.",
+)
+class ModelStatisticsMarkdownRenderer(Renderer):
+    def render(self, args, schema: sch.Schema):
+        total_packages = len(schema.get_packages())
+        total_classes = sum(len(pkg.classes) for pkg in schema.get_packages())
+        total_attributes = sum(len(clazz.attributes) for pkg in schema.get_packages() for clazz in pkg.classes)
+        total_associations = sum(
+            len(getattr(clazz, "uitgaande_associaties", [])) for pkg in schema.get_packages() for clazz in pkg.classes
+        )
+        total_enumerations = sum(len(pkg.enumerations) for pkg in schema.get_packages())
+        total_enum_values = sum(len(enum.values) for pkg in schema.get_packages() for enum in pkg.enumerations)
+
+        avg_attributes_per_class = total_attributes / total_classes if total_classes else 0
+        avg_associations_per_class = total_associations / total_classes if total_classes else 0
+
+        with open(args.outputfile, "w") as f:
+            f.write("# Model Statistics\n\n")
+            f.write(f"- **Packages**: {total_packages}\n")
+            f.write(f"- **Classes**: {total_classes}\n")
+            f.write(f"- **Attributes**: {total_attributes}\n")
+            f.write(f"- **Associations**: {total_associations}\n")
+            f.write(f"- **Enumerations**: {total_enumerations}\n")
+            f.write(f"- **Enumeration values**: {total_enum_values}\n")
+            f.write(f"- **Avg. attributes per class**: {avg_attributes_per_class:.2f}\n")
+            f.write(f"- **Avg. associations per class**: {avg_associations_per_class:.2f}\n")
+
+            # Laatste gewijzigde packages
+            recent_packages = sorted(
+                schema.get_packages(), key=lambda p: getattr(p, "modified", None) or getattr(p, "created", None), reverse=True
+            )[:5]
+
+            f.write("\n## Recently Modified Packages\n\n")
+            for pkg in recent_packages:
+                f.write(f"- **{pkg.name}** ")
+                if hasattr(pkg, "modified") and pkg.updated_at:
+                    f.write(f"(last updated: {pkg.updated_at})\n")
+                elif hasattr(pkg, "created") and pkg.created_at:
+                    f.write(f"(created: {pkg.created_at})\n")
+                else:
+                    f.write("(no timestamp available)\n")

@@ -67,16 +67,24 @@ class Jinja2Renderer(ModelRenderer):
 
     def addFilters(self, env):
         def fix_and_format(s):
+
+            def fix_mojibake(text: str) -> str:
+                try:
+                    # Tekst die ten onrechte als Windows-1252 is gelezen, maar eigenlijk UTF-8 was
+                    return text.encode('latin1').decode('utf-8')
+                except UnicodeDecodeError:
+                    return text  # Als het niet fout is, laat het zoals het is
+
             if isinstance(s, bytes):
                 result = from_bytes(s).best()
                 if result:
                     s = str(result)
+                    s = fix_mojibake(s)
+                    s = html.unescape(s)
                 else:
                     return ""
             elif not isinstance(s, str):
                 return ""
-
-            s = html.unescape(s)
 
             def normalize_bullet(line):
                 # Check op opsommingsteken na eventuele inspringing
@@ -112,6 +120,18 @@ class Jinja2Renderer(ModelRenderer):
             "<br>".join(line.strip() for line in s.strip().splitlines()) if isinstance(s, str) else ""
         )
         env.filters["fix_and_format"] = fix_and_format
+        env.filters["trim"] = lambda s: (
+            s.strip() if isinstance(s, str) else ""
+        )
+        # Nieuwe filters toevoegen
+        env.filters["strip"] = lambda s: s.strip() if isinstance(s, str) else ""
+        env.filters["strip_html"] = lambda s: re.sub(r"<[^>]*>", "", s) if isinstance(s, str) else s
+        env.filters["title_case"] = lambda s: inflection.titleize(s) if isinstance(s, str) else ""
+        env.filters["slugify"] = lambda s: inflection.parameterize(s, separator="-") if isinstance(s, str) else ""
+        env.filters["pluralize"] = lambda s: inflection.pluralize(s) if isinstance(s, str) else ""
+        env.filters["singularize"] = lambda s: inflection.singularize(s) if isinstance(s, str) else ""
+        env.filters["truncate"] = lambda s, length=80: (s[:length] + "...") if isinstance(s, str) and len(s) > length else s
+        env.filters["blockquote"] = lambda s: "\n".join(["> " + line for line in s.splitlines()]) if isinstance(s, str) else s
 
     def getFilename(self, inputfilename, extension, uml_generic):
         return f"{inputfilename}_{uml_generic.name}{extension}"
@@ -301,3 +321,167 @@ class JSON_SchemaRenderer(Jinja2Renderer, ClassRenderer):
                 del db.Attribute.getJSONDatatype
             if hasattr(db.Class, "getVerplichteAttributen"):
                 del db.Class.getVerplichteAttributen
+
+
+@RendererRegistry.register(
+    "plain_html",
+    descr="Renderer that generates simple HTML documentation for the model.",
+)
+class PlainHTMLRenderer(Jinja2Renderer):
+    """
+    Renderer that produces basic HTML documentation for each model package.
+    This renderer outputs one HTML file per package using a simple Jinja2 template.
+    """
+    template = "plain_html.j2"  # type: ignore
+    enforce_output_package_ids = False
+
+    def render(self, args, schema: sch.Schema):
+        """
+        Render the model packages into simple HTML files.
+        """
+        filename, extension = os.path.splitext(args.outputfile)
+        template, templatedir = self.getTemplateAndDir(args)
+
+        file_loader = FileSystemLoader(templatedir)
+        env = Environment(loader=file_loader)
+        self.addFilters(env)
+
+        models = self.getModels(args, schema)
+        if not models:
+            msg = "No packages found to render for PlainHTMLRenderer"
+            logger.error(msg)
+            raise CrunchException(msg)
+
+        for index, package in enumerate(models):
+            template_obj = env.get_template(template)
+            output = template_obj.render(package=package, args=args)
+
+            outputfilename = (
+                self.getFilename(filename, ".html", package)
+                if package.name is not None
+                else f"{filename}_{index}.html"
+            )
+            with open(outputfilename, "w") as file:
+                file.write(output)
+            logger.info(f"Plain HTML documentation generated: {outputfilename}")
+
+
+@RendererRegistry.register(
+    "model_overview_md",
+    descr="Renderer that generates a single markdown file with an overview of all models.",
+)
+class ModelOverviewMarkdownRenderer(Jinja2Renderer):
+    """
+    Renderer that creates one markdown file summarizing all models in the schema.
+    Useful for generating a high-level overview in markdown format.
+    """
+    template = "model_overview_markdown.j2"  # type: ignore
+    enforce_output_package_ids = False
+
+    def render(self, args, schema: sch.Schema):
+        """
+        Render a single markdown file containing an overview of all models.
+        """
+        filename, extension = os.path.splitext(args.outputfile)
+        template, templatedir = self.getTemplateAndDir(args)
+
+        file_loader = FileSystemLoader(templatedir)
+        env = Environment(loader=file_loader)
+        self.addFilters(env)
+
+        models = self.getModels(args, schema)
+        if not models:
+            msg = "No packages found to render for ModelOverviewMarkdownRenderer"
+            logger.error(msg)
+            raise CrunchException(msg)
+
+        template_obj = env.get_template(template)
+        output = template_obj.render(models=models, args=args)
+
+        outputfilename = f"{filename}.md"
+        with open(outputfilename, "w") as file:
+            file.write(output)
+        logger.info(f"Model overview markdown generated: {outputfilename}")
+
+
+@RendererRegistry.register(
+    "er_diagram",
+    descr="Renderer that generates an ER diagram visualization via Graphviz.",
+)
+class ERDiagramRenderer(Jinja2Renderer):
+    """
+    Renderer that produces a visual Entity-Relationship diagram for the model.
+    Uses Graphviz to create graphical representations of classes and associations.
+    """
+    template = "er_diagram.dot.j2"  # type: ignore
+    enforce_output_package_ids = False
+
+    def render(self, args, schema: sch.Schema):
+        """
+        Render ER diagrams in DOT format for each model package.
+        The output can then be processed with Graphviz tools to produce images.
+        """
+        filename, extension = os.path.splitext(args.outputfile)
+        template, templatedir = self.getTemplateAndDir(args)
+
+        file_loader = FileSystemLoader(templatedir)
+        env = Environment(loader=file_loader)
+        self.addFilters(env)
+
+        models = self.getModels(args, schema)
+        if not models:
+            msg = "No packages found to render for ERDiagramRenderer"
+            logger.error(msg)
+            raise CrunchException(msg)
+
+        for index, package in enumerate(models):
+            template_obj = env.get_template(template)
+            output = template_obj.render(package=package, args=args)
+
+            outputfilename = (
+                self.getFilename(filename, ".dot", package)
+                if package.name is not None
+                else f"{filename}_{index}.dot"
+            )
+            with open(outputfilename, "w") as file:
+                file.write(output)
+            logger.info(f"ER diagram DOT file generated: {outputfilename}")
+
+
+@RendererRegistry.register(
+    "openapi",
+    descr="Renderer that generates OpenAPI YAML specification for the model.",
+)
+class OpenAPIRenderer(Jinja2Renderer):
+    """
+    Renderer that creates an OpenAPI YAML specification from the model schema.
+    This is useful for generating REST API documentation automatically.
+    """
+    template = "openapi.yaml.j2"  # type: ignore
+    enforce_output_package_ids = True
+
+    def render(self, args, schema: sch.Schema):
+        """
+        Render the OpenAPI YAML file for the model schema.
+        """
+        filename, extension = os.path.splitext(args.outputfile)
+        template, templatedir = self.getTemplateAndDir(args)
+
+        file_loader = FileSystemLoader(templatedir)
+        env = Environment(loader=file_loader)
+        self.addFilters(env)
+
+        models = self.getModels(args, schema)
+        if not models:
+            msg = "No packages found to render for OpenAPIRenderer"
+            logger.error(msg)
+            raise CrunchException(msg)
+
+        # OpenAPI typically outputs a single file, so render all models together
+        template_obj = env.get_template(template)
+        output = template_obj.render(models=models, args=args)
+
+        outputfilename = f"{filename}.yaml"
+        with open(outputfilename, "w") as file:
+            file.write(output)
+        logger.info(f"OpenAPI YAML specification generated: {outputfilename}")

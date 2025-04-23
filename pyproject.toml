@@ -10,3 +10,7 @@ skip-string-normalization = true
 [tool.isort]
 profile = "black"
 skip = ["cli.py"]
+
+[tool.mypy]
+files = ["crunch_uml", "tests"]
+exclude = "^(site-packages|\\.venv)/"
