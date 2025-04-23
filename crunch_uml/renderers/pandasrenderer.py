@@ -267,6 +267,7 @@ class CSVRenderer(Renderer):
 
             df.to_csv(f"{args.outputfile}_{table_name}.csv", index=False)
 
+
 @RendererRegistry.register(
     "shex",
     descr="Renderer that generates Shape Expressions (ShEx) schema from the model.",
@@ -275,7 +276,7 @@ class SHexRenderer(Renderer):
     def render(self, args, schema: sch.Schema):
         filename, _ = os.path.splitext(args.outputfile)
         with open(f"{filename}.shex", "w") as f:
-            for pkg in schema.get_packages():
+            for pkg in schema.get_all_packages():
                 for clazz in pkg.classes:
                     f.write(f"<{clazz.name}> {{\n")
                     for attr in clazz.attributes:
@@ -310,7 +311,7 @@ class UMLClassDiagramRenderer(Renderer):
         filename, _ = os.path.splitext(args.outputfile)
         with open(f"{filename}.mmd", "w") as f:
             f.write("classDiagram\n")
-            for pkg in schema.get_packages():
+            for pkg in schema.get_all_packages():
                 for clazz in pkg.classes:
                     f.write(f"  class {clazz.name} {{\n")
                     for attr in clazz.attributes:
@@ -320,20 +321,24 @@ class UMLClassDiagramRenderer(Renderer):
                     for assoc in getattr(clazz, "uitgaande_associaties", []):
                         if getattr(assoc, "dst_class", None):
                             f.write(f"  {clazz.name} --> {assoc.dst_class.name}\n")
+
+
 @RendererRegistry.register(
     "model_stats_md",
     descr="Renderer that outputs extended model statistics in Markdown format.",
 )
 class ModelStatisticsMarkdownRenderer(Renderer):
     def render(self, args, schema: sch.Schema):
-        total_packages = len(schema.get_packages())
-        total_classes = sum(len(pkg.classes) for pkg in schema.get_packages())
-        total_attributes = sum(len(clazz.attributes) for pkg in schema.get_packages() for clazz in pkg.classes)
+        total_packages = len(schema.get_all_packages())
+        total_classes = sum(len(pkg.classes) for pkg in schema.get_all_packages())
+        total_attributes = sum(len(clazz.attributes) for pkg in schema.get_all_packages() for clazz in pkg.classes)
         total_associations = sum(
-            len(getattr(clazz, "uitgaande_associaties", [])) for pkg in schema.get_packages() for clazz in pkg.classes
+            len(getattr(clazz, "uitgaande_associaties", []))
+            for pkg in schema.get_all_packages()
+            for clazz in pkg.classes
         )
-        total_enumerations = sum(len(pkg.enumerations) for pkg in schema.get_packages())
-        total_enum_values = sum(len(enum.values) for pkg in schema.get_packages() for enum in pkg.enumerations)
+        total_enumerations = sum(len(pkg.enumerations) for pkg in schema.get_all_packages())
+        total_enum_values = sum(len(enum.values) for pkg in schema.get_all_packages() for enum in pkg.enumerations)
 
         avg_attributes_per_class = total_attributes / total_classes if total_classes else 0
         avg_associations_per_class = total_associations / total_classes if total_classes else 0
@@ -351,7 +356,13 @@ class ModelStatisticsMarkdownRenderer(Renderer):
 
             # Laatste gewijzigde packages
             recent_packages = sorted(
-                schema.get_packages(), key=lambda p: getattr(p, "modified", None) or getattr(p, "created", None), reverse=True
+                schema.get_all_packages(),
+                key=lambda p: (
+                    getattr(p, "modified", float('-inf'))
+                    if hasattr(p, "modified")
+                    else getattr(p, "created", float('-inf'))
+                ),
+                reverse=True,
             )[:5]
 
             f.write("\n## Recently Modified Packages\n\n")
