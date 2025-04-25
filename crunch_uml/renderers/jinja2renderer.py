@@ -81,6 +81,7 @@ class Jinja2Renderer(ModelRenderer):
                     s = str(result)
                     s = fix_mojibake(s)
                     s = html.unescape(s)
+                    s = s.replace("\\", "\\\\").replace('"', '\"').replace("'", "\'")
                 else:
                     return ""
             elif not isinstance(s, str):
@@ -98,39 +99,73 @@ class Jinja2Renderer(ModelRenderer):
             lines = [normalize_bullet(line.rstrip()) for line in lines if line.strip() != ""]
             return "<br>".join(lines)
 
-        # Voeg het inflection filter toe
+        # Zet tekst om naar snake_case
         env.filters["snake_case"] = lambda s: (inflection.underscore(s.replace(" ", "")) if isinstance(s, str) else "")
+
+        # Zet tekst om naar PascalCase
         env.filters["pascal_case"] = lambda s: (inflection.camelize(s.replace(" ", "")) if isinstance(s, str) else "")
+
+        # Zet tekst om naar camelCase
         env.filters["camel_case"] = lambda s: (
             inflection.camelize(s.replace(" ", ""), False) if isinstance(s, str) else ""
         )
+
+        # Vervang spaties en koppeltekens door underscores (Python-compatibel)
         env.filters["pythonize"] = lambda s: (s.replace(" ", "").replace("-", "_") if isinstance(s, str) else "")
+
+        # Voeg Markdown quote-tekens toe aan nieuwe regels
         env.filters["md_newline"] = lambda s: (
             s.replace("\n", "\n> ").replace("\r\n", "\r\n> ") if isinstance(s, str) else ""
         )
+
+        # Verwijder nieuwe regels uit de tekst
         env.filters["del_newline"] = lambda s: (s.replace("\n", " ").replace("\r\n", " ") if isinstance(s, str) else "")
+
+        # Maak van een URL een klikbare Markdown-link
         env.filters["set_url"] = lambda s: f"[{s}]({s})" if validators.url(s) else s
+
+        # Verwijder items uit een lijst waarvoor een bepaalde methode True retourneert
         env.filters["reject_method"] = lambda iterable, method_name: [
             item for item in iterable if not getattr(item, method_name)()
         ]
+
+        # Sorteer relaties op 'order', waarbij None als oneindig groot wordt behandeld
         env.filters["sort_order"] = lambda rels: sorted(
             rels if rels else [], key=lambda rel: float('inf') if rel.order is None else rel.order
         )
+
+        # Verander meerdere regels tekst in Markdown met <br> scheiding
         env.filters["mdonize"] = lambda s: (
             "<br>".join(line.strip() for line in s.strip().splitlines()) if isinstance(s, str) else ""
         )
+
+        # Formatteer en escape tekst (reeds aanwezig als 'fix_and_format')
         env.filters["fix_and_format"] = fix_and_format
+
+        # Verwijder voor- en achterliggende spaties
         env.filters["trim"] = lambda s: (s.strip() if isinstance(s, str) else "")
-        # Nieuwe filters toevoegen
-        env.filters["strip"] = lambda s: s.strip() if isinstance(s, str) else ""
+
+        # Verwijder alle HTML-tags uit de tekst
         env.filters["strip_html"] = lambda s: re.sub(r"<[^>]*>", "", s) if isinstance(s, str) else s
+
+        # Zet tekst om naar Title Case
         env.filters["title_case"] = lambda s: inflection.titleize(s) if isinstance(s, str) else ""
+
+        # Maak een slug (URL-vriendelijke tekst)
         env.filters["slugify"] = lambda s: inflection.parameterize(s, separator="-") if isinstance(s, str) else ""
+
+        # Zet enkelvoud naar meervoud
         env.filters["pluralize"] = lambda s: inflection.pluralize(s) if isinstance(s, str) else ""
+
+        # Zet meervoud naar enkelvoud
         env.filters["singularize"] = lambda s: inflection.singularize(s) if isinstance(s, str) else ""
+
+        # Kort tekst af tot een bepaalde lengte
         env.filters["truncate"] = lambda s, length=80: (
             (s[:length] + "...") if isinstance(s, str) and len(s) > length else s
         )
+
+        # Voeg Markdown blockquote syntax toe aan iedere regel
         env.filters["blockquote"] = lambda s: (
             "\n".join(["> " + line for line in s.splitlines()]) if isinstance(s, str) else s
         )

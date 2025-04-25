@@ -273,13 +273,26 @@ class CSVRenderer(Renderer):
     descr="Renderer that generates Shape Expressions (ShEx) schema from the model.",
 )
 class SHexRenderer(Renderer):
+    """
+    Render de Shape Expressions (ShEx) van het model naar een .shex bestand.
+
+    Args:
+        args: Argumenten waaronder de bestandsnaam (zonder extensie).
+        schema (sch.Schema): Het informatiemodel met alle pakketten en klassen.
+
+    Output:
+        Een ShEx-bestand (.shex) dat de klassen en attributen beschrijft.
+    """
+
     def render(self, args, schema: sch.Schema):
         filename, _ = os.path.splitext(args.outputfile)
         with open(f"{filename}.shex", "w") as f:
             for pkg in schema.get_all_packages():
                 for clazz in pkg.classes:
+                    # Start de beschrijving van een ShEx shape voor elke klasse
                     f.write(f"<{clazz.name}> {{\n")
                     for attr in clazz.attributes:
+                        # Voeg een propertyregel toe voor elk attribuut met naam en datatype
                         f.write(f"  {attr.name} xsd:{attr.datatype} ;\n")
                     f.write("}\n\n")
 
