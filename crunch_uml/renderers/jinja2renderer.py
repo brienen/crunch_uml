@@ -37,13 +37,13 @@ def fix_and_format_text(s, mode="markdown"):
             s = str(result)
             s = fix_mojibake(s)
             s = html.unescape(s)
+
+            # Escaping quotes en backslashes
+            s = s.replace('"', '&#34;').replace("'", "&#39;")
         else:
             return ""
     elif not isinstance(s, str):
         return ""
-
-    # Escaping quotes en backslashes
-    s = s.replace("\\", "\\\\").replace('"', '\\"').replace("'", "\\'")
 
     def normalize_bullet(line):
         match = re.match(r"^(\s*)([-■•*·●◦‣›»▪–—])(\s+)(.*)", line)
