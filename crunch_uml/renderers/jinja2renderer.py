@@ -17,6 +17,53 @@ from crunch_uml.renderers.renderer import ClassRenderer, ModelRenderer, Renderer
 logger = logging.getLogger()
 
 
+def fix_mojibake(text: str) -> str:
+    try:
+        # Tekst die ten onrechte als Windows-1252 is gelezen, maar eigenlijk UTF-8 was
+        return text.encode('latin1').decode('utf-8')
+    except UnicodeDecodeError:
+        return text  # Als het niet fout is, laat het zoals het is
+
+
+def fix_and_format_text(s, mode="markdown"):
+    """
+    Formatteert en escapt tekst afhankelijk van het doel:
+    - mode="markdown": geschikt voor HTML/Markdown gebruik
+    - mode="alert": geschikt voor JavaScript alert() boxen
+    """
+    if isinstance(s, bytes):
+        result = from_bytes(s).best()
+        if result:
+            s = str(result)
+            s = fix_mojibake(s)
+            s = html.unescape(s)
+        else:
+            return ""
+    elif not isinstance(s, str):
+        return ""
+
+    # Escaping quotes en backslashes
+    s = s.replace("\\", "\\\\").replace('"', '\\"').replace("'", "\\'")
+
+    def normalize_bullet(line):
+        match = re.match(r"^(\s*)([-■•*·●◦‣›»▪–—])(\s+)(.*)", line)
+        if match:
+            indent, _, spacing, rest = match.groups()
+            bullet = "-" if mode == "alert" else "•"
+            return f"{indent}{bullet} {rest}"
+        return line
+
+    lines = s.strip().splitlines()
+    lines = [normalize_bullet(line.rstrip()) for line in lines if line.strip() != ""]
+
+    if mode == "markdown":
+        return "<br>".join(lines)
+    elif mode == "alert":
+        return "\\n".join(lines)
+    else:
+        raise ValueError(f"Unsupported mode '{mode}'. Use 'markdown' or 'alert'.")
+
+
 @RendererRegistry.register(
     "jinja2",
     descr="Renderer that uses Jinja2 to renders one file per model in the database, "
@@ -66,38 +113,6 @@ class Jinja2Renderer(ModelRenderer):
         return template, templatedir
 
     def addFilters(self, env):
-        def fix_and_format(s):
-
-            def fix_mojibake(text: str) -> str:
-                try:
-                    # Tekst die ten onrechte als Windows-1252 is gelezen, maar eigenlijk UTF-8 was
-                    return text.encode('latin1').decode('utf-8')
-                except UnicodeDecodeError:
-                    return text  # Als het niet fout is, laat het zoals het is
-
-            if isinstance(s, bytes):
-                result = from_bytes(s).best()
-                if result:
-                    s = str(result)
-                    s = fix_mojibake(s)
-                    s = html.unescape(s)
-                    s = s.replace("\\", "\\\\").replace('"', '\"').replace("'", "\'")
-                else:
-                    return ""
-            elif not isinstance(s, str):
-                return ""
-
-            def normalize_bullet(line):
-                # Check op opsommingsteken na eventuele inspringing
-                match = re.match(r"^(\s*)([-■•*·●◦‣›»▪–—])(\s+)(.*)", line)
-                if match:
-                    indent, _, spacing, rest = match.groups()
-                    return f"{indent}•{spacing}{rest}"
-                return line
-
-            lines = s.strip().splitlines()
-            lines = [normalize_bullet(line.rstrip()) for line in lines if line.strip() != ""]
-            return "<br>".join(lines)
 
         # Zet tekst om naar snake_case
         env.filters["snake_case"] = lambda s: (inflection.underscore(s.replace(" ", "")) if isinstance(s, str) else "")
@@ -139,8 +154,11 @@ class Jinja2Renderer(ModelRenderer):
             "<br>".join(line.strip() for line in s.strip().splitlines()) if isinstance(s, str) else ""
         )
 
-        # Formatteer en escape tekst (reeds aanwezig als 'fix_and_format')
-        env.filters["fix_and_format"] = fix_and_format
+        # Formatteer en escape tekst voor gebruik in alert boxes
+        env.filters["fix_and_format_alert"] = lambda s: fix_and_format_text(s, mode="alert")
+
+        # Formatteer en escape tekst voor gebruik in markdown
+        env.filters["fix_and_format"] = lambda s: fix_and_format_text(s, mode="markdown")
 
         # Verwijder voor- en achterliggende spaties
         env.filters["trim"] = lambda s: (s.strip() if isinstance(s, str) else "")
