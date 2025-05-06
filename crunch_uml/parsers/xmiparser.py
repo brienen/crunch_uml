@@ -13,6 +13,12 @@ from crunch_uml.parsers.parser import Parser, ParserRegistry
 logger = logging.getLogger()
 
 
+def extract_declared_encoding(xml_bytes):
+    match = re.search(br'<\?xml[^>]*encoding=["\']([^"\']+)["\']', xml_bytes)
+    if match:
+        return match.group(1).decode("ascii")
+    return None
+
 def load_xmi(source):
     if source.startswith("http://") or source.startswith("https://"):
         response = requests.get(source)
@@ -20,18 +26,20 @@ def load_xmi(source):
     else:
         with open(source, "rb") as f:
             raw = f.read()
-    detected = chardet.detect(raw)
-    original_encoding = detected["encoding"] or const.ENCODING
+
+    declared_encoding = extract_declared_encoding(raw)
+    detected_encoding = chardet.detect(raw)["encoding"]
+    used_encoding = declared_encoding or detected_encoding or const.ENCODING
+
     try:
-        # Decode altijd naar unicode string
-        text = raw.decode(original_encoding).lstrip('\ufeff')
-        # Encode daarna expliciet naar utf-8
+        text = raw.decode(used_encoding).lstrip('\ufeff')
+        # Corrigeer header
+        text = re.sub(r'(<\?xml[^>]*encoding=["\'])([^"\']+)(["\'])', r'\1utf-8\3', text, flags=re.IGNORECASE)
         utf8_bytes = text.encode(const.ENCODING)
         parser = etree.XMLParser(recover=True, encoding=const.ENCODING)
         return etree.fromstring(utf8_bytes, parser)
     except Exception as e:
-        raise RuntimeError(f"Probleem met XMI inlezen (oorspronkelijke encoding: {original_encoding}): {e}")
-
+        raise RuntimeError(f"Probleem met XMI inlezen (declared: {declared_encoding}, detected: {detected_encoding}): {e}")
 
 def remove_EADatatype(input_string):
     pattern = r"^EA[\d\w]+_"
