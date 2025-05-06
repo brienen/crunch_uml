@@ -19,6 +19,7 @@ def extract_declared_encoding(xml_bytes):
         return match.group(1).decode("ascii")
     return None
 
+
 def load_xmi(source):
     if source.startswith("http://") or source.startswith("https://"):
         response = requests.get(source)
@@ -39,7 +40,10 @@ def load_xmi(source):
         parser = etree.XMLParser(recover=True, encoding=const.ENCODING)
         return etree.fromstring(utf8_bytes, parser)
     except Exception as e:
-        raise RuntimeError(f"Probleem met XMI inlezen (declared: {declared_encoding}, detected: {detected_encoding}): {e}")
+        raise RuntimeError(
+            f"Probleem met XMI inlezen (declared: {declared_encoding}, detected: {detected_encoding}): {e}"
+        )
+
 
 def remove_EADatatype(input_string):
     pattern = r"^EA[\d\w]+_"
