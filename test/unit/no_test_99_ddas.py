@@ -8,6 +8,10 @@ from jsonschema import validate
 # import crunch_uml.schema as sch
 from crunch_uml import cli
 
+# Schuldhulp
+ROOT_IM_SCHULDHULP = "EAPK_06C51790_1F81_4ac4_8E16_5177352EF2E1"
+ROOT_CLASS_UM_SCHULDHULP = "EAID_6b4326e3_eb4e_41d2_902b_0bff06604f63"
+
 
 @pytest.mark.slow
 def test_importAndTransform_schuldhulp():
@@ -43,7 +47,7 @@ def test_importAndTransform_schuldhulp():
         "-sch_to",
         "schuldhulp_informatiemodel",
         "-rt_pkg",
-        "EAPK_06C51790_1F81_4ac4_8E16_5177352EF2E1",
+        ROOT_IM_SCHULDHULP,
         "--plugin_class_name",
         "DDASPluginInformatiemodel",
         "--plugin_file_name",
@@ -69,7 +73,7 @@ def test_importAndTransform_schuldhulp():
         "-sch_to",
         "schuldhulp_uitwisselmodel",
         "-rt_pkg",
-        "EAPK_06C51790_1F81_4ac4_8E16_5177352EF2E1",
+        ROOT_IM_SCHULDHULP,
         "--plugin_class_name",
         "DDASPluginUitwisselmodel",
         "--plugin_file_name",
@@ -95,7 +99,7 @@ def test_importAndTransform_schuldhulp():
         "-f",
         "./test/output/schema.json",
         "--output_class_id",
-        "EAID_6b4326e3_eb4e_41d2_902b_0bff06604f63",
+        ROOT_CLASS_UM_SCHULDHULP,
         "-js_url",
         "https://raw.githubusercontent.com/brienen/ddas/main/json_schema_Uitwisselmodel.json",
     ]
