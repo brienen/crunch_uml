@@ -72,3 +72,14 @@ LANGUAGE_TRANSLATE_FIELDS = [
 COLUMN_DOMEIN_IV3 = 'domein_iv3'
 COLUMN_DOMEIN_GGM_UML_TYPE = 'ggm_uml_type'
 COLUMN_DOMEIN_DATUM_TIJD_EXPORT = 'Datum-tijd-export'
+
+TAG_PROFILE = {'class': {'table': 't_object',
+                         'properties': 't_objectproperties',
+                         'stereotype': 'ObjectType'},
+               'attribute': {'table': 't_attribute',
+                             'properties': 't_attributeproperties',
+                             'stereotype': 'AttributeType'},
+               'association': {'table': 't_association',
+                              'properties': 't_associationproperties',
+                              'stereotype': 'AssociationType'},
+}
