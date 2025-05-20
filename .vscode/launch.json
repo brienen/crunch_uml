@@ -88,7 +88,7 @@
             "justMyCode": true,
             "args": ["import",
                 "-t", "eaxmi",
-                "-f", "/Users/arjen/Dropbox/Development/Gemeentelijk-Gegevensmodel/Gemeentelijk Gegevensmodel XMI2.1.xml",
+                "-f", "/Users/arjen/kDrive/Development/Gemeentelijk-Gegevensmodel-v2.4.0/v2.4.0/Gemeentelijk Gegevensmodel XMI2.1.xml",
                 "-db_create" //,
                 //"--skip_xmi_relations"
             ],

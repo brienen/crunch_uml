@@ -1,10 +1,9 @@
 import logging
 import os
-import re
 from urllib.parse import quote, urljoin, urlunparse
 
 from rdflib import BNode, Graph, Literal, Namespace
-from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SH, XSD
+from rdflib.namespace import OWL, RDF, RDFS, SH, XSD
 
 import crunch_uml.schema as sch
 from crunch_uml import const, util
@@ -12,10 +11,6 @@ from crunch_uml.exceptions import CrunchException
 from crunch_uml.renderers.renderer import ModelRenderer, RendererRegistry
 
 logger = logging.getLogger()
-
-
-def slugify(name):
-    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
 
 class LodRenderer(ModelRenderer):
@@ -29,13 +24,6 @@ class LodRenderer(ModelRenderer):
 
     def render(self, args, zchema: sch.Schema):
         try:
-            TYPEMAP = {
-                "string": XSD.string,
-                "integer": XSD.integer,
-                "boolean": XSD.boolean,
-                "date": XSD.date,
-            }
-
             if args.linked_data_namespace is None:
                 logger.warning(
                     f'No namespace provided via parameter "linked_data_namespace", using default {const.DEFAULT_LOD_NS}'
@@ -67,29 +55,28 @@ class LodRenderer(ModelRenderer):
             # First add all classes
             try:
                 for model in models:
-                    modelname = util.remove_substring(model.name, "model").lower()
+                    modelname = util.remove_substring(model.name, "model")
                     ns = Namespace(urljoin(str(args.linked_data_namespace), f"/{quote(modelname)}/"))
 
                     for cls in model.classes:
-                        class_uri = ns[slugify(cls.name)] if cls.name else ns[slugify(cls.id)]
+                        class_uri = ns[quote(cls.name)] if cls.name else ns[quote(cls.id)]
                         # Werk eerst de dict bij
                         class_dict[cls.id] = class_uri
 
                         # Voeg de klasse toe
                         g.add((class_uri, RDF.type, OWL.Class))
                         g.add((class_uri, RDFS.label, Literal(cls.name)))
-                        g.add((class_uri, DCTERMS.identifier, Literal(cls.id)))
+                        g.add((class_uri, RDFS.comment, Literal(f"id: {cls.id}")))
                         if cls.definitie is not None:
                             g.add((class_uri, RDFS.comment, Literal(cls.definitie)))
 
                         for attribute in cls.attributes:
                             if attribute.name is not None and attribute.primitive is not None:
-                                attr_uri = ns[slugify(attribute.name)] if attribute.name else ns[slugify(attribute.id)]
+                                attr_uri = ns[quote(attribute.name)] if attribute.name else ns[attribute.id]
                                 g.add((attr_uri, RDF.type, OWL.DatatypeProperty))
                                 g.add((attr_uri, RDFS.domain, class_uri))
                                 g.add((attr_uri, RDFS.label, Literal(attribute.name)))
                                 g.add((attr_uri, RDFS.range, XSD.string))
-                                g.add((attr_uri, DCTERMS.identifier, Literal(attribute.id)))
                                 if attribute.definitie is not None:
                                     g.add(
                                         (
@@ -101,26 +88,20 @@ class LodRenderer(ModelRenderer):
 
                     # Add SHACL NodeShapes for each class
                     for cls in model.classes:
-                        class_uri = ns[slugify(cls.name)] if cls.name else ns[slugify(cls.id)]
+                        class_uri = ns[quote(cls.name)] if cls.name else ns[quote(cls.id)]
                         shape_uri = (
-                            shape_ns[slugify(cls.name + "Shape")] if cls.name else shape_ns[slugify(cls.id + "Shape")]
+                            shape_ns[quote(cls.name + "Shape")] if cls.name else shape_ns[quote(cls.id + "Shape")]
                         )
                         g.add((shape_uri, RDF.type, SH.NodeShape))
                         g.add((shape_uri, SH.targetClass, class_uri))
-                        g.add((shape_uri, DCTERMS.identifier, Literal(cls.id)))
 
                         for attribute in cls.attributes:
                             if attribute.name is not None and attribute.primitive is not None:
                                 prop_bnode = BNode()
-                                attr_uri = ns[slugify(attribute.name)] if attribute.name else ns[slugify(attribute.id)]
+                                attr_uri = ns[quote(attribute.name)] if attribute.name else ns[attribute.id]
                                 g.add((shape_uri, SH.property, prop_bnode))
                                 g.add((prop_bnode, SH.path, attr_uri))
-                                shacl_type = TYPEMAP.get(attribute.primitive.lower(), XSD.string)
-                                g.add((prop_bnode, SH.datatype, shacl_type))
-                                g.add((prop_bnode, SH.minCount, Literal(0)))
-                                g.add((prop_bnode, SH.maxCount, Literal(1)))
-                                if attribute.definitie:
-                                    g.add((prop_bnode, SH.description, Literal(attribute.definitie)))
+                                g.add((prop_bnode, SH.datatype, XSD.string))
             except Exception as e:
                 logger.exception("Fout tijdens het renderen van modellen:")
                 raise CrunchException(f"Renderproces mislukt: {e}") from e
@@ -143,12 +124,11 @@ class LodRenderer(ModelRenderer):
                         to_cls = class_dict.get(assoc.dst_class.id)
 
                         if from_cls is not None and to_cls is not None:
-                            assoc_uri = ns[slugify(assoc.name)] if assoc.name else ns[slugify(assoc.id)]
+                            assoc_uri = ns[quote(assoc.name)] if assoc.name else ns[assoc.id]
                             g.add((assoc_uri, RDF.type, OWL.ObjectProperty))
                             g.add((assoc_uri, RDFS.domain, from_cls))
                             g.add((assoc_uri, RDFS.range, to_cls))
                             g.add((assoc_uri, RDFS.label, Literal(assoc.name)))
-                            g.add((assoc_uri, DCTERMS.identifier, Literal(assoc.id)))
                             if assoc.definitie is not None:
                                 g.add((assoc_uri, RDFS.comment, Literal(assoc.definitie)))
 
