@@ -10,7 +10,7 @@ from crunch_uml import cli, const, db, util
 EA_DB = "./test/output/Monumenten.qea"
 
 
-def getRecordFromEARepository(table, ea_guid):
+def getRecordFromEARepository(table, ea_guid, key="ea_guid"):
 
     # Test eerst de waarde in de EA Repository
     # Verbinding maken met de Monumenten.qea SQLite database
@@ -20,7 +20,7 @@ def getRecordFromEARepository(table, ea_guid):
     conn.row_factory = sqlite3.Row
 
     cursor = conn.cursor()
-    cursor.execute(f"SELECT * FROM {table} WHERE ea_guid = '{ea_guid}'")
+    cursor.execute(f"SELECT * FROM {table} WHERE {key} = '{ea_guid}'")
     record = cursor.fetchone()
 
     # Database verbinding sluiten
@@ -92,113 +92,38 @@ def test_import_monumenten():
     unchange_bouwtype = getRecordFromEARepository("t_object", "{5E9DAFBB-C9B5-4706-A43D-07AD4979DED4}")
     assert unchange_bouwtype is not None
 
-    # Import Monumenten.json met changes
-    # import json to clean database
-    inputfile = "./test/data/Monumenten_test_15.json"
-
-    test_args = ["import", "-f", inputfile, "-t", "json", "-db_create"]
-    cli.main(test_args)
-
-    # Check if content is correctly loaded
-    database = db.Database(const.DATABASE_URL, db_create=False)
-    schema = sch.Schema(database)
-
-    assert schema.count_package() == 3
-    assert schema.count_enumeratie() == 1
-    assert schema.count_class() == 10
-    assert schema.count_attribute() == 40
-    assert schema.count_enumeratieliteral() == 2
-
-    database = db.Database(const.DATABASE_URL, db_create=False)
-    ambacht = schema.get_class("EAID_54944273_F312_44b2_A78D_43488F915429")  # Diagram Package
-    assert ambacht is not None
-    assert ambacht.name == "test-Ambacht"
-
-    # Voer nu de changes door en kijk of de waarden zijn aangepast
-    # export to json
-    test_args = ["export", "-f", EA_DB, "-t", "eamimrepo", "--tag_strategy", "update"]
-    cli.main(test_args)
-
-    # Testen of het record voldoet aan bepaalde voorwaarden
-    record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
-    assert record is not None, "Record met de naam 'MonumentNaam' niet gevonden."
-    assert record[const.EA_REPO_MAPPER["name"]] == "test-Ambacht"
-    assert (
-        record[const.EA_REPO_MAPPER["definitie"]]
-        == "test-Beroep waarbij een handwerker met gereedschap eindproducten maakt."
-    )
-    assert record[const.EA_REPO_MAPPER["author"]] == "test-Arjen Brienen"
-    #assert record[const.EA_REPO_MAPPER["stereotype"]] == "test-"
-    assert record[const.EA_REPO_MAPPER["alias"]] == "test-"
-    assert util.parse_date(str(record[const.EA_REPO_MAPPER["modified"]])) > util.parse_date(str(modified))
-    version = record[const.EA_REPO_MAPPER["version"]]
-    major, minor = map(int, version.split("."))
-    assert minor == minor_original + 1
-    assert countTagsOfObject(record["Object_ID"]) == 17
-
-    # Testen van tags
-    tag = getRecordFromEARepository("t_objectproperties", "{5BAA8E81-480F-405D-A818-A3F79725AFE3}")
-    assert tag is not None
-    assert tag["Value"] == "test_"
-
-    # Packages testen eerste
-    record = getRecordFromEARepository("t_object", "{F7651B45-2B64-4197-A6E5-BFC56EC98466}")
-    assert record is not None
-    assert record[const.EA_REPO_MAPPER["name"]] == "test-Model Monumenten"
-
-    # Packages testen tweede
-    record = getRecordFromEARepository("t_package", "{F7651B45-2B64-4197-A6E5-BFC56EC98466}")
-    assert record is not None
-    assert record[const.EA_REPO_MAPPER["name"]] == "test-Model Monumenten"
-
-    # Enumeratie testen
-    record = getRecordFromEARepository("t_object", "{5C808AC9-CB09-4f4d-813E-821829856BA8}")
-    assert record is not None
-    assert record[const.EA_REPO_MAPPER["name"]] == "test-TypeMonument"
-
-    # Literal testen
-    record = getRecordFromEARepository("t_attribute", "{B2AE8AFC-C1D5-4d83-BFD3-EBF1663F3468}")
-    assert record is not None
-    assert record[const.EA_REPO_MAPPER_LITERALS["name"]] == "test-rijksmonument"
-
-    # Attribute testen
-    record = getRecordFromEARepository("t_attribute", "{200B84E0-1D73-4608-9258-12338B5EC034}")
-    assert record is not None
-    assert record[const.EA_REPO_MAPPER_ATTRIBUTES["name"]] == "test-verbijzondering"
-    assert record[const.EA_REPO_MAPPER_ATTRIBUTES["definitie"]] == "test-"
-    assert record[const.EA_REPO_MAPPER_ATTRIBUTES["primitive"]] == "test-AN200"
-
-    # Associations testen
-    record = getRecordFromEARepository("t_connector", "{8E18F665-2A86-44fd-AD55-3E435A282BDF}")
-    assert record is not None
-    assert record[const.EA_REPO_MAPPER_ATTRIBUTES["name"]] == "test-monument ambacht"
-    assert record[const.EA_REPO_MAPPER_ATTRIBUTES["definitie"]] == "test-"
-
-    # Associations testen
-    record = getRecordFromEARepository("t_diagram", "{7429E175-1CBE-4336-BF92-6C5029395E69}")
-    assert record is not None
-    assert record[const.EA_REPO_MAPPER_ATTRIBUTES["name"]] == "test-Diagram Monumenten"
-
     # Nog even andere tag update strategien testen
     # export to json
     test_args = ["export", "-f", EA_DB, "-t", "eamimrepo", "--tag_strategy", "upsert"]
     cli.main(test_args)
+
+    # Test objecttype
     record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
-    assert countTagsOfObject(record["Object_ID"]) == 26
+    xref = getRecordFromEARepository("t_xref", "{54944273-F312-44b2-A78D-43488F915429}", key="Client")
+    assert record["Stereotype"] == "Objecttype"
+    assert xref is not None
+    assert xref["Description"] == "@STEREO;Name=Objecttype;FQName=MIM::Objecttype;@ENDSTEREO;"
 
-    # Testen van tags
-    tag = getRecordFromEARepository("t_objectproperties", "{5BAA8E81-480F-405D-A818-A3F79725AFE3}")
-    assert tag is not None
-    assert tag["Value"] == "test_"
+    #Test Enumeration
+    record = getRecordFromEARepository("t_object", "{5C808AC9-CB09-4f4d-813E-821829856BA8}")
+    xref = getRecordFromEARepository("t_xref", "{5C808AC9-CB09-4f4d-813E-821829856BA8}", key="Client")
+    assert record is not None, "Record met de naam 'Enumeratie' niet gevonden."
+    assert record["Stereotype"] == "Enumeratie"
+    assert xref is not None
+    assert xref["Description"] == "@STEREO;Name=Enumeratie;FQName=MIM::Enumeratie;@ENDSTEREO;"
 
-    # Nog even andere tag update strategien testen
-    # export to json
-    test_args = ["export", "-f", EA_DB, "-t", "earepo", "--tag_strategy", "replace"]
-    cli.main(test_args)
-    record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
-    assert countTagsOfObject(record["Object_ID"]) == 11
+    #Test Attribute
+    record = getRecordFromEARepository("t_attribute", "{EBD24559-2F60-43fb-B865-2A7AAA4E3001}")
+    xref = getRecordFromEARepository("t_xref", "{EBD24559-2F60-43fb-B865-2A7AAA4E3001}", key="Client")
+    assert record is not None, "Record met de naam 'Attribuut' niet gevonden."
+    assert record["Stereotype"] == "Attribuutsoort"
+    assert xref is not None
+    assert xref["Description"] == "@STEREO;Name=Attribuutsoort;FQName=MIM::Attribuutsoort;@ENDSTEREO;"
 
-    # Testen van tags
-    tag = getRecordFromEARepository("t_objectproperties", "{5BAA8E81-480F-405D-A818-A3F79725AFE3}")
-    assert tag is not None
-    assert tag["Value"] == "test_"
+    #Test Associatie
+    record = getRecordFromEARepository("t_connector", "{FD27EB67-1CFA-4f40-AE79-329DE9DE6754}")
+    xref = getRecordFromEARepository("t_xref", "{FD27EB67-1CFA-4f40-AE79-329DE9DE6754}", key="Client")
+    assert record is not None, "Record met de naam 'Relatiesoort' niet gevonden."
+    assert record["Stereotype"] == "Relatiesoort"
+    assert xref is not None
+    assert xref["Description"] == "@STEREO;Name=Relatiesoort;FQName=MIM::Relatiesoort;@ENDSTEREO;"

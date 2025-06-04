@@ -273,3 +273,12 @@ def reorder_dict(original_dict, order_list):
     # Combineer beide
     reordered.update(remaining)
     return reordered
+
+def split_number(code):
+    code = code.strip()  # verwijder spaties voor en na
+    match = re.match(r"^([A-Z]+)(\d*)$", code)
+    if match:
+        letters, digits = match.groups()
+        return letters, digits
+    else:
+        return None, None

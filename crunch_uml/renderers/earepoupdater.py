@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from sqlalchemy import Column, MetaData, create_engine, insert, text
+from sqlalchemy import Column, MetaData, create_engine, insert, text, or_, and_
 from sqlalchemy.orm import sessionmaker
 
 import crunch_uml.schema as sch
@@ -644,6 +644,61 @@ class EAMIMRepoUpdater(EARepoUpdater):
         else:
             logger.warning(f"Unknown recordtype {recordtype}, not setting stereotype.")
 
+        # Set data type for attributes
+        if recordtype == const.RECORDTYPE_ATTRIBUTE:
+
+            # Skip values that point to a datatype
+            datatype_input = data_dict.get("Type", None).lower().strip() if data_dict.get("Type", None) else None
+            table = metadata.tables["t_attribute"]
+            record = session.query(table).filter_by(
+                ea_guid=util.fromEAGuid(data_dict.get("ea_guid"))
+            ).first()
+
+            if datatype_input is not None and (record.Classifier is None or record.Classifier == 0 or record.Classifier == "0"):
+                if datatype_input.startswith("an") or datatype_input in ["text", "string", "characterstring", "tekst"]:
+                    datatype = "CharacterString"
+                    data_dict["Classifier"] = self.datatype_map.get(datatype, None)
+                    data_dict["Type"] = datatype
+                    dt, number = util.split_number(datatype_input)
+                    if number is not None:
+                        data_dict["length"] = number
+                elif datatype_input.startswith("n") or datatype_input.startswith("int") or datatype_input.startswith("number"):
+                    datatype = "Integer"
+                    data_dict["Classifier"] = self.datatype_map.get(datatype, None)
+                    data_dict["Type"] = datatype
+                    dt, number = util.split_number(datatype_input)
+                    if number is not None:
+                        data_dict["length"] = number
+                elif datatype_input in ["date", "datum"]:
+                    datatype = "Date"
+                    data_dict["Classifier"] = self.datatype_map.get(datatype, None)
+                    data_dict["Type"] = datatype
+                elif datatype_input.startswith("bool") or "stdindjn" in datatype_input:
+                    datatype = "Boolean"
+                    data_dict["Classifier"] = self.datatype_map.get(datatype, None)
+                    data_dict["Type"] = datatype
+                elif datatype_input.startswith("decimal") or datatype_input.startswith("float"):
+                    datatype = "Decimal"
+                    data_dict["Classifier"] = self.datatype_map.get(datatype, None)
+                    data_dict["Type"] = datatype
+                elif datatype_input in ["punt", "point", "coordinate", "coördinaat", "geopunt", "coordinaat", 'gml']:
+                    datatype = "GM_Point"
+                    data_dict["Classifier"] = self.datatype_map.get(datatype, None)
+                    data_dict["Type"] = datatype
+                elif datatype_input in ["bedrag", "currency", "monetair", "geldbedrag"]:
+                    datatype = "Decimal"
+                    data_dict["Classifier"] = self.datatype_map.get(datatype, None)
+                    data_dict["Type"] = datatype
+                elif datatype_input in ["blob", "binary", "byte"]:
+                    datatype = "CharacterString"
+                    data_dict["Classifier"] = self.datatype_map.get(datatype, None)
+                    data_dict["Type"] = datatype
+                elif datatype_input in ["guid"]:
+                    datatype = "CharacterString"
+                    data_dict["Classifier"] = self.datatype_map.get(datatype, None)
+                    data_dict["Type"] = datatype
+
+
         super().update_existing_record(
             data_dict,
             table_name,
@@ -656,3 +711,44 @@ class EAMIMRepoUpdater(EARepoUpdater):
             recordtype=recordtype,
         )
 
+
+
+
+    # Get a map of data types and their IDs from the t_object table
+    def get_relevant_object_id_map(self, session, metadata):
+        """
+        Haalt objecten op uit t_object waar:
+        - Object_Type = 'Datatype', of
+        - Object_Type = 'Class' en Name begint met 'GM_'
+
+        Retourneert een dict met {Name: Object_ID}.
+        """
+        table = metadata.tables.get("t_object")
+        if table is None:
+            logger.warning("Tabel 't_object' niet gevonden in metadata.")
+            return {}
+
+        try:
+            results = session.query(table.c.Name, table.c.Object_ID).filter(
+                or_(
+                    table.c.Object_Type == "Datatype",
+                    and_(
+                        table.c.Object_Type == "Class",
+                        table.c.Name.startswith("GM_")
+                    )
+                )
+            ).all()
+
+            return {row.Name: row.Object_ID for row in results}
+        except Exception as e:
+            logger.error(f"Fout bij ophalen van relevante objecten: {e}")
+            return {}
+
+    def render(self, args, schema: sch.Schema):
+        target_session, target_metadata = self.get_database_session(args.outputfile)
+        self.datatype_map = self.get_relevant_object_id_map(target_session, target_metadata)
+
+        super().render(
+            args,
+            schema,
+        )
