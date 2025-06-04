@@ -1,3 +1,12 @@
+# Recordtype constants for use in EARepoUpdater and other modules
+RECORDTYPE_CLASS = "class"
+RECORDTYPE_ATTRIBUTE = "attribute"
+RECORDTYPE_LITERAL = "literal"
+RECORDTYPE_ENUMERATION = "enumeration"
+RECORDTYPE_PACKAGE = "package"
+RECORDTYPE_ASSOCIATION = "association"
+RECORDTYPE_GENERALIZATION = "generalization"
+RECORDTYPE_DIAGRAM = "diagram"
 DATABASE_URL = "sqlite:///crunch_uml.db"
 NS_XMI = "http://www.omg.org/spec/XMI/20110701"
 NS_UML = "http://www.omg.org/spec/UML/20110701"
@@ -49,6 +58,9 @@ EA_REPO_MAPPER_LITERALS["type"] = "Type"
 
 EA_REPO_MAPPER_ASSOCIATION = EA_REPO_MAPPER.copy()
 EA_REPO_MAPPER_ASSOCIATION["definitie"] = "Notes"
+
+EA_REPO_MAPPER_GENERALIZATION = EA_REPO_MAPPER.copy()
+EA_REPO_MAPPER_GENERALIZATION["definitie"] = "Notes"
 
 TAG_STRATEGY_UPDATE = "update"
 TAG_STRATEGY_UPSERT = "upsert"

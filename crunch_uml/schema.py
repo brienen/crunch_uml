@@ -127,6 +127,9 @@ class Schema:
     def get_all_associations(self):
         return self.database.session.query(db.Association).filter_by(schema_id=self.schema_id).all()
 
+    def get_all_generalizations(self):
+        return self.database.session.query(db.Generalization).filter_by(schema_id=self.schema_id).all()
+
     def count_class(self):
         return self.database.session.query(db.Class).filter_by(schema_id=self.schema_id).count()
 

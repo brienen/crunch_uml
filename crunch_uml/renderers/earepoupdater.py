@@ -15,7 +15,7 @@ logger = logging.getLogger()
 
 @RendererRegistry.register(
     "earepo",
-    descr="Updates as Enterprise Architect v16 repository. "
+    descr="Updates as Enterprise Architect v16+ repository. "
     + "Only updates existing Classes and attributes, Enumerations and literals, Packages and Associations. "
     + "Does not add new things, updates only."
     + "provide the EA Repo through the --file parameter.",
@@ -174,7 +174,7 @@ class EARepoUpdater(ModelRenderer):
         for key, value in delete_dict.items():
             session.query(table).filter_by(**{tag_id_parent_column: object_id, tag_property_column: key}).delete()
 
-    def update_existing_record(
+    def check_and_update_record(
         self,
         data_dict,
         table_name,
@@ -184,6 +184,7 @@ class EARepoUpdater(ModelRenderer):
         field_mapper=None,
         tag_table=None,
         tag_strategy=const.TAG_STRATEGY_REPLACE,
+        recordtype=None,
     ):
         ea_guid = const.EA_REPO_MAPPER["id"]
 
@@ -213,129 +214,162 @@ class EARepoUpdater(ModelRenderer):
             existing_record = session.query(table).filter_by(**{ea_guid: guid_value}).first()
 
             if existing_record:
-                # Filter de data_dict om alleen kolommen in te voegen die bestaan in de tabel
-                valid_data = {
-                    col: data_dict[col]
-                    for col in data_dict
-                    if col in table.columns.keys() and data_dict[col] is not None
-                }
-
-                changed = False
-                (
-                    tag_id_parent_column,
-                    tag_id_child_column,
-                    tag_property_column,
-                    tag_value_column,
-                ) = self.get_tablefields(tag_table)
-                if (
-                    tag_table
-                    and tag_id_parent_column
-                    and tag_id_child_column
-                    and tag_property_column
-                    and tag_value_column
-                ):
-                    # Haal de bestaande tags op uit de definities
-                    uml_tag_names = [attr for attr in UMLTags.__dict__ if isinstance(getattr(UMLTags, attr), Column)]
-
-                    # Haal de bestaande tags op uit de database
-                    db_tags = (
-                        session.query(self.get_table_structure(tag_table, metadata))
-                        .filter_by(**{tag_id_child_column: getattr(existing_record, tag_id_parent_column)})
-                        .all()
-                    )
-                    db_tags = {getattr(tag, tag_property_column): getattr(tag, tag_value_column) for tag in db_tags}
-
-                    # Bepaal welke tags zijn gewijzigd
-                    tags_changed = {
-                        col: data_dict[col]
-                        for col in data_dict
-                        if col in uml_tag_names and col in db_tags.keys() and data_dict[col] != db_tags[col]
-                    }
-                    tags_new = {
-                        col: data_dict[col] for col in data_dict if col in uml_tag_names and col not in db_tags.keys()
-                    }
-                    tags_deleted = {col: db_tags[col] for col in db_tags if col not in data_dict.keys()}
-
-                    if tag_strategy == const.TAG_STRATEGY_UPSERT:
-                        self.update_repo(
-                            tags_changed,
-                            session,
-                            tag_table,
-                            metadata,
-                            getattr(existing_record, tag_id_parent_column),
-                        )
-                        self.insert_repo(
-                            tags_new,
-                            session,
-                            tag_table,
-                            metadata,
-                            getattr(existing_record, tag_id_parent_column),
-                        )
-                        changed = len(tags_changed) > 0 or len(tags_new) > 0
-                    elif tag_strategy == const.TAG_STRATEGY_UPDATE:
-                        self.update_repo(
-                            tags_changed,
-                            session,
-                            tag_table,
-                            metadata,
-                            getattr(existing_record, tag_id_parent_column),
-                        )
-                        changed = len(tags_changed) > 0
-                    elif tag_strategy == const.TAG_STRATEGY_REPLACE:
-                        self.update_repo(
-                            tags_changed,
-                            session,
-                            tag_table,
-                            metadata,
-                            getattr(existing_record, tag_id_parent_column),
-                        )
-                        self.delete_repo(
-                            tags_deleted,
-                            session,
-                            tag_table,
-                            metadata,
-                            getattr(existing_record, tag_id_parent_column),
-                        )
-                        self.insert_repo(
-                            tags_new,
-                            session,
-                            tag_table,
-                            metadata,
-                            getattr(existing_record, tag_id_parent_column),
-                        )
-                        changed = len(tags_changed) > 0 or len(tags_new) > 0 or len(tags_deleted) > 0
-
-                # Check of er iets is veranderd
-                changes = {}
-                for key, value in valid_data.items():
-                    if getattr(existing_record, key) != value and key not in [
-                        ea_guid,
-                        const.EA_REPO_MAPPER["modified"],
-                    ]:
-                        changes[key] = value
-
-                changed = changed or len(changes) > 0
-                # Alleen updaten als er daadwerkelijk wijzigingen zijn
-                if changed:
-                    # Update het modified veld
-                    if const.EA_REPO_MAPPER["modified"] in columns:
-                        changes[const.EA_REPO_MAPPER["modified"]] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-                    # Update het versienummer indien van toepassing
-                    if const.EA_REPO_MAPPER["version"] in columns and version_type is not None:
-                        current_version = getattr(existing_record, const.EA_REPO_MAPPER["version"])
-                        new_version = self.increment_version(current_version, version_type)
-                        changes[const.EA_REPO_MAPPER["version"]] = new_version
-
-                    session.query(table).filter_by(**{ea_guid: guid_value}).update(changes)
-                    logger.debug(f"Record with GUID {guid_value} has been updated.")
-                else:
-                    logger.debug(f"No changes detected for record with GUID {guid_value}.")
+                self.update_existing_record(
+                    data_dict,
+                    table_name,
+                    session,
+                    metadata,
+                    version_type,
+                    field_mapper,
+                    tag_table,
+                    tag_strategy,
+                    recordtype=recordtype,
+                )
             else:
                 logger.debug(
-                    f"No record found with GUID {guid_value} in table {table} and data dict {data_dict}. No update"
-                    " performed."
+                    f"No record found with GUID {guid_value} in table {table} and data dict {data_dict}. No update performed."
                 )
+        except Exception as e:
+            logger.error(f"Error while updating record with GUID {guid_value} with message: {e}")
+            raise CrunchException(f"Error while updating record with GUID {guid_value} with message: {e}")
+
+    def update_existing_record(
+        self,
+        data_dict,
+        table_name,
+        session,
+        metadata,
+        version_type=None,
+        field_mapper=None,
+        tag_table=None,
+        tag_strategy=const.TAG_STRATEGY_REPLACE,
+        recordtype=None,
+    ):
+        ea_guid = const.EA_REPO_MAPPER["id"]
+        logger.debug(f"Updating recordtype '{recordtype}' in table '{table_name}'...")
+        try:
+            table = self.get_table_structure(table_name, metadata)
+            columns = table.columns.keys()
+            guid_value = util.fromEAGuid(data_dict[ea_guid])
+            existing_record = session.query(table).filter_by(**{ea_guid: guid_value}).first()
+            # Filter de data_dict om alleen kolommen in te voegen die bestaan in de tabel
+            valid_data = {
+                col: data_dict[col]
+                for col in data_dict
+                if col in table.columns.keys() and data_dict[col] is not None
+            }
+
+            changed = False
+            (
+                tag_id_parent_column,
+                tag_id_child_column,
+                tag_property_column,
+                tag_value_column,
+            ) = self.get_tablefields(tag_table)
+            if (
+                tag_table
+                and tag_id_parent_column
+                and tag_id_child_column
+                and tag_property_column
+                and tag_value_column
+            ):
+                # Haal de bestaande tags op uit de definities
+                uml_tag_names = [attr for attr in UMLTags.__dict__ if isinstance(getattr(UMLTags, attr), Column)]
+
+                # Haal de bestaande tags op uit de database
+                db_tags = (
+                    session.query(self.get_table_structure(tag_table, metadata))
+                    .filter_by(**{tag_id_child_column: getattr(existing_record, tag_id_parent_column)})
+                    .all()
+                )
+                db_tags = {getattr(tag, tag_property_column): getattr(tag, tag_value_column) for tag in db_tags}
+
+                # Bepaal welke tags zijn gewijzigd
+                tags_changed = {
+                    col: data_dict[col]
+                    for col in data_dict
+                    if col in uml_tag_names and col in db_tags.keys() and data_dict[col] != db_tags[col]
+                }
+                tags_new = {
+                    col: data_dict[col] for col in data_dict if col in uml_tag_names and col not in db_tags.keys()
+                }
+                tags_deleted = {col: db_tags[col] for col in db_tags if col not in data_dict.keys()}
+
+                if tag_strategy == const.TAG_STRATEGY_UPSERT:
+                    self.update_repo(
+                        tags_changed,
+                        session,
+                        tag_table,
+                        metadata,
+                        getattr(existing_record, tag_id_parent_column),
+                    )
+                    self.insert_repo(
+                        tags_new,
+                        session,
+                        tag_table,
+                        metadata,
+                        getattr(existing_record, tag_id_parent_column),
+                    )
+                    changed = len(tags_changed) > 0 or len(tags_new) > 0
+                elif tag_strategy == const.TAG_STRATEGY_UPDATE:
+                    self.update_repo(
+                        tags_changed,
+                        session,
+                        tag_table,
+                        metadata,
+                        getattr(existing_record, tag_id_parent_column),
+                    )
+                    changed = len(tags_changed) > 0
+                elif tag_strategy == const.TAG_STRATEGY_REPLACE:
+                    self.update_repo(
+                        tags_changed,
+                        session,
+                        tag_table,
+                        metadata,
+                        getattr(existing_record, tag_id_parent_column),
+                    )
+                    self.delete_repo(
+                        tags_deleted,
+                        session,
+                        tag_table,
+                        metadata,
+                        getattr(existing_record, tag_id_parent_column),
+                    )
+                    self.insert_repo(
+                        tags_new,
+                        session,
+                        tag_table,
+                        metadata,
+                        getattr(existing_record, tag_id_parent_column),
+                    )
+                    changed = len(tags_changed) > 0 or len(tags_new) > 0 or len(tags_deleted) > 0
+
+            # Check of er iets is veranderd
+            changes = {}
+            for key, value in valid_data.items():
+                if getattr(existing_record, key) != value and key not in [
+                    ea_guid,
+                    const.EA_REPO_MAPPER["modified"],
+                ]:
+                    changes[key] = value
+
+            changed = changed or len(changes) > 0
+            # Alleen updaten als er daadwerkelijk wijzigingen zijn
+            if changed:
+                # Update het modified veld
+                if const.EA_REPO_MAPPER["modified"] in columns:
+                    changes[const.EA_REPO_MAPPER["modified"]] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+                # Update het versienummer indien van toepassing
+                if const.EA_REPO_MAPPER["version"] in columns and version_type is not None:
+                    current_version = getattr(existing_record, const.EA_REPO_MAPPER["version"])
+                    new_version = self.increment_version(current_version, version_type)
+                    changes[const.EA_REPO_MAPPER["version"]] = new_version
+
+                session.query(table).filter_by(**{ea_guid: guid_value}).update(changes)
+                logger.debug(f"Record with GUID {guid_value} has been updated.")
+            else:
+                logger.debug(f"No changes detected for record with GUID {guid_value}.")
         except Exception as e:
             logger.error(f"Error while updating record with GUID {guid_value} with message: {e}")
             raise CrunchException(f"Error while updating record with GUID {guid_value} with message: {e}")
@@ -351,12 +385,13 @@ class EARepoUpdater(ModelRenderer):
         tag_table=None,
         batch_size=100,
         tag_strategy=const.TAG_STRATEGY_REPLACE,
+        recordtype=None,
     ):
         # Verwerk de data in batches
         for i in range(0, len(source_data), batch_size):
             batch = source_data[i : i + batch_size]
             for record in batch:
-                self.update_existing_record(
+                self.check_and_update_record(
                     record,
                     target_table_name,
                     target_session,
@@ -365,6 +400,7 @@ class EARepoUpdater(ModelRenderer):
                     field_mapper,
                     tag_table,
                     tag_strategy=tag_strategy,
+                    recordtype=recordtype,
                 )
 
     def render(self, args, schema: sch.Schema):
@@ -397,6 +433,7 @@ class EARepoUpdater(ModelRenderer):
                     tag_table="t_objectproperties",
                     field_mapper=const.EA_REPO_MAPPER,
                     tag_strategy=tag_strategy,
+                    recordtype=const.RECORDTYPE_CLASS,
                 )
 
                 # Process all attributes
@@ -412,6 +449,7 @@ class EARepoUpdater(ModelRenderer):
                     field_mapper=const.EA_REPO_MAPPER_ATTRIBUTES,
                     tag_table="t_attributetag",
                     tag_strategy=tag_strategy,
+                    recordtype=const.RECORDTYPE_ATTRIBUTE,
                 )
 
                 # Process all literals
@@ -427,6 +465,7 @@ class EARepoUpdater(ModelRenderer):
                     field_mapper=const.EA_REPO_MAPPER_LITERALS,
                     tag_table="t_attributetag",
                     tag_strategy=tag_strategy,
+                    recordtype=const.RECORDTYPE_LITERAL,
                 )
 
                 # Process all enumerations
@@ -442,6 +481,7 @@ class EARepoUpdater(ModelRenderer):
                     field_mapper=const.EA_REPO_MAPPER,
                     tag_table="t_objectproperties",
                     tag_strategy=tag_strategy,
+                    recordtype=const.RECORDTYPE_ENUMERATION,
                 )
 
                 # Process all packages
@@ -457,6 +497,7 @@ class EARepoUpdater(ModelRenderer):
                     field_mapper=const.EA_REPO_MAPPER,
                     tag_table="t_objectproperties",
                     tag_strategy=tag_strategy,
+                    recordtype=const.RECORDTYPE_PACKAGE,
                 )
                 self.process_batch(
                     dict_packages,
@@ -466,6 +507,7 @@ class EARepoUpdater(ModelRenderer):
                     version_type=version_type,
                     field_mapper=const.EA_REPO_MAPPER,
                     tag_strategy=tag_strategy,
+                    recordtype=const.RECORDTYPE_PACKAGE,
                 )
 
                 # Process all associations
@@ -480,6 +522,22 @@ class EARepoUpdater(ModelRenderer):
                     version_type=version_type,
                     field_mapper=const.EA_REPO_MAPPER_ASSOCIATION,
                     tag_strategy=tag_strategy,
+                    recordtype=const.RECORDTYPE_ASSOCIATION,
+                )
+
+                # Process all generalizations   
+                logger.info("Updating generalizations...")
+                generalizations = schema.get_all_generalizations()
+                dict_generalizations = [record.to_dict() for record in generalizations]
+                self.process_batch(
+                    dict_generalizations,
+                    "t_connector",
+                    target_session,
+                    target_metadata,
+                    version_type=version_type,
+                    field_mapper=const.EA_REPO_MAPPER_GENERALIZATION,
+                    tag_strategy=tag_strategy,
+                    recordtype=const.RECORDTYPE_GENERALIZATION,
                 )
 
                 # Process all diagrams
@@ -494,6 +552,7 @@ class EARepoUpdater(ModelRenderer):
                     version_type=version_type,
                     field_mapper=const.EA_REPO_MAPPER,
                     tag_strategy=tag_strategy,
+                    recordtype=const.RECORDTYPE_DIAGRAM,
                 )
 
                 logger.info(f"All data updated in repo {args.outputfile}, commiting...")
@@ -504,3 +563,96 @@ class EARepoUpdater(ModelRenderer):
 
                 target_session.rollback()
                 raise CrunchException(msg)
+
+@RendererRegistry.register(
+    "eamimrepo",
+    descr="Updates as Enterprise Architect v16+ repository and applies MIM profile. "
+    + "Only updates existing Classes and attributes, Enumerations and literals, Packages and Associations. "
+    + "Does not add new things, updates only. Sets  MIM profile on all entities. "
+    + "provide the EA Repo through the --file parameter.",
+)
+class EAMIMRepoUpdater(EARepoUpdater):
+    """
+    Connects to an Enterprise Architect repository by treating it as a database
+    Usualy SQLlite with the .qua extension.
+    """
+
+    def setStereotype(self, recordtype, data_dict, metadata, session, Type, Name, FQName):
+        """
+        Set the stereotype for the recordtype.
+        """
+        try:
+            ea_guid = data_dict.get("ea_guid", None)
+            if ea_guid is None:
+                logger.error(f"Cannot update {recordtype} without EA GUID.")
+                raise CrunchException(f"Cannot update {recordtype} without EA GUID.")
+
+            # First delete existing xrefs
+            table_name = "t_xref"
+            if table_name in metadata.tables:
+                table = metadata.tables[table_name]
+                session.query(table).filter_by(Client=util.fromEAGuid(ea_guid)).delete()
+            else:
+                logger.warning(f"Tabel '{table_name}' niet gevonden in metadata.")
+
+            # Add MIM profile to the class
+            insert_item = {
+                "Name": 'Stereotypes',
+                "Type": Type,
+                "Visibility": 'Public',
+                "Description": f'@STEREO;Name={Name};FQName={FQName};@ENDSTEREO;',
+                "Client": util.fromEAGuid(ea_guid),
+                "XrefID": util.get_repo_guid(),
+            }
+            stmt = insert(metadata.tables["t_xref"]).values(insert_item)
+            session.execute(stmt)
+
+            data_dict["Stereotype"] = Name
+            return data_dict
+        except Exception as e:
+            logger.error(f"Error while updating MIM profile for {recordtype} with EA GUID {ea_guid}: {e}")
+            raise CrunchException(f"Error while updating MIM profile for {recordtype} with EA GUID {ea_guid}: {e}")
+
+
+
+    def update_existing_record(
+        self,
+        data_dict,
+        table_name,
+        session,
+        metadata,
+        version_type=None,
+        field_mapper=None,
+        tag_table=None,
+        tag_strategy=const.TAG_STRATEGY_REPLACE,
+        recordtype=None,
+    ):
+        if recordtype == const.RECORDTYPE_CLASS:
+            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'element property', 'Objecttype', 'MIM::Objecttype')
+        elif recordtype == const.RECORDTYPE_ATTRIBUTE:
+            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'attribute property', 'Attribuutsoort', 'MIM::Attribuutsoort')
+        elif recordtype == const.RECORDTYPE_LITERAL:
+            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'attribute property', 'Enumeratiewaarde', 'MIM::Enumeratiewaarde')
+        elif recordtype == const.RECORDTYPE_ENUMERATION:
+            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'element property', 'Enumeratie', 'MIM::Enumeratie')
+        #elif recordtype == const.RECORDTYPE_PACKAGE:
+        #    data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'element property', 'Package', 'MIM::Package')
+        elif recordtype == const.RECORDTYPE_ASSOCIATION:
+            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'connector property', 'Relatiesoort', 'MIM::Relatiesoort')
+        elif recordtype == const.RECORDTYPE_GENERALIZATION:
+            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'connector property', 'Generalisatie', 'MIM::Generalisatie')
+        else:
+            logger.warning(f"Unknown recordtype {recordtype}, not setting stereotype.")
+
+        super().update_existing_record(
+            data_dict,
+            table_name,
+            session,
+            metadata,
+            version_type,
+            field_mapper,
+            tag_table,
+            tag_strategy,
+            recordtype=recordtype,
+        )
+

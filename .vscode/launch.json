@@ -105,7 +105,7 @@
             "justMyCode": true,
             "args": ["import",
                 "-t", "eaxmi",
-                "-f", "/Users/arjen/Dropbox/Development/GGM-Sociaal-Domein/Gemeentelijk Gegevensmodel XMI2.1.xml",
+                "-f", "./test/data/Sociaal Domein XMI2.1.xml",
                 "-db_create" //,
                 //"--skip_xmi_relations"
             ],
@@ -585,6 +585,20 @@
             "program": "${workspaceFolder}/.venv/bin/pytest",  // Pas aan naar je lokale pytest pad
             "args": [
                 "${workspaceFolder}/test/unit/test_12_copy_structure.py"  // Pas aan naar je testmap
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
+        },
+        {
+            "name": "Python: pytest test_15a_updateEAMIMModel",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/pytest",  // Pas aan naar je lokale pytest pad
+            "args": [
+                "${workspaceFolder}/test/unit/test_15a_updateEAMIMModel.py"  // Pas aan naar je testmap
             ],
             "console": "integratedTerminal",
             "justMyCode": false,

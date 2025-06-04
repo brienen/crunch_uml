@@ -71,7 +71,10 @@ class LodRenderer(ModelRenderer):
                     ns = Namespace(urljoin(str(args.linked_data_namespace), f"/{quote(modelname)}/"))
 
                     for cls in model.classes:
-                        class_uri = ns[slugify(cls.name)] if cls.name else ns[slugify(cls.id)]
+                        if not cls.name:
+                            logger.warning(f"Klasse zonder naam gevonden: {cls.id}")
+                            continue
+                        class_uri = ns[slugify(cls.name)]
                         # Werk eerst de dict bij
                         class_dict[cls.id] = class_uri
 
@@ -84,7 +87,7 @@ class LodRenderer(ModelRenderer):
 
                         for attribute in cls.attributes:
                             if attribute.name is not None and attribute.primitive is not None:
-                                attr_uri = ns[slugify(attribute.name)] if attribute.name else ns[slugify(attribute.id)]
+                                attr_uri = ns[slugify(cls.name) + "/" + slugify(attribute.name)] if attribute.name else ns[slugify(cls.name) + "/" + slugify(attribute.id)]
                                 g.add((attr_uri, RDF.type, OWL.DatatypeProperty))
                                 g.add((attr_uri, RDFS.domain, class_uri))
                                 g.add((attr_uri, RDFS.label, Literal(attribute.name)))
@@ -101,26 +104,30 @@ class LodRenderer(ModelRenderer):
 
                     # Add SHACL NodeShapes for each class
                     for cls in model.classes:
-                        class_uri = ns[slugify(cls.name)] if cls.name else ns[slugify(cls.id)]
-                        shape_uri = (
-                            shape_ns[slugify(cls.name + "Shape")] if cls.name else shape_ns[slugify(cls.id + "Shape")]
-                        )
+                        if not cls.name:
+                            logger.warning(f"SHACL-shape overgeslagen voor klasse zonder naam: {cls.id}")
+                            continue
+                        class_uri = ns[slugify(cls.name)]
+                        shape_uri = shape_ns[slugify(modelname) + "/" + slugify(cls.name)]
                         g.add((shape_uri, RDF.type, SH.NodeShape))
                         g.add((shape_uri, SH.targetClass, class_uri))
-                        g.add((shape_uri, DCTERMS.identifier, Literal(cls.id)))
+                        g.add((shape_uri, RDFS.label, Literal(cls.name)))
+                        g.add((shape_uri, DCTERMS.identifier, Literal(f"{cls.id}")))
 
                         for attribute in cls.attributes:
                             if attribute.name is not None and attribute.primitive is not None:
                                 prop_bnode = BNode()
-                                attr_uri = ns[slugify(attribute.name)] if attribute.name else ns[slugify(attribute.id)]
+                                attr_uri = ns[slugify(cls.name) + "/" + slugify(attribute.name)] if attribute.name else ns[slugify(cls.name) + "/" + slugify(attribute.id)]
                                 g.add((shape_uri, SH.property, prop_bnode))
                                 g.add((prop_bnode, SH.path, attr_uri))
                                 shacl_type = TYPEMAP.get(attribute.primitive.lower(), XSD.string)
                                 g.add((prop_bnode, SH.datatype, shacl_type))
                                 g.add((prop_bnode, SH.minCount, Literal(0)))
                                 g.add((prop_bnode, SH.maxCount, Literal(1)))
+                                g.add((prop_bnode, SH.name, Literal(attribute.name)))
                                 if attribute.definitie:
                                     g.add((prop_bnode, SH.description, Literal(attribute.definitie)))
+                logger.info(f"Aantal klassen verwerkt in model '{modelname}': {len(model.classes)}")
             except Exception as e:
                 logger.exception("Fout tijdens het renderen van modellen:")
                 raise CrunchException(f"Renderproces mislukt: {e}") from e
@@ -140,10 +147,13 @@ class LodRenderer(ModelRenderer):
                     # Then set associations
                     for assoc in cls.uitgaande_associaties:
                         from_cls = class_dict.get(cls.id)
-                        to_cls = class_dict.get(assoc.dst_class.id)
+                        to_cls = class_dict.get(getattr(assoc.dst_class, "id", None))
+                        if to_cls is None:
+                            logger.warning(f"Doelklasse onbekend voor associatie {assoc.name or assoc.id}")
+                            continue
 
                         if from_cls is not None and to_cls is not None:
-                            assoc_uri = ns[slugify(assoc.name)] if assoc.name else ns[slugify(assoc.id)]
+                            assoc_uri = ns[slugify(cls.name) + "/" + slugify(assoc.name)] if assoc.name else ns[slugify(cls.name) + "/" + slugify(assoc.id)]
                             g.add((assoc_uri, RDF.type, OWL.ObjectProperty))
                             g.add((assoc_uri, RDFS.domain, from_cls))
                             g.add((assoc_uri, RDFS.range, to_cls))
