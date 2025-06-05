@@ -1,0 +1,464 @@
+<?xml  version='1.0' encoding='windows-1252' ?>
+<xmi:XMI xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmi:version="2.1" xmlns:uml="http://schema.omg.org/spec/UML/2.1" xmlns:thecustomprofile="http://www.sparxsystems.com/profiles/thecustomprofile/1.0">
+	<xmi:Documentation exporter="Enterprise Architect" exporterVersion="6.5" exporterID="1704"/>
+	<uml:Model xmi:type="uml:Model" name="EA_Model" visibility="public">
+		<packagedElement xmi:type="uml:Package" xmi:id="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" name="GML3" visibility="public">
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_12A2F94C_66D6_4ff2_84A4_042A18ADB694" name="GM_AbstractFeature" visibility="public" isAbstract="true"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_019183C0_051A_4f1a_B9F9_95274D6FFDC2" name="GM_AbstractFeatureCollection" visibility="public" isAbstract="true"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_EB13DB41_59C5_4ecc_8C58_1B481129B911" name="GM_AbstractFeatureCollectionType" visibility="public" isAbstract="true"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_E7F2AC55_6C60_44cd_A739_7D1D0AED81E4" name="GM_AbstractFeatureMember" visibility="public" isAbstract="true"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_DDDD54F4_18D9_42b8_AF44_A73DCC924E10" name="GM_AbstractFeatureMemberType" visibility="public" isAbstract="true"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_C0E778D3_830A_4221_BCC9_DF9E4AF21368" name="GM_AbstractFeatureType" visibility="public" isAbstract="true"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_E929B2F9_3712_44ef_99ED_B33D0DD0F2D6" name="GM_AbstractGML" visibility="public" isAbstract="true"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_3A6D7B77_F012_43f4_907C_BFEFEA1258A4" name="GM_AbstractGMLType" visibility="public" isAbstract="true"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_D86339CE_C7AC_4684_B50E_36A650984BF3" name="GM_ArcString" visibility="public"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_B66F6A35_46FC_49f1_B064_059E929060EB" name="GM_Curve" visibility="public"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_C6B192FD_631B_48b1_AAA7_6B12160B4B7D" name="GM_Object" visibility="public"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_AE6EB1BF_E3B0_4b8e_AD19_3F4CE5142242" name="GM_LineString" visibility="public"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_CB525A00_7CFB_4a1c_B51E_FAEB7531D350" name="GM_MultiLineString" visibility="public"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_7A20EDB5_0429_41f5_954B_4CF6563B5F7E" name="GM_MultiCurve" visibility="public"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_2ADA66EF_86A9_48f4_A6C9_B3166331E080" name="GM_Geometry" visibility="public"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_8A1056A0_0F3E_4608_A131_6E6B2CE53459" name="GM_MultiGeometry" visibility="public"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_B2682035_9BBD_4840_8730_162283535E51" name="GM_MultiPoint" visibility="public"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_88104FC1_EFC6_4317_84B1_F9D7C6B9B47B" name="GM_MultiSurface" visibility="public"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_079B935A_189C_456e_B4E0_4C144BFBB6D3" name="GM_Point" visibility="public"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_0A24E3A4_A056_41f5_90FD_C21F8E1C4E43" name="GM_Polygon" visibility="public"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_D22BBC0B_89D3_44c3_8377_A006F4CCFC9A" name="GM_Surface" visibility="public"/>
+		</packagedElement>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_12A2F94C_66D6_4ff2_84A4_042A18ADB694" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_12A2F94C_66D6_4ff2_84A4_042A18ADB694" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_019183C0_051A_4f1a_B9F9_95274D6FFDC2" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_019183C0_051A_4f1a_B9F9_95274D6FFDC2" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_EB13DB41_59C5_4ecc_8C58_1B481129B911" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_EB13DB41_59C5_4ecc_8C58_1B481129B911" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_E7F2AC55_6C60_44cd_A739_7D1D0AED81E4" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_E7F2AC55_6C60_44cd_A739_7D1D0AED81E4" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_DDDD54F4_18D9_42b8_AF44_A73DCC924E10" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_DDDD54F4_18D9_42b8_AF44_A73DCC924E10" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_C0E778D3_830A_4221_BCC9_DF9E4AF21368" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_C0E778D3_830A_4221_BCC9_DF9E4AF21368" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_E929B2F9_3712_44ef_99ED_B33D0DD0F2D6" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_E929B2F9_3712_44ef_99ED_B33D0DD0F2D6" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_3A6D7B77_F012_43f4_907C_BFEFEA1258A4" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_3A6D7B77_F012_43f4_907C_BFEFEA1258A4" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_D86339CE_C7AC_4684_B50E_36A650984BF3" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_D86339CE_C7AC_4684_B50E_36A650984BF3" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_B66F6A35_46FC_49f1_B064_059E929060EB" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_B66F6A35_46FC_49f1_B064_059E929060EB" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_C6B192FD_631B_48b1_AAA7_6B12160B4B7D" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_C6B192FD_631B_48b1_AAA7_6B12160B4B7D" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_AE6EB1BF_E3B0_4b8e_AD19_3F4CE5142242" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_AE6EB1BF_E3B0_4b8e_AD19_3F4CE5142242" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_CB525A00_7CFB_4a1c_B51E_FAEB7531D350" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_CB525A00_7CFB_4a1c_B51E_FAEB7531D350" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_7A20EDB5_0429_41f5_954B_4CF6563B5F7E" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_7A20EDB5_0429_41f5_954B_4CF6563B5F7E" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_2ADA66EF_86A9_48f4_A6C9_B3166331E080" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_2ADA66EF_86A9_48f4_A6C9_B3166331E080" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_8A1056A0_0F3E_4608_A131_6E6B2CE53459" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_8A1056A0_0F3E_4608_A131_6E6B2CE53459" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_B2682035_9BBD_4840_8730_162283535E51" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_B2682035_9BBD_4840_8730_162283535E51" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_88104FC1_EFC6_4317_84B1_F9D7C6B9B47B" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_88104FC1_EFC6_4317_84B1_F9D7C6B9B47B" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_079B935A_189C_456e_B4E0_4C144BFBB6D3" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_079B935A_189C_456e_B4E0_4C144BFBB6D3" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_0A24E3A4_A056_41f5_90FD_C21F8E1C4E43" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_0A24E3A4_A056_41f5_90FD_C21F8E1C4E43" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:Is_afgeleid base_Class="EAID_D22BBC0B_89D3_44c3_8377_A006F4CCFC9A" __EAStereoName="Is afgeleid" Is_afgeleid="Zie package"/>
+		<thecustomprofile:VNGR_SIM_Grouping_NL__Interface base_Class="EAID_D22BBC0B_89D3_44c3_8377_A006F4CCFC9A" __EAStereoName="VNGR SIM+Grouping NL::Interface"/>
+		<thecustomprofile:release base_Package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" release="20211203"/>
+		<thecustomprofile:Extern base_Package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD"/>
+	</uml:Model>
+	<xmi:Extension extender="Enterprise Architect" extenderID="6.5">
+		<elements>
+			<element xmi:idref="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" xmi:type="uml:Package" name="GML3" scope="public">
+				<model package2="EAID_DF146CEE_0F96_4d36_837B_A8040A7C68DD" package="EAPK_27A2F9A3_1BA4_4cb6_96AC_BF0AE2DE3B3B" tpos="0" ea_localid="30" ea_eleType="package"/>
+				<properties isSpecification="false" sType="Package" nType="0" alias="http://www.kadaster.nl/conceptual-schemas/ISO19107" scope="public" stereotype="Extern"/>
+				<project author="debat_e" version="1.0" phase="1.0" created="2015-12-07 10:17:14" modified="2021-12-03 15:59:47" complexity="1" status="Proposed"/>
+				<code gentype="&lt;none&gt;"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_0D62BA16_E4F7_42cc_BB26_4EE284E9C6C6" name="release" value="20211203" modelElement="EAID_DF146CEE_0F96_4d36_837B_A8040A7C68DD"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={4F76AC48-C239-42df-B02A-D14FDEB986E5}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Extern;GUID={3AEAB51F-DFED-4e21-9BFE-A4A587104291};@ENDSTEREO;$DES;$CLT={DF146CEE-0F96-4d36-837B-A8040A7C68DD}$CLT;$SUP=&lt;none&gt;$SUP;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="KING: SIM"/>
+				<packageproperties version="1.0" owner="Melsk_R" xmiver="Enterprise Architect XMI/UML 1.3" tpos="0"/>
+				<paths/>
+				<times created="2015-12-07 10:17:14" modified="2025-01-22 11:32:34" lastloaddate="2025-01-22 11:32:35" lastsavedate="2016-03-25 12:17:33"/>
+				<flags iscontrolled="0" isprotected="0" batchsave="0" batchload="0" usedtd="0" logxml="0" packageFlags="Recurse=1;"/>
+			</element>
+			<element xmi:idref="EAID_12A2F94C_66D6_4ff2_84A4_042A18ADB694" xmi:type="uml:Class" name="GM_AbstractFeature" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="1" ea_localid="102" ea_eleType="element"/>
+				<properties documentation="Representatie van AbstractFeature." isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="true" isActive="false"/>
+				<project author="Arjan" version="1.0" phase="1.0" created="2012-05-21 15:38:14" modified="2021-04-08 13:46:34" complexity="1" status="Proposed"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_AF2F_73DD2A15726A" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_12A2F94C_66D6_4ff2_84A4_042A18ADB694"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_9627_FA804A6E54D4" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_12A2F94C_66D6_4ff2_84A4_042A18ADB694"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={1415A2FA-C8C9-441d-8A5B-9B324667C7A5}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={12A2F94C-66D6-4ff2-84A4-042A18ADB694}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_019183C0_051A_4f1a_B9F9_95274D6FFDC2" xmi:type="uml:Class" name="GM_AbstractFeatureCollection" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="2" ea_localid="99" ea_eleType="element"/>
+				<properties documentation="Representatie van &lt;font color=&quot;#993300&quot;&gt;AbstractFeatureCollection&lt;/font&gt;." isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="true" isActive="false"/>
+				<project author="Arjan" version="1.0" phase="1.0" created="2012-05-21 15:38:14" modified="2021-04-08 13:51:35" complexity="1" status="Proposed"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_9B0C_A00FC9864EC2" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_019183C0_051A_4f1a_B9F9_95274D6FFDC2"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_93AE_8B4F2B2035B3" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_019183C0_051A_4f1a_B9F9_95274D6FFDC2"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={75DDF330-1CF0-48cb-A1D0-72398CFFD73A}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={019183C0-051A-4f1a-B9F9-95274D6FFDC2}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_EB13DB41_59C5_4ecc_8C58_1B481129B911" xmi:type="uml:Class" name="GM_AbstractFeatureCollectionType" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="3" ea_localid="119" ea_eleType="element"/>
+				<properties documentation="Representatie van &lt;font color=&quot;#993300&quot;&gt;AbstractFeatureCollectionType&lt;/font&gt;." isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="true" isActive="false"/>
+				<project author="Arjan" version="1.0" phase="1.0" created="2012-05-21 15:38:14" modified="2021-04-08 13:59:58" complexity="1" status="Proposed"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_AB80_F9A2FE59C755" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_EB13DB41_59C5_4ecc_8C58_1B481129B911"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_9868_391894D8DED8" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_EB13DB41_59C5_4ecc_8C58_1B481129B911"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={9D72F47D-0719-4cba-8998-EF8EEB8E5092}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={EB13DB41-59C5-4ecc-8C58-1B481129B911}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_E7F2AC55_6C60_44cd_A739_7D1D0AED81E4" xmi:type="uml:Class" name="GM_AbstractFeatureMember" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="4" ea_localid="117" ea_eleType="element"/>
+				<properties documentation="Representatie van &lt;font color=&quot;#993300&quot;&gt;AbstractFeatureMember&lt;/font&gt;." isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="true" isActive="false"/>
+				<project author="Arjan" version="1.0" phase="1.0" created="2012-05-21 15:38:14" modified="2021-04-08 13:52:28" complexity="1" status="Proposed"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_89EB_5A81974388D3" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_E7F2AC55_6C60_44cd_A739_7D1D0AED81E4"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_8C5F_CCBB3285E939" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_E7F2AC55_6C60_44cd_A739_7D1D0AED81E4"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={197721F7-1BF2-427a-9552-DB138B89AC26}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={E7F2AC55-6C60-44cd-A739-7D1D0AED81E4}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_DDDD54F4_18D9_42b8_AF44_A73DCC924E10" xmi:type="uml:Class" name="GM_AbstractFeatureMemberType" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="5" ea_localid="116" ea_eleType="element"/>
+				<properties documentation="Representatie van &lt;font color=&quot;#993300&quot;&gt;AbstractFeatureMemberType&lt;/font&gt;." isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="true" isActive="false"/>
+				<project author="Arjan" version="1.0" phase="1.0" created="2012-05-21 15:38:14" modified="2021-04-08 13:52:46" complexity="1" status="Proposed"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_9562_33E32C6D98A4" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_DDDD54F4_18D9_42b8_AF44_A73DCC924E10"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_A872_AC23204A4C3A" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_DDDD54F4_18D9_42b8_AF44_A73DCC924E10"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={C722AC7A-6333-459a-82AD-8A3ABA44F42B}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={DDDD54F4-18D9-42b8-AF44-A73DCC924E10}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_C0E778D3_830A_4221_BCC9_DF9E4AF21368" xmi:type="uml:Class" name="GM_AbstractFeatureType" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="6" ea_localid="111" ea_eleType="element"/>
+				<properties documentation="Representatie van AbstractFeatureType, de gemeenschappelijke superklasse van alle Geo-objecten." isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="true" isActive="false"/>
+				<project author="Arjan" version="1.0" phase="1.0" created="2012-05-21 15:38:14" modified="2021-04-08 13:53:01" complexity="1" status="Proposed"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_B592_12A48D6FCFE3" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_C0E778D3_830A_4221_BCC9_DF9E4AF21368"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_A391_949A2B04171F" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_C0E778D3_830A_4221_BCC9_DF9E4AF21368"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={D0EC1166-C7FA-48fd-8113-626F87AF43AE}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={C0E778D3-830A-4221-BCC9-DF9E4AF21368}$CLT;$SUP=&lt;none&gt;$SUP;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_E929B2F9_3712_44ef_99ED_B33D0DD0F2D6" xmi:type="uml:Class" name="GM_AbstractGML" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="7" ea_localid="118" ea_eleType="element"/>
+				<properties documentation="Representatie van &lt;font color=&quot;#993300&quot;&gt;AbstractGML&lt;/font&gt;." isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="true" isActive="false"/>
+				<project author="Arjan" version="1.0" phase="1.0" created="2012-05-21 15:38:14" modified="2021-04-08 13:53:22" complexity="1" status="Proposed"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_9331_B25CC611E57D" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_E929B2F9_3712_44ef_99ED_B33D0DD0F2D6"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_9C28_EE59DB56DE22" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_E929B2F9_3712_44ef_99ED_B33D0DD0F2D6"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={3072B563-5D88-4350-AA39-F14FD3516A8A}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={E929B2F9-3712-44ef-99ED-B33D0DD0F2D6}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_3A6D7B77_F012_43f4_907C_BFEFEA1258A4" xmi:type="uml:Class" name="GM_AbstractGMLType" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="8" ea_localid="104" ea_eleType="element"/>
+				<properties documentation="Representatie van &lt;font color=&quot;#993300&quot;&gt;AbstractGMLType&lt;/font&gt;." isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="true" isActive="false"/>
+				<project author="Arjan" version="1.0" phase="1.0" created="2012-05-21 15:38:14" modified="2021-04-08 13:53:41" complexity="1" status="Proposed"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_8DCF_5CF4DB9D4C80" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_3A6D7B77_F012_43f4_907C_BFEFEA1258A4"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_BCB5_F2DF51D07900" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_3A6D7B77_F012_43f4_907C_BFEFEA1258A4"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={85C7935C-38C0-4a7b-8395-942D54DD1887}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={3A6D7B77-F012-43f4-907C-BFEFEA1258A4}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_D86339CE_C7AC_4684_B50E_36A650984BF3" xmi:type="uml:Class" name="GM_ArcString" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="9" ea_localid="115" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Class" nType="0" alias="Boog" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Wilko Quak" version="1.0" phase="1.0" created="2010-01-20 14:52:00" modified="2021-04-08 13:54:05" complexity="1"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_B6B1_45E6DFB745C6" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_D86339CE_C7AC_4684_B50E_36A650984BF3"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_9979_4B0B8DB6DA28" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_D86339CE_C7AC_4684_B50E_36A650984BF3"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={570CB656-A9A1-495f-95F4-561482CC37A2}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={D86339CE-C7AC-4684-B50E-36A650984BF3}$CLT;$ENDXREF;$XREFPROP=$XID={BA3899D1-6D55-4d1e-9EC1-8722429692E3}$XID;$NAM=CustomProperties$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@PROP=@NAME=isActive@ENDNAME;@TYPE=Boolean@ENDTYPE;@VALU=@ENDVALU;@PRMT=@ENDPRMT;@ENDPROP;$DES;$CLT={D86339CE-C7AC-4684-B50E-36A650984BF3}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_B66F6A35_46FC_49f1_B064_059E929060EB" xmi:type="uml:Class" name="GM_Curve" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="10" ea_localid="110" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Class" nType="0" alias="Lijn" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Wilko Quak" version="1.0" phase="1.0" created="2010-01-20 14:52:21" modified="2021-04-08 13:54:38" complexity="1"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_AB89_22ABF7A4FDFA" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_B66F6A35_46FC_49f1_B064_059E929060EB"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_A6A8_A976F34B707C" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_B66F6A35_46FC_49f1_B064_059E929060EB"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={B290C9A9-CC19-41e4-95AB-C08BECF7A270}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={B66F6A35-46FC-49f1-B064-059E929060EB}$CLT;$ENDXREF;$XREFPROP=$XID={2C7E7153-1A3B-49ea-B096-866411B6A64E}$XID;$NAM=CustomProperties$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@PROP=@NAME=isActive@ENDNAME;@TYPE=Boolean@ENDTYPE;@VALU=@ENDVALU;@PRMT=@ENDPRMT;@ENDPROP;$DES;$CLT={B66F6A35-46FC-49f1-B064-059E929060EB}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_C6B192FD_631B_48b1_AAA7_6B12160B4B7D" xmi:type="uml:Class" name="GM_Object" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="11" ea_localid="112" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Wilko Quak" version="1.0" phase="1.0" created="2010-01-20 14:52:55" modified="2021-04-08 13:54:55" complexity="1"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_9C3C_D64DD926DFDF" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_C6B192FD_631B_48b1_AAA7_6B12160B4B7D"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_B8AA_AF7DD448101F" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_C6B192FD_631B_48b1_AAA7_6B12160B4B7D"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={F068B571-204A-4046-BAD1-6DCABE8AE2ED}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={C6B192FD-631B-48b1-AAA7-6B12160B4B7D}$CLT;$ENDXREF;$XREFPROP=$XID={A56E219B-6564-499b-9A00-7AA3ADE417D0}$XID;$NAM=CustomProperties$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@PROP=@NAME=isActive@ENDNAME;@TYPE=Boolean@ENDTYPE;@VALU=@ENDVALU;@PRMT=@ENDPRMT;@ENDPROP;$DES;$CLT={C6B192FD-631B-48b1-AAA7-6B12160B4B7D}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_AE6EB1BF_E3B0_4b8e_AD19_3F4CE5142242" xmi:type="uml:Class" name="GM_LineString" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="12" ea_localid="108" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Wilko Quak" version="1.0" phase="1.0" created="2010-01-20 15:03:53" modified="2021-04-08 13:55:11" complexity="1"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_847B_08BF2E2B1AB0" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_AE6EB1BF_E3B0_4b8e_AD19_3F4CE5142242"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_B451_B9EC18B10885" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_AE6EB1BF_E3B0_4b8e_AD19_3F4CE5142242"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={7CB83FC8-4920-4e2a-AC40-5E48440D99E0}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={AE6EB1BF-E3B0-4b8e-AD19-3F4CE5142242}$CLT;$ENDXREF;$XREFPROP=$XID={3266A6D3-F963-4c0b-A261-EFC0E8F56A22}$XID;$NAM=CustomProperties$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@PROP=@NAME=isActive@ENDNAME;@TYPE=Boolean@ENDTYPE;@VALU=@ENDVALU;@PRMT=@ENDPRMT;@ENDPROP;$DES;$CLT={AE6EB1BF-E3B0-4b8e-AD19-3F4CE5142242}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_CB525A00_7CFB_4a1c_B51E_FAEB7531D350" xmi:type="uml:Class" name="GM_MultiLineString" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="12" ea_localid="113" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Wilko Quak" version="1.0" phase="1.0" created="2021-12-06 18:00:57" modified="2021-12-06 18:01:14" complexity="1"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_BB8C_57471E3A424E" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_CB525A00_7CFB_4a1c_B51E_FAEB7531D350"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_BD0A_173B130B0CBC" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_CB525A00_7CFB_4a1c_B51E_FAEB7531D350"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={86AFF068-AC41-41d0-AA34-176B31FFED5F}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={CB525A00-7CFB-4a1c-B51E-FAEB7531D350}$CLT;$ENDXREF;$XREFPROP=$XID={E84C6596-5532-4f85-B64E-65DC6EFB857B}$XID;$NAM=CustomProperties$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@PROP=@NAME=isActive@ENDNAME;@TYPE=Boolean@ENDTYPE;@VALU=@ENDVALU;@PRMT=@ENDPRMT;@ENDPROP;$DES;$CLT={CB525A00-7CFB-4a1c-B51E-FAEB7531D350}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_7A20EDB5_0429_41f5_954B_4CF6563B5F7E" xmi:type="uml:Class" name="GM_MultiCurve" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="13" ea_localid="105" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Class" nType="0" alias="Multilijn" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Wilko Quak" version="1.0" phase="1.0" created="2010-01-20 14:53:15" modified="2021-04-08 13:55:28" complexity="1"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_BDD3_3B092D93A107" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_7A20EDB5_0429_41f5_954B_4CF6563B5F7E"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_B7A6_3865C6EF902B" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_7A20EDB5_0429_41f5_954B_4CF6563B5F7E"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={41FCB794-C98A-40a9-A6EE-B91A3499FC28}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={7A20EDB5-0429-41f5-954B-4CF6563B5F7E}$CLT;$ENDXREF;$XREFPROP=$XID={598B99B4-06A0-4abf-BA44-D30189199846}$XID;$NAM=CustomProperties$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@PROP=@NAME=isActive@ENDNAME;@TYPE=Boolean@ENDTYPE;@VALU=@ENDVALU;@PRMT=@ENDPRMT;@ENDPROP;$DES;$CLT={7A20EDB5-0429-41f5-954B-4CF6563B5F7E}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_2ADA66EF_86A9_48f4_A6C9_B3166331E080" xmi:type="uml:Class" name="GM_Geometry" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="14" ea_localid="103" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Wilko Quak" version="1.0" phase="1.0" created="2021-12-03 15:47:43" modified="2021-12-03 15:48:13" complexity="1"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_9228_2E6632B909A7" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_2ADA66EF_86A9_48f4_A6C9_B3166331E080"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_9CAF_DA77AD5184C3" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_2ADA66EF_86A9_48f4_A6C9_B3166331E080"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={BE6657CE-EC4D-45e3-9D8E-723ECB62743A}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={2ADA66EF-86A9-48f4-A6C9-B3166331E080}$CLT;$ENDXREF;$XREFPROP=$XID={830FE88D-CDE4-4f7a-AEEC-4234925BC7B0}$XID;$NAM=CustomProperties$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@PROP=@NAME=isActive@ENDNAME;@TYPE=Boolean@ENDTYPE;@VALU=@ENDVALU;@PRMT=@ENDPRMT;@ENDPROP;$DES;$CLT={2ADA66EF-86A9-48f4-A6C9-B3166331E080}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3" ea_attsclassified="{D8A4792E-EBD8-4ccd-9566-518A0822735E}"/>
+			</element>
+			<element xmi:idref="EAID_8A1056A0_0F3E_4608_A131_6E6B2CE53459" xmi:type="uml:Class" name="GM_MultiGeometry" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="14" ea_localid="107" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Wilko Quak" version="1.0" phase="1.0" created="2010-01-20 14:53:37" modified="2021-04-08 13:55:43" complexity="1"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_BA05_7364CC3AE3A2" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_8A1056A0_0F3E_4608_A131_6E6B2CE53459"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_AC44_45AEEFB05B99" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_8A1056A0_0F3E_4608_A131_6E6B2CE53459"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={4744EC08-5FA5-4806-B264-A404F7918029}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={8A1056A0-0F3E-4608-A131-6E6B2CE53459}$CLT;$ENDXREF;$XREFPROP=$XID={9FFFDEAF-4B46-49b4-B026-BCF7C1810A1B}$XID;$NAM=CustomProperties$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@PROP=@NAME=isActive@ENDNAME;@TYPE=Boolean@ENDTYPE;@VALU=@ENDVALU;@PRMT=@ENDPRMT;@ENDPROP;$DES;$CLT={8A1056A0-0F3E-4608-A131-6E6B2CE53459}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_B2682035_9BBD_4840_8730_162283535E51" xmi:type="uml:Class" name="GM_MultiPoint" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="15" ea_localid="109" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Class" nType="0" alias="Multipunt" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Wilko Quak" version="1.0" phase="1.0" created="2010-01-20 14:53:04" modified="2021-04-08 13:55:59" complexity="1"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_BA5F_85516D8344CA" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_B2682035_9BBD_4840_8730_162283535E51"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_ADC9_4EDA2615B4F9" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_B2682035_9BBD_4840_8730_162283535E51"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={46C6199A-8AA4-44c1-81A1-042A916DD45E}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={B2682035-9BBD-4840-8730-162283535E51}$CLT;$ENDXREF;$XREFPROP=$XID={626C0173-93C5-41fb-A214-C0DC958F803A}$XID;$NAM=CustomProperties$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@PROP=@NAME=isActive@ENDNAME;@TYPE=Boolean@ENDTYPE;@VALU=@ENDVALU;@PRMT=@ENDPRMT;@ENDPROP;$DES;$CLT={B2682035-9BBD-4840-8730-162283535E51}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_88104FC1_EFC6_4317_84B1_F9D7C6B9B47B" xmi:type="uml:Class" name="GM_MultiSurface" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="16" ea_localid="106" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Class" nType="0" alias="Multivlak" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Wilko Quak" version="1.0" phase="1.0" created="2010-01-20 14:53:27" modified="2021-04-08 13:58:35" complexity="1"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_BC05_C6F6B33B93CA" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_88104FC1_EFC6_4317_84B1_F9D7C6B9B47B"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_A7D9_8FE3AE45C0EE" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_88104FC1_EFC6_4317_84B1_F9D7C6B9B47B"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={3D2634C4-5AF0-460e-8C69-E2B77A0BBE8D}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={88104FC1-EFC6-4317-84B1-F9D7C6B9B47B}$CLT;$ENDXREF;$XREFPROP=$XID={171B45BD-43D9-48fe-BCB8-DE84CDBB30EC}$XID;$NAM=CustomProperties$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@PROP=@NAME=isActive@ENDNAME;@TYPE=Boolean@ENDTYPE;@VALU=@ENDVALU;@PRMT=@ENDPRMT;@ENDPROP;$DES;$CLT={88104FC1-EFC6-4317-84B1-F9D7C6B9B47B}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_079B935A_189C_456e_B4E0_4C144BFBB6D3" xmi:type="uml:Class" name="GM_Point" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="17" ea_localid="100" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Class" nType="0" alias="Punt" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Wilko Quak" version="1.0" phase="1.0" created="2010-01-20 14:52:00" modified="2021-04-08 13:58:52" complexity="1"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_954F_E6F676848884" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_079B935A_189C_456e_B4E0_4C144BFBB6D3"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_AC28_E66BD055101A" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_079B935A_189C_456e_B4E0_4C144BFBB6D3"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={DAB41243-3819-4c44-8375-2A9BEA44DD4D}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={079B935A-189C-456e-B4E0-4C144BFBB6D3}$CLT;$ENDXREF;$XREFPROP=$XID={EB0EBA04-1BA8-46c9-8C96-0735EBB3BC80}$XID;$NAM=CustomProperties$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@PROP=@NAME=isActive@ENDNAME;@TYPE=Boolean@ENDTYPE;@VALU=@ENDVALU;@PRMT=@ENDPRMT;@ENDPROP;$DES;$CLT={079B935A-189C-456e-B4E0-4C144BFBB6D3}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_0A24E3A4_A056_41f5_90FD_C21F8E1C4E43" xmi:type="uml:Class" name="GM_Polygon" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="18" ea_localid="101" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Wilko Quak" version="1.0" phase="1.0" created="2010-01-20 14:50:07" modified="2021-04-08 13:59:06" complexity="1"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_83E8_5C781BCDA2C3" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_0A24E3A4_A056_41f5_90FD_C21F8E1C4E43"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_B675_ED7CB65BC843" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_0A24E3A4_A056_41f5_90FD_C21F8E1C4E43"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={6C567A28-7D2E-4a9c-8BC3-309E2CF80CB4}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={0A24E3A4-A056-41f5-90FD-C21F8E1C4E43}$CLT;$ENDXREF;$XREFPROP=$XID={AC05BA85-6902-4354-AC2D-0E225B75EA30}$XID;$NAM=CustomProperties$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@PROP=@NAME=isActive@ENDNAME;@TYPE=Boolean@ENDTYPE;@VALU=@ENDVALU;@PRMT=@ENDPRMT;@ENDPROP;$DES;$CLT={0A24E3A4-A056-41f5-90FD-C21F8E1C4E43}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+			<element xmi:idref="EAID_D22BBC0B_89D3_44c3_8377_A006F4CCFC9A" xmi:type="uml:Class" name="GM_Surface" scope="public">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" tpos="19" ea_localid="114" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Class" nType="0" alias="Vlak" scope="public" stereotype="Interface" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Wilko Quak" version="1.0" phase="1.0" created="2010-01-20 14:52:41" modified="2021-04-08 13:59:26" complexity="1"/>
+				<code product_name="Java" gentype="Java"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags>
+					<tag xmi:id="EAID_3B9D7FED_C51C_28c5_9B9E_2E1E79E7C456" name="Is afgeleid" value="Zie package#NOTES#Values: Nee,Ja,Zie package&#xA;Default: Zie package&#xA;Description: Deze constructie is al dan niet afgeleid van een &quot;supplier model&quot;. Wanneer je niks opgeeft wordt afleiding vastgesteld op basis van het package waarin het voorkomt.&#xA;" modelElement="EAID_D22BBC0B_89D3_44c3_8377_A006F4CCFC9A"/>
+					<tag xmi:id="EAID_B8C3C35D_C90C_75c9_8FCA_E5A14C30A834" name="Positie" value="#NOTES#Description: De positie van de construct binnen producten waarin deze opeenvolging een rol speelt.&#xA;" modelElement="EAID_D22BBC0B_89D3_44c3_8377_A006F4CCFC9A"/>
+				</tags>
+				<xrefs value="$XREFPROP=$XID={310EA9EF-3D1A-4eb4-88FD-D5E48FA96E8B}$XID;$NAM=Stereotypes$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=Interface;FQName=VNGR SIM+Grouping NL::Interface;@ENDSTEREO;$DES;$CLT={D22BBC0B-89D3-44c3-8377-A006F4CCFC9A}$CLT;$ENDXREF;$XREFPROP=$XID={966A129C-1D42-4934-B5DF-0CBAF5B94527}$XID;$NAM=CustomProperties$NAM;$TYP=element property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@PROP=@NAME=isActive@ENDNAME;@TYPE=Boolean@ENDTYPE;@VALU=@ENDVALU;@PRMT=@ENDPRMT;@ENDPROP;$DES;$CLT={D22BBC0B-89D3-44c3-8377-A006F4CCFC9A}$CLT;$ENDXREF;"/>
+				<extendedProperties tagged="0" package_name="GML3"/>
+			</element>
+		</elements>
+		<connectors/>
+		<primitivetypes>
+			<packagedElement xmi:type="uml:Package" xmi:id="EAPrimitiveTypesPackage" name="EA_PrimitiveTypes_Package" visibility="public"/>
+		</primitivetypes>
+		<profiles>
+			<uml:Profile xmlns:uml="http://schema.omg.org/spec/UML/2.1/" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmi:version="2.1" xmi:id="thecustomprofile" nsPrefix="thecustomprofile" name="thecustomprofile" metamodelReference="mmref01">
+				<ownedComment xmi:type="uml:Comment" xmi:id="comment01" annotatedElement="thecustomprofile">
+					<body> Version:1.0</body>
+				</ownedComment>
+				<packageImport xmi:id="mmref01">
+					<importedPackage href="http://schema.omg.org/spec/UML/2.1/"/>
+				</packageImport>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="VNGR SIM+Grouping NL::Interface" name="VNGR SIM+Grouping NL::Interface">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="VNGR SIM+Grouping NL::Interface-base_Class" name="base_Class" association="Class_VNGR SIM+Grouping NL::Interface">
+						<type href="http://schema.omg.org/spec/UML/2.1/Class"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Class_VNGR SIM+Grouping NL::Interface" name="A_Class_VNGR SIM+Grouping NL::Interface" memberEnd="extension_VNGR SIM+Grouping NL::Interface VNGR SIM+Grouping NL::Interface-base_Class">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_VNGR SIM+Grouping NL::Interface" name="extension_VNGR SIM+Grouping NL::Interface" type="VNGR SIM+Grouping NL::Interface" isComposite="true" lower="0" upper="1" memberEnd="extension_VNGR SIM+Grouping NL::Interface VNGR SIM+Grouping NL::Interface-base_Class"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Is afgeleid" name="Is afgeleid">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Is afgeleid-base_Class" name="base_Class" association="Class_Is afgeleid">
+						<type href="http://schema.omg.org/spec/UML/2.1/Class"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Is afgeleid-Is afgeleid" name="Is afgeleid">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Class_Is afgeleid" name="A_Class_Is afgeleid" memberEnd="extension_Is afgeleid Is afgeleid-base_Class">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Is afgeleid" name="extension_Is afgeleid" type="Is afgeleid" isComposite="true" lower="0" upper="1" memberEnd="extension_Is afgeleid Is afgeleid-base_Class"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="Extern" name="Extern">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Extern-base_Package" name="base_Package" association="Package_Extern">
+						<type href="http://schema.omg.org/spec/UML/2.1/Package"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Package_Extern" name="A_Package_Extern" memberEnd="extension_Extern Extern-base_Package">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_Extern" name="extension_Extern" type="Extern" isComposite="true" lower="0" upper="1" memberEnd="extension_Extern Extern-base_Package"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Stereotype" xmi:id="release" name="release">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="release-base_Package" name="base_Package" association="Package_release">
+						<type href="http://schema.omg.org/spec/UML/2.1/Package"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="release-release" name="release">
+						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Extension" xmi:id="Package_release" name="A_Package_release" memberEnd="extension_release release-base_Package">
+					<ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="extension_release" name="extension_release" type="release" isComposite="true" lower="0" upper="1" memberEnd="extension_release release-base_Package"/>
+				</packagedElement>
+			</uml:Profile>
+		</profiles>
+		<diagrams>
+			<diagram xmi:id="EAID_EBF76413_8363_4d13_89EF_85CF2BB653EB">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" localID="17" owner="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD"/>
+				<properties name="Spatial" type="Logical"/>
+				<project author="Wilko Quak" version="1.0" created="2010-01-20 14:49:56" modified="2021-12-03 15:48:29"/>
+				<style1 value="ShowPrivate=1;ShowProtected=1;ShowPublic=1;HideRelationships=0;Locked=0;Border=1;HighlightForeign=1;PackageContents=1;SequenceNotes=0;ScalePrintImage=0;PPgs.cx=1;PPgs.cy=1;DocSize.cx=1130;DocSize.cy=795;ShowDetails=0;Orientation=L;Zoom=100;ShowTags=0;OpParams=1;VisibleAttributeDetail=0;ShowOpRetType=1;ShowIcons=1;CollabNums=0;HideProps=0;ShowReqs=0;ShowCons=0;PaperSize=9;HideParents=0;UseAlias=0;HideAtts=0;HideOps=0;HideStereo=0;HideElemStereo=0;ShowTests=0;ShowMaint=0;ConnectorNotation=UML 2.1;ExplicitNavigability=0;ShowShape=1;AllDockable=0;AdvancedElementProps=1;AdvancedFeatureProps=1;AdvancedConnectorProps=1;m_bElementClassifier=1;SPT=1;ShowNotes=0;SuppressBrackets=0;SuppConnectorLabels=0;PrintPageHeadFoot=0;ShowAsList=0;"/>
+				<style2 value="SaveTag=69A55669;ExcludeRTF=0;DocAll=0;HideQuals=0;AttPkg=1;ShowTests=0;ShowMaint=0;SuppressFOC=1;MatrixActive=0;SwimlanesActive=1;KanbanActive=0;MatrixLineWidth=1;MatrixLineClr=0;MatrixLocked=0;TConnectorNotation=UML 2.1;TExplicitNavigability=0;AdvancedElementProps=1;AdvancedFeatureProps=1;AdvancedConnectorProps=1;m_bElementClassifier=1;SPT=1;MDGDgm=;STBLDgm=;ShowNotes=0;VisibleAttributeDetail=0;ShowOpRetType=1;SuppressBrackets=0;SuppConnectorLabels=0;PrintPageHeadFoot=0;ShowAsList=0;SuppressedCompartments=;Theme=:119;"/>
+				<swimlanes value="locked=false;orientation=0;width=0;inbar=false;names=false;color=0;bold=false;fcol=0;tcol=-1;ofCol=-1;ufCol=-1;hl=1;ufh=0;hh=0;cls=0;bw=0;hli=0;bro=0;SwimlaneFont=lfh:-21,lfw:0,lfi:0,lfu:0,lfs:0,lfface:Calibri,lfe:0,lfo:0,lfchar:1,lfop:0,lfcp:0,lfq:0,lfpf=0,lfWidth=0;"/>
+				<matrixitems value="locked=false;matrixactive=false;swimlanesactive=true;kanbanactive=false;width=1;clrLine=0;"/>
+				<extendedProperties/>
+				<xrefs/>
+				<elements>
+					<element geometry="Left=588;Top=127;Right=688;Bottom=197;" subject="EAID_2ADA66EF_86A9_48f4_A6C9_B3166331E080" seqno="1" style="DUID=78575704;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;HideIcon=0;"/>
+					<element geometry="Left=25;Top=255;Right=144;Bottom=325;" subject="EAID_3A6D7B77_F012_43f4_907C_BFEFEA1258A4" seqno="2" style="DUID=6DC43B8F;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;"/>
+					<element geometry="Left=486;Top=260;Right=576;Bottom=330;" subject="EAID_E929B2F9_3712_44ef_99ED_B33D0DD0F2D6" seqno="3" style="DUID=597B39F2;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;"/>
+					<element geometry="Left=30;Top=347;Right=203;Bottom=417;" subject="EAID_DDDD54F4_18D9_42b8_AF44_A73DCC924E10" seqno="4" style="DUID=5071763D;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;"/>
+					<element geometry="Left=263;Top=352;Right=412;Bottom=422;" subject="EAID_E7F2AC55_6C60_44cd_A739_7D1D0AED81E4" seqno="5" style="DUID=F41A9025;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;"/>
+					<element geometry="Left=263;Top=266;Right=445;Bottom=336;" subject="EAID_EB13DB41_59C5_4ecc_8C58_1B481129B911" seqno="6" style="DUID=C2A2337D;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;"/>
+					<element geometry="Left=496;Top=350;Right=654;Bottom=420;" subject="EAID_019183C0_051A_4f1a_B9F9_95274D6FFDC2" seqno="7" style="DUID=20A037EC;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;"/>
+					<element geometry="Left=684;Top=256;Right=793;Bottom=326;" subject="EAID_12A2F94C_66D6_4ff2_84A4_042A18ADB694" seqno="8" style="DUID=B2C26813;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;"/>
+					<element geometry="Left=473;Top=127;Right=563;Bottom=197;" subject="EAID_0A24E3A4_A056_41f5_90FD_C21F8E1C4E43" seqno="9" style="DUID=F7EBE523;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;"/>
+					<element geometry="Left=363;Top=127;Right=453;Bottom=197;" subject="EAID_B2682035_9BBD_4840_8730_162283535E51" seqno="10" style="DUID=290091C3;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;"/>
+					<element geometry="Left=241;Top=127;Right=343;Bottom=197;" subject="EAID_8A1056A0_0F3E_4608_A131_6E6B2CE53459" seqno="11" style="DUID=3E264C72;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;"/>
+					<element geometry="Left=131;Top=127;Right=221;Bottom=197;" subject="EAID_7A20EDB5_0429_41f5_954B_4CF6563B5F7E" seqno="12" style="DUID=B0551B3C;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;"/>
+					<element geometry="Left=21;Top=127;Right=111;Bottom=197;" subject="EAID_C6B192FD_631B_48b1_AAA7_6B12160B4B7D" seqno="13" style="DUID=C1A0CF04;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;"/>
+					<element geometry="Left=724;Top=37;Right=814;Bottom=107;" subject="EAID_D86339CE_C7AC_4684_B50E_36A650984BF3" seqno="14" style="DUID=B1E9A8D9;NSL=0;BCol=-1;BFol=-1;LCol=-1;LWth=-1;fontsz=0;bold=0;black=0;italic=0;ul=0;charset=0;pitch=0;"/>
+					<element geometry="Left=571;Top=37;Right=704;Bottom=107;" subject="EAID_C0E778D3_830A_4221_BCC9_DF9E4AF21368" seqno="15" style="DUID=A74BCFC1;"/>
+					<element geometry="Left=461;Top=37;Right=551;Bottom=107;" subject="EAID_AE6EB1BF_E3B0_4b8e_AD19_3F4CE5142242" seqno="16" style="DUID=8523045B;"/>
+					<element geometry="Left=351;Top=37;Right=441;Bottom=107;" subject="EAID_88104FC1_EFC6_4317_84B1_F9D7C6B9B47B" seqno="17" style="DUID=244C4989;"/>
+					<element geometry="Left=241;Top=37;Right=331;Bottom=107;" subject="EAID_D22BBC0B_89D3_44c3_8377_A006F4CCFC9A" seqno="18" style="DUID=53D12621;"/>
+					<element geometry="Left=131;Top=37;Right=221;Bottom=107;" subject="EAID_B66F6A35_46FC_49f1_B064_059E929060EB" seqno="19" style="DUID=333572AC;"/>
+					<element geometry="Left=21;Top=37;Right=111;Bottom=107;" subject="EAID_079B935A_189C_456e_B4E0_4C144BFBB6D3" seqno="20" style="DUID=D625C47B;"/>
+				</elements>
+			</diagram>
+			<diagram xmi:id="EAID_CB1334C0_0E60_41e7_BD17_3676B033789C">
+				<model package="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD" localID="18" owner="EAPK_DF146CEE_0F96_4d36_837B_A8040A7C68DD"/>
+				<properties name="primitives" type="Logical"/>
+				<project author="loeffa" version="1.0" created="2013-06-13 16:13:48" modified="2013-06-13 16:16:28"/>
+				<style1 value="ShowPrivate=1;ShowProtected=1;ShowPublic=1;HideRelationships=0;Locked=0;Border=1;HighlightForeign=1;PackageContents=1;SequenceNotes=0;ScalePrintImage=0;PPgs.cx=1;PPgs.cy=1;DocSize.cx=827;DocSize.cy=1169;ShowDetails=0;Orientation=P;Zoom=100;ShowTags=0;OpParams=1;VisibleAttributeDetail=0;ShowOpRetType=1;ShowIcons=1;CollabNums=0;HideProps=0;ShowReqs=0;ShowCons=0;PaperSize=9;HideParents=0;UseAlias=0;HideAtts=0;HideOps=0;HideStereo=0;HideElemStereo=0;ShowTests=0;ShowMaint=0;ConnectorNotation=UML 2.1;ExplicitNavigability=0;ShowShape=1;AllDockable=0;AdvancedElementProps=1;AdvancedFeatureProps=1;AdvancedConnectorProps=1;m_bElementClassifier=1;SPT=1;ShowNotes=0;SuppressBrackets=0;SuppConnectorLabels=0;PrintPageHeadFoot=0;ShowAsList=0;"/>
+				<style2 value="SaveTag=649AFE55;ExcludeRTF=0;DocAll=0;HideQuals=0;AttPkg=1;ShowTests=0;ShowMaint=0;SuppressFOC=1;MatrixActive=0;SwimlanesActive=1;KanbanActive=0;MatrixLineWidth=1;MatrixLineClr=0;MatrixLocked=0;TConnectorNotation=UML 2.1;TExplicitNavigability=0;AdvancedElementProps=1;AdvancedFeatureProps=1;AdvancedConnectorProps=1;m_bElementClassifier=1;SPT=1;MDGDgm=;STBLDgm=;ShowNotes=0;VisibleAttributeDetail=0;ShowOpRetType=1;SuppressBrackets=0;SuppConnectorLabels=0;PrintPageHeadFoot=0;ShowAsList=0;SuppressedCompartments=;Theme=:119;"/>
+				<swimlanes value="locked=false;orientation=0;width=0;inbar=false;names=false;color=0;bold=false;fcol=0;tcol=-1;ofCol=-1;ufCol=-1;hl=1;ufh=0;hh=0;cls=0;bw=0;hli=0;bro=0;SwimlaneFont=lfh:-21,lfw:0,lfi:0,lfu:0,lfs:0,lfface:Calibri,lfe:0,lfo:0,lfchar:1,lfop:0,lfcp:0,lfq:0,lfpf=0,lfWidth=0;"/>
+				<matrixitems value="locked=false;matrixactive=false;swimlanesactive=true;kanbanactive=false;width=1;clrLine=0;"/>
+				<extendedProperties/>
+				<xrefs/>
+			</diagram>
+		</diagrams>
+	</xmi:Extension>
+</xmi:XMI>

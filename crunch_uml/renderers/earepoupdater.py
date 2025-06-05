@@ -662,6 +662,7 @@ class EAMIMRepoUpdater(EARepoUpdater):
                     dt, number = util.split_number(datatype_input)
                     if number is not None:
                         data_dict["length"] = number
+                        data_dict["Length"] = number
                 elif datatype_input.startswith("n") or datatype_input.startswith("int") or datatype_input.startswith("number"):
                     datatype = "Integer"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
@@ -669,6 +670,7 @@ class EAMIMRepoUpdater(EARepoUpdater):
                     dt, number = util.split_number(datatype_input)
                     if number is not None:
                         data_dict["length"] = number
+                        data_dict["Length"] = number
                 elif datatype_input in ["date", "datum"]:
                     datatype = "Date"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
@@ -686,15 +688,15 @@ class EAMIMRepoUpdater(EARepoUpdater):
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
                     data_dict["Type"] = datatype
                 elif datatype_input in ["bedrag", "currency", "monetair", "geldbedrag"]:
-                    datatype = "Decimal"
+                    datatype = "Bedrag"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
                     data_dict["Type"] = datatype
                 elif datatype_input in ["blob", "binary", "byte"]:
-                    datatype = "CharacterString"
+                    datatype = "Blob"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
                     data_dict["Type"] = datatype
                 elif datatype_input in ["guid"]:
-                    datatype = "CharacterString"
+                    datatype = "GUID"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
                     data_dict["Type"] = datatype
 

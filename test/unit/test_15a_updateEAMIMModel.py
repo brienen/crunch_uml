@@ -7,7 +7,7 @@ import pytest
 import crunch_uml.schema as sch
 from crunch_uml import cli, const, db, util
 
-EA_DB = "./test/output/Monumenten.qea"
+EA_DB = "./test/output/MonumentenMIM.qea"
 
 
 def getRecordFromEARepository(table, ea_guid, key="ea_guid"):
@@ -55,7 +55,7 @@ def countTagsOfObject(object_id):
 def copy_test_files():
     # Pad naar de bronbestanden
     source_files = [
-        ("./test/data/Monumenten.qea", EA_DB),
+        ("./test/data/MonumentenMIM.qea", EA_DB),
     ]
 
     # Zorg ervoor dat de testdata-map bestaat

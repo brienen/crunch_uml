@@ -244,6 +244,10 @@ class UMLTags:
     gemma_url = Column(String)
     gemma_definitie = Column(String)
     gemma_toelichting = Column(String)
+    #authentiek = Column(Boolean, default=False)
+    #ind_formele_historie = Column(Boolean, default=False)
+    #ind_in_onderzoek = Column(Boolean, default=False)
+    #ind_materiele_historie = Column(Boolean, default=False)
 
 
 class Package(Base, UMLBase):  # type: ignore
