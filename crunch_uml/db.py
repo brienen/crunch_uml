@@ -11,6 +11,7 @@ from sqlalchemy import (
     PrimaryKeyConstraint,
     String,
     Text,
+    Date,   
     create_engine,
 )
 from sqlalchemy import exc as sa_exc
@@ -221,7 +222,7 @@ class UML_Generic:
         sch.save(copy_instance)
         return copy_instance
 
-
+# define the base class for UML elements
 class UMLBase(UML_Generic):
     author = Column(String)
     version = Column(String)
@@ -231,23 +232,64 @@ class UMLBase(UML_Generic):
     visibility = Column(String)
     alias = Column(String)
 
+# Define the base class for UML tags conformant to MIM
+class UMLTagsCommon:
+    herkomst = Column(String)
+    herkomst_definitie = Column(String)
+    toelichting = Column(String)
+    begrip = Column(String)
+    datum_opname = Column(Date)
 
-class UMLTags:
-    archimate_type = Column(String)
-    datum_tijd_export = Column(String)
-    synoniemen = Column(String)
-    domein_dcat = Column(String)
-    domein_iv3 = Column(String)
-    synoniemen = Column(String)
+class UMLTagsGEMMA:
     gemma_naam = Column(String)
     gemma_type = Column(String)
     gemma_url = Column(String)
     gemma_definitie = Column(String)
     gemma_toelichting = Column(String)
-    #authentiek = Column(Boolean, default=False)
-    #ind_formele_historie = Column(Boolean, default=False)
-    #ind_in_onderzoek = Column(Boolean, default=False)
-    #ind_materiele_historie = Column(Boolean, default=False)
+    domein_dcat = Column(String)
+    domein_iv3 = Column(String)
+    datum_tijd_export = Column(String)
+
+class UMLTagsHistory:
+    heeft_tijdlijn_geldigheid = Column(String, default="Nee")
+    heeft_tijdlijn_registratie = Column(String, default="Nee")
+    indicatie_formele_historie = Column(String, default="Nee")
+    indicatie_materiele_historie = Column(String, default="Nee")
+    indicatie_in_onderzoek = Column(String, default="Nee")
+
+class UMLTagsNumeriek:
+    minimumwaarde_inclusief = Column(String)
+    minimumwaarde_exclusief = Column(String)
+    maximumwaarde_inclusief = Column(String)
+    maximumwaarde_exclusief = Column(String)
+    eenheid = Column(String)
+
+class UMLTagsMetadata:
+    populatie = Column(String)
+    kwaliteit = Column(String)
+    synoniemen = Column(String)
+    authentiek = Column(String, default="Ja")
+
+# Define the UML tags classes for different UML elements
+class UMLTags(UMLTagsCommon, UMLTagsGEMMA, UMLTagsMetadata):
+    archimate_type = Column(String)
+
+class UMLTagsAttribute(UMLTagsCommon, UMLTagsHistory, UMLTagsNumeriek, UMLTagsMetadata):
+    lengte = Column(String)
+    patroon = Column(String)
+    formeel_patroon = Column(String)
+    indicatie_classificerend = Column(String)
+    mogelijk_geen_waarde = Column(String, default="Ja")
+
+class UMLTagsRelation(UMLTagsCommon, UMLTagsHistory, UMLTagsMetadata):
+    mogelijk_geen_waarde = Column(String, default="Ja")
+
+class UMLTagsGeneralization(UMLTagsCommon):
+    pass
+
+class UMLTagsLiteral(UMLTagsCommon):
+    pass
+
 
 
 class Package(Base, UMLBase):  # type: ignore
@@ -665,7 +707,7 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
         return copy_instance
 
 
-class Attribute(Base, UML_Generic):  # type: ignore
+class Attribute(Base, UML_Generic, UMLTagsAttribute):  # type: ignore
     __tablename__ = "attributes"
 
     clazz_id = Column(String, index=True, nullable=False)
@@ -842,7 +884,7 @@ class EnumerationLiteral(Base, UML_Generic):  # type: ignore
         return copy_instance
 
 
-class Association(Base, UML_Generic):  # type: ignore
+class Association(Base, UML_Generic, UMLTagsRelation):  # type: ignore
     __tablename__ = "associations"
 
     src_class_id = Column(String, index=True, nullable=False)
@@ -948,7 +990,7 @@ class Association(Base, UML_Generic):  # type: ignore
                 return inflection.camelize(util.getMeervoud(self.src_class.name.replace(" ", "")), False)
 
 
-class Generalization(Base, UML_Generic):  # type: ignore
+class Generalization(Base, UML_Generic, UMLTagsRelation):  # type: ignore
     __tablename__ = "generalizations"
 
     superclass_id = Column(String, index=True, nullable=False)

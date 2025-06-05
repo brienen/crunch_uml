@@ -53,9 +53,9 @@ EA_REPO_MAPPER_ATTRIBUTES = EA_REPO_MAPPER.copy()
 EA_REPO_MAPPER_ATTRIBUTES["definitie"] = "Notes"
 EA_REPO_MAPPER_ATTRIBUTES["primitive"] = "Type"
 EA_REPO_MAPPER_ATTRIBUTES["authentiek"] = "Authentiek"
-#EA_REPO_MAPPER_ATTRIBUTES["ind_formele_historie"] = "Indicatie formele historie"
-#EA_REPO_MAPPER_ATTRIBUTES["ind_in_onderzoek"] = "Indicatie in onderzoek"
-#EA_REPO_MAPPER_ATTRIBUTES["ind_materiele_historie"] = "Indicatie materiële historie"
+EA_REPO_MAPPER_ATTRIBUTES["ind_formele_historie"] = "Indicatie formele historie"
+EA_REPO_MAPPER_ATTRIBUTES["ind_in_onderzoek"] = "Indicatie in onderzoek"
+EA_REPO_MAPPER_ATTRIBUTES["ind_materiele_historie"] = "Indicatie materiële historie"
 
 EA_REPO_MAPPER_LITERALS = EA_REPO_MAPPER_ATTRIBUTES.copy()
 EA_REPO_MAPPER_LITERALS["type"] = "Type"
@@ -65,6 +65,9 @@ EA_REPO_MAPPER_ASSOCIATION["definitie"] = "Notes"
 
 EA_REPO_MAPPER_GENERALIZATION = EA_REPO_MAPPER.copy()
 EA_REPO_MAPPER_GENERALIZATION["definitie"] = "Notes"
+
+EA_REPO_MAPPER_LITERAL = EA_REPO_MAPPER.copy()
+EA_REPO_MAPPER_LITERAL["definitie"] = "Notes"
 
 TAG_STRATEGY_UPDATE = "update"
 TAG_STRATEGY_UPSERT = "upsert"

@@ -282,3 +282,8 @@ def split_number(code):
         return letters, digits
     else:
         return None, None
+    
+
+def snake_to_sentence_case(s):
+    words = s.split('_')
+    return ' '.join([words[0].capitalize()] + [w.lower() for w in words[1:]])

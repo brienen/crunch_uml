@@ -73,6 +73,17 @@ def copy_test_files():
 
 def test_import_monumenten():
 
+    # eerst monumenten importeren
+    test_args = [
+        "import",
+        "-f",
+        "./test/data/GGM_Monumenten_EA2.1.xml",
+        "-t",
+        "eaxmi",
+        "-db_create",
+    ]
+    cli.main(test_args)
+
     record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
     # Testen of de records schoon in de database staan
     assert record is not None, "Record met de naam 'MonumentNaam' niet gevonden."

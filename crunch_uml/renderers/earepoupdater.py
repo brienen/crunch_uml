@@ -1,12 +1,13 @@
 import logging
 from datetime import datetime
+import inspect
 
 from sqlalchemy import Column, MetaData, create_engine, insert, text, or_, and_
 from sqlalchemy.orm import sessionmaker
 
 import crunch_uml.schema as sch
 from crunch_uml import const, util
-from crunch_uml.db import UMLTags
+from crunch_uml.db import UMLTags, UMLTagsAttribute, UMLTagsRelation, UMLTagsGeneralization, UMLTagsLiteral
 from crunch_uml.exceptions import CrunchException
 from crunch_uml.renderers.renderer import ModelRenderer, RendererRegistry
 
@@ -86,13 +87,41 @@ class EARepoUpdater(ModelRenderer):
         """
         return {field_mapper.get(k, k): v for k, v in data_dict.items()}
 
+    def map_field_name_to_EARepo(self, field_name, mapper=const.EA_REPO_MAPPER):
+        """
+        Maakt een mapping van veldnamen naar EA Repository veldnamen.
+        Als de veldnaam niet voorkomt in de expliciete mapper, wordt deze omgezet
+        naar zinvolle weergave (snake_case → sentence case), met IV3 en GEMMA in hoofdletters.
+        """
+        if field_name in mapper:
+            return mapper[field_name]
+        
+        # Zet snake_case om naar sentence case
+        label = util.snake_to_sentence_case(field_name)
+
+        # Vervang "iv3" en "gemma" door hoofdletters (case-insensitive)
+        label = label.replace("iv3", "IV3").replace("Iv3", "IV3")
+        label = label.replace("gemma", "GEMMA").replace("Gemma", "GEMMA")
+        label = label.replace("dcat", "DCAT").replace("Dcat", "DCAT")
+        return label
+    
+    def map_field_name_from_EARepo(self, field_name, mapper=const.EA_REPO_MAPPER):
+        """
+        Maakt een mapping van veldnamen naar EA Repository veldnamen.
+        """
+        if field_name in mapper.values():
+            return {v: k for k, v in mapper.items()}[field_name]
+        else:
+            return field_name.lower().replace(' ', '_').replace('-', '_')
+
+
     def get_tablefields(self, table):
         if table == "t_objectproperties":
-            return "Object_ID", "Object_ID", "Property", "Value"
+            return "Object_ID", "Object_ID", "Property", "Value", "ea_guid"
         elif table == "t_attributetag":
-            return "ID", "ElementID", "Property", "VALUE"
+            return "ID", "ElementID", "Property", "VALUE", "ea_guid"
         else:
-            return None, None, None, None
+            return None, None, None, None, None
 
     def update_sequence(self, session, sequence_name, increment=1):
         try:
@@ -133,10 +162,11 @@ class EARepoUpdater(ModelRenderer):
             tag_id_child_column,
             tag_property_column,
             tag_value_column,
+            ea_guid_column,
         ) = self.get_tablefields(table_name)
 
         for key, value in update_dict.items():
-            session.query(table).filter_by(**{tag_id_parent_column: object_id, tag_property_column: key}).update(
+            session.query(table).filter_by(**{ea_guid_column: key}).update(
                 {tag_value_column: value}
             )
 
@@ -147,6 +177,7 @@ class EARepoUpdater(ModelRenderer):
             tag_id_child_column,
             tag_property_column,
             tag_value_column,
+            ea_guid_column, 
         ) = self.get_tablefields(table_name)
 
         for key, value in insert_dict.items():
@@ -169,10 +200,11 @@ class EARepoUpdater(ModelRenderer):
             tag_id_child_column,
             tag_property_column,
             tag_value_column,
+            ea_guid_column,
         ) = self.get_tablefields(table_name)
 
         for key, value in delete_dict.items():
-            session.query(table).filter_by(**{tag_id_parent_column: object_id, tag_property_column: key}).delete()
+            session.query(table).filter_by(**{ea_guid_column: key}).delete()
 
     def check_and_update_record(
         self,
@@ -265,6 +297,7 @@ class EARepoUpdater(ModelRenderer):
                 tag_id_child_column,
                 tag_property_column,
                 tag_value_column,
+                ea_guid_column,
             ) = self.get_tablefields(tag_table)
             if (
                 tag_table
@@ -274,26 +307,49 @@ class EARepoUpdater(ModelRenderer):
                 and tag_value_column
             ):
                 # Haal de bestaande tags op uit de definities
-                uml_tag_names = [attr for attr in UMLTags.__dict__ if isinstance(getattr(UMLTags, attr), Column)]
+                if recordtype in [const.RECORDTYPE_CLASS, const.RECORDTYPE_ENUMERATION]:
+                    uml_tag_names = [name for name, attr in inspect.getmembers(UMLTags) if isinstance(attr, Column)]
+                elif recordtype == const.RECORDTYPE_ATTRIBUTE:
+                    uml_tag_names = [name for name, attr in inspect.getmembers(UMLTagsAttribute) if isinstance(attr, Column)]
+                elif recordtype in [const.RECORDTYPE_ASSOCIATION]:
+                    uml_tag_names = [name for name, attr in inspect.getmembers(UMLTagsRelation) if isinstance(attr, Column)]
+                elif recordtype in [const.RECORDTYPE_GENERALIZATION]:
+                    uml_tag_names = [name for name, attr in inspect.getmembers(UMLTagsGeneralization) if isinstance(attr, Column)]
+                elif recordtype in [const.RECORDTYPE_LITERAL]:
+                    uml_tag_names = [name for name, attr in inspect.getmembers(UMLTagsLiteral) if isinstance(attr, Column)]
+                else:
+                    # Voor andere recordtypes, gebruik de standaard UMLTags
+                    uml_tag_names = []
 
                 # Haal de bestaande tags op uit de database
-                db_tags = (
+                db_tags_query = (
                     session.query(self.get_table_structure(tag_table, metadata))
                     .filter_by(**{tag_id_child_column: getattr(existing_record, tag_id_parent_column)})
                     .all()
                 )
-                db_tags = {getattr(tag, tag_property_column): getattr(tag, tag_value_column) for tag in db_tags}
+                db_tags = {getattr(tag, tag_property_column): getattr(tag, tag_value_column) for tag in db_tags_query}
+                db_tags = {self.map_field_name_from_EARepo(k, const.EA_REPO_MAPPER): v for k, v in db_tags.items()}
+
+                db_tags_keys = {getattr(tag, tag_property_column): getattr(tag, 'ea_guid') for tag in db_tags_query}
+                db_tags_keys = {self.map_field_name_from_EARepo(k, const.EA_REPO_MAPPER): v for k, v in db_tags_keys.items()}
+                # Nog even de veldnaam in de goed stijl zetten
+                for name, guid in db_tags_keys.items():
+                    session.query(self.get_table_structure(tag_table, metadata)).filter_by(ea_guid=guid).update({tag_property_column: self.map_field_name_to_EARepo(name)})
 
                 # Bepaal welke tags zijn gewijzigd
                 tags_changed = {
-                    col: data_dict[col]
+                    db_tags_keys[col]: data_dict[col]
                     for col in data_dict
                     if col in uml_tag_names and col in db_tags.keys() and data_dict[col] != db_tags[col]
                 }
                 tags_new = {
-                    col: data_dict[col] for col in data_dict if col in uml_tag_names and col not in db_tags.keys()
+                    self.map_field_name_to_EARepo(col): data_dict[col] for col in data_dict if col in uml_tag_names and col not in db_tags.keys()
                 }
-                tags_deleted = {col: db_tags[col] for col in db_tags if col not in data_dict.keys()}
+                tags_deleted = {
+                    db_tags_keys[col]: db_tags[col]
+                    for col in db_tags
+                    if col not in data_dict.keys()
+                }
 
                 if tag_strategy == const.TAG_STRATEGY_UPSERT:
                     self.update_repo(
@@ -370,6 +426,8 @@ class EARepoUpdater(ModelRenderer):
                 logger.debug(f"Record with GUID {guid_value} has been updated.")
             else:
                 logger.debug(f"No changes detected for record with GUID {guid_value}.")
+
+
         except Exception as e:
             logger.error(f"Error while updating record with GUID {guid_value} with message: {e}")
             raise CrunchException(f"Error while updating record with GUID {guid_value} with message: {e}")
@@ -663,6 +721,7 @@ class EAMIMRepoUpdater(EARepoUpdater):
                     if number is not None:
                         data_dict["length"] = number
                         data_dict["Length"] = number
+                        data_dict["lengte"] = number
                 elif datatype_input.startswith("n") or datatype_input.startswith("int") or datatype_input.startswith("number"):
                     datatype = "Integer"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
@@ -671,6 +730,7 @@ class EAMIMRepoUpdater(EARepoUpdater):
                     if number is not None:
                         data_dict["length"] = number
                         data_dict["Length"] = number
+                        data_dict["lengte"] = number
                 elif datatype_input in ["date", "datum"]:
                     datatype = "Date"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
