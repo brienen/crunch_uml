@@ -238,7 +238,7 @@ class UMLTagsCommon:
     herkomst_definitie = Column(String)
     toelichting = Column(String)
     begrip = Column(String)
-    datum_opname = Column(Date)
+    datum_opname = Column(String)
 
 class UMLTagsGEMMA:
     gemma_naam = Column(String)

@@ -287,3 +287,32 @@ def split_number(code):
 def snake_to_sentence_case(s):
     words = s.split('_')
     return ' '.join([words[0].capitalize()] + [w.lower() for w in words[1:]])
+
+
+def map_field_name_to_EARepo(field_name, mapper=const.EA_REPO_MAPPER):
+    """
+    Maakt een mapping van veldnamen naar EA Repository veldnamen.
+    Als de veldnaam niet voorkomt in de expliciete mapper, wordt deze omgezet
+    naar zinvolle weergave (snake_case → sentence case), met IV3 en GEMMA in hoofdletters.
+    """
+    if field_name in mapper:
+        return mapper[field_name]
+    
+    # Zet snake_case om naar sentence case
+    label = snake_to_sentence_case(field_name)
+
+    # Vervang "iv3" en "gemma" door hoofdletters (case-insensitive)
+    label = label.replace("iv3", "IV3").replace("Iv3", "IV3")
+    label = label.replace("gemma", "GEMMA").replace("Gemma", "GEMMA")
+    label = label.replace("dcat", "DCAT").replace("Dcat", "DCAT")
+    return label
+
+def map_field_name_from_EARepo(field_name, mapper=const.EA_REPO_MAPPER):
+    """
+    Maakt een mapping van veldnamen naar EA Repository veldnamen.
+    """
+    if field_name in mapper.values():
+        return {v: k for k, v in mapper.items()}[field_name]
+    else:
+        return field_name.lower().replace(' ', '_').replace('-', '_')
+

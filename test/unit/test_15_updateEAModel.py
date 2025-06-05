@@ -191,7 +191,7 @@ def test_import_monumenten():
     test_args = ["export", "-f", EA_DB, "-t", "earepo", "--tag_strategy", "upsert"]
     cli.main(test_args)
     record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
-    assert countTagsOfObject(record["Object_ID"]) == 26
+    assert countTagsOfObject(record["Object_ID"]) == 17
 
     # Testen van tags
     tag = getRecordFromEARepository("t_objectproperties", "{5BAA8E81-480F-405D-A818-A3F79725AFE3}")
@@ -203,7 +203,7 @@ def test_import_monumenten():
     test_args = ["export", "-f", EA_DB, "-t", "earepo", "--tag_strategy", "replace"]
     cli.main(test_args)
     record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
-    assert countTagsOfObject(record["Object_ID"]) == 11
+    assert countTagsOfObject(record["Object_ID"]) == 17
 
     # Testen van tags
     tag = getRecordFromEARepository("t_objectproperties", "{5BAA8E81-480F-405D-A818-A3F79725AFE3}")

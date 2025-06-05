@@ -2,6 +2,7 @@ import logging
 
 import crunch_uml.db as db
 import crunch_uml.schema as sch
+import crunch_uml.util as util
 from crunch_uml.parsers.parser import ParserRegistry, copy_values, fixtag
 from crunch_uml.parsers.xmiparser import XMIParser
 
@@ -101,6 +102,8 @@ class EAXMIParser(XMIParser):
                 for tag in tags:
                     if hasattr(clazz, fixtag(tag.get("name"))):
                         setattr(clazz, fixtag(tag.get("name")), tag.get("value"))
+                    #if hasattr(clazz, fixtag(util.map_field_name_from_EARepo(tag.get("name")))):
+                    #    setattr(clazz, fixtag(util.map_field_name_from_EARepo(tag.get("name"))), tag.get("value"))
 
                 properties = clazzref.xpath("./properties")[0]
                 if properties is not None:
@@ -123,6 +126,8 @@ class EAXMIParser(XMIParser):
                 for tag in tags:
                     if hasattr(enum, fixtag(tag.get("name"))):
                         setattr(enum, fixtag(tag.get("name")), tag.get("value"))
+                    #if hasattr(enum, fixtag(util.map_field_name_from_EARepo(tag.get("name")))):
+                    #    setattr(enum, fixtag(util.map_field_name_from_EARepo(tag.get("name"))), tag.get("value"))
 
                 properties = enumref.xpath("./properties")[0]
                 if properties is not None:
@@ -164,6 +169,14 @@ class EAXMIParser(XMIParser):
                 stereotype = attrref.xpath("./stereotype")
                 copy_values(stereotype, attr)
 
+                # First set tags that might be overridden
+                #tags = attrref.xpath("./tags/tag")
+                #for tag in tags:
+                #    if hasattr(attr, fixtag(tag.get("name"))):
+                #        setattr(attr, fixtag(tag.get("name")), tag.get("value"))
+                #    if hasattr(attr, fixtag(util.map_field_name_from_EARepo(tag.get("name")))):
+                #        setattr(attr, fixtag(util.map_field_name_from_EARepo(tag.get("name"))), tag.get("value"))
+
                 schema.save(attr)  # can also reference to enumeration literals
             else:
                 literal = schema.get_enumeration_literal(idref)
@@ -174,6 +187,14 @@ class EAXMIParser(XMIParser):
                     literal.definitie = documentation[0].get("value") if documentation is not None else None
                     stereotype = attrref.xpath("./stereotype")
                     copy_values(stereotype, literal)
+
+                    # First set tags that might be overridden
+                    #tags = attrref.xpath("./tags/tag")
+                    #for tag in tags:
+                    #    if hasattr(literal, fixtag(tag.get("name"))):
+                    #        setattr(literal, fixtag(tag.get("name")), tag.get("value"))
+                    #    if hasattr(literal, fixtag(util.map_field_name_from_EARepo(tag.get("name")))):
+                    #        setattr(literal, fixtag(util.map_field_name_from_EARepo(tag.get("name"))), tag.get("value"))
 
                     schema.save(literal)
 
@@ -189,6 +210,14 @@ class EAXMIParser(XMIParser):
                 documentation = connectorref.xpath("./documentation")
                 if len(documentation) == 1:
                     association.definitie = documentation[0].get("value")
+
+                # First set tags that might be overridden
+                #tags = connectorref.xpath("./tags/tag")
+                #for tag in tags:
+                #    if hasattr(association, fixtag(tag.get("name"))):
+                #        setattr(association, fixtag(tag.get("name")), tag.get("value"))
+                #    if hasattr(association, fixtag(util.map_field_name_from_EARepo(tag.get("name")))):
+                #        setattr(association, fixtag(util.map_field_name_from_EARepo(tag.get("name"))), tag.get("value"))
 
                 schema.save(association)
 

@@ -87,33 +87,6 @@ class EARepoUpdater(ModelRenderer):
         """
         return {field_mapper.get(k, k): v for k, v in data_dict.items()}
 
-    def map_field_name_to_EARepo(self, field_name, mapper=const.EA_REPO_MAPPER):
-        """
-        Maakt een mapping van veldnamen naar EA Repository veldnamen.
-        Als de veldnaam niet voorkomt in de expliciete mapper, wordt deze omgezet
-        naar zinvolle weergave (snake_case → sentence case), met IV3 en GEMMA in hoofdletters.
-        """
-        if field_name in mapper:
-            return mapper[field_name]
-        
-        # Zet snake_case om naar sentence case
-        label = util.snake_to_sentence_case(field_name)
-
-        # Vervang "iv3" en "gemma" door hoofdletters (case-insensitive)
-        label = label.replace("iv3", "IV3").replace("Iv3", "IV3")
-        label = label.replace("gemma", "GEMMA").replace("Gemma", "GEMMA")
-        label = label.replace("dcat", "DCAT").replace("Dcat", "DCAT")
-        return label
-    
-    def map_field_name_from_EARepo(self, field_name, mapper=const.EA_REPO_MAPPER):
-        """
-        Maakt een mapping van veldnamen naar EA Repository veldnamen.
-        """
-        if field_name in mapper.values():
-            return {v: k for k, v in mapper.items()}[field_name]
-        else:
-            return field_name.lower().replace(' ', '_').replace('-', '_')
-
 
     def get_tablefields(self, table):
         if table == "t_objectproperties":
@@ -328,13 +301,13 @@ class EARepoUpdater(ModelRenderer):
                     .all()
                 )
                 db_tags = {getattr(tag, tag_property_column): getattr(tag, tag_value_column) for tag in db_tags_query}
-                db_tags = {self.map_field_name_from_EARepo(k, const.EA_REPO_MAPPER): v for k, v in db_tags.items()}
+                db_tags = {util.map_field_name_from_EARepo(k, const.EA_REPO_MAPPER): v for k, v in db_tags.items()}
 
                 db_tags_keys = {getattr(tag, tag_property_column): getattr(tag, 'ea_guid') for tag in db_tags_query}
-                db_tags_keys = {self.map_field_name_from_EARepo(k, const.EA_REPO_MAPPER): v for k, v in db_tags_keys.items()}
+                db_tags_keys = {util.map_field_name_from_EARepo(k, const.EA_REPO_MAPPER): v for k, v in db_tags_keys.items()}
                 # Nog even de veldnaam in de goed stijl zetten
                 for name, guid in db_tags_keys.items():
-                    session.query(self.get_table_structure(tag_table, metadata)).filter_by(ea_guid=guid).update({tag_property_column: self.map_field_name_to_EARepo(name)})
+                    session.query(self.get_table_structure(tag_table, metadata)).filter_by(ea_guid=guid).update({tag_property_column: util.map_field_name_to_EARepo(name)})
 
                 # Bepaal welke tags zijn gewijzigd
                 tags_changed = {
@@ -343,7 +316,7 @@ class EARepoUpdater(ModelRenderer):
                     if col in uml_tag_names and col in db_tags.keys() and data_dict[col] != db_tags[col]
                 }
                 tags_new = {
-                    self.map_field_name_to_EARepo(col): data_dict[col] for col in data_dict if col in uml_tag_names and col not in db_tags.keys()
+                    util.map_field_name_to_EARepo(col): data_dict[col] for col in data_dict if col in uml_tag_names and col not in db_tags.keys()
                 }
                 tags_deleted = {
                     db_tags_keys[col]: db_tags[col]
