@@ -9,6 +9,23 @@ from crunch_uml.parsers.xmiparser import XMIParser
 logger = logging.getLogger()
 
 
+
+def get_sorted_tags(tag_nodes):
+    """
+    Sorteert tags op basis van vermoedelijke ouderdom aan de hand van de eerste drie hex-blokken in xmi:id.
+    """
+    def tag_sort_key(tag):
+        tag_id = tag.get("xmi:id") or tag.get("{http://www.omg.org/XMI}id") or ""
+        parts = tag_id.split("_")
+        try:
+            # Neem de eerste drie blokken als sorteercomponent
+            return tuple(int(p, 16) for p in parts[1:4])
+        except (IndexError, ValueError):
+            return (0, 0, 0)
+
+    return sorted(tag_nodes, key=tag_sort_key)
+
+
 @ParserRegistry.register(
     "eaxmi",
     descr="XMI-Parser that parses EA (Enterprise Architect) specific extensions. Tested on XMI v2.1 spec ",
@@ -53,7 +70,7 @@ class EAXMIParser(XMIParser):
             idref = packageref.get("{" + ns["xmi"] + "}idref")
             package = schema.get_package(idref)
 
-            tags = packageref.xpath("./tags/tag")
+            tags = get_sorted_tags(packageref.xpath("./tags/tag"))
             for tag in tags:
                 if hasattr(package, fixtag(tag.get("name"))):
                     setattr(package, fixtag(tag.get("name")), tag.get("value"))
@@ -98,7 +115,7 @@ class EAXMIParser(XMIParser):
 
             if clazz is not None:
                 # First set tags that might be overridden
-                tags = clazzref.xpath("./tags/tag")
+                tags = get_sorted_tags(clazzref.xpath("./tags/tag"))
                 for tag in tags:
                     if hasattr(clazz, fixtag(tag.get("name"))):
                         setattr(clazz, fixtag(tag.get("name")), tag.get("value"))
@@ -122,7 +139,7 @@ class EAXMIParser(XMIParser):
 
             if enum is not None:
                 # First set tags that might be overridden
-                tags = enumref.xpath("./tags/tag")
+                tags = get_sorted_tags(enumref.xpath("./tags/tag"))
                 for tag in tags:
                     if hasattr(enum, fixtag(tag.get("name"))):
                         setattr(enum, fixtag(tag.get("name")), tag.get("value"))
@@ -169,6 +186,10 @@ class EAXMIParser(XMIParser):
                 stereotype = attrref.xpath("./stereotype")
                 copy_values(stereotype, attr)
 
+                tags = get_sorted_tags(attrref.xpath("./tags/tag"))
+                for tag in tags:
+                    if hasattr(attr, fixtag(tag.get("name"))):
+                        setattr(attr, fixtag(tag.get("name")), tag.get("value"))
                 # First set tags that might be overridden
                 #tags = attrref.xpath("./tags/tag")
                 #for tag in tags:
@@ -187,6 +208,13 @@ class EAXMIParser(XMIParser):
                     literal.definitie = documentation[0].get("value") if documentation is not None else None
                     stereotype = attrref.xpath("./stereotype")
                     copy_values(stereotype, literal)
+                    style = attrref.xpath("./style")
+                    literal.alias = style[0].get("value") if style else None
+
+                    tags = get_sorted_tags(attrref.xpath("./tags/tag"))
+                    for tag in tags:
+                        if hasattr(literal, fixtag(tag.get("name"))):
+                            setattr(literal, fixtag(tag.get("name")), tag.get("value"))
 
                     # First set tags that might be overridden
                     #tags = attrref.xpath("./tags/tag")
@@ -211,6 +239,10 @@ class EAXMIParser(XMIParser):
                 if len(documentation) == 1:
                     association.definitie = documentation[0].get("value")
 
+                tags = get_sorted_tags(connectorref.xpath("./tags/tag"))
+                for tag in tags:
+                    if hasattr(association, fixtag(tag.get("name"))):
+                        setattr(association, fixtag(tag.get("name")), tag.get("value"))
                 # First set tags that might be overridden
                 #tags = connectorref.xpath("./tags/tag")
                 #for tag in tags:

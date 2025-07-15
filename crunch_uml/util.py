@@ -6,6 +6,7 @@ import re
 import uuid
 from datetime import datetime
 from urllib.parse import urlparse
+from dateutil import parser
 
 from crunch_uml import const
 
@@ -316,3 +317,12 @@ def map_field_name_from_EARepo(field_name, mapper=const.EA_REPO_MAPPER):
     else:
         return field_name.lower().replace(' ', '_').replace('-', '_')
 
+
+def to_yyyymmdd(datum_string, default='01/06/2019'):
+    try:
+        # Verwijder aanhalingstekens en witruimte
+        schone_string = datum_string.strip().strip("'\"")
+        datum = parser.parse(schone_string)
+        return datum.strftime("%Y%m%d")
+    except Exception as e:
+        return default

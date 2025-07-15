@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 import inspect
 
-from sqlalchemy import Column, MetaData, create_engine, insert, text, or_, and_
+from sqlalchemy import Column, MetaData, create_engine, insert, text, or_, and_, func
 from sqlalchemy.orm import sessionmaker
 
 import crunch_uml.schema as sch
@@ -434,6 +434,71 @@ class EARepoUpdater(ModelRenderer):
                     recordtype=recordtype,
                 )
 
+    def deduplicate_tags(self, session, metadata, tag_table, tag_id_child_column, tag_property_column, tag_value_column):
+        """
+        Verwijder dubbele tags uit de tag-tabel (t_objectproperties of t_attributetag).
+        Houdt alleen het eerste (laagste ID) record per (child_id, property).
+        """
+        try:
+            table = self.get_table_structure(tag_table, metadata)
+            if table is None:
+                logger.warning(f"Tabel '{tag_table}' niet gevonden in metadata voor deduplicatie.")
+                return
+
+            # Bepaal het ID veld voor de tabel
+            id_column = None
+            if tag_table == "t_objectproperties":
+                id_column = "PropertyID"
+            elif tag_table == "t_attributetag":
+                id_column = "PropertyID"
+            else:
+                logger.warning(f"Deduplicatie niet geïmplementeerd voor tabel '{tag_table}'.")
+                return
+
+            required_columns = {id_column, tag_id_child_column, tag_property_column}
+            missing_columns = required_columns - set(c.name for c in table.columns)
+            if missing_columns:
+                logger.warning(f"Deduplicatie afgebroken. Vereiste kolommen ontbreken in tabel '{tag_table}': {missing_columns}")
+                return
+
+            # Zoek dubbele (child_id, property) combinaties
+            subquery = (
+                session.query(
+                    getattr(table.c, tag_id_child_column).label("child_id"),
+                    getattr(table.c, tag_property_column).label("property"),
+                    func.min(getattr(table.c, id_column)).label("min_id"),
+                )
+                .group_by(getattr(table.c, tag_id_child_column), getattr(table.c, tag_property_column))
+                .subquery()
+            )
+
+            # Vind alle id's die NIET de min_id zijn (dus duplicaten)
+            duplicates = (
+                session.query(getattr(table.c, id_column))
+                .join(
+                    subquery,
+                    and_(
+                        getattr(table.c, tag_id_child_column) == subquery.c.child_id,
+                        getattr(table.c, tag_property_column) == subquery.c.property,
+                        getattr(table.c, id_column) != subquery.c.min_id,
+                    ),
+                )
+                .order_by(getattr(table.c, id_column).desc())
+                .all()
+            )
+
+            duplicate_ids = [row[0] for row in duplicates]
+            if duplicate_ids:
+                session.query(table).filter(getattr(table.c, id_column).in_(duplicate_ids)).delete(synchronize_session=False)
+                logger.info(f"Deduplicatie uitgevoerd op '{tag_table}': {len(duplicate_ids)} dubbele tags verwijderd.")
+            else:
+                logger.debug(f"Geen dubbele tags gevonden in '{tag_table}'.")
+
+        except Exception as e:
+            logger.error(f"Fout tijdens deduplicatie van '{tag_table}': {e}")
+
+
+
     def render(self, args, schema: sch.Schema):
 
         # Check to see if a list of Package ids is provided
@@ -451,6 +516,24 @@ class EARepoUpdater(ModelRenderer):
             )
 
             try:
+                # First fix duplicate tags
+                self.deduplicate_tags(
+                    target_session,
+                    target_metadata,
+                    tag_table="t_objectproperties",
+                    tag_id_child_column="Object_ID",
+                    tag_property_column="Property",
+                    tag_value_column="Value"
+                )
+                self.deduplicate_tags(
+                    target_session,
+                    target_metadata,
+                    tag_table="t_attributetag",
+                    tag_id_child_column="ElementID",
+                    tag_property_column="Property",
+                    tag_value_column="VALUE"
+                )
+
                 # Process all classes
                 logger.info("Updating classes...")
                 classes = schema.get_all_classes()
@@ -657,23 +740,48 @@ class EAMIMRepoUpdater(EARepoUpdater):
         tag_table=None,
         tag_strategy=const.TAG_STRATEGY_REPLACE,
         recordtype=None,
+        profiel="MIM"
     ):
         if recordtype == const.RECORDTYPE_CLASS:
-            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'element property', 'Objecttype', 'MIM::Objecttype')
+            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'element property', 'Objecttype', 'VNGR SIM+Grouping NL::Objecttype')
         elif recordtype == const.RECORDTYPE_ATTRIBUTE:
-            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'attribute property', 'Attribuutsoort', 'MIM::Attribuutsoort')
+            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'attribute property', 'Attribuutsoort', 'VNGR SIM+Grouping NL::Attribuutsoort')
         elif recordtype == const.RECORDTYPE_LITERAL:
-            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'attribute property', 'Enumeratiewaarde', 'MIM::Enumeratiewaarde')
+            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'attribute property', 'Enumeratiewaarde', 'VNGR SIM+Grouping NL::Enumeratiewaarde')
         elif recordtype == const.RECORDTYPE_ENUMERATION:
-            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'element property', 'Enumeratie', 'MIM::Enumeratie')
+            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'element property', 'Enumeratie', 'VNGR SIM+Grouping NL::Enumeratie')
         #elif recordtype == const.RECORDTYPE_PACKAGE:
-        #    data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'element property', 'Package', 'MIM::Package')
+        #    data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'element property', 'Package', 'VNGR SIM+Grouping NL::Package')
         elif recordtype == const.RECORDTYPE_ASSOCIATION:
-            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'connector property', 'Relatiesoort', 'MIM::Relatiesoort')
+            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'connector property', 'Relatiesoort', 'VNGR SIM+Grouping NL::Relatiesoort')
         elif recordtype == const.RECORDTYPE_GENERALIZATION:
-            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'connector property', 'Generalisatie', 'MIM::Generalisatie')
+            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'connector property', 'Generalisatie', 'VNGR SIM+Grouping NL::Generalisatie')
         else:
             logger.warning(f"Unknown recordtype {recordtype}, not setting stereotype.")
+
+        # If data_dict contains release set de waarde
+        # Set 'Release' field case-insensitively and ensure it's written as 'Release'
+        release_key = next((k for k in data_dict.keys() if k.lower() == "release"), None)
+        if release_key is not None and data_dict[release_key] is None:
+            data_dict["release"] = util.to_yyyymmdd(data_dict.get("ModifiedDate", "2019/06/01"))
+        elif release_key is not None:
+            data_dict["release"] = data_dict[release_key]
+
+        # Set data type for attributes
+        if recordtype == const.RECORDTYPE_LITERAL:
+            # Set "Style" field case-insensitively from "alias"
+            alias_key = next((k for k in data_dict.keys() if k.lower() == "alias"), None)
+            if alias_key is not None:
+                data_dict["Style"] = data_dict.get(alias_key, None)
+            elif data_dict.get("Type"):
+            # If "Type" is filled and "alias" is not, use "Type" value for "alias" and "Style"
+                data_dict["alias"] = data_dict["Type"]
+                data_dict["Style"] = data_dict["Type"]
+            else:
+                data_dict["Style"] = None
+            # Set "Type" to None
+            data_dict["Type"] = None
+
 
         # Set data type for attributes
         if recordtype == const.RECORDTYPE_ATTRIBUTE:
@@ -745,7 +853,62 @@ class EAMIMRepoUpdater(EARepoUpdater):
             tag_strategy,
             recordtype=recordtype,
         )
+        # Speciaal voor Enumeratiewaarde: Style updaten en Type op None zetten in t_attribute
+        if recordtype == const.RECORDTYPE_LITERAL:
+            table = metadata.tables["t_attribute"]
+            guid_value = util.fromEAGuid(data_dict.get("ea_guid"))
+            update_values = {}
+            if "Style" in data_dict:
+                update_values["Style"] = data_dict["Style"]
+            update_values["Type"] = None
+            session.query(table).filter_by(ea_guid=guid_value).update(update_values)
 
+        # Robuuste upsert voor 'Release'-tag bij packages met 'domein' stereotype
+        if recordtype == const.RECORDTYPE_PACKAGE:
+            try:
+                stereotype = data_dict.get("Stereotype", "")
+                release_value = data_dict.get("release")
+                if stereotype and "domein" in stereotype.lower() and release_value:
+                    table_prop = metadata.tables.get("t_objectproperties")
+                    object_table = metadata.tables.get("t_object")
+
+                    if table_prop is None or object_table is None:
+                        logger.warning("Tabel 't_objectproperties' of 't_object' niet gevonden in metadata.")
+                    else:
+                        result = session.query(object_table).filter_by(
+                            ea_guid=util.fromEAGuid(data_dict["ea_guid"])
+                        ).first()
+                        if not result:
+                            logger.warning(f"Geen object gevonden voor GUID {data_dict['ea_guid']}")
+                        else:
+                            object_id = result.Object_ID
+                            existing = session.query(table_prop).filter_by(
+                                Object_ID=object_id,
+                                Property="Release"
+                            ).first()
+
+                            if existing:
+                                session.query(table_prop).filter_by(
+                                    Object_ID=object_id,
+                                    Property="Release"
+                                ).update({
+                                    "Value": release_value
+                                })
+                                logger.info(f"Release-tag bijgewerkt voor package met GUID {data_dict['ea_guid']}")
+                            else:
+                                insert_item = {
+                                    "PropertyID": self.update_sequence(session, "t_objectproperties"),
+                                    "Object_ID": object_id,
+                                    "Property": "Release",
+                                    "Value": release_value,
+                                    "ea_guid": util.get_repo_guid(),
+                                }
+                                session.execute(insert(table_prop).values(insert_item))
+                                logger.info(f"Release-tag toegevoegd voor package met GUID {data_dict['ea_guid']}")
+                else:
+                    logger.debug(f"Geen release-tag upsert voor package met GUID {data_dict.get('ea_guid', '<geen guid>')}: stereotype={stereotype}, release={release_value}")
+            except Exception as e:
+                logger.warning(f"Fout bij het toevoegen/bijwerken van de Release-tag: {e}")
 
 
 

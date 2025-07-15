@@ -289,10 +289,9 @@ class UMLTagsGeneralization(UMLTagsCommon):
 
 class UMLTagsLiteral(UMLTagsCommon):
     pass
-
-
-
-class Package(Base, UMLBase):  # type: ignore
+class UMLTagsDomain(UMLTagsCommon):
+    release = Column(String)
+class Package(Base, UMLBase, UMLTagsDomain):  # type: ignore
     __tablename__ = "packages"
 
     parent_package_id = Column(String, index=True)
@@ -862,6 +861,7 @@ class EnumerationLiteral(Base, UML_Generic):  # type: ignore
     enumeratie_id = Column(String, index=True, nullable=False)
     enumeratie = relationship("Enumeratie", back_populates="literals")
     type = Column(String)
+    alias = Column(String)
 
     __table_args__ = (
         ForeignKeyConstraint(

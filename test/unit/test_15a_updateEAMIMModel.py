@@ -113,7 +113,7 @@ def test_import_monumenten():
     xref = getRecordFromEARepository("t_xref", "{54944273-F312-44b2-A78D-43488F915429}", key="Client")
     assert record["Stereotype"] == "Objecttype"
     assert xref is not None
-    assert xref["Description"] == "@STEREO;Name=Objecttype;FQName=MIM::Objecttype;@ENDSTEREO;"
+    assert xref["Description"] == "@STEREO;Name=Objecttype;FQName=VNGR SIM+Grouping NL::Objecttype;@ENDSTEREO;"
 
     #Test Enumeration
     record = getRecordFromEARepository("t_object", "{5C808AC9-CB09-4f4d-813E-821829856BA8}")
@@ -121,7 +121,7 @@ def test_import_monumenten():
     assert record is not None, "Record met de naam 'Enumeratie' niet gevonden."
     assert record["Stereotype"] == "Enumeratie"
     assert xref is not None
-    assert xref["Description"] == "@STEREO;Name=Enumeratie;FQName=MIM::Enumeratie;@ENDSTEREO;"
+    assert xref["Description"] == "@STEREO;Name=Enumeratie;FQName=VNGR SIM+Grouping NL::Enumeratie;@ENDSTEREO;"
 
     #Test Attribute
     record = getRecordFromEARepository("t_attribute", "{EBD24559-2F60-43fb-B865-2A7AAA4E3001}")
@@ -129,7 +129,7 @@ def test_import_monumenten():
     assert record is not None, "Record met de naam 'Attribuut' niet gevonden."
     assert record["Stereotype"] == "Attribuutsoort"
     assert xref is not None
-    assert xref["Description"] == "@STEREO;Name=Attribuutsoort;FQName=MIM::Attribuutsoort;@ENDSTEREO;"
+    assert xref["Description"] == "@STEREO;Name=Attribuutsoort;FQName=VNGR SIM+Grouping NL::Attribuutsoort;@ENDSTEREO;"
 
     #Test Associatie
     record = getRecordFromEARepository("t_connector", "{FD27EB67-1CFA-4f40-AE79-329DE9DE6754}")
@@ -137,4 +137,4 @@ def test_import_monumenten():
     assert record is not None, "Record met de naam 'Relatiesoort' niet gevonden."
     assert record["Stereotype"] == "Relatiesoort"
     assert xref is not None
-    assert xref["Description"] == "@STEREO;Name=Relatiesoort;FQName=MIM::Relatiesoort;@ENDSTEREO;"
+    assert xref["Description"] == "@STEREO;Name=Relatiesoort;FQName=VNGR SIM+Grouping NL::Relatiesoort;@ENDSTEREO;"
