@@ -2,7 +2,7 @@
 <xmi:XMI xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmi:version="2.1" xmlns:uml="http://schema.omg.org/spec/UML/2.1" xmlns:thecustomprofile="http://www.sparxsystems.com/profiles/thecustomprofile/1.0" xmlns:MIM="http://www.sparxsystems.com/profiles/MIM/1.1.1" xmlns:VNGR_SIM_Grouping_NL="http://www.sparxsystems.com/profiles/VNGR_SIM_Grouping_NL/1.1.1-4.3.0">
 	<xmi:Documentation exporter="Enterprise Architect" exporterVersion="6.5" exporterID="1704"/>
 	<uml:Model xmi:type="uml:Model" name="EA_Model" visibility="public">
-		<packagedElement xmi:type="uml:Package" xmi:id="EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E" name="Monumenten " visibility="public">
+		<packagedElement xmi:type="uml:Package" xmi:id="EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E" name="Monumenten" visibility="public">
 			<packagedElement xmi:type="uml:Package" xmi:id="EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652" name="Diagram" visibility="public">
 				<ownedComment xmi:type="uml:Comment" xmi:id="EAID_EBF38EE2_DAF0_4704_ADA6_705868BA7C05" body="Kadastrale Aanduiding">
 					<annotatedElement xmi:idref="EAID_9775E778_DBF8_4122_94CE_551466B62F46"/>
@@ -366,7 +366,7 @@
 	</uml:Model>
 	<xmi:Extension extender="Enterprise Architect" extenderID="6.5">
 		<elements>
-			<element xmi:idref="EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E" xmi:type="uml:Package" name="Monumenten " scope="public">
+			<element xmi:idref="EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E" xmi:type="uml:Package" name="Monumenten" scope="public">
 				<model package2="EAID_45B88627_6F44_4b6d_BE77_3EC51BBE679E" package="EAPK_44E38F87_AE1C_45c6_B0AB_1366F32ADB28" tpos="0" ea_localid="43" ea_eleType="package"/>
 				<properties documentation="Het informatiedomein dat gegevens omvat over de aanwijzing, bescherming en instandhouding van monumenten, inclusief gebouwen, objecten en landschappen, die van cultuurhistorische, wetenschappelijke of esthetische waarde zijn." isSpecification="false" sType="Package" nType="0" scope="public" stereotype="Domein"/>
 				<project author="Arjen Brienen" version="1.2" phase="1.0" created="2019-07-03 14:46:07" modified="2025-03-27 15:28:35" complexity="1" status="Proposed"/>
@@ -410,7 +410,7 @@
 				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
 				<tags/>
 				<xrefs/>
-				<extendedProperties tagged="0" package_name="Monumenten "/>
+				<extendedProperties tagged="0" package_name="Monumenten"/>
 				<packageproperties version="1.0" tpos="0"/>
 				<paths/>
 				<times created="2019-07-03 14:46:15" modified="2025-03-26 16:14:36" lastloaddate="2019-07-06 17:08:07" lastsavedate="2019-07-06 17:08:07"/>
@@ -450,7 +450,7 @@
 				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
 				<tags/>
 				<xrefs/>
-				<extendedProperties tagged="0" package_name="Monumenten "/>
+				<extendedProperties tagged="0" package_name="Monumenten"/>
 				<packageproperties version="1.0" tpos="0"/>
 				<paths/>
 				<times created="2019-07-03 14:46:25" modified="2025-03-26 16:14:36" lastloaddate="2019-07-06 17:08:08" lastsavedate="2019-07-06 17:08:08"/>
@@ -1353,8 +1353,8 @@
 				<modifiers isRoot="false" isLeaf="false"/>
 				<documentation/>
 				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
-				<labels lb="0..1" mb="«use»" mt="documentatie" rb="0..*"/>
-				<extendedProperties conditional="«use»" virtualInheritance="0"/>
+				<labels lb="0..1" mb="ï¿½useï¿½" mt="documentatie" rb="0..*"/>
+				<extendedProperties conditional="ï¿½useï¿½" virtualInheritance="0"/>
 				<style/>
 				<xrefs/>
 				<tags/>
@@ -1828,7 +1828,7 @@
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatierol-Mogelijk geen waarde" name="Mogelijk geen waarde">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatierol-Indicatie materiële historie" name="Indicatie materiële historie">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatierol-Indicatie materiï¿½le historie" name="Indicatie materiï¿½le historie">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatierol-Authentiek" name="Authentiek">
@@ -1863,7 +1863,7 @@
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatieklasse-Mogelijk geen waarde" name="Mogelijk geen waarde">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatieklasse-Indicatie materiële historie" name="Indicatie materiële historie">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatieklasse-Indicatie materiï¿½le historie" name="Indicatie materiï¿½le historie">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatieklasse-Authentiek" name="Authentiek">
@@ -1898,7 +1898,7 @@
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatiesoort-Mogelijk geen waarde" name="Mogelijk geen waarde">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatiesoort-Indicatie materiële historie" name="Indicatie materiële historie">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatiesoort-Indicatie materiï¿½le historie" name="Indicatie materiï¿½le historie">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatiesoort-Authentiek" name="Authentiek">
@@ -1930,7 +1930,7 @@
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep-base_Attribute" name="base_Attribute" association="Attribute_Gegevensgroep">
 						<type href="http://schema.omg.org/spec/UML/2.1/Attribute"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep-Indicatie materiële historie" name="Indicatie materiële historie">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep-Indicatie materiï¿½le historie" name="Indicatie materiï¿½le historie">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep-Authentiek" name="Authentiek">
@@ -2118,7 +2118,7 @@
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Externe koppeling-Mogelijk geen waarde" name="Mogelijk geen waarde">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="Externe koppeling-Indicatie materiële historie" name="Indicatie materiële historie">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Externe koppeling-Indicatie materiï¿½le historie" name="Indicatie materiï¿½le historie">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Externe koppeling-Authentiek" name="Authentiek">
@@ -2319,7 +2319,7 @@
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Mogelijk geen waarde" name="Mogelijk geen waarde">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Indicatie materiële historie" name="Indicatie materiële historie">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Indicatie materiï¿½le historie" name="Indicatie materiï¿½le historie">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Authentiek" name="Authentiek">
@@ -2608,7 +2608,7 @@
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep_proxy-Mogelijk geen waarde" name="Mogelijk geen waarde">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep_proxy-Indicatie materiële historie" name="Indicatie materiële historie">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep_proxy-Indicatie materiï¿½le historie" name="Indicatie materiï¿½le historie">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep_proxy-Authentiek" name="Authentiek">
@@ -2684,7 +2684,7 @@
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatierol-Mogelijk geen waarde" name="Mogelijk geen waarde">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatierol-Indicatie materiële historie" name="Indicatie materiële historie">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatierol-Indicatie materiï¿½le historie" name="Indicatie materiï¿½le historie">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatierol-Authentiek" name="Authentiek">
@@ -2731,7 +2731,7 @@
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatieklasse-base_AssociationClass" name="base_AssociationClass" association="AssociationClass_Relatieklasse">
 						<type href="http://schema.omg.org/spec/UML/2.1/AssociationClass"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatieklasse-Indicatie materiële historie" name="Indicatie materiële historie">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatieklasse-Indicatie materiï¿½le historie" name="Indicatie materiï¿½le historie">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatieklasse-Positie" name="Positie">
@@ -2772,7 +2772,7 @@
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatiesoort-Mogelijk geen waarde" name="Mogelijk geen waarde">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatiesoort-Indicatie materiële historie" name="Indicatie materiële historie">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatiesoort-Indicatie materiï¿½le historie" name="Indicatie materiï¿½le historie">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Relatiesoort-Authentiek" name="Authentiek">
@@ -2828,7 +2828,7 @@
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep-base_Attribute" name="base_Attribute" association="Attribute_Gegevensgroep">
 						<type href="http://schema.omg.org/spec/UML/2.1/Attribute"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep-Indicatie materiële historie" name="Indicatie materiële historie">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep-Indicatie materiï¿½le historie" name="Indicatie materiï¿½le historie">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroep-Authentiek" name="Authentiek">
@@ -2940,7 +2940,7 @@
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroeptype_proxy-Mogelijk geen waarde" name="Mogelijk geen waarde">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroeptype_proxy-Indicatie materiële historie" name="Indicatie materiële historie">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroeptype_proxy-Indicatie materiï¿½le historie" name="Indicatie materiï¿½le historie">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Gegevensgroeptype_proxy-Eigenaar" name="Eigenaar">
@@ -3275,7 +3275,7 @@
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Externe koppeling-base_Association" name="base_Association" association="Association_Externe koppeling">
 						<type href="http://schema.omg.org/spec/UML/2.1/Association"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="Externe koppeling-Indicatie materiële historie" name="Indicatie materiële historie">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Externe koppeling-Indicatie materiï¿½le historie" name="Indicatie materiï¿½le historie">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Externe koppeling-Alternatieve naam" name="Alternatieve naam">
@@ -3774,7 +3774,7 @@
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Mogelijk geen waarde" name="Mogelijk geen waarde">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Indicatie materiële historie" name="Indicatie materiële historie">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Indicatie materiï¿½le historie" name="Indicatie materiï¿½le historie">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort-Eigenaar" name="Eigenaar">
@@ -4027,7 +4027,7 @@
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort_proxy-Mogelijk geen waarde" name="Mogelijk geen waarde">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort_proxy-Indicatie materiële historie" name="Indicatie materiële historie">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort_proxy-Indicatie materiï¿½le historie" name="Indicatie materiï¿½le historie">
 						<type href="http://schema.omg.org/spec/UML/2.1/String"/>
 					</ownedAttribute>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="Attribuutsoort_proxy-Eigenaar" name="Eigenaar">

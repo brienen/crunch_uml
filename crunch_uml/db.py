@@ -268,7 +268,7 @@ class UMLTagsMetadata:
     populatie = Column(String)
     kwaliteit = Column(String)
     synoniemen = Column(String)
-    authentiek = Column(String, default="Ja")
+    authentiek = Column(String)
 
 # Define the UML tags classes for different UML elements
 class UMLTags(UMLTagsCommon, UMLTagsGEMMA, UMLTagsMetadata):
@@ -290,7 +290,9 @@ class UMLTagsGeneralization(UMLTagsCommon):
 class UMLTagsLiteral(UMLTagsCommon):
     pass
 class UMLTagsDomain(UMLTagsCommon):
+    afkorting = Column(String)
     release = Column(String)
+    
 class Package(Base, UMLBase, UMLTagsDomain):  # type: ignore
     __tablename__ = "packages"
 

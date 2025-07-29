@@ -69,14 +69,21 @@ class EARepoUpdater(ModelRenderer):
 
     def increment_version(self, version, version_type):
         try:
-            major, minor = map(int, version.split("."))
-
+            parts = version.split(".")
+            while len(parts) < 3:
+                parts.append("0")  # minimaal major.minor.patch
+            major = int(parts[0])
+            minor = int(parts[1])
+            patch = int(parts[2])
             if version_type == const.VERSION_STEP_MAJOR:
                 major += 1
                 minor = 0
+                patch = 0
             elif version_type == const.VERSION_STEP_MINOR:
                 minor += 1
-            return f"{major}.{minor}"
+                patch = 0
+            # Always return three-part version
+            return f"{major}.{minor}.0"
         except ValueError:
             logger.warning(f"Version '{version}' is not in the correct format.")
             return version
@@ -395,14 +402,17 @@ class EARepoUpdater(ModelRenderer):
                     new_version = self.increment_version(current_version, version_type)
                     changes[const.EA_REPO_MAPPER["version"]] = new_version
 
-                session.query(table).filter_by(**{ea_guid: guid_value}).update(changes)
-                logger.debug(f"Record with GUID {guid_value} has been updated.")
+                if len(changes) > 0:
+                    session.query(table).filter_by(**{ea_guid: guid_value}).update(changes)
+                    logger.debug(f"Record with GUID {guid_value} has been updated with version info.")
+                else:
+                    logger.debug(f"No version info detected for record with GUID {guid_value}.")
             else:
                 logger.debug(f"No changes detected for record with GUID {guid_value}.")
 
 
         except Exception as e:
-            logger.error(f"Error while updating record with GUID {guid_value} with message: {e}")
+            logger.error(f"Error while updating record with GUID {guid_value} with message: {e} for changes {changes}")
             raise CrunchException(f"Error while updating record with GUID {guid_value} with message: {e}")
 
     def process_batch(
@@ -701,11 +711,14 @@ class EAMIMRepoUpdater(EARepoUpdater):
                 logger.error(f"Cannot update {recordtype} without EA GUID.")
                 raise CrunchException(f"Cannot update {recordtype} without EA GUID.")
 
-            # First delete existing xrefs
+            # First delete existing stereotype xrefs only
             table_name = "t_xref"
             if table_name in metadata.tables:
                 table = metadata.tables[table_name]
-                session.query(table).filter_by(Client=util.fromEAGuid(ea_guid)).delete()
+                session.query(table).filter(
+                    table.c.Client == util.fromEAGuid(ea_guid),
+                    table.c.Name == "Stereotypes"
+                ).delete()
             else:
                 logger.warning(f"Tabel '{table_name}' niet gevonden in metadata.")
 
@@ -757,7 +770,7 @@ class EAMIMRepoUpdater(EARepoUpdater):
         elif recordtype == const.RECORDTYPE_GENERALIZATION:
             data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'connector property', 'Generalisatie', 'VNGR SIM+Grouping NL::Generalisatie')
         else:
-            logger.warning(f"Unknown recordtype {recordtype}, not setting stereotype.")
+            logger.debug(f"Unknown recordtype {recordtype}, not setting stereotype.")
 
         # If data_dict contains release set de waarde
         # Set 'Release' field case-insensitively and ensure it's written as 'Release'
@@ -794,7 +807,7 @@ class EAMIMRepoUpdater(EARepoUpdater):
             ).first()
 
             if datatype_input is not None and (record.Classifier is None or record.Classifier == 0 or record.Classifier == "0"):
-                if datatype_input.startswith("an") or datatype_input in ["text", "string", "characterstring", "tekst"]:
+                if datatype_input.startswith("an") or datatype_input in ["text", "string", "characterstring", "tekst", "memo", "character", "char", "varchar", "character varying", "string text"]:
                     datatype = "CharacterString"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
                     data_dict["Type"] = datatype
@@ -803,7 +816,7 @@ class EAMIMRepoUpdater(EARepoUpdater):
                         data_dict["length"] = number
                         data_dict["Length"] = number
                         data_dict["lengte"] = number
-                elif datatype_input.startswith("n") or datatype_input.startswith("int") or datatype_input.startswith("number"):
+                elif datatype_input.startswith("n") or datatype_input.startswith("int") or datatype_input in ["ìnt", "number", "integer", "integer number", "nummertotaal", "nummertotaal integer", "short", "integer short", "long", "integer long", "int", "integer int"]:
                     datatype = "Integer"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
                     data_dict["Type"] = datatype
@@ -816,15 +829,23 @@ class EAMIMRepoUpdater(EARepoUpdater):
                     datatype = "Date"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
                     data_dict["Type"] = datatype
-                elif datatype_input.startswith("bool") or "stdindjn" in datatype_input:
+                elif datatype_input in ["datetime", "datumtijd"]:
+                    datatype = "DateTime"
+                    data_dict["Classifier"] = self.datatype_map.get(datatype, None)
+                    data_dict["Type"] = datatype
+                elif datatype_input in ["time", "tijd"]:
+                    datatype = "Time"
+                    data_dict["Classifier"] = self.datatype_map.get(datatype, None)
+                    data_dict["Type"] = datatype
+                elif datatype_input.startswith("bool") or "stdindjn" in datatype_input or datatype_input in ["boolean", "bool", "ja/nee", "ja nee", "yes no", "ja/neen", "indic"]:
                     datatype = "Boolean"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
                     data_dict["Type"] = datatype
-                elif datatype_input.startswith("decimal") or datatype_input.startswith("float"):
+                elif datatype_input in ["decimal", "float", "double", "decimaal", "real"]:
                     datatype = "Decimal"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
                     data_dict["Type"] = datatype
-                elif datatype_input in ["punt", "point", "coordinate", "coördinaat", "geopunt", "coordinaat", 'gml']:
+                elif datatype_input in ["punt", "point", "coordinate", "coördinaat", "geopunt", "coordinaat", 'gml', 'locatie', 'spatial', 'geometrie']:
                     datatype = "GM_Point"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
                     data_dict["Type"] = datatype
@@ -840,6 +861,17 @@ class EAMIMRepoUpdater(EARepoUpdater):
                     datatype = "GUID"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
                     data_dict["Type"] = datatype
+                else:
+                    # Check to see if the datatype is a known geometry type
+                    types = list(self.datatype_map.keys())
+                    if f"GM_{data_dict.get('Type', '')}" in types:
+                        datatype = f"GM_{data_dict.get('Type', '')}"
+                        data_dict["Classifier"] = self.datatype_map.get(datatype, None)
+                        data_dict["Type"] = datatype
+                    if data_dict.get('Type', '') in types:
+                        datatype = data_dict.get('Type', '')
+                        data_dict["Classifier"] = self.datatype_map.get(datatype, None)
+                        data_dict["Type"] = datatype
 
 
         super().update_existing_record(
@@ -904,7 +936,7 @@ class EAMIMRepoUpdater(EARepoUpdater):
                                     "ea_guid": util.get_repo_guid(),
                                 }
                                 session.execute(insert(table_prop).values(insert_item))
-                                logger.info(f"Release-tag toegevoegd voor package met GUID {data_dict['ea_guid']}")
+                                logger.debug(f"Release-tag toegevoegd voor package met GUID {data_dict['ea_guid']}")
                 else:
                     logger.debug(f"Geen release-tag upsert voor package met GUID {data_dict.get('ea_guid', '<geen guid>')}: stereotype={stereotype}, release={release_value}")
             except Exception as e:

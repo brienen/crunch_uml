@@ -11,3 +11,4 @@ venv
 *.db
 test/output/*
 build
+*.log
