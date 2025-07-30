@@ -88,7 +88,7 @@ def test_import_monumenten():
         "eaxmi",
         "-db_create",
     ]
-    #cli.main(test_args)
+    cli.main(test_args)
 
     record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
     # Testen of de records schoon in de database staan
