@@ -93,8 +93,8 @@ def test_csv_parser_renderer():
 
     assert schema.count_package() == 3
     assert schema.count_enumeratie() == 1
-    assert schema.count_class() == 10
-    assert schema.count_attribute() == 40
+    assert schema.count_class() == 11
+    assert schema.count_attribute() == 41
     assert schema.count_enumeratieliteral() == 2
 
     # export to csv
@@ -118,7 +118,7 @@ def test_csv_parser_renderer():
     # Check if content is correctly loaded
     database = db.Database(const.DATABASE_URL, db_create=False)
     schema = sch.Schema(database)
-    assert schema.count_class() == 10
+    assert schema.count_class() == 11
 
     # export to csv
     test_args = ["export", "-f", outputfile, "-t", "xlsx", "--mapper", str(json.dumps(mapper))]

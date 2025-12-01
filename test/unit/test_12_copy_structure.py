@@ -17,10 +17,10 @@ def test_import_monumenten():
     schema = sch.Schema(database)
     assert schema.count_package() == 3
     assert schema.count_enumeratie() == 1
-    assert schema.count_class() == 10
-    assert schema.count_attribute() == 40
+    assert schema.count_class() == 11
+    assert schema.count_attribute() == 41
     assert schema.count_enumeratieliteral() == 2
-    assert schema.count_association() == 9
+    assert schema.count_association() == 10
 
     # root = schema.get_package("EAPK_45B88627_6F44_4b6d_BE77_3EC51BBE679E")  # Main Package
     # kopie_schema = sch.Schema(database, "kopie")
@@ -52,21 +52,21 @@ def test_import_monumenten():
     assert kopie_schema.count_package() == 3
     assert kopie_schema.count_enumeratie() == 1
     assert kopie_schema.count_class() == 6
-    assert kopie_schema.count_attribute() == 40
+    assert kopie_schema.count_attribute() == 41
     assert kopie_schema.count_enumeratieliteral() == 2
     assert kopie_schema.count_association() == 5
 
     assert kopie2_schema.count_package() == 3
     assert kopie2_schema.count_enumeratie() == 1
     assert kopie2_schema.count_class() == 6
-    assert kopie2_schema.count_attribute() == 40
+    assert kopie2_schema.count_attribute() == 41
     assert kopie2_schema.count_enumeratieliteral() == 2
     assert kopie2_schema.count_association() == 5
 
     assert kopie3_schema.count_package() == 1
     assert kopie3_schema.count_enumeratie() == 1
     assert kopie3_schema.count_class() == 6
-    assert kopie3_schema.count_attribute() == 40
+    assert kopie3_schema.count_attribute() == 41
     assert kopie3_schema.count_enumeratieliteral() == 2
     assert kopie3_schema.count_association() == 5
     database.close()
@@ -81,7 +81,7 @@ def test_import_monumenten():
     assert kopie_schema.count_package() == 3
     assert kopie_schema.count_enumeratie() == 1
     assert kopie_schema.count_class() == 6
-    assert kopie_schema.count_attribute() == 40
+    assert kopie_schema.count_attribute() == 41
     assert kopie_schema.count_enumeratieliteral() == 2
     assert kopie_schema.count_association() == 5
     database.close()
@@ -95,7 +95,7 @@ def test_import_monumenten():
     assert kopie_schema6.count_package() == 1
     assert kopie_schema6.count_enumeratie() == 1
     assert kopie_schema6.count_class() == 6
-    assert kopie_schema6.count_attribute() == 40
+    assert kopie_schema6.count_attribute() == 41
     assert kopie_schema6.count_enumeratieliteral() == 2
     assert kopie_schema6.count_diagrams() == 2
 

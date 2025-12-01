@@ -3,7 +3,11 @@ import json
 import logging
 import os
 import re
-
+from bs4 import BeautifulSoup
+from markdownify import markdownify as md
+from bs4 import MarkupResemblesLocatorWarning
+import warnings
+ 
 import inflection
 import validators
 from charset_normalizer import from_bytes
@@ -25,44 +29,149 @@ def fix_mojibake(text: str) -> str:
         return text  # Als het niet fout is, laat het zoals het is
 
 
-def fix_and_format_text(s, mode="markdown"):
+# Herbruikbare regex om "meerregeligheid" te detecteren
+_MULTILINE_RE = re.compile(
+    r'(<\s*br\s*/?\s*>|</\s*p\s*>|<\s*li\b|<\s*p\b|\n)',
+    flags=re.IGNORECASE,
+)
+
+def _html_to_markdown_lines(raw: str) -> list[str]:
+    """
+    Helper:
+    - HTML entities decoderen
+    - HTML → Markdown (incl. lijsten) via markdownify
+    - trailing spaces weg
+    - max 1 lege regel achter elkaar
+    - geeft een lijst met regels terug
+    """
+    markdown = md(
+        html.unescape(raw),
+        heading_style="ATX",   # # H1, ## H2, ...
+        bullets="*",           # <ul><li> → * item
+        strip=["style", "script"],
+    )
+
+    lines = [ln.rstrip() for ln in markdown.splitlines()]
+    cleaned_lines = []
+    previous_blank = False
+
+    for ln in lines:
+        if ln.strip() == "":
+            if not previous_blank:        # max 1 lege regel
+                cleaned_lines.append("")
+            previous_blank = True
+        else:
+            cleaned_lines.append(ln)
+            previous_blank = False
+
+    # trailing en leading lege regels eraf
+    while cleaned_lines and cleaned_lines[0].strip() == "":
+        cleaned_lines.pop(0)
+    while cleaned_lines and cleaned_lines[-1].strip() == "":
+        cleaned_lines.pop()
+
+    return cleaned_lines
+
+
+def fix_and_format_text(text: str, mode: str = "markdown") -> str:
     """
     Formatteert en escapt tekst afhankelijk van het doel:
-    - mode="markdown": geschikt voor HTML/Markdown gebruik
-    - mode="alert": geschikt voor JavaScript alert() boxen
-    """
-    if isinstance(s, bytes):
-        result = from_bytes(s).best()
-        if result:
-            s = str(result)
-            s = fix_mojibake(s)
-            s = html.unescape(s)
 
-            # Escaping quotes en backslashes
-            s = s.replace('"', '&#34;').replace("'", "&#39;")
-        else:
-            return ""
-    elif not isinstance(s, str):
+    - mode="markdown":
+        * Enkelregelig:
+            - HTML-tags strippen
+            - HTML-entities decoderen
+            - platte tekst teruggeven
+        * Meerregelig:
+            - HTML → Markdown (incl. lijsten)
+            - regels opschonen
+            - elke regel in een blockquote (> ...)
+    - mode="alert":
+        * HTML → Markdown (incl. lijsten)
+        * bullets normaliseren naar "- "
+        * tekst geschikt maken voor gebruik in een JS alert-string:
+            - newlines → \n
+            - backslash → \\\\
+            - " → \\\"
+
+    Parameters
+    ----------
+    text : str
+        De bron-HTML of -tekst.
+    mode : {"markdown", "alert"}
+        Doelcontext van de tekst.
+
+    Returns
+    -------
+    str
+        Geformatteerde tekst.
+    """
+
+    if not text:
         return ""
 
-    def normalize_bullet(line):
-        match = re.match(r"^(\s*)([-■•*·●◦‣›»▪–—])(\s+)(.*)", line)
-        if match:
-            indent, _, spacing, rest = match.groups()
-            bullet = "-" if mode == "alert" else "•"
-            return f"{indent}{bullet} {rest}"
-        return line
+    text = fix_mojibake(text)
+    raw = text.strip()
 
-    lines = s.strip().splitlines()
-    lines = [normalize_bullet(line.rstrip()) for line in lines if line.strip() != ""]
+    # Bepaal of er feitelijk meerdere regels / blokken in zitten
+    has_multiline = bool(_MULTILINE_RE.search(raw))
 
+    # ---------------------------
+    #  mode = "markdown"
+    # ---------------------------
     if mode == "markdown":
-        return "<br>".join(lines)
-    elif mode == "alert":
-        return "\\n".join(lines)
-    else:
-        raise ValueError(f"Unsupported mode '{mode}'. Use 'markdown' or 'alert'.")
+        if not has_multiline:
+            # Enkelregelig: HTML strippen + entities decoderen → platte tekst
+            warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
+            soup = BeautifulSoup(raw, "html.parser")
+            plain = soup.get_text(separator=" ", strip=True)
+            return plain if isinstance(plain, str) else html.unescape(plain)
 
+        # Meerregelig: HTML → Markdown → blockquote
+        lines = _html_to_markdown_lines(raw)
+
+        if not lines:
+            return ""
+
+        quoted_lines = [
+            ("> " + ln) if ln.strip() != "" else ">"
+            for ln in lines
+        ]
+        return "\n".join(quoted_lines)
+
+    # ---------------------------
+    #  mode = "alert"
+    # ---------------------------
+    elif mode == "alert":
+        # Voor alerts altijd via dezelfde pipeline:
+        # HTML → Markdown-lijnen
+        lines = _html_to_markdown_lines(raw)
+
+        # Bullets normaliseren: "* item", "- item", "+ item" → "- item"
+        norm_lines = []
+        bullet_re = re.compile(r"^(\s*)([-*+])\s+(.*)")
+
+        for ln in lines:
+            m = bullet_re.match(ln)
+            if m:
+                indent, _, rest = m.groups()
+                ln = f"{indent}- {rest}"
+            norm_lines.append(ln)
+
+        base = "\n".join(norm_lines)
+
+        if not base:
+            return ""
+
+        # Escapen voor gebruik in een JS alert("...") string
+        js = base.replace("\\", "\\\\")   # backslashes escapen
+        js = js.replace('"', '\\"')       # dubbele quotes escapen
+        js = js.replace("\n", "\\n")      # echte newline → \n literal
+
+        return js
+
+    else:
+        raise ValueError("Unsupported mode. Use 'markdown' or 'alert'.")
 
 @RendererRegistry.register(
     "jinja2",

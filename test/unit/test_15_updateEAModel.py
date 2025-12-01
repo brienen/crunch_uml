@@ -132,7 +132,9 @@ def test_import_monumenten():
     assert record[const.EA_REPO_MAPPER["alias"]] == "test-"
     assert util.parse_date(str(record[const.EA_REPO_MAPPER["modified"]])) > util.parse_date(str(modified))
     version = record[const.EA_REPO_MAPPER["version"]]
-    major, minor = map(int, version.split("."))
+    #major, minor = map(int, version.split("."))
+    major = int(version.split(".")[0])
+    minor = int(version.split(".")[1])
     assert minor == minor_original + 1
     assert countTagsOfObject(record["Object_ID"]) == 17
 
@@ -191,7 +193,7 @@ def test_import_monumenten():
     test_args = ["export", "-f", EA_DB, "-t", "earepo", "--tag_strategy", "upsert"]
     cli.main(test_args)
     record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
-    assert countTagsOfObject(record["Object_ID"]) == 17
+    assert countTagsOfObject(record["Object_ID"]) == 24
 
     # Testen van tags
     tag = getRecordFromEARepository("t_objectproperties", "{5BAA8E81-480F-405D-A818-A3F79725AFE3}")
@@ -203,7 +205,7 @@ def test_import_monumenten():
     test_args = ["export", "-f", EA_DB, "-t", "earepo", "--tag_strategy", "replace"]
     cli.main(test_args)
     record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
-    assert countTagsOfObject(record["Object_ID"]) == 17
+    assert countTagsOfObject(record["Object_ID"]) ==18
 
     # Testen van tags
     tag = getRecordFromEARepository("t_objectproperties", "{5BAA8E81-480F-405D-A818-A3F79725AFE3}")

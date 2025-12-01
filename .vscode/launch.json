@@ -607,6 +607,20 @@
             }
         },
         {
+            "name": "Python: pytest test_15_updateEAModel",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/pytest",  // Pas aan naar je lokale pytest pad
+            "args": [
+                "${workspaceFolder}/test/unit/test_15_updateEAModel.py"  // Pas aan naar je testmap
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+            }
+        },
+        {
             "name": "Python: pytest test_15b_updateEAMIMModel_GGM_Complete",
             "type": "python",
             "request": "launch",

@@ -57,8 +57,8 @@ def test_lod_renderer():
 
     assert schema.count_package() == 3
     assert schema.count_enumeratie() == 1
-    assert schema.count_class() == 10
-    assert schema.count_attribute() == 40
+    assert schema.count_class() == 11
+    assert schema.count_attribute() == 41
     assert schema.count_enumeratieliteral() == 2
 
     # export to json

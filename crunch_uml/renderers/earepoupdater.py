@@ -740,7 +740,20 @@ class EAMIMRepoUpdater(EARepoUpdater):
             logger.error(f"Error while updating MIM profile for {recordtype} with EA GUID {ea_guid}: {e}")
             raise CrunchException(f"Error while updating MIM profile for {recordtype} with EA GUID {ea_guid}: {e}")
 
-
+    def infer_datatype(self, name):
+        """
+        Infer datatype based on the value.
+        """
+        if "datum" in name.lower() or "date" in name.lower():
+            return "Date"
+        elif "indicatie" in name.lower():
+            return "Boolean"
+        elif "aantal" in name.lower() or "number" in name.lower():
+            return "Integer"
+        elif "bedrag" in name.lower() or "amount" in name.lower():
+            return "Bedrag"
+        else:
+            return "CharacterString"
 
     def update_existing_record(
         self,
@@ -872,7 +885,20 @@ class EAMIMRepoUpdater(EARepoUpdater):
                         datatype = data_dict.get('Type', '')
                         data_dict["Classifier"] = self.datatype_map.get(datatype, None)
                         data_dict["Type"] = datatype
-
+            elif datatype_input is None:
+                # If the datatype is still None, we can try to infer it from the value
+                name = data_dict.get("Name", "")
+                if name and name != "":
+                    inferred_type = self.infer_datatype(name)
+                    if inferred_type:
+                        datatype = inferred_type
+                        data_dict["Classifier"] = self.datatype_map.get(datatype, None)
+                        data_dict["Type"] = datatype
+                else:
+                    # If we still can't determine the type, fall back to a default
+                    datatype = "CharacterString"
+                    data_dict["Classifier"] = self.datatype_map.get(datatype, None)
+                    data_dict["Type"] = datatype
 
         super().update_existing_record(
             data_dict,
@@ -941,6 +967,10 @@ class EAMIMRepoUpdater(EARepoUpdater):
                     logger.debug(f"Geen release-tag upsert voor package met GUID {data_dict.get('ea_guid', '<geen guid>')}: stereotype={stereotype}, release={release_value}")
             except Exception as e:
                 logger.warning(f"Fout bij het toevoegen/bijwerken van de Release-tag: {e}")
+
+    def new_method(self, value):
+        inferred_type = self.infer_datatype(value)
+        return inferred_type
 
 
 

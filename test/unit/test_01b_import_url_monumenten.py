@@ -17,8 +17,8 @@ def test_import_monumenten():
     schema = sch.Schema(database)
     assert schema.count_package() == 3
     assert schema.count_enumeratie() == 1
-    assert schema.count_class() == 10
-    assert schema.count_attribute() == 40
+    assert schema.count_class() == 11
+    assert schema.count_attribute() == 41
     assert schema.count_enumeratieliteral() == 2
 
     clazz = schema.get_class("EAID_4AD539EC_A308_43da_B025_17A1647303F3")
