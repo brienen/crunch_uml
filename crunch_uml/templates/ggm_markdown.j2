@@ -25,7 +25,7 @@ Het model '{{ package.name }}' heeft de volgende kenmerken:
 ### {{ class.name }}
 > **Definitie {{ class.name }}:** 
 >
-> {{ class.definitie|default("Geen Definitie", true)|fix_and_format()|set_url() }}
+> {{ class.definitie|default("Geen Definitie", true)|fix_and_format(depth=0)|set_url() }}
 
 | Eigenschap | Waarde |
 | :--- | :------ |
@@ -48,7 +48,9 @@ Attributen van objecttype {{ class.name }}
 
 {% for enumeration in package.enumerations %}
 ### {{ enumeration.name }}
-{{ enumeration.definitie|default("Geen Definitie", true)|fix_and_format()|set_url() }}
+> **Definitie {{ enumeration.name }}:** 
+>
+> {{ enumeration.definitie|default("Geen Definitie", true)|fix_and_format(depth=0)|set_url() }}
 
 Het enumeratie {{ enumeration.name }} kent de volgende waarden:
 

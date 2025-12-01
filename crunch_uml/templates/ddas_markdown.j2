@@ -6,6 +6,9 @@
 {# Classes #}
 {% for class in package.classes|sort(attribute='name') %}
 ### {{ class.name }}
+> **Definitie {{ class.name }}:** 
+>
+> {{ class.definitie|default("Geen Definitie", true)|fix_and_format(depth=0)|set_url() }}
 
 Het objecttype {{ class.name }} kent de volgende eigenschappen:
 
@@ -29,7 +32,9 @@ Attributen van objecttype {{ class.name }}:
 
 {% for enumeration in package.enumerations|sort(attribute='name') %}
 ### {{ enumeration.name }}
-{{ enumeration.definitie|default("Geen Definitie", true)|fix_and_format()|set_url() }}
+> **Definitie {{ enumeration.name }}:** 
+>
+> {{ enumeration.definitie|default("Geen Definitie", true)|fix_and_format(depth=0)|set_url() }}
 
 Het enumeratie {{ enumeration.name }} kent de volgende waarden:
 

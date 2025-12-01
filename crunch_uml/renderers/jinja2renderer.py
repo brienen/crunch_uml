@@ -72,7 +72,7 @@ def _html_to_markdown_lines(raw: str) -> list[str]:
     return cleaned_lines
 
 
-def fix_and_format_text(text: str, mode: str = "markdown") -> str:
+def fix_and_format_text(text: str, mode: str = "markdown", depth: int = 1) -> str:
     """
     Formatteert en escapt tekst afhankelijk van het doel:
 
@@ -132,8 +132,9 @@ def fix_and_format_text(text: str, mode: str = "markdown") -> str:
         if not lines:
             return ""
 
-        quoted_lines = [("> " + ln) if ln.strip() != "" else ">" for ln in lines]
-        return "\n".join(quoted_lines)
+        chr = ">" * depth + " "
+        quoted_lines = [(chr + ln) if ln.strip() != "" else chr.rstrip() for ln in lines]
+        return "\n" + "\n".join(quoted_lines)
 
     # ---------------------------
     #  mode = "alert"
@@ -264,7 +265,7 @@ class Jinja2Renderer(ModelRenderer):
         env.filters["fix_and_format_alert"] = lambda s: fix_and_format_text(s, mode="alert")
 
         # Formatteer en escape tekst voor gebruik in markdown
-        env.filters["fix_and_format"] = lambda s: fix_and_format_text(s, mode="markdown")
+        env.filters["fix_and_format"] = lambda s, depth=1: fix_and_format_text(s, mode="markdown", depth=depth)
 
         # Verwijder voor- en achterliggende spaties
         env.filters["trim"] = lambda s: (s.strip() if isinstance(s, str) else "")
