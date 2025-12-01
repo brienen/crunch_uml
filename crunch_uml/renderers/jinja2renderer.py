@@ -23,7 +23,7 @@ def fix_mojibake(text: str) -> str:
     try:
         # Tekst die ten onrechte als Windows-1252 is gelezen, maar eigenlijk UTF-8 was
         return text.encode('latin1').decode('utf-8')
-    except UnicodeDecodeError:
+    except:
         return text  # Als het niet fout is, laat het zoals het is
 
 
