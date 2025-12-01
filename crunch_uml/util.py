@@ -6,6 +6,7 @@ import re
 import uuid
 from datetime import datetime
 from urllib.parse import urlparse
+
 from dateutil import parser
 
 from crunch_uml import const
@@ -275,6 +276,7 @@ def reorder_dict(original_dict, order_list):
     reordered.update(remaining)
     return reordered
 
+
 def split_number(code):
     code = code.strip()  # verwijder spaties voor en na
     match = re.match(r"^([a-zA-Z]+)(\d*)$", code)
@@ -283,7 +285,7 @@ def split_number(code):
         return letters, digits
     else:
         return None, None
-    
+
 
 def snake_to_sentence_case(s):
     words = s.split('_')
@@ -298,7 +300,7 @@ def map_field_name_to_EARepo(field_name, mapper=const.EA_REPO_MAPPER):
     """
     if field_name in mapper:
         return mapper[field_name]
-    
+
     # Zet snake_case om naar sentence case
     label = snake_to_sentence_case(field_name)
 
@@ -307,6 +309,7 @@ def map_field_name_to_EARepo(field_name, mapper=const.EA_REPO_MAPPER):
     label = label.replace("gemma", "GEMMA").replace("Gemma", "GEMMA")
     label = label.replace("dcat", "DCAT").replace("Dcat", "DCAT")
     return label
+
 
 def map_field_name_from_EARepo(field_name, mapper=const.EA_REPO_MAPPER):
     """
@@ -324,5 +327,5 @@ def to_yyyymmdd(datum_string, default='01/06/2019'):
         schone_string = datum_string.strip().strip("'\"")
         datum = parser.parse(schone_string)
         return datum.strftime("%Y%m%d")
-    except Exception as e:
+    except Exception:
         return default

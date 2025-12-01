@@ -1,19 +1,18 @@
+import logging
 import os
 import shutil
 import sqlite3
 
 import pytest
 
-import crunch_uml.schema as sch
-from crunch_uml import cli, const, db, util
+from crunch_uml import cli
 
-import logging
-
-logging.basicConfig(level=logging.INFO, force=True) # Of INFO, afhankelijk van wat je wilt zien
+logging.basicConfig(level=logging.INFO, force=True)  # Of INFO, afhankelijk van wat je wilt zien
 logger = logging.getLogger(__name__)
 
 
 EA_DB = "./test/output/Gemeentelijk Gegevensmodel 2.4.0.qea"
+
 
 def getRecordFromEARepository(table, ea_guid, key="ea_guid"):
 
@@ -75,6 +74,7 @@ def copy_test_files():
     # Opruimen na de test als dat nodig is
     # Bijvoorbeeld: os.remove(destination)
 
+
 @pytest.mark.slow
 def test_import_monumenten():
 
@@ -90,24 +90,24 @@ def test_import_monumenten():
     ]
     cli.main(test_args)
 
-    record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
+    # record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
     # Testen of de records schoon in de database staan
-    #assert record is not None, "Record met de naam 'MonumentNaam' niet gevonden."
-    #assert record[const.EA_REPO_MAPPER["name"]] == "Ambacht"
-    #assert (
-    ##    record[const.EA_REPO_MAPPER["definitie"]]
+    # assert record is not None, "Record met de naam 'MonumentNaam' niet gevonden."
+    # assert record[const.EA_REPO_MAPPER["name"]] == "Ambacht"
+    # assert (
+    #    record[const.EA_REPO_MAPPER["definitie"]]
     #    == "Beroep waarbij een handwerker met gereedschap eindproducten maakt."
-    #)
-    #assert record[const.EA_REPO_MAPPER["author"]] == "Arjen Brienen"
-    #assert record[const.EA_REPO_MAPPER["stereotype"]] is None
-    #assert record[const.EA_REPO_MAPPER["alias"]] is None
-    #modified = util.parse_date(str(record[const.EA_REPO_MAPPER["modified"]]))
-    #version = record[const.EA_REPO_MAPPER["version"]]
-    #major_original, minor_original = map(int, version.split("."))
+    # )
+    # assert record[const.EA_REPO_MAPPER["author"]] == "Arjen Brienen"
+    # assert record[const.EA_REPO_MAPPER["stereotype"]] is None
+    # assert record[const.EA_REPO_MAPPER["alias"]] is None
+    # modified = util.parse_date(str(record[const.EA_REPO_MAPPER["modified"]]))
+    # version = record[const.EA_REPO_MAPPER["version"]]
+    # major_original, minor_original = map(int, version.split("."))
 
     # record ophalen wat niet aangepast wordt
-    #unchange_bouwtype = getRecordFromEARepository("t_object", "{5E9DAFBB-C9B5-4706-A43D-07AD4979DED4}")
-    #assert unchange_bouwtype is not None
+    # unchange_bouwtype = getRecordFromEARepository("t_object", "{5E9DAFBB-C9B5-4706-A43D-07AD4979DED4}")
+    # assert unchange_bouwtype is not None
 
     # Nog even andere tag update strategien testen
     # export to json
@@ -115,33 +115,33 @@ def test_import_monumenten():
     cli.main(test_args)
 
     # Test objecttype
-    record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
-    xref = getRecordFromEARepository("t_xref", "{54944273-F312-44b2-A78D-43488F915429}", key="Client")
-    #assert record["Stereotype"] == "Objecttype"
-    #assert xref is not None
-    #assert xref["Description"] == "@STEREO;Name=Objecttype;FQName=VNGR SIM+Grouping NL::Objecttype;@ENDSTEREO;"
+    # record = getRecordFromEARepository("t_object", "{54944273-F312-44b2-A78D-43488F915429}")
+    # xref = getRecordFromEARepository("t_xref", "{54944273-F312-44b2-A78D-43488F915429}", key="Client")
+    # assert record["Stereotype"] == "Objecttype"
+    # assert xref is not None
+    # assert xref["Description"] == "@STEREO;Name=Objecttype;FQName=VNGR SIM+Grouping NL::Objecttype;@ENDSTEREO;"
 
-    #Test Enumeration
-    record = getRecordFromEARepository("t_object", "{5C808AC9-CB09-4f4d-813E-821829856BA8}")
-    xref = getRecordFromEARepository("t_xref", "{5C808AC9-CB09-4f4d-813E-821829856BA8}", key="Client")
-    #assert record is not None, "Record met de naam 'Enumeratie' niet gevonden."
-    #assert record["Stereotype"] == "Enumeratie"
-    #assert xref is not None
-    #assert xref["Description"] == "@STEREO;Name=Enumeratie;FQName=VNGR SIM+Grouping NL::Enumeratie;@ENDSTEREO;"
+    # Test Enumeration
+    # record = getRecordFromEARepository("t_object", "{5C808AC9-CB09-4f4d-813E-821829856BA8}")
+    # xref = getRecordFromEARepository("t_xref", "{5C808AC9-CB09-4f4d-813E-821829856BA8}", key="Client")
+    # assert record is not None, "Record met de naam 'Enumeratie' niet gevonden."
+    # assert record["Stereotype"] == "Enumeratie"
+    # assert xref is not None
+    # assert xref["Description"] == "@STEREO;Name=Enumeratie;FQName=VNGR SIM+Grouping NL::Enumeratie;@ENDSTEREO;"
 
-    #Test Attribute
-    record = getRecordFromEARepository("t_attribute", "{EBD24559-2F60-43fb-B865-2A7AAA4E3001}")
-    xref = getRecordFromEARepository("t_xref", "{EBD24559-2F60-43fb-B865-2A7AAA4E3001}", key="Client")
-    #assert record is not None, "Record met de naam 'Attribuut' niet gevonden."x
-    #assert record["Stereotype"] == "Attribuutsoort"
-    #assert xref is not None
-    #assert xref["Description"] == "@STEREO;Name=Attribuutsoort;FQName=VNGR SIM+Grouping NL::Attribuutsoort;@ENDSTEREO;"
+    # Test Attribute
+    # record = getRecordFromEARepository("t_attribute", "{EBD24559-2F60-43fb-B865-2A7AAA4E3001}")
+    # xref = getRecordFromEARepository("t_xref", "{EBD24559-2F60-43fb-B865-2A7AAA4E3001}", key="Client")
+    # assert record is not None, "Record met de naam 'Attribuut' niet gevonden."x
+    # assert record["Stereotype"] == "Attribuutsoort"
+    # assert xref is not None
+    # assert xref["Description"] == "@STEREO;Name=Attribuutsoort;FQName=VNGR SIM+Grouping NL::Attribuutsoort;@ENDSTEREO;"
 
-    #Test Associatie
-    record = getRecordFromEARepository("t_connector", "{FD27EB67-1CFA-4f40-AE79-329DE9DE6754}")
-    xref = getRecordFromEARepository("t_xref", "{FD27EB67-1CFA-4f40-AE79-329DE9DE6754}", key="Client")
-    #assert record is not None, "Record met de naam 'Relatiesoort' niet gevonden."
-    #assert record["Stereotype"] == "Relatiesoort"
-    #assert xref is not None
-    #assert xref["Description"] == "@STEREO;Name=Relatiesoort;FQName=VNGR SIM+Grouping NL::Relatiesoort;@ENDSTEREO;"
+    # Test Associatie
+    # record = getRecordFromEARepository("t_connector", "{FD27EB67-1CFA-4f40-AE79-329DE9DE6754}")
+    # xref = getRecordFromEARepository("t_xref", "{FD27EB67-1CFA-4f40-AE79-329DE9DE6754}", key="Client")
+    # assert record is not None, "Record met de naam 'Relatiesoort' niet gevonden."
+    # assert record["Stereotype"] == "Relatiesoort"
+    # assert xref is not None
+    # assert xref["Description"] == "@STEREO;Name=Relatiesoort;FQName=VNGR SIM+Grouping NL::Relatiesoort;@ENDSTEREO;"
     print("Test import_monumenten passed.")

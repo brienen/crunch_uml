@@ -19,3 +19,4 @@ charset-normalizer>=3.4.1,<4
 chardet>=5.2.0,<6
 beautifulsoup4>=4.12.2,<5
 markdownify>=1.2.2,<2
+types-python-dateutil>=2.9,<3

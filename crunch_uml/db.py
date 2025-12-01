@@ -11,7 +11,6 @@ from sqlalchemy import (
     PrimaryKeyConstraint,
     String,
     Text,
-    Date,   
     create_engine,
 )
 from sqlalchemy import exc as sa_exc
@@ -222,6 +221,7 @@ class UML_Generic:
         sch.save(copy_instance)
         return copy_instance
 
+
 # define the base class for UML elements
 class UMLBase(UML_Generic):
     author = Column(String)
@@ -232,6 +232,7 @@ class UMLBase(UML_Generic):
     visibility = Column(String)
     alias = Column(String)
 
+
 # Define the base class for UML tags conformant to MIM
 class UMLTagsCommon:
     herkomst = Column(String)
@@ -239,6 +240,7 @@ class UMLTagsCommon:
     toelichting = Column(String)
     begrip = Column(String)
     datum_opname = Column(String)
+
 
 class UMLTagsGEMMA:
     gemma_naam = Column(String)
@@ -250,12 +252,14 @@ class UMLTagsGEMMA:
     domein_iv3 = Column(String)
     datum_tijd_export = Column(String)
 
+
 class UMLTagsHistory:
     heeft_tijdlijn_geldigheid = Column(String, default="Nee")
     heeft_tijdlijn_registratie = Column(String, default="Nee")
     indicatie_formele_historie = Column(String, default="Nee")
     indicatie_materiele_historie = Column(String, default="Nee")
     indicatie_in_onderzoek = Column(String, default="Nee")
+
 
 class UMLTagsNumeriek:
     minimumwaarde_inclusief = Column(String)
@@ -264,15 +268,18 @@ class UMLTagsNumeriek:
     maximumwaarde_exclusief = Column(String)
     eenheid = Column(String)
 
+
 class UMLTagsMetadata:
     populatie = Column(String)
     kwaliteit = Column(String)
     synoniemen = Column(String)
     authentiek = Column(String)
 
+
 # Define the UML tags classes for different UML elements
 class UMLTags(UMLTagsCommon, UMLTagsGEMMA, UMLTagsMetadata):
     archimate_type = Column(String)
+
 
 class UMLTagsAttribute(UMLTagsCommon, UMLTagsHistory, UMLTagsNumeriek, UMLTagsMetadata):
     lengte = Column(String)
@@ -281,18 +288,24 @@ class UMLTagsAttribute(UMLTagsCommon, UMLTagsHistory, UMLTagsNumeriek, UMLTagsMe
     indicatie_classificerend = Column(String)
     mogelijk_geen_waarde = Column(String, default="Ja")
 
+
 class UMLTagsRelation(UMLTagsCommon, UMLTagsHistory, UMLTagsMetadata):
     mogelijk_geen_waarde = Column(String, default="Ja")
+
 
 class UMLTagsGeneralization(UMLTagsCommon):
     pass
 
+
 class UMLTagsLiteral(UMLTagsCommon):
     pass
+
+
 class UMLTagsDomain(UMLTagsCommon):
     afkorting = Column(String)
     release = Column(String)
-    
+
+
 class Package(Base, UMLBase, UMLTagsDomain):  # type: ignore
     __tablename__ = "packages"
 

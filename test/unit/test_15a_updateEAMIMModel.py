@@ -4,8 +4,7 @@ import sqlite3
 
 import pytest
 
-import crunch_uml.schema as sch
-from crunch_uml import cli, const, db, util
+from crunch_uml import cli, const
 
 EA_DB = "./test/output/MonumentenMIM.qea"
 
@@ -95,7 +94,7 @@ def test_import_monumenten():
     assert record[const.EA_REPO_MAPPER["author"]] == "Arjen Brienen"
     assert record[const.EA_REPO_MAPPER["stereotype"]] is None
     assert record[const.EA_REPO_MAPPER["alias"]] is None
-    modified = util.parse_date(str(record[const.EA_REPO_MAPPER["modified"]]))
+    # modified = util.parse_date(str(record[const.EA_REPO_MAPPER["modified"]]))
     version = record[const.EA_REPO_MAPPER["version"]]
     major_original, minor_original = map(int, version.split("."))
 
@@ -115,7 +114,7 @@ def test_import_monumenten():
     assert xref is not None
     assert xref["Description"] == "@STEREO;Name=Objecttype;FQName=VNGR SIM+Grouping NL::Objecttype;@ENDSTEREO;"
 
-    #Test Enumeration
+    # Test Enumeration
     record = getRecordFromEARepository("t_object", "{5C808AC9-CB09-4f4d-813E-821829856BA8}")
     xref = getRecordFromEARepository("t_xref", "{5C808AC9-CB09-4f4d-813E-821829856BA8}", key="Client")
     assert record is not None, "Record met de naam 'Enumeratie' niet gevonden."
@@ -123,7 +122,7 @@ def test_import_monumenten():
     assert xref is not None
     assert xref["Description"] == "@STEREO;Name=Enumeratie;FQName=VNGR SIM+Grouping NL::Enumeratie;@ENDSTEREO;"
 
-    #Test Attribute
+    # Test Attribute
     record = getRecordFromEARepository("t_attribute", "{EBD24559-2F60-43fb-B865-2A7AAA4E3001}")
     xref = getRecordFromEARepository("t_xref", "{EBD24559-2F60-43fb-B865-2A7AAA4E3001}", key="Client")
     assert record is not None, "Record met de naam 'Attribuut' niet gevonden."
@@ -131,7 +130,7 @@ def test_import_monumenten():
     assert xref is not None
     assert xref["Description"] == "@STEREO;Name=Attribuutsoort;FQName=VNGR SIM+Grouping NL::Attribuutsoort;@ENDSTEREO;"
 
-    #Test Associatie
+    # Test Associatie
     record = getRecordFromEARepository("t_connector", "{FD27EB67-1CFA-4f40-AE79-329DE9DE6754}")
     xref = getRecordFromEARepository("t_xref", "{FD27EB67-1CFA-4f40-AE79-329DE9DE6754}", key="Client")
     assert record is not None, "Record met de naam 'Relatiesoort' niet gevonden."

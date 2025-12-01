@@ -1,13 +1,19 @@
+import inspect
 import logging
 from datetime import datetime
-import inspect
 
-from sqlalchemy import Column, MetaData, create_engine, insert, text, or_, and_, func
+from sqlalchemy import Column, MetaData, and_, create_engine, func, insert, or_, text
 from sqlalchemy.orm import sessionmaker
 
 import crunch_uml.schema as sch
 from crunch_uml import const, util
-from crunch_uml.db import UMLTags, UMLTagsAttribute, UMLTagsRelation, UMLTagsGeneralization, UMLTagsLiteral
+from crunch_uml.db import (
+    UMLTags,
+    UMLTagsAttribute,
+    UMLTagsGeneralization,
+    UMLTagsLiteral,
+    UMLTagsRelation,
+)
 from crunch_uml.exceptions import CrunchException
 from crunch_uml.renderers.renderer import ModelRenderer, RendererRegistry
 
@@ -74,14 +80,14 @@ class EARepoUpdater(ModelRenderer):
                 parts.append("0")  # minimaal major.minor.patch
             major = int(parts[0])
             minor = int(parts[1])
-            patch = int(parts[2])
+            # patch = int(parts[2])
             if version_type == const.VERSION_STEP_MAJOR:
                 major += 1
                 minor = 0
-                patch = 0
+                # patch = 0
             elif version_type == const.VERSION_STEP_MINOR:
                 minor += 1
-                patch = 0
+                # patch = 0
             # Always return three-part version
             return f"{major}.{minor}.0"
         except ValueError:
@@ -93,7 +99,6 @@ class EARepoUpdater(ModelRenderer):
         Past de veldnamen in data_dict aan op basis van de field_mapper.
         """
         return {field_mapper.get(k, k): v for k, v in data_dict.items()}
-
 
     def get_tablefields(self, table):
         if table == "t_objectproperties":
@@ -146,9 +151,7 @@ class EARepoUpdater(ModelRenderer):
         ) = self.get_tablefields(table_name)
 
         for key, value in update_dict.items():
-            session.query(table).filter_by(**{ea_guid_column: key}).update(
-                {tag_value_column: value}
-            )
+            session.query(table).filter_by(**{ea_guid_column: key}).update({tag_value_column: value})
 
     def insert_repo(self, insert_dict, session, table_name, metadata, object_id):
         table = self.get_table_structure(table_name, metadata)
@@ -157,7 +160,7 @@ class EARepoUpdater(ModelRenderer):
             tag_id_child_column,
             tag_property_column,
             tag_value_column,
-            ea_guid_column, 
+            ea_guid_column,
         ) = self.get_tablefields(table_name)
 
         for key, value in insert_dict.items():
@@ -203,7 +206,7 @@ class EARepoUpdater(ModelRenderer):
         try:
             # Haal de tabelstructuur op
             table = self.get_table_structure(table_name, metadata)
-            columns = table.columns.keys()
+            # columns = table.columns.keys()
 
             if table is None:
                 logger.warning(
@@ -266,9 +269,7 @@ class EARepoUpdater(ModelRenderer):
             existing_record = session.query(table).filter_by(**{ea_guid: guid_value}).first()
             # Filter de data_dict om alleen kolommen in te voegen die bestaan in de tabel
             valid_data = {
-                col: data_dict[col]
-                for col in data_dict
-                if col in table.columns.keys() and data_dict[col] is not None
+                col: data_dict[col] for col in data_dict if col in table.columns.keys() and data_dict[col] is not None
             }
 
             changed = False
@@ -279,24 +280,26 @@ class EARepoUpdater(ModelRenderer):
                 tag_value_column,
                 ea_guid_column,
             ) = self.get_tablefields(tag_table)
-            if (
-                tag_table
-                and tag_id_parent_column
-                and tag_id_child_column
-                and tag_property_column
-                and tag_value_column
-            ):
+            if tag_table and tag_id_parent_column and tag_id_child_column and tag_property_column and tag_value_column:
                 # Haal de bestaande tags op uit de definities
                 if recordtype in [const.RECORDTYPE_CLASS, const.RECORDTYPE_ENUMERATION]:
                     uml_tag_names = [name for name, attr in inspect.getmembers(UMLTags) if isinstance(attr, Column)]
                 elif recordtype == const.RECORDTYPE_ATTRIBUTE:
-                    uml_tag_names = [name for name, attr in inspect.getmembers(UMLTagsAttribute) if isinstance(attr, Column)]
+                    uml_tag_names = [
+                        name for name, attr in inspect.getmembers(UMLTagsAttribute) if isinstance(attr, Column)
+                    ]
                 elif recordtype in [const.RECORDTYPE_ASSOCIATION]:
-                    uml_tag_names = [name for name, attr in inspect.getmembers(UMLTagsRelation) if isinstance(attr, Column)]
+                    uml_tag_names = [
+                        name for name, attr in inspect.getmembers(UMLTagsRelation) if isinstance(attr, Column)
+                    ]
                 elif recordtype in [const.RECORDTYPE_GENERALIZATION]:
-                    uml_tag_names = [name for name, attr in inspect.getmembers(UMLTagsGeneralization) if isinstance(attr, Column)]
+                    uml_tag_names = [
+                        name for name, attr in inspect.getmembers(UMLTagsGeneralization) if isinstance(attr, Column)
+                    ]
                 elif recordtype in [const.RECORDTYPE_LITERAL]:
-                    uml_tag_names = [name for name, attr in inspect.getmembers(UMLTagsLiteral) if isinstance(attr, Column)]
+                    uml_tag_names = [
+                        name for name, attr in inspect.getmembers(UMLTagsLiteral) if isinstance(attr, Column)
+                    ]
                 else:
                     # Voor andere recordtypes, gebruik de standaard UMLTags
                     uml_tag_names = []
@@ -311,10 +314,14 @@ class EARepoUpdater(ModelRenderer):
                 db_tags = {util.map_field_name_from_EARepo(k, const.EA_REPO_MAPPER): v for k, v in db_tags.items()}
 
                 db_tags_keys = {getattr(tag, tag_property_column): getattr(tag, 'ea_guid') for tag in db_tags_query}
-                db_tags_keys = {util.map_field_name_from_EARepo(k, const.EA_REPO_MAPPER): v for k, v in db_tags_keys.items()}
+                db_tags_keys = {
+                    util.map_field_name_from_EARepo(k, const.EA_REPO_MAPPER): v for k, v in db_tags_keys.items()
+                }
                 # Nog even de veldnaam in de goed stijl zetten
                 for name, guid in db_tags_keys.items():
-                    session.query(self.get_table_structure(tag_table, metadata)).filter_by(ea_guid=guid).update({tag_property_column: util.map_field_name_to_EARepo(name)})
+                    session.query(self.get_table_structure(tag_table, metadata)).filter_by(ea_guid=guid).update(
+                        {tag_property_column: util.map_field_name_to_EARepo(name)}
+                    )
 
                 # Bepaal welke tags zijn gewijzigd
                 tags_changed = {
@@ -323,13 +330,11 @@ class EARepoUpdater(ModelRenderer):
                     if col in uml_tag_names and col in db_tags.keys() and data_dict[col] != db_tags[col]
                 }
                 tags_new = {
-                    util.map_field_name_to_EARepo(col): data_dict[col] for col in data_dict if col in uml_tag_names and col not in db_tags.keys()
+                    util.map_field_name_to_EARepo(col): data_dict[col]
+                    for col in data_dict
+                    if col in uml_tag_names and col not in db_tags.keys()
                 }
-                tags_deleted = {
-                    db_tags_keys[col]: db_tags[col]
-                    for col in db_tags
-                    if col not in data_dict.keys()
-                }
+                tags_deleted = {db_tags_keys[col]: db_tags[col] for col in db_tags if col not in data_dict.keys()}
 
                 if tag_strategy == const.TAG_STRATEGY_UPSERT:
                     self.update_repo(
@@ -410,7 +415,6 @@ class EARepoUpdater(ModelRenderer):
             else:
                 logger.debug(f"No changes detected for record with GUID {guid_value}.")
 
-
         except Exception as e:
             logger.error(f"Error while updating record with GUID {guid_value} with message: {e} for changes {changes}")
             raise CrunchException(f"Error while updating record with GUID {guid_value} with message: {e}")
@@ -444,7 +448,9 @@ class EARepoUpdater(ModelRenderer):
                     recordtype=recordtype,
                 )
 
-    def deduplicate_tags(self, session, metadata, tag_table, tag_id_child_column, tag_property_column, tag_value_column):
+    def deduplicate_tags(
+        self, session, metadata, tag_table, tag_id_child_column, tag_property_column, tag_value_column
+    ):
         """
         Verwijder dubbele tags uit de tag-tabel (t_objectproperties of t_attributetag).
         Houdt alleen het eerste (laagste ID) record per (child_id, property).
@@ -468,7 +474,9 @@ class EARepoUpdater(ModelRenderer):
             required_columns = {id_column, tag_id_child_column, tag_property_column}
             missing_columns = required_columns - set(c.name for c in table.columns)
             if missing_columns:
-                logger.warning(f"Deduplicatie afgebroken. Vereiste kolommen ontbreken in tabel '{tag_table}': {missing_columns}")
+                logger.warning(
+                    f"Deduplicatie afgebroken. Vereiste kolommen ontbreken in tabel '{tag_table}': {missing_columns}"
+                )
                 return
 
             # Zoek dubbele (child_id, property) combinaties
@@ -499,15 +507,15 @@ class EARepoUpdater(ModelRenderer):
 
             duplicate_ids = [row[0] for row in duplicates]
             if duplicate_ids:
-                session.query(table).filter(getattr(table.c, id_column).in_(duplicate_ids)).delete(synchronize_session=False)
+                session.query(table).filter(getattr(table.c, id_column).in_(duplicate_ids)).delete(
+                    synchronize_session=False
+                )
                 logger.info(f"Deduplicatie uitgevoerd op '{tag_table}': {len(duplicate_ids)} dubbele tags verwijderd.")
             else:
                 logger.debug(f"Geen dubbele tags gevonden in '{tag_table}'.")
 
         except Exception as e:
             logger.error(f"Fout tijdens deduplicatie van '{tag_table}': {e}")
-
-
 
     def render(self, args, schema: sch.Schema):
 
@@ -533,7 +541,7 @@ class EARepoUpdater(ModelRenderer):
                     tag_table="t_objectproperties",
                     tag_id_child_column="Object_ID",
                     tag_property_column="Property",
-                    tag_value_column="Value"
+                    tag_value_column="Value",
                 )
                 self.deduplicate_tags(
                     target_session,
@@ -541,7 +549,7 @@ class EARepoUpdater(ModelRenderer):
                     tag_table="t_attributetag",
                     tag_id_child_column="ElementID",
                     tag_property_column="Property",
-                    tag_value_column="VALUE"
+                    tag_value_column="VALUE",
                 )
 
                 # Process all classes
@@ -649,7 +657,7 @@ class EARepoUpdater(ModelRenderer):
                     recordtype=const.RECORDTYPE_ASSOCIATION,
                 )
 
-                # Process all generalizations   
+                # Process all generalizations
                 logger.info("Updating generalizations...")
                 generalizations = schema.get_all_generalizations()
                 dict_generalizations = [record.to_dict() for record in generalizations]
@@ -688,6 +696,7 @@ class EARepoUpdater(ModelRenderer):
                 target_session.rollback()
                 raise CrunchException(msg)
 
+
 @RendererRegistry.register(
     "eamimrepo",
     descr="Updates as Enterprise Architect v16+ repository and applies MIM profile. "
@@ -716,8 +725,7 @@ class EAMIMRepoUpdater(EARepoUpdater):
             if table_name in metadata.tables:
                 table = metadata.tables[table_name]
                 session.query(table).filter(
-                    table.c.Client == util.fromEAGuid(ea_guid),
-                    table.c.Name == "Stereotypes"
+                    table.c.Client == util.fromEAGuid(ea_guid), table.c.Name == "Stereotypes"
                 ).delete()
             else:
                 logger.warning(f"Tabel '{table_name}' niet gevonden in metadata.")
@@ -766,22 +774,70 @@ class EAMIMRepoUpdater(EARepoUpdater):
         tag_table=None,
         tag_strategy=const.TAG_STRATEGY_REPLACE,
         recordtype=None,
-        profiel="MIM"
+        profiel="MIM",
     ):
         if recordtype == const.RECORDTYPE_CLASS:
-            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'element property', 'Objecttype', 'VNGR SIM+Grouping NL::Objecttype')
+            data_dict = self.setStereotype(
+                recordtype,
+                data_dict,
+                metadata,
+                session,
+                'element property',
+                'Objecttype',
+                'VNGR SIM+Grouping NL::Objecttype',
+            )
         elif recordtype == const.RECORDTYPE_ATTRIBUTE:
-            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'attribute property', 'Attribuutsoort', 'VNGR SIM+Grouping NL::Attribuutsoort')
+            data_dict = self.setStereotype(
+                recordtype,
+                data_dict,
+                metadata,
+                session,
+                'attribute property',
+                'Attribuutsoort',
+                'VNGR SIM+Grouping NL::Attribuutsoort',
+            )
         elif recordtype == const.RECORDTYPE_LITERAL:
-            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'attribute property', 'Enumeratiewaarde', 'VNGR SIM+Grouping NL::Enumeratiewaarde')
+            data_dict = self.setStereotype(
+                recordtype,
+                data_dict,
+                metadata,
+                session,
+                'attribute property',
+                'Enumeratiewaarde',
+                'VNGR SIM+Grouping NL::Enumeratiewaarde',
+            )
         elif recordtype == const.RECORDTYPE_ENUMERATION:
-            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'element property', 'Enumeratie', 'VNGR SIM+Grouping NL::Enumeratie')
-        #elif recordtype == const.RECORDTYPE_PACKAGE:
+            data_dict = self.setStereotype(
+                recordtype,
+                data_dict,
+                metadata,
+                session,
+                'element property',
+                'Enumeratie',
+                'VNGR SIM+Grouping NL::Enumeratie',
+            )
+        # elif recordtype == const.RECORDTYPE_PACKAGE:
         #    data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'element property', 'Package', 'VNGR SIM+Grouping NL::Package')
         elif recordtype == const.RECORDTYPE_ASSOCIATION:
-            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'connector property', 'Relatiesoort', 'VNGR SIM+Grouping NL::Relatiesoort')
+            data_dict = self.setStereotype(
+                recordtype,
+                data_dict,
+                metadata,
+                session,
+                'connector property',
+                'Relatiesoort',
+                'VNGR SIM+Grouping NL::Relatiesoort',
+            )
         elif recordtype == const.RECORDTYPE_GENERALIZATION:
-            data_dict = self.setStereotype(recordtype, data_dict, metadata, session, 'connector property', 'Generalisatie', 'VNGR SIM+Grouping NL::Generalisatie')
+            data_dict = self.setStereotype(
+                recordtype,
+                data_dict,
+                metadata,
+                session,
+                'connector property',
+                'Generalisatie',
+                'VNGR SIM+Grouping NL::Generalisatie',
+            )
         else:
             logger.debug(f"Unknown recordtype {recordtype}, not setting stereotype.")
 
@@ -800,7 +856,7 @@ class EAMIMRepoUpdater(EARepoUpdater):
             if alias_key is not None:
                 data_dict["Style"] = data_dict.get(alias_key, None)
             elif data_dict.get("Type"):
-            # If "Type" is filled and "alias" is not, use "Type" value for "alias" and "Style"
+                # If "Type" is filled and "alias" is not, use "Type" value for "alias" and "Style"
                 data_dict["alias"] = data_dict["Type"]
                 data_dict["Style"] = data_dict["Type"]
             else:
@@ -808,19 +864,29 @@ class EAMIMRepoUpdater(EARepoUpdater):
             # Set "Type" to None
             data_dict["Type"] = None
 
-
         # Set data type for attributes
         if recordtype == const.RECORDTYPE_ATTRIBUTE:
 
             # Skip values that point to a datatype
             datatype_input = data_dict.get("Type", None).lower().strip() if data_dict.get("Type", None) else None
             table = metadata.tables["t_attribute"]
-            record = session.query(table).filter_by(
-                ea_guid=util.fromEAGuid(data_dict.get("ea_guid"))
-            ).first()
+            record = session.query(table).filter_by(ea_guid=util.fromEAGuid(data_dict.get("ea_guid"))).first()
 
-            if datatype_input is not None and (record.Classifier is None or record.Classifier == 0 or record.Classifier == "0"):
-                if datatype_input.startswith("an") or datatype_input in ["text", "string", "characterstring", "tekst", "memo", "character", "char", "varchar", "character varying", "string text"]:
+            if datatype_input is not None and (
+                record.Classifier is None or record.Classifier == 0 or record.Classifier == "0"
+            ):
+                if datatype_input.startswith("an") or datatype_input in [
+                    "text",
+                    "string",
+                    "characterstring",
+                    "tekst",
+                    "memo",
+                    "character",
+                    "char",
+                    "varchar",
+                    "character varying",
+                    "string text",
+                ]:
                     datatype = "CharacterString"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
                     data_dict["Type"] = datatype
@@ -829,7 +895,25 @@ class EAMIMRepoUpdater(EARepoUpdater):
                         data_dict["length"] = number
                         data_dict["Length"] = number
                         data_dict["lengte"] = number
-                elif datatype_input.startswith("n") or datatype_input.startswith("int") or datatype_input in ["ìnt", "number", "integer", "integer number", "nummertotaal", "nummertotaal integer", "short", "integer short", "long", "integer long", "int", "integer int"]:
+                elif (
+                    datatype_input.startswith("n")
+                    or datatype_input.startswith("int")
+                    or datatype_input
+                    in [
+                        "ìnt",
+                        "number",
+                        "integer",
+                        "integer number",
+                        "nummertotaal",
+                        "nummertotaal integer",
+                        "short",
+                        "integer short",
+                        "long",
+                        "integer long",
+                        "int",
+                        "integer int",
+                    ]
+                ):
                     datatype = "Integer"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
                     data_dict["Type"] = datatype
@@ -850,7 +934,11 @@ class EAMIMRepoUpdater(EARepoUpdater):
                     datatype = "Time"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
                     data_dict["Type"] = datatype
-                elif datatype_input.startswith("bool") or "stdindjn" in datatype_input or datatype_input in ["boolean", "bool", "ja/nee", "ja nee", "yes no", "ja/neen", "indic"]:
+                elif (
+                    datatype_input.startswith("bool")
+                    or "stdindjn" in datatype_input
+                    or datatype_input in ["boolean", "bool", "ja/nee", "ja nee", "yes no", "ja/neen", "indic"]
+                ):
                     datatype = "Boolean"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
                     data_dict["Type"] = datatype
@@ -858,7 +946,18 @@ class EAMIMRepoUpdater(EARepoUpdater):
                     datatype = "Decimal"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
                     data_dict["Type"] = datatype
-                elif datatype_input in ["punt", "point", "coordinate", "coördinaat", "geopunt", "coordinaat", 'gml', 'locatie', 'spatial', 'geometrie']:
+                elif datatype_input in [
+                    "punt",
+                    "point",
+                    "coordinate",
+                    "coördinaat",
+                    "geopunt",
+                    "coordinaat",
+                    'gml',
+                    'locatie',
+                    'spatial',
+                    'geometrie',
+                ]:
                     datatype = "GM_Point"
                     data_dict["Classifier"] = self.datatype_map.get(datatype, None)
                     data_dict["Type"] = datatype
@@ -933,25 +1032,21 @@ class EAMIMRepoUpdater(EARepoUpdater):
                     if table_prop is None or object_table is None:
                         logger.warning("Tabel 't_objectproperties' of 't_object' niet gevonden in metadata.")
                     else:
-                        result = session.query(object_table).filter_by(
-                            ea_guid=util.fromEAGuid(data_dict["ea_guid"])
-                        ).first()
+                        result = (
+                            session.query(object_table).filter_by(ea_guid=util.fromEAGuid(data_dict["ea_guid"])).first()
+                        )
                         if not result:
                             logger.warning(f"Geen object gevonden voor GUID {data_dict['ea_guid']}")
                         else:
                             object_id = result.Object_ID
-                            existing = session.query(table_prop).filter_by(
-                                Object_ID=object_id,
-                                Property="Release"
-                            ).first()
+                            existing = (
+                                session.query(table_prop).filter_by(Object_ID=object_id, Property="Release").first()
+                            )
 
                             if existing:
-                                session.query(table_prop).filter_by(
-                                    Object_ID=object_id,
-                                    Property="Release"
-                                ).update({
-                                    "Value": release_value
-                                })
+                                session.query(table_prop).filter_by(Object_ID=object_id, Property="Release").update(
+                                    {"Value": release_value}
+                                )
                                 logger.info(f"Release-tag bijgewerkt voor package met GUID {data_dict['ea_guid']}")
                             else:
                                 insert_item = {
@@ -964,15 +1059,15 @@ class EAMIMRepoUpdater(EARepoUpdater):
                                 session.execute(insert(table_prop).values(insert_item))
                                 logger.debug(f"Release-tag toegevoegd voor package met GUID {data_dict['ea_guid']}")
                 else:
-                    logger.debug(f"Geen release-tag upsert voor package met GUID {data_dict.get('ea_guid', '<geen guid>')}: stereotype={stereotype}, release={release_value}")
+                    logger.debug(
+                        f"Geen release-tag upsert voor package met GUID {data_dict.get('ea_guid', '<geen guid>')}: stereotype={stereotype}, release={release_value}"
+                    )
             except Exception as e:
                 logger.warning(f"Fout bij het toevoegen/bijwerken van de Release-tag: {e}")
 
     def new_method(self, value):
         inferred_type = self.infer_datatype(value)
         return inferred_type
-
-
 
     # Get a map of data types and their IDs from the t_object table
     def get_relevant_object_id_map(self, session, metadata):
@@ -989,15 +1084,16 @@ class EAMIMRepoUpdater(EARepoUpdater):
             return {}
 
         try:
-            results = session.query(table.c.Name, table.c.Object_ID).filter(
-                or_(
-                    table.c.Object_Type == "Datatype",
-                    and_(
-                        table.c.Object_Type == "Class",
-                        table.c.Name.startswith("GM_")
+            results = (
+                session.query(table.c.Name, table.c.Object_ID)
+                .filter(
+                    or_(
+                        table.c.Object_Type == "Datatype",
+                        and_(table.c.Object_Type == "Class", table.c.Name.startswith("GM_")),
                     )
                 )
-            ).all()
+                .all()
+            )
 
             return {row.Name: row.Object_ID for row in results}
         except Exception as e:

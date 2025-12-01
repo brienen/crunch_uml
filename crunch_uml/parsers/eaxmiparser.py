@@ -2,18 +2,17 @@ import logging
 
 import crunch_uml.db as db
 import crunch_uml.schema as sch
-import crunch_uml.util as util
 from crunch_uml.parsers.parser import ParserRegistry, copy_values, fixtag
 from crunch_uml.parsers.xmiparser import XMIParser
 
 logger = logging.getLogger()
 
 
-
 def get_sorted_tags(tag_nodes):
     """
     Sorteert tags op basis van vermoedelijke ouderdom aan de hand van de eerste drie hex-blokken in xmi:id.
     """
+
     def tag_sort_key(tag):
         tag_id = tag.get("xmi:id") or tag.get("{http://www.omg.org/XMI}id") or ""
         parts = tag_id.split("_")
@@ -119,7 +118,7 @@ class EAXMIParser(XMIParser):
                 for tag in tags:
                     if hasattr(clazz, fixtag(tag.get("name"))):
                         setattr(clazz, fixtag(tag.get("name")), tag.get("value"))
-                    #if hasattr(clazz, fixtag(util.map_field_name_from_EARepo(tag.get("name")))):
+                    # if hasattr(clazz, fixtag(util.map_field_name_from_EARepo(tag.get("name")))):
                     #    setattr(clazz, fixtag(util.map_field_name_from_EARepo(tag.get("name"))), tag.get("value"))
 
                 properties = clazzref.xpath("./properties")[0]
@@ -143,7 +142,7 @@ class EAXMIParser(XMIParser):
                 for tag in tags:
                     if hasattr(enum, fixtag(tag.get("name"))):
                         setattr(enum, fixtag(tag.get("name")), tag.get("value"))
-                    #if hasattr(enum, fixtag(util.map_field_name_from_EARepo(tag.get("name")))):
+                    # if hasattr(enum, fixtag(util.map_field_name_from_EARepo(tag.get("name")))):
                     #    setattr(enum, fixtag(util.map_field_name_from_EARepo(tag.get("name"))), tag.get("value"))
 
                 properties = enumref.xpath("./properties")[0]
@@ -191,8 +190,8 @@ class EAXMIParser(XMIParser):
                     if hasattr(attr, fixtag(tag.get("name"))):
                         setattr(attr, fixtag(tag.get("name")), tag.get("value"))
                 # First set tags that might be overridden
-                #tags = attrref.xpath("./tags/tag")
-                #for tag in tags:
+                # tags = attrref.xpath("./tags/tag")
+                # for tag in tags:
                 #    if hasattr(attr, fixtag(tag.get("name"))):
                 #        setattr(attr, fixtag(tag.get("name")), tag.get("value"))
                 #    if hasattr(attr, fixtag(util.map_field_name_from_EARepo(tag.get("name")))):
@@ -217,8 +216,8 @@ class EAXMIParser(XMIParser):
                             setattr(literal, fixtag(tag.get("name")), tag.get("value"))
 
                     # First set tags that might be overridden
-                    #tags = attrref.xpath("./tags/tag")
-                    #for tag in tags:
+                    # tags = attrref.xpath("./tags/tag")
+                    # for tag in tags:
                     #    if hasattr(literal, fixtag(tag.get("name"))):
                     #        setattr(literal, fixtag(tag.get("name")), tag.get("value"))
                     #    if hasattr(literal, fixtag(util.map_field_name_from_EARepo(tag.get("name")))):
@@ -244,8 +243,8 @@ class EAXMIParser(XMIParser):
                     if hasattr(association, fixtag(tag.get("name"))):
                         setattr(association, fixtag(tag.get("name")), tag.get("value"))
                 # First set tags that might be overridden
-                #tags = connectorref.xpath("./tags/tag")
-                #for tag in tags:
+                # tags = connectorref.xpath("./tags/tag")
+                # for tag in tags:
                 #    if hasattr(association, fixtag(tag.get("name"))):
                 #        setattr(association, fixtag(tag.get("name")), tag.get("value"))
                 #    if hasattr(association, fixtag(util.map_field_name_from_EARepo(tag.get("name")))):

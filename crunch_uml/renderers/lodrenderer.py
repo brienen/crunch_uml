@@ -87,7 +87,11 @@ class LodRenderer(ModelRenderer):
 
                         for attribute in cls.attributes:
                             if attribute.name is not None and attribute.primitive is not None:
-                                attr_uri = ns[slugify(cls.name) + "/" + slugify(attribute.name)] if attribute.name else ns[slugify(cls.name) + "/" + slugify(attribute.id)]
+                                attr_uri = (
+                                    ns[slugify(cls.name) + "/" + slugify(attribute.name)]
+                                    if attribute.name
+                                    else ns[slugify(cls.name) + "/" + slugify(attribute.id)]
+                                )
                                 g.add((attr_uri, RDF.type, OWL.DatatypeProperty))
                                 g.add((attr_uri, RDFS.domain, class_uri))
                                 g.add((attr_uri, RDFS.label, Literal(attribute.name)))
@@ -117,7 +121,11 @@ class LodRenderer(ModelRenderer):
                         for attribute in cls.attributes:
                             if attribute.name is not None and attribute.primitive is not None:
                                 prop_bnode = BNode()
-                                attr_uri = ns[slugify(cls.name) + "/" + slugify(attribute.name)] if attribute.name else ns[slugify(cls.name) + "/" + slugify(attribute.id)]
+                                attr_uri = (
+                                    ns[slugify(cls.name) + "/" + slugify(attribute.name)]
+                                    if attribute.name
+                                    else ns[slugify(cls.name) + "/" + slugify(attribute.id)]
+                                )
                                 g.add((shape_uri, SH.property, prop_bnode))
                                 g.add((prop_bnode, SH.path, attr_uri))
                                 shacl_type = TYPEMAP.get(attribute.primitive.lower(), XSD.string)
@@ -153,7 +161,11 @@ class LodRenderer(ModelRenderer):
                             continue
 
                         if from_cls is not None and to_cls is not None:
-                            assoc_uri = ns[slugify(cls.name) + "/" + slugify(assoc.name)] if assoc.name else ns[slugify(cls.name) + "/" + slugify(assoc.id)]
+                            assoc_uri = (
+                                ns[slugify(cls.name) + "/" + slugify(assoc.name)]
+                                if assoc.name
+                                else ns[slugify(cls.name) + "/" + slugify(assoc.id)]
+                            )
                             g.add((assoc_uri, RDF.type, OWL.ObjectProperty))
                             g.add((assoc_uri, RDFS.domain, from_cls))
                             g.add((assoc_uri, RDFS.range, to_cls))

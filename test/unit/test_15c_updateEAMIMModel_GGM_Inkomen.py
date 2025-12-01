@@ -4,8 +4,7 @@ import sqlite3
 
 import pytest
 
-import crunch_uml.schema as sch
-from crunch_uml import cli, const, db, util
+from crunch_uml import cli
 
 EA_DB = "./test/output/InkomenMIM_Processed.qea"
 
@@ -69,6 +68,7 @@ def copy_test_files():
 
     # Opruimen na de test als dat nodig is
     # Bijvoorbeeld: os.remove(destination)
+
 
 @pytest.mark.slow
 def test_import_monumenten():

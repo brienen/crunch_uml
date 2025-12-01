@@ -3,15 +3,13 @@ import json
 import logging
 import os
 import re
-from bs4 import BeautifulSoup
-from markdownify import markdownify as md
-from bs4 import MarkupResemblesLocatorWarning
 import warnings
- 
+
 import inflection
 import validators
-from charset_normalizer import from_bytes
+from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
 from jinja2 import Environment, FileSystemLoader
+from markdownify import markdownify as md
 
 import crunch_uml.schema as sch
 from crunch_uml import const, db, util
@@ -35,6 +33,7 @@ _MULTILINE_RE = re.compile(
     flags=re.IGNORECASE,
 )
 
+
 def _html_to_markdown_lines(raw: str) -> list[str]:
     """
     Helper:
@@ -46,8 +45,8 @@ def _html_to_markdown_lines(raw: str) -> list[str]:
     """
     markdown = md(
         html.unescape(raw),
-        heading_style="ATX",   # # H1, ## H2, ...
-        bullets="*",           # <ul><li> → * item
+        heading_style="ATX",  # # H1, ## H2, ...
+        bullets="*",  # <ul><li> → * item
         strip=["style", "script"],
     )
 
@@ -57,7 +56,7 @@ def _html_to_markdown_lines(raw: str) -> list[str]:
 
     for ln in lines:
         if ln.strip() == "":
-            if not previous_blank:        # max 1 lege regel
+            if not previous_blank:  # max 1 lege regel
                 cleaned_lines.append("")
             previous_blank = True
         else:
@@ -133,10 +132,7 @@ def fix_and_format_text(text: str, mode: str = "markdown") -> str:
         if not lines:
             return ""
 
-        quoted_lines = [
-            ("> " + ln) if ln.strip() != "" else ">"
-            for ln in lines
-        ]
+        quoted_lines = [("> " + ln) if ln.strip() != "" else ">" for ln in lines]
         return "\n".join(quoted_lines)
 
     # ---------------------------
@@ -164,14 +160,15 @@ def fix_and_format_text(text: str, mode: str = "markdown") -> str:
             return ""
 
         # Escapen voor gebruik in een JS alert("...") string
-        js = base.replace("\\", "\\\\")   # backslashes escapen
-        js = js.replace('"', '\\"')       # dubbele quotes escapen
-        js = js.replace("\n", "\\n")      # echte newline → \n literal
+        js = base.replace("\\", "\\\\")  # backslashes escapen
+        js = js.replace('"', '\\"')  # dubbele quotes escapen
+        js = js.replace("\n", "\\n")  # echte newline → \n literal
 
         return js
 
     else:
         raise ValueError("Unsupported mode. Use 'markdown' or 'alert'.")
+
 
 @RendererRegistry.register(
     "jinja2",
