@@ -1047,7 +1047,7 @@ class EAMIMRepoUpdater(EARepoUpdater):
                                 session.query(table_prop).filter_by(Object_ID=object_id, Property="Release").update(
                                     {"Value": release_value}
                                 )
-                                logger.info(f"Release-tag bijgewerkt voor package met GUID {data_dict['ea_guid']}")
+                                logger.debug(f"Release-tag bijgewerkt voor package met GUID {data_dict['ea_guid']}")
                             else:
                                 insert_item = {
                                     "PropertyID": self.update_sequence(session, "t_objectproperties"),

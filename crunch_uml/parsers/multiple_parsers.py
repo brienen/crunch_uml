@@ -71,7 +71,7 @@ class TransformableParser(Parser):
             if len(column_mapper) > 0:
                 record = {column_mapper.get(k, k): v for k, v in record.items()}
             else:
-                logger.warning("Empty mapper provided, no columns will be renamed and original record saved.")
+                logger.debug("Empty mapper provided, no columns will be renamed and original record saved.")
 
         # Controleer en transformeer het 'id' veld
         if "id" in record and isinstance(record["id"], str):
