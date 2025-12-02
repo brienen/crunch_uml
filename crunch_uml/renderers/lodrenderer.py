@@ -52,7 +52,9 @@ class LodRenderer(ModelRenderer):
             g = Graph()
 
             # Add SHACL shapes namespace and bindings
-            shape_ns = Namespace(args.linked_data_namespace + "shapes/")
+            shape_ns = Namespace(
+                args.linked_data_namespace + ("" if args.linked_data_namespace.endswith("/") else "/") + "shapes/"
+            )
             g.bind("sh", SH)
             g.bind("shape", shape_ns)
 
