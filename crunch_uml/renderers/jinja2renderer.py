@@ -92,12 +92,19 @@ def fix_and_format_text(text: str, mode: str = "markdown", depth: int = 1) -> st
             - newlines → \n
             - backslash → \\\\
             - " → \\\"
+    - mode="table":
+        * HTML → Markdown (incl. lijsten)
+        * geschikt voor één Markdown-tabelcel (MkDocs Material):
+            - alles naar één regel
+            - newlines → <br>
+            - '|' escapen
+            - dubbele spaties en lege regels opruimen
 
     Parameters
     ----------
     text : str
         De bron-HTML of -tekst.
-    mode : {"markdown", "alert"}
+    mode : {"markdown", "alert", "table"}
         Doelcontext van de tekst.
 
     Returns
@@ -167,8 +174,42 @@ def fix_and_format_text(text: str, mode: str = "markdown", depth: int = 1) -> st
 
         return js
 
+    # ---------------------------
+    #  mode = "table"
+    # ---------------------------
+    elif mode == "table":
+        # Voor tabellen willen we:
+        # - HTML → Markdown (incl. lijsten)
+        # - geen blockquotes
+        # - alles in 1 cel kunnen tonen (dus 1 regel), met <br> voor regeleindes
+        # - '|' escapen zodat Markdown-tabellen niet breken
+
+        lines = _html_to_markdown_lines(raw)
+        if not lines:
+            return ""
+
+        # Maak lijsten compacter in een cel: "- item" blijft, maar alles wordt 1 string
+        base = "\n".join(lines).strip()
+
+        # Normaliseer bullet markers een beetje (optioneel maar veilig)
+        base = re.sub(r"^(\s*)([*+])\s+", r"\\1- ", base, flags=re.MULTILINE)
+
+        # Tabellen: '|' moet escaped worden
+        base = base.replace("|", "\\|")
+
+        # Newlines worden <br> zodat het binnen één cel blijft
+        base = base.replace("\n", "<br>")
+
+        # Extra opschoning: geen opeenvolgende <br><br>
+        base = re.sub(r"(<br>){2,}", "<br>", base)
+
+        # En whitespace rond <br> strak trekken
+        base = re.sub(r"\s*<br>\s*", "<br>", base)
+
+        return base
+
     else:
-        raise ValueError("Unsupported mode. Use 'markdown' or 'alert'.")
+        raise ValueError("Unsupported mode. Use 'markdown', 'alert' or 'table'.")
 
 
 @RendererRegistry.register(
@@ -266,6 +307,9 @@ class Jinja2Renderer(ModelRenderer):
 
         # Formatteer en escape tekst voor gebruik in markdown
         env.filters["fix_and_format"] = lambda s, depth=1: fix_and_format_text(s, mode="markdown", depth=depth)
+
+        # Formatteer en escape tekst voor gebruik in een Markdown tabelcel (MkDocs Material)
+        env.filters["fix_and_format_table"] = lambda s: fix_and_format_text(s, mode="table")
 
         # Verwijder voor- en achterliggende spaties
         env.filters["trim"] = lambda s: (s.strip() if isinstance(s, str) else "")
