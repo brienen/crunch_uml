@@ -158,7 +158,7 @@ def test_import_monumenten():
     assert record is not None
     assert record[const.EA_REPO_MAPPER["name"]] == "test-TypeMonument"
 
-    # Literal testen
+    # Literal testenx
     record = getRecordFromEARepository("t_attribute", "{B2AE8AFC-C1D5-4d83-BFD3-EBF1663F3468}")
     assert record is not None
     assert record[const.EA_REPO_MAPPER_LITERALS["name"]] == "test-rijksmonument"
@@ -169,6 +169,15 @@ def test_import_monumenten():
     assert record[const.EA_REPO_MAPPER_ATTRIBUTES["name"]] == "test-verbijzondering"
     assert record[const.EA_REPO_MAPPER_ATTRIBUTES["definitie"]] == "test-"
     assert record[const.EA_REPO_MAPPER_ATTRIBUTES["primitive"]] == "test-AN200"
+
+    # Attributen met class primitive testen
+    record = getRecordFromEARepository("t_attribute", "{04B5CEE9-8929-4729-A545-FEEB5604B5C8}")
+    assert record is not None
+    assert record['Classifier'] == '6'
+
+    record = getRecordFromEARepository("t_attribute", "{0E956D19-44D9-42f6-9C44-15FDAAF5AEF1}")
+    assert record is not None
+    assert record['Classifier'] == '12'
 
     # Associations testen
     record = getRecordFromEARepository("t_connector", "{8E18F665-2A86-44fd-AD55-3E435A282BDF}")

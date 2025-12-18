@@ -267,6 +267,39 @@ class EARepoUpdater(ModelRenderer):
             columns = table.columns.keys()
             guid_value = util.fromEAGuid(data_dict[ea_guid])
             existing_record = session.query(table).filter_by(**{ea_guid: guid_value}).first()
+
+            # --- Handle non-primitive datatypes for attributes (Enumeration/Class) ---
+            # The Excel sheet `attributes` can contain `enumeration_id` and/or `type_class_id` (EA GUIDs like EAID_...).
+            # EA stores these links in t_attribute.Classifier (Object_ID from t_object).
+            if recordtype == const.RECORDTYPE_ATTRIBUTE and table_name == "t_attribute":
+                enum_guid = data_dict.get("enumeration_id")
+                type_class_guid = data_dict.get("type_class_id")
+
+                def _resolve_object_id_and_name(ea_guid_value: str):
+                    if not ea_guid_value:
+                        return None, None
+                    obj_table = metadata.tables.get("t_object")
+                    if obj_table is None:
+                        return None, None
+                    row = (
+                        session.query(obj_table.c.Object_ID, obj_table.c.Name)
+                        .filter(obj_table.c.ea_guid == util.fromEAGuid(ea_guid_value))
+                        .first()
+                    )
+                    if not row:
+                        return None, None
+                    return row.Object_ID, row.Name
+
+                # Prefer enumeration_id over type_class_id if both are present
+                target_guid = enum_guid or type_class_guid
+                if target_guid:
+                    obj_id, obj_name = _resolve_object_id_and_name(target_guid)
+                    if obj_id:
+                        data_dict["Classifier"] = obj_id
+                        # Keep Type readable in EA (optional but useful)
+                        if obj_name:
+                            data_dict["Type"] = obj_name
+
             # Filter de data_dict om alleen kolommen in te voegen die bestaan in de tabel
             valid_data = {
                 col: data_dict[col] for col in data_dict if col in table.columns.keys() and data_dict[col] is not None
