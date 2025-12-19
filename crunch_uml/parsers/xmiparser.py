@@ -50,6 +50,10 @@ def remove_EADatatype(input_string):
     return re.sub(pattern, "", input_string)
 
 
+def zetOpLeeg():
+    return ""
+
+
 @ParserRegistry.register(
     "xmi",
     descr="XMI-Parser for strict XMI files. No extensions (like EA extensions) are parsed. Tested on XMI v2.1 spec ",
@@ -104,7 +108,8 @@ class XMIParser(Parser):
                         elif datatype.startswith("EAID_"):
                             # Reference to a classifier (Class / Enumeration) in the model
                             # This is NOT a primitive EA datatype.
-                            attribute.type_class_id = datatype
+                            # attribute.type_class_id = datatype
+                            attribute.primitive = zetOpLeeg()
                         else:
                             # EA primitive datatype (e.g. EAJava_int, EASomeProfile_String, etc.)
                             attribute.primitive = remove_EADatatype(datatype)
@@ -293,6 +298,21 @@ class XMIParser(Parser):
                     attribute = schema.get_attribute(id)
                     if attribute is not None:
                         attribute.enumeration_id = enum.id
+                        attribute.primitive = enum.name
+                        schema.save(attribute)
+
+        # Last of all set object references
+        classes = schema.get_all_classes()
+        for clazz in classes:
+            classverws = node.xpath(".//type[@xmi:idref='" + clazz.id + "']", namespaces=ns)
+            for classverw in classverws:
+                property = classverw.getparent()
+                if property.tag == "ownedAttribute" and property.get("{" + ns["xmi"] + "}type") == "uml:Property":
+                    id = property.get("{" + ns["xmi"] + "}id")
+                    attribute = schema.get_attribute(id)
+                    if attribute is not None:
+                        attribute.type_class_id = clazz.id
+                        attribute.primitive = clazz.name
                         schema.save(attribute)
 
     def phase3_process_extra(self, node, ns, schema: sch.Schema):
