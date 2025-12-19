@@ -99,9 +99,14 @@ class XMIParser(Parser):
                     datatypes = childnode.xpath("./type")
                     if len(datatypes) != 0:
                         datatype = datatypes[0].get("{" + ns["xmi"] + "}idref")
-                        if datatype is not None and not datatype.startswith(
-                            "EAID_"
-                        ):  # Remove references to other classes
+                        if datatype is None:
+                            pass
+                        elif datatype.startswith("EAID_"):
+                            # Reference to a classifier (Class / Enumeration) in the model
+                            # This is NOT a primitive EA datatype.
+                            attribute.type_class_id = datatype
+                        else:
+                            # EA primitive datatype (e.g. EAJava_int, EASomeProfile_String, etc.)
                             attribute.primitive = remove_EADatatype(datatype)
                     logger.debug(
                         f"Attribute {attribute.name} met id {attribute.id} ingelezen met inhoud: {vars(attribute)}"
@@ -273,7 +278,7 @@ class XMIParser(Parser):
                 clsid = clsrefs[0].get("{" + ns["xmi"] + "}idref")
                 cls = schema.get_class(clsid)
                 if cls is None:
-                    next
+                    continue
                 attribute.type_class_id = cls.id
             schema.save(attribute)
 
