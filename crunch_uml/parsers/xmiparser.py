@@ -316,6 +316,20 @@ class XMIParser(Parser):
                         attribute.primitive = clazz.name
                         schema.save(attribute)
 
+        # Last of all set object references
+        datatypes = schema.get_all_datatypes()
+        for dt in datatypes:
+            dtverws = node.xpath(".//type[@xmi:idref='" + dt.id + "']", namespaces=ns)
+            for dtverw in dtverws:
+                property = dtverw.getparent()
+                if property.tag == "ownedAttribute" and property.get("{" + ns["xmi"] + "}type") == "uml:Property":
+                    id = property.get("{" + ns["xmi"] + "}id")
+                    attribute = schema.get_attribute(id)
+                    if attribute is not None:
+                        attribute.type_class_id = dt.id
+                        attribute.primitive = dt.name
+                        schema.save(attribute)
+
     def phase3_process_extra(self, node, ns, schema: sch.Schema):
         """
         third and last phase of parsing XMI-documents. Parsing extra propriatary data: addons to allready found data
