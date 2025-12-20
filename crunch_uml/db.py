@@ -360,6 +360,12 @@ class Package(Base, UMLBase, UMLTagsDomain):  # type: ignore
     )
 
     # Logic for models
+    def get_classes(self):
+        return [c for c in self.classes if not c.is_datatype]
+
+    def get_datatypes(self):
+        return [c for c in self.classes if c.is_datatype]
+
     def is_model(self):
         return self.modelnaam_kort is not None or self.parent_package is None
 
