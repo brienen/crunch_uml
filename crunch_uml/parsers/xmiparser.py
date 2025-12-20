@@ -83,11 +83,12 @@ class XMIParser(Parser):
             else:
                 logger.debug(f"Package with {name} does not have id value: discarded")
 
-        elif tp == "uml:Class":
+        elif tp in ["uml:Class", "uml:DataType"]:
             clazz = db.Class(
                 id=node.get("{" + ns["xmi"] + "}id"),
                 name=node.get("name"),
                 package_id=parent_package_id,
+                is_datatype=(tp == "uml:DataType"),
             )
             logger.debug(f"Class {clazz.name} met id {clazz.id} ingelezen met inhoud: {clazz}")
             schema.save(clazz)

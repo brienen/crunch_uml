@@ -89,7 +89,14 @@ class Schema:
         return self.database.session.query(db.Diagram).filter_by(id=id, schema_id=self.schema_id).first()
 
     def get_class(self, id):
-        return self.database.session.query(db.Class).filter_by(id=id, schema_id=self.schema_id).first()
+        return (
+            self.database.session.query(db.Class).filter_by(id=id, schema_id=self.schema_id, is_datatype=False).first()
+        )
+
+    def get_datatype(self, id):
+        return (
+            self.database.session.query(db.Class).filter_by(id=id, schema_id=self.schema_id, is_datatype=True).first()
+        )
 
     def get_enumeration(self, id):
         return self.database.session.query(db.Enumeratie).filter_by(id=id, schema_id=self.schema_id).first()
@@ -116,7 +123,10 @@ class Schema:
         return self.database.session.query(db.Diagram).filter_by(schema_id=self.schema_id).all()
 
     def get_all_classes(self):
-        return self.database.session.query(db.Class).filter_by(schema_id=self.schema_id).all()
+        return self.database.session.query(db.Class).filter_by(schema_id=self.schema_id, is_datatype=False).all()
+
+    def get_all_datatypes(self):
+        return self.database.session.query(db.Class).filter_by(schema_id=self.schema_id, is_datatype=True).all()
 
     def get_all_attributes(self):
         return self.database.session.query(db.Attribute).filter_by(schema_id=self.schema_id).all()
@@ -131,7 +141,10 @@ class Schema:
         return self.database.session.query(db.Generalization).filter_by(schema_id=self.schema_id).all()
 
     def count_class(self):
-        return self.database.session.query(db.Class).filter_by(schema_id=self.schema_id).count()
+        return self.database.session.query(db.Class).filter_by(schema_id=self.schema_id, is_datatype=False).count()
+
+    def count_datatype(self):
+        return self.database.session.query(db.Class).filter_by(schema_id=self.schema_id, is_datatype=True).count()
 
     def count_attribute(self):
         return self.database.session.query(db.Attribute).filter_by(schema_id=self.schema_id).count()

@@ -603,6 +603,7 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
     indicatie_formele_historie = Column(String)
     authentiek = Column(String)
     nullable = Column(String)
+    is_datatype = Column(Boolean, default=False)
 
     # @hybrid_property
     # def domain(self):
@@ -1213,7 +1214,10 @@ class Database:
         return self.session.get(Package, id)
 
     def get_class(self, id):
-        return self.session.get(Class, id)
+        return self.session.query(Class).filter_by(id=id, is_datatype=False).first()
+
+    def get_datatype(self, id):
+        return self.session.query(Class).filter_by(id=id, is_datatype=True).first()
 
     def get_enumeration(self, id):
         return self.session.get(Enumeratie, id)
@@ -1231,7 +1235,10 @@ class Database:
         return self.session.query(Enumeratie).all()
 
     def count_class(self):
-        return self.session.query(Class).count()
+        return self.session.query(Class).filter_by(is_datatype=False).count()
+
+    def count_datatype(self):
+        return self.session.query(Class).filter_by(is_datatype=True).count()
 
     def count_attribute(self):
         return self.session.query(Attribute).count()
