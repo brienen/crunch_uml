@@ -27,6 +27,7 @@ from crunch_uml.renderers.lodrenderer import TTLRenderer  # noqa: F401
 from crunch_uml.renderers.pandasrenderer import CSVRenderer  # noqa: F401
 from crunch_uml.renderers.pandasrenderer import I18nRenderer  # noqa: F401
 from crunch_uml.renderers.pandasrenderer import JSONRenderer  # noqa: F401
+from crunch_uml.renderers.pandasrenderer import SchemaDiffMarkdownRenderer  # noqa: F401
 from crunch_uml.renderers.sqlarenderer import SQLARenderer  # noqa: F401
 from crunch_uml.renderers.xlsxrenderer import XLSXRenderer  # noqa: F401
 from crunch_uml.transformers.copytransformer import CopyTransformer  # noqa: F401

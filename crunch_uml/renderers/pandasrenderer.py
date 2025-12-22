@@ -1,6 +1,8 @@
 import json
 import logging
 import os
+from dataclasses import dataclass
+from typing import Any, Dict, Iterable, List, Optional, Set
 
 import pandas as pd
 import sqlalchemy
@@ -387,3 +389,386 @@ class ModelStatisticsMarkdownRenderer(Renderer):
                     f.write(f"(created: {pkg.created_at})\n")
                 else:
                     f.write("(no timestamp available)\n")
+
+
+@dataclass
+class _DiffItem:
+    key: str
+    title: str
+    changes: List[str]
+
+
+def _norm(v: Any) -> Any:
+    if v is None:
+        return ""
+    return v
+
+
+def _safe_get(obj: Any, field: str) -> Any:
+    return getattr(obj, field) if obj is not None and hasattr(obj, field) else None
+
+
+def _diff_fields(a: Any, b: Any, fields: Iterable[str], labels: Optional[Dict[str, str]] = None) -> List[str]:
+    out: List[str] = []
+    for f in fields:
+        av = _norm(_safe_get(a, f))
+        bv = _norm(_safe_get(b, f))
+        if av != bv:
+            label = labels.get(f, f) if labels else f
+            out.append(f"- **{label}**: `{av}` → `{bv}`")
+    return out
+
+
+def _md_list(items: List[str], indent: int = 0) -> str:
+    if not items:
+        return ""
+    pad = " " * indent
+    return "\n".join(pad + it for it in items)
+
+
+def _md_escape(s: str) -> str:
+    return str(s).replace("\n", " ").strip()
+
+
+@RendererRegistry.register(
+    "diff_md",
+    descr="Top-down Markdown diff between two schema versions (Package → Class/Datatype/Enum → Attribute/Literal).",
+)
+class SchemaDiffMarkdownRenderer(Renderer):
+    def _get_other_schema(self, schema: sch.Schema, args) -> sch.Schema:
+        other_name = getattr(args, "compare_schema_name", None)
+        if not other_name:
+            raise ValueError("diff_md requires --compare_schema_name <schema_id/schema_name>.")
+        return sch.Schema(schema.database, schema_name=other_name)
+
+    def _index_by_id(self, items: Iterable[Any]) -> Dict[str, Any]:
+        out: Dict[str, Any] = {}
+        for it in items:
+            if getattr(it, "id", None) is not None:
+                out[str(it.id)] = it
+        return out
+
+    def render(self, args, schema: sch.Schema):
+        other = self._get_other_schema(schema, args)
+        title = getattr(args, "compare_title", None) or f"Diff: {schema.schema_id} → {other.schema_id}"
+
+        # Load entities
+        a_pkgs = schema.get_all_packages()
+        b_pkgs = other.get_all_packages()
+        a_classes = schema.get_all_classes()  # includes datatypes
+        b_classes = other.get_all_classes()
+        a_enums = schema.get_all_enumerations()
+        b_enums = other.get_all_enumerations()
+        a_attrs = schema.get_all_attributes()
+        b_attrs = other.get_all_attributes()
+        a_literals = schema.get_all_literals()
+        b_literals = other.get_all_literals()
+
+        A_pkg = self._index_by_id(a_pkgs)
+        B_pkg = self._index_by_id(b_pkgs)
+        A_cls = self._index_by_id(a_classes)
+        B_cls = self._index_by_id(b_classes)
+        A_enum = self._index_by_id(a_enums)
+        B_enum = self._index_by_id(b_enums)
+        A_attr = self._index_by_id(a_attrs)
+        B_attr = self._index_by_id(b_attrs)
+
+        # Sets
+        cls_added = sorted(set(B_cls) - set(A_cls))
+        cls_removed = sorted(set(A_cls) - set(B_cls))
+        cls_common = sorted(set(A_cls) & set(B_cls))
+
+        enum_added = sorted(set(B_enum) - set(A_enum))
+        enum_removed = sorted(set(A_enum) - set(B_enum))
+        enum_common = sorted(set(A_enum) & set(B_enum))
+
+        attr_added = sorted(set(B_attr) - set(A_attr))
+        attr_removed = sorted(set(A_attr) - set(B_attr))
+        attr_common = sorted(set(A_attr) & set(B_attr))
+
+        # Field-level diffs
+        labels = {"notes": "notes/toelichting", "definition": "definition/definitie"}
+        class_fields = ["name", "stereotype", "alias", "uri", "notes", "definition", "package_id", "is_datatype"]
+        enum_fields = ["name", "stereotype", "alias", "uri", "notes", "definition", "package_id"]
+        attr_fields = [
+            "name",
+            "stereotype",
+            "alias",
+            "uri",
+            "notes",
+            "definition",
+            "clazz_id",
+            "primitive",
+            "enumeration_id",
+            "type_class_id",
+            "verplicht",
+        ]
+
+        class_changes: List[_DiffItem] = []
+        enum_changes: List[_DiffItem] = []
+        attr_changes: List[_DiffItem] = []
+
+        for cid in cls_common:
+            field_changes = _diff_fields(A_cls[cid], B_cls[cid], class_fields, labels=labels)
+            if field_changes:
+                class_changes.append(
+                    _DiffItem(
+                        key=cid,
+                        title=str(_safe_get(B_cls[cid], "name") or cid),
+                        changes=field_changes,
+                    )
+                )
+
+        for eid in enum_common:
+            field_changes = _diff_fields(A_enum[eid], B_enum[eid], enum_fields, labels=labels)
+            if field_changes:
+                enum_changes.append(
+                    _DiffItem(
+                        key=eid,
+                        title=str(_safe_get(B_enum[eid], "name") or eid),
+                        changes=field_changes,
+                    )
+                )
+
+        for aid in attr_common:
+            field_changes = _diff_fields(A_attr[aid], B_attr[aid], attr_fields, labels=labels)
+            if field_changes:
+                nm = str(_safe_get(B_attr[aid], "name") or aid)
+                clsid = str(_safe_get(B_attr[aid], "clazz_id") or "")
+                attr_changes.append(
+                    _DiffItem(
+                        key=aid,
+                        title=f"{nm} (class={clsid})",
+                        changes=field_changes,
+                    )
+                )
+
+        changed_class_ids: Set[str] = {d.key for d in class_changes}
+        changed_enum_ids: Set[str] = {d.key for d in enum_changes}
+        changed_attr_ids: Set[str] = {d.key for d in attr_changes}
+
+        # Fast lookups (and avoids mypy issues with next(..., None))
+        class_changes_by_id: Dict[str, _DiffItem] = {d.key: d for d in class_changes}
+        enum_changes_by_id: Dict[str, _DiffItem] = {d.key: d for d in enum_changes}
+        attr_changes_by_id: Dict[str, _DiffItem] = {d.key: d for d in attr_changes}
+
+        # Literals diff per enum
+        lit_changes: Dict[str, Dict[str, List[str]]] = {}
+        for eid in set(A_enum) | set(B_enum):
+            a_lits = [lol for lol in a_literals if str(getattr(lol, "enumeratie_id", "")) == str(eid)]
+            b_lits = [lol for lol in b_literals if str(getattr(lol, "enumeratie_id", "")) == str(eid)]
+            a_names = {str(getattr(lol, "name", "")) for lol in a_lits if getattr(lol, "name", None)}
+            b_names = {str(getattr(lol, "name", "")) for lol in b_lits if getattr(lol, "name", None)}
+            added = sorted(b_names - a_names)
+            removed = sorted(a_names - b_names)
+            if added or removed:
+                lit_changes[str(eid)] = {"added": added, "removed": removed}
+
+        changed_enum_ids |= set(lit_changes.keys())
+
+        # Helpers
+        def pkg_name(pid: str) -> str:
+            p = B_pkg.get(pid) or A_pkg.get(pid)
+            return str(getattr(p, "name", pid))
+
+        def cls_pkg_id(cid: str) -> str:
+            c = B_cls.get(cid) or A_cls.get(cid)
+            return str(getattr(c, "package_id", "") or "")
+
+        def enum_pkg_id(eid: str) -> str:
+            e = B_enum.get(eid) or A_enum.get(eid)
+            return str(getattr(e, "package_id", "") or "")
+
+        def is_datatype(cid: str) -> bool:
+            c = B_cls.get(cid) or A_cls.get(cid)
+            return bool(getattr(c, "is_datatype", False))
+
+        # Markdown
+        lines: List[str] = []
+        lines.append(f"# {title}\n")
+
+        lit_added_total = sum(len(v.get("added", [])) for v in lit_changes.values())
+        lit_removed_total = sum(len(v.get("removed", [])) for v in lit_changes.values())
+
+        cls_added_dt = [cid for cid in cls_added if is_datatype(cid)]
+        cls_added_cl = [cid for cid in cls_added if not is_datatype(cid)]
+        cls_removed_dt = [cid for cid in cls_removed if is_datatype(cid)]
+        cls_removed_cl = [cid for cid in cls_removed if not is_datatype(cid)]
+        cls_changed_dt = [cid for cid in changed_class_ids if is_datatype(cid)]
+        cls_changed_cl = [cid for cid in changed_class_ids if not is_datatype(cid)]
+
+        lines.append("## Summary\n")
+        lines.append(
+            "\n".join(
+                [
+                    f"- **Classes**: +{len(cls_added_cl)} / -{len(cls_removed_cl)} / ~{len(cls_changed_cl)}",
+                    f"- **Datatypes**: +{len(cls_added_dt)} / -{len(cls_removed_dt)} / ~{len(cls_changed_dt)}",
+                    f"- **Enumerations**: +{len(enum_added)} / -{len(enum_removed)} / ~{len(changed_enum_ids)}",
+                    f"- **Attributes**: +{len(attr_added)} / -{len(attr_removed)} / ~{len(changed_attr_ids)}",
+                    f"- **Literals**: +{lit_added_total} / -{lit_removed_total}",
+                ]
+            )
+        )
+        lines.append("")
+
+        # Overview
+        touched: Set[str] = set()
+        for cid in set(cls_added) | set(cls_removed) | changed_class_ids:
+            pid = cls_pkg_id(cid)
+            if pid:
+                touched.add(pid)
+        for eid in set(enum_added) | set(enum_removed) | changed_enum_ids:
+            pid = enum_pkg_id(eid)
+            if pid:
+                touched.add(pid)
+        for aid in set(attr_added) | set(attr_removed) | changed_attr_ids:
+            a = B_attr.get(aid) or A_attr.get(aid)
+            parent = str(getattr(a, "clazz_id", "") or "")
+            pid = cls_pkg_id(parent) if parent else ""
+            if pid:
+                touched.add(pid)
+
+        lines.append("## Overview\n")
+        lines.append(
+            "**Packages touched:** "
+            + ", ".join(f"`{_md_escape(pkg_name(pid))}`" for pid in sorted(touched, key=pkg_name))
+        )
+        lines.append("\n")
+
+        # Top-down
+        lines.append("## Top-down changes\n")
+
+        def status(i: str, added: Set[str], removed: Set[str], changed: Set[str]) -> str:
+            if i in added:
+                return "Added"
+            if i in removed:
+                return "Removed"
+            if i in changed:
+                return "Changed"
+            return "Unchanged"
+
+        set_cls_added, set_cls_removed = set(cls_added), set(cls_removed)
+        set_enum_added, set_enum_removed = set(enum_added), set(enum_removed)
+        set_attr_added, set_attr_removed = set(attr_added), set(attr_removed)
+
+        pkg_classes: Dict[str, Set[str]] = {}
+        pkg_enums: Dict[str, Set[str]] = {}
+
+        def bucket_class(cid: str):
+            pid = cls_pkg_id(cid)
+            if pid:
+                pkg_classes.setdefault(pid, set()).add(cid)
+
+        def bucket_enum(eid: str):
+            pid = enum_pkg_id(eid)
+            if pid:
+                pkg_enums.setdefault(pid, set()).add(eid)
+
+        for cid in set_cls_added | set_cls_removed | changed_class_ids:
+            bucket_class(cid)
+        for eid in set_enum_added | set_enum_removed | changed_enum_ids:
+            bucket_enum(eid)
+
+        attrs_by_class: Dict[str, Set[str]] = {}
+        for aid in set_attr_added | set_attr_removed | changed_attr_ids:
+            a = B_attr.get(aid) or A_attr.get(aid)
+            parent = str(getattr(a, "clazz_id", "") or "")
+            if parent:
+                attrs_by_class.setdefault(parent, set()).add(aid)
+                bucket_class(parent)
+
+        def sort_by_name(ids: Iterable[str], lookup: Dict[str, Any]) -> List[str]:
+            return sorted(ids, key=lambda x: _md_escape(str(_safe_get(lookup.get(x), "name") or x)))
+
+        for pid in sorted(set(pkg_classes) | set(pkg_enums), key=pkg_name):
+            lines.append(f"## Package: {_md_escape(pkg_name(pid))}\n")
+
+            all_cls_ids = pkg_classes.get(pid, set())
+            class_ids = sort_by_name([cid for cid in all_cls_ids if not is_datatype(cid)], {**A_cls, **B_cls})
+            dtype_ids = sort_by_name([cid for cid in all_cls_ids if is_datatype(cid)], {**A_cls, **B_cls})
+
+            if class_ids:
+                lines.append("### Classes\n")
+                for cid in class_ids:
+                    c = B_cls.get(cid) or A_cls.get(cid)
+                    cname = _md_escape(getattr(c, "name", "(no name)"))
+                    lines.append(
+                        f"#### {cname} — **{status(cid, set_cls_added, set_cls_removed, changed_class_ids)}**\n"
+                    )
+                    class_diff = class_changes_by_id.get(cid)
+                    if class_diff:
+                        lines.append(_md_list(class_diff.changes) + "\n")
+                    a_ids = sort_by_name(attrs_by_class.get(cid, set()), {**A_attr, **B_attr})
+                    if a_ids:
+                        lines.append("##### Attributes\n")
+                        for aid in a_ids:
+                            aobj = B_attr.get(aid) or A_attr.get(aid)
+                            raw_name = getattr(aobj, "name", None) if aobj is not None else None
+                            if raw_name is None or str(raw_name).strip() == "":
+                                # Skip unnamed/None attributes (these are usually incomplete rows)
+                                continue
+                            an = _md_escape(str(raw_name))
+                            lines.append(
+                                f"- {an} — **{status(aid, set_attr_added, set_attr_removed, changed_attr_ids)}**"
+                            )
+                            ach = attr_changes_by_id.get(aid)
+                            if ach:
+                                lines.append(_md_list(ach.changes, indent=2))
+                        lines.append("")
+            else:
+                lines.append("_No class changes in this package._\n")
+
+            if dtype_ids:
+                lines.append("### Datatypes\n")
+                for cid in dtype_ids:
+                    c = B_cls.get(cid) or A_cls.get(cid)
+                    cname = _md_escape(getattr(c, "name", "(no name)"))
+                    lines.append(
+                        f"#### {cname} — **{status(cid, set_cls_added, set_cls_removed, changed_class_ids)}**\n"
+                    )
+                    class_diff = class_changes_by_id.get(cid)
+                    if class_diff:
+                        lines.append(_md_list(class_diff.changes) + "\n")
+                    a_ids = sort_by_name(attrs_by_class.get(cid, set()), {**A_attr, **B_attr})
+                    if a_ids:
+                        lines.append("##### Attributes\n")
+                        for aid in a_ids:
+                            aobj = B_attr.get(aid) or A_attr.get(aid)
+                            raw_name = getattr(aobj, "name", None) if aobj is not None else None
+                            if raw_name is None or str(raw_name).strip() == "":
+                                # Skip unnamed/None attributes (these are usually incomplete rows)
+                                continue
+                            an = _md_escape(str(raw_name))
+                            lines.append(
+                                f"- {an} — **{status(aid, set_attr_added, set_attr_removed, changed_attr_ids)}**"
+                            )
+                            ach = attr_changes_by_id.get(aid)
+                            if ach:
+                                lines.append(_md_list(ach.changes, indent=2))
+                        lines.append("")
+            else:
+                lines.append("_No datatype changes in this package._\n")
+
+            enum_ids = sort_by_name(pkg_enums.get(pid, set()), {**A_enum, **B_enum})
+            if enum_ids:
+                lines.append("### Enumerations\n")
+                for eid in enum_ids:
+                    e = B_enum.get(eid) or A_enum.get(eid)
+                    en = _md_escape(getattr(e, "name", "(no name)"))
+                    lines.append(f"#### {en} — **{status(eid, set_enum_added, set_enum_removed, changed_enum_ids)}**\n")
+                    enum_diff = enum_changes_by_id.get(eid)
+                    if enum_diff:
+                        lines.append(_md_list(enum_diff.changes) + "\n")
+                    lc = lit_changes.get(eid)
+                    if lc:
+                        lines.append("##### Literals\n")
+                        for n in lc.get("added", []):
+                            lines.append(f"- `{_md_escape(n)}` — **Added**")
+                        for n in lc.get("removed", []):
+                            lines.append(f"- `{_md_escape(n)}` — **Removed**")
+                        lines.append("")
+            else:
+                lines.append("_No enumeration changes in this package._\n")
+
+        with open(args.outputfile, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines).rstrip() + "\n")

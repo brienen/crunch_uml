@@ -157,6 +157,23 @@ def add_args(argumentparser, subparser_dict):
             f" {db.getTables()}"
         ),
     )
+    # diff_md renderer (schema comparison)
+    output_subparser.add_argument(
+        "--compare_schema_name",
+        type=str,
+        help=(
+            "Used only for diff_md renderer. The schema_name/schema_id to compare the current schema against. "
+            "Example: --schema_name v2.5.0 --compare_schema_name v2.4.0"
+        ),
+    )
+    output_subparser.add_argument(
+        "--compare_title",
+        type=str,
+        help=(
+            "Used only for diff_md renderer. Optional title for the Markdown diff report. "
+            'Example: --compare_title "v2.4.0 vs v2.5.0"'
+        ),
+    )
 
     # Set the epilog help text
     entries = RendererRegistry.entries()
