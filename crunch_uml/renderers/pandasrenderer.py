@@ -408,14 +408,23 @@ def _safe_get(obj: Any, field: str) -> Any:
     return getattr(obj, field) if obj is not None and hasattr(obj, field) else None
 
 
-def _diff_fields(a: Any, b: Any, fields: Iterable[str], labels: Optional[Dict[str, str]] = None) -> List[str]:
+def _diff_fields(
+    a: Any,
+    b: Any,
+    fields: Iterable[str],
+    labels: Optional[Dict[str, str]] = None,
+    formatters: Optional[Dict[str, Any]] = None,
+) -> List[str]:
     out: List[str] = []
     for f in fields:
         av = _norm(_safe_get(a, f))
         bv = _norm(_safe_get(b, f))
         if av != bv:
             label = labels.get(f, f) if labels else f
-            out.append(f"- **{label}**: `{av}` → `{bv}`")
+            if formatters and f in formatters:
+                out.append(formatters[f](label, av, bv))
+            else:
+                out.append(f"- **{label}**: `{av}` → `{bv}`")
     return out
 
 
@@ -472,6 +481,34 @@ class SchemaDiffMarkdownRenderer(Renderer):
         B_enum = self._index_by_id(b_enums)
         A_attr = self._index_by_id(a_attrs)
         B_attr = self._index_by_id(b_attrs)
+
+        # Human-readable ID lookups
+        enum_name_by_id: Dict[str, str] = {}
+        for _eid, _e in {**A_enum, **B_enum}.items():
+            enum_name_by_id[_eid] = str(getattr(_e, "name", _eid))
+
+        class_name_by_id: Dict[str, str] = {}
+        for _cid, _c in {**A_cls, **B_cls}.items():
+            class_name_by_id[_cid] = str(getattr(_c, "name", _cid))
+
+        def _fmt_enum(label: str, old: Any, new: Any) -> str:
+            o = str(old) if old not in (None, "") else ""
+            n = str(new) if new not in (None, "") else ""
+            o_txt = f"Enumeratie: {enum_name_by_id.get(o, o)}" if o else ""
+            n_txt = f"Enumeratie: {enum_name_by_id.get(n, n)}" if n else ""
+            return f"- **{label}**: `{o_txt}` → `{n_txt}`"
+
+        def _fmt_class(label: str, old: Any, new: Any) -> str:
+            o = str(old) if old not in (None, "") else ""
+            n = str(new) if new not in (None, "") else ""
+            o_txt = f"Objecttype: {class_name_by_id.get(o, o)}" if o else ""
+            n_txt = f"Objecttype: {class_name_by_id.get(n, n)}" if n else ""
+            return f"- **{label}**: `{o_txt}` → `{n_txt}`"
+
+        attr_formatters: Dict[str, Any] = {
+            "enumeration_id": _fmt_enum,
+            "type_class_id": _fmt_class,
+        }
 
         # Sets
         cls_added = sorted(set(B_cls) - set(A_cls))
@@ -531,7 +568,13 @@ class SchemaDiffMarkdownRenderer(Renderer):
                 )
 
         for aid in attr_common:
-            field_changes = _diff_fields(A_attr[aid], B_attr[aid], attr_fields, labels=labels)
+            field_changes = _diff_fields(
+                A_attr[aid],
+                B_attr[aid],
+                attr_fields,
+                labels=labels,
+                formatters=attr_formatters,
+            )
             if field_changes:
                 nm = str(_safe_get(B_attr[aid], "name") or aid)
                 clsid = str(_safe_get(B_attr[aid], "clazz_id") or "")

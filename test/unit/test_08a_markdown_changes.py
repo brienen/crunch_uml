@@ -55,7 +55,7 @@ def test_markdown_monumenten_onderwijs():
     database = db.Database(const.DATABASE_URL, db_create=False)
     schema = sch.Schema(database, schema_name="old")
     assert schema.count_package() == 1
-    assert schema.count_enumeratie() == 1
+    assert schema.count_enumeratie() == 2
     assert schema.count_class() == 6
     assert schema.count_attribute() == 32
     assert schema.count_enumeratieliteral() == 3
@@ -81,3 +81,8 @@ def test_markdown_monumenten_onderwijs():
     assert open(monfilename, "r").read().find("omschrijving — **Added**")
     assert open(monfilename, "r").read().find("toelichting — **Removed**")
     assert open(monfilename, "r").read().find("`test` — **Added**")
+    assert (
+        open(monfilename, "r")
+        .read()
+        .find("**enumeration_id**: `Enumeratie: TypeMonument` → `Enumeratie: EnumVervanger`")
+    )
