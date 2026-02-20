@@ -1,4 +1,4 @@
-PYTHON_BINARY := python3.11
+PYTHON_BINARY := python3
 VIRTUAL_ENV := .venv
 VIRTUAL_BIN := $(VIRTUAL_ENV)/bin
 crunch_uml := crunch_uml
