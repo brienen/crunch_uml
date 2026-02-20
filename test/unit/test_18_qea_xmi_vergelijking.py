@@ -8,30 +8,40 @@ komen niet voor in t_attribute van de QEA en worden bij de vergelijking
 buiten beschouwing gelaten.
 """
 
+from sqlalchemy.orm import Session
+
 import crunch_uml.db as db
 import crunch_uml.schema as sch
 from crunch_uml import cli, const
-from sqlalchemy.orm import Session
-
 
 SCHEMA_QEA = "monumentenmim_qea"
 SCHEMA_XMI = "monumentenmim_xmi"
 
 
 def setup_module():
-    cli.main([
-        "-sch", SCHEMA_QEA,
-        "import",
-        "-f", "./test/data/MonumentenMIM.qea",
-        "-t", "qea",
-        "-db_create",
-    ])
-    cli.main([
-        "-sch", SCHEMA_XMI,
-        "import",
-        "-f", "./test/data/MonumentenMIM.xml",
-        "-t", "eaxmi",
-    ])
+    cli.main(
+        [
+            "-sch",
+            SCHEMA_QEA,
+            "import",
+            "-f",
+            "./test/data/MonumentenMIM.qea",
+            "-t",
+            "qea",
+            "-db_create",
+        ]
+    )
+    cli.main(
+        [
+            "-sch",
+            SCHEMA_XMI,
+            "import",
+            "-f",
+            "./test/data/MonumentenMIM.xml",
+            "-t",
+            "eaxmi",
+        ]
+    )
 
 
 def get_schemas():
@@ -62,11 +72,7 @@ def test_attributen_gelijk_zonder_dst():
     database, _, _ = get_schemas()
 
     with Session(database.engine) as session:
-        qea_count = (
-            session.query(db.Attribute)
-            .filter(db.Attribute.schema_id == SCHEMA_QEA)
-            .count()
-        )
+        qea_count = session.query(db.Attribute).filter(db.Attribute.schema_id == SCHEMA_QEA).count()
         xmi_count = (
             session.query(db.Attribute)
             .filter(
@@ -83,14 +89,8 @@ def test_package_ids_gelijk():
     database, _, _ = get_schemas()
 
     with Session(database.engine) as session:
-        qea_ids = {
-            p.id
-            for p in session.query(db.Package).filter(db.Package.schema_id == SCHEMA_QEA)
-        }
-        xmi_ids = {
-            p.id
-            for p in session.query(db.Package).filter(db.Package.schema_id == SCHEMA_XMI)
-        }
+        qea_ids = {p.id for p in session.query(db.Package).filter(db.Package.schema_id == SCHEMA_QEA)}
+        xmi_ids = {p.id for p in session.query(db.Package).filter(db.Package.schema_id == SCHEMA_XMI)}
     assert qea_ids == xmi_ids
 
 
@@ -99,14 +99,8 @@ def test_class_ids_gelijk():
     database, _, _ = get_schemas()
 
     with Session(database.engine) as session:
-        qea_ids = {
-            c.id
-            for c in session.query(db.Class).filter(db.Class.schema_id == SCHEMA_QEA)
-        }
-        xmi_ids = {
-            c.id
-            for c in session.query(db.Class).filter(db.Class.schema_id == SCHEMA_XMI)
-        }
+        qea_ids = {c.id for c in session.query(db.Class).filter(db.Class.schema_id == SCHEMA_QEA)}
+        xmi_ids = {c.id for c in session.query(db.Class).filter(db.Class.schema_id == SCHEMA_XMI)}
     assert qea_ids == xmi_ids
 
 
@@ -115,14 +109,8 @@ def test_enumeratie_ids_gelijk():
     database, _, _ = get_schemas()
 
     with Session(database.engine) as session:
-        qea_ids = {
-            e.id
-            for e in session.query(db.Enumeratie).filter(db.Enumeratie.schema_id == SCHEMA_QEA)
-        }
-        xmi_ids = {
-            e.id
-            for e in session.query(db.Enumeratie).filter(db.Enumeratie.schema_id == SCHEMA_XMI)
-        }
+        qea_ids = {e.id for e in session.query(db.Enumeratie).filter(db.Enumeratie.schema_id == SCHEMA_QEA)}
+        xmi_ids = {e.id for e in session.query(db.Enumeratie).filter(db.Enumeratie.schema_id == SCHEMA_XMI)}
     assert qea_ids == xmi_ids
 
 
@@ -132,12 +120,11 @@ def test_associatie_ids_en_inhoud_gelijk():
     database, _, _ = get_schemas()
 
     with Session(database.engine) as session:
+
         def assoc_dict(schema_id):
             return {
                 a.id: (a.name, a.src_class_id, a.dst_class_id)
-                for a in session.query(db.Association).filter(
-                    db.Association.schema_id == schema_id
-                )
+                for a in session.query(db.Association).filter(db.Association.schema_id == schema_id)
             }
 
         qea = assoc_dict(SCHEMA_QEA)
@@ -151,19 +138,11 @@ def test_class_namen_gelijk():
     database, _, _ = get_schemas()
 
     with Session(database.engine) as session:
-        qea_namen = {
-            c.id: c.name
-            for c in session.query(db.Class).filter(db.Class.schema_id == SCHEMA_QEA)
-        }
-        xmi_namen = {
-            c.id: c.name
-            for c in session.query(db.Class).filter(db.Class.schema_id == SCHEMA_XMI)
-        }
+        qea_namen = {c.id: c.name for c in session.query(db.Class).filter(db.Class.schema_id == SCHEMA_QEA)}
+        xmi_namen = {c.id: c.name for c in session.query(db.Class).filter(db.Class.schema_id == SCHEMA_XMI)}
 
     for cid in qea_namen:
-        assert qea_namen[cid] == xmi_namen[cid], (
-            f"Class {cid}: QEA naam={qea_namen[cid]}, XMI naam={xmi_namen[cid]}"
-        )
+        assert qea_namen[cid] == xmi_namen[cid], f"Class {cid}: QEA naam={qea_namen[cid]}, XMI naam={xmi_namen[cid]}"
 
 
 def test_class_definities_gelijk_waar_aanwezig():
@@ -173,21 +152,13 @@ def test_class_definities_gelijk_waar_aanwezig():
     database, _, _ = get_schemas()
 
     with Session(database.engine) as session:
-        qea_def = {
-            c.id: c.definitie
-            for c in session.query(db.Class).filter(db.Class.schema_id == SCHEMA_QEA)
-        }
-        xmi_def = {
-            c.id: c.definitie
-            for c in session.query(db.Class).filter(db.Class.schema_id == SCHEMA_XMI)
-        }
+        qea_def = {c.id: c.definitie for c in session.query(db.Class).filter(db.Class.schema_id == SCHEMA_QEA)}
+        xmi_def = {c.id: c.definitie for c in session.query(db.Class).filter(db.Class.schema_id == SCHEMA_XMI)}
 
     for cid in qea_def:
         q, x = qea_def[cid], xmi_def.get(cid)
         if q and x:
-            assert q == x, (
-                f"Class {cid}: QEA definitie={q!r}, XMI definitie={x!r}"
-            )
+            assert q == x, f"Class {cid}: QEA definitie={q!r}, XMI definitie={x!r}"
 
 
 def test_tagged_values_gelijk():

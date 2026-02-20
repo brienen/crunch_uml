@@ -114,9 +114,19 @@ class QEAParser(Parser):
 
         for row in rows:
             (
-                obj_id, obj_type, name, package_id, ea_guid,
-                note, stereotype, author, version, created, modified,
-                status, alias,
+                obj_id,
+                obj_type,
+                name,
+                package_id,
+                ea_guid,
+                note,
+                stereotype,
+                author,
+                version,
+                created,
+                modified,
+                status,
+                alias,
             ) = row
 
             eaid = guid_to_eaid(ea_guid)
@@ -156,10 +166,7 @@ class QEAParser(Parser):
                 logger.debug(f"Class {name} ({obj_type}) met id {eaid}")
                 schema.save(clazz)
 
-        logger.info(
-            f"Phase 2 done: {schema.count_class()} classes, "
-            f"{schema.count_enumeratie()} enumerations"
-        )
+        logger.info(f"Phase 2 done: {schema.count_class()} classes, " f"{schema.count_enumeratie()} enumerations")
 
     def _phase3_attributes(self, conn, schema: sch.Schema):
         """Parse t_attribute into Attribute and EnumerationLiteral objects."""
@@ -179,9 +186,18 @@ class QEAParser(Parser):
 
         for row in rows:
             (
-                attr_id, obj_id, name, attr_type, classifier,
-                lower, upper, notes, ea_guid, scope,
-                stereotype, parent_type,
+                attr_id,
+                obj_id,
+                name,
+                attr_type,
+                classifier,
+                lower,
+                upper,
+                notes,
+                ea_guid,
+                scope,
+                stereotype,
+                parent_type,
             ) = row
 
             eaid = guid_to_eaid(ea_guid)
@@ -247,8 +263,16 @@ class QEAParser(Parser):
 
         for row in rows:
             (
-                conn_id, name, conn_type, src_card, dst_card,
-                start_obj_id, end_obj_id, ea_guid, notes, stereotype,
+                conn_id,
+                name,
+                conn_type,
+                src_card,
+                dst_card,
+                start_obj_id,
+                end_obj_id,
+                ea_guid,
+                notes,
+                stereotype,
             ) = row
 
             eaid = guid_to_eaid(ea_guid)
