@@ -37,14 +37,19 @@ _MULTILINE_RE = re.compile(
 def _html_to_markdown_lines(raw: str) -> list[str]:
     """
     Helper:
-    - HTML entities decoderen
     - HTML → Markdown (incl. lijsten) via markdownify
+    - HTML-entities worden afgehandeld door BeautifulSoup (intern in markdownify)
     - trailing spaces weg
     - max 1 lege regel achter elkaar
     - geeft een lijst met regels terug
+
+    Let op: html.unescape() wordt hier NIET aangeroepen. Door dat vóór markdownify
+    te doen worden `&lt;tekst` entiteiten omgezet naar letterlijke '<tekst', waarna
+    markdownify ze als HTML-tags probeert te parsen en weggooit. BeautifulSoup
+    handelt HTML-entiteiten (&lt; &#235; enz.) zelf correct af.
     """
     markdown = md(
-        html.unescape(raw),
+        raw,
         heading_style="ATX",  # # H1, ## H2, ...
         bullets="*",  # <ul><li> → * item
         strip=["style", "script"],
@@ -191,8 +196,9 @@ def fix_and_format_text(text: str, mode: str = "markdown", depth: int = 1) -> st
         # Maak lijsten compacter in een cel: "- item" blijft, maar alles wordt 1 string
         base = "\n".join(lines).strip()
 
-        # Normaliseer bullet markers een beetje (optioneel maar veilig)
-        base = re.sub(r"^(\s*)([*+])\s+", r"\\1- ", base, flags=re.MULTILINE)
+        # Normaliseer bullet markers: *, \*, +, \+ → -
+        # \\? matcht een optionele letterlijke backslash (markdownify escapet * soms als \*)
+        base = re.sub(r"^(\s*)\\?([*+])\s+", r"\1- ", base, flags=re.MULTILINE)
 
         # Tabellen: '|' moet escaped worden
         base = base.replace("|", "\\|")
