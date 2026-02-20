@@ -11,6 +11,7 @@ import crunch_uml.transformers.transformer as transformers
 from crunch_uml import const
 from crunch_uml.db import Database
 from crunch_uml.parsers.eaxmiparser import EAXMIParser  # noqa: F401
+from crunch_uml.parsers.qeaparser import QEAParser  # noqa: F401
 from crunch_uml.parsers.multiple_parsers import CSVParser  # noqa: F401
 from crunch_uml.parsers.multiple_parsers import I18nParser  # noqa: F401
 from crunch_uml.parsers.multiple_parsers import JSONParser  # noqa: F401
