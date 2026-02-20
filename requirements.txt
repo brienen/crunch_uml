@@ -1,5 +1,5 @@
 SQLAlchemy>=2.0.20,<3
-lxml>=5.3
+lxml>=4.9.3,<5
 lxml-stubs
 openpyxl>=3.0.10,<4
 types-openpyxl
