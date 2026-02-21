@@ -33,6 +33,90 @@ _MULTILINE_RE = re.compile(
     flags=re.IGNORECASE,
 )
 
+# Regex om plain-text opsommingstekens te detecteren (■, -, *, +, 1., 2.)
+_PLAIN_BULLET_LINE_RE = re.compile(
+    r'^[ \t]*(■|[-*+]|\d+[.)])\s+',
+    re.MULTILINE,
+)
+
+
+def _preprocess_plain_lists(text: str) -> str:
+    """
+    Preprocess tekst vóór markdownify: converteer plain-text opsommingstekens
+    (■, -, *, +, 1., 2.) op aparte regels naar HTML <ul>/<ol>/<li> blokken,
+    zodat markdownify whitespace niet kan collapseren.
+
+    Laat regels met bestaande HTML-tags ongemoeid (worden als raw HTML doorgestuurd).
+    Slaat de preprocessing over als er al HTML-lijsttags aanwezig zijn.
+    """
+    # Bevat het al HTML-lijsttags? Dan niet aanraken – markdownify verwerkt ze al.
+    if re.search(r'<(ul|ol|li)\b', text, re.IGNORECASE):
+        return text
+
+    # Bevat het plain-text bullets? Zo niet, niets te doen.
+    if not _PLAIN_BULLET_LINE_RE.search(text):
+        return text
+
+    UL_RE = re.compile(r'^[ \t]*(■|[-*+])\s+(.*)', re.DOTALL)
+    OL_RE = re.compile(r'^[ \t]*(\d+)[.)]\s+(.*)', re.DOTALL)
+    HTML_TAG_RE = re.compile(r'<[a-zA-Z][^>]*>')
+
+    lines = text.replace('\r\n', '\n').replace('\r', '\n').split('\n')
+    parts: list[str] = []
+    text_buf: list[str] = []
+    list_items: list[str] = []
+    list_type: str | None = None
+
+    def flush_text() -> None:
+        nonlocal text_buf
+        if text_buf:
+            joined = '<br>'.join(ln.strip() for ln in text_buf if ln.strip())
+            if joined:
+                parts.append(f'<p>{joined}</p>')
+            text_buf = []
+
+    def flush_list() -> None:
+        nonlocal list_items, list_type
+        if list_items:
+            tag = list_type or 'ul'
+            li_html = ''.join(f'<li>{item}</li>' for item in list_items)
+            parts.append(f'<{tag}>{li_html}</{tag}>')
+            list_items = []
+            list_type = None
+
+    for line in lines:
+        ul_m = UL_RE.match(line)
+        ol_m = OL_RE.match(line)
+        if ul_m:
+            flush_text()
+            if list_type == 'ol':
+                flush_list()
+            list_type = 'ul'
+            list_items.append(ul_m.group(2).strip())
+        elif ol_m:
+            flush_text()
+            if list_type == 'ul':
+                flush_list()
+            list_type = 'ol'
+            list_items.append(ol_m.group(2).strip())
+        elif HTML_TAG_RE.search(line):
+            # Regel met HTML-tags: als raw HTML doorsturen
+            flush_text()
+            flush_list()
+            parts.append(line)
+        elif line.strip():
+            # Gewone tekst
+            flush_list()
+            text_buf.append(line)
+        else:
+            # Lege regel: flush beide buffers
+            flush_text()
+            flush_list()
+
+    flush_text()
+    flush_list()
+    return '\n'.join(parts)
+
 
 def _html_to_markdown_lines(raw: str) -> list[str]:
     """
@@ -48,8 +132,12 @@ def _html_to_markdown_lines(raw: str) -> list[str]:
     markdownify ze als HTML-tags probeert te parsen en weggooit. BeautifulSoup
     handelt HTML-entiteiten (&lt; &#235; enz.) zelf correct af.
     """
+    # Preprocess plain-text bullets (■, -, *, +, 1.) naar HTML vóór markdownify,
+    # zodat BS4 ze niet weggooit door whitespace-collapsing in tekst-nodes.
+    preprocessed = _preprocess_plain_lists(raw)
+
     markdown = md(
-        raw,
+        preprocessed,
         heading_style="ATX",  # # H1, ## H2, ...
         bullets="*",  # <ul><li> → * item
         strip=["style", "script"],
@@ -144,9 +232,19 @@ def fix_and_format_text(text: str, mode: str = "markdown", depth: int = 1) -> st
         if not lines:
             return ""
 
-        chr = ">" * depth + " "
-        quoted_lines = [(chr + ln) if ln.strip() != "" else chr.rstrip() for ln in lines]
-        return "\n" + "\n".join(quoted_lines)
+        if depth == 0:
+            # depth=0: het Jinja2-template zet zelf '> ' vóór de eerste regel.
+            # Eerste regel krijgt géén prefix (template dekt die af).
+            # Vervolg-regels krijgen '> ' zodat ze binnen de blockquote vallen.
+            # Geen leading '\n' – het template staat al op de juiste positie.
+            result_lines = [lines[0]]
+            for ln in lines[1:]:
+                result_lines.append(("> " + ln) if ln.strip() else ">")
+            return "\n".join(result_lines)
+        else:
+            prefix = ">" * depth + " "
+            quoted_lines = [(prefix + ln) if ln.strip() != "" else (">" * depth) for ln in lines]
+            return "\n" + "\n".join(quoted_lines)
 
     # ---------------------------
     #  mode = "alert"

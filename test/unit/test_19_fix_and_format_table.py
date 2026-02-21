@@ -1,5 +1,5 @@
 """
-Tests voor fix_and_format_text in mode="table".
+Tests voor fix_and_format_text in mode="table" en mode="markdown".
 
 Dekt alle opsommingsvarianten die kunnen voorkomen in definities
 van classes en attributen:
@@ -16,6 +16,8 @@ van classes en attributen:
   - Enkelvoudige tekst (geen opmaak)
   - Tekst met pipe-tekens (|) die geëscaped moeten worden
   - Mojibake-tekst (Windows-1252 als latin1 gelezen, eigenlijk UTF-8)
+  - Plain-text ■ bullets (markdown mode)
+  - depth=0 blockquote-afhandeling (markdown mode)
 """
 
 from crunch_uml.renderers.jinja2renderer import fix_and_format_text
@@ -28,6 +30,16 @@ from crunch_uml.renderers.jinja2renderer import fix_and_format_text
 def table(text: str) -> str:
     """Verkorte aanroep voor mode='table'."""
     return fix_and_format_text(text, mode="table")
+
+
+def md0(text: str) -> str:
+    """Verkorte aanroep voor mode='markdown', depth=0 (template-mode)."""
+    return fix_and_format_text(text, mode="markdown", depth=0)
+
+
+def md1(text: str) -> str:
+    """Verkorte aanroep voor mode='markdown', depth=1 (standaard)."""
+    return fix_and_format_text(text, mode="markdown", depth=1)
 
 
 # ---------------------------------------------------------------------------
@@ -332,3 +344,212 @@ def test_table_complex_definition():
     assert "<br><br>" not in result
     assert "\\|" in result  # pipe geëscaped
     assert r"\1" not in result  # oude bug afwezig
+
+
+# ===========================================================================
+# MARKDOWN MODE tests
+# ===========================================================================
+
+
+# ---------------------------------------------------------------------------
+# depth=0: single line (geen multiline → platte tekst, geen prefix)
+# ---------------------------------------------------------------------------
+
+
+def test_markdown_depth0_single_line():
+    """Enkele regel: geen blockquote-prefix, geen leading newline."""
+    result = md0("Gewone definitietekst")
+    assert result == "Gewone definitietekst"
+    assert "\n" not in result
+    assert ">" not in result
+
+
+def test_markdown_depth0_single_line_strips_html():
+    """Enkele regel met HTML-tag: tag gestript, tekst terug."""
+    result = md0('<p>Een definitie.</p>')
+    assert "Een definitie." in result
+    assert "<p>" not in result
+
+
+# ---------------------------------------------------------------------------
+# depth=0: multiline (eerste regel plain, vervolg met '> ')
+# ---------------------------------------------------------------------------
+
+
+def test_markdown_depth0_multiline_plain():
+    """Meerdere regels plain tekst: eerste regel zonder prefix, rest met '> '."""
+    result = md0("Regel 1\nRegel 2\nRegel 3")
+    lines = result.split("\n")
+    assert "Regel 1" in lines[0]
+    assert lines[0].startswith(">") is False  # eerste regel: geen prefix
+    # Tweede en derde regel moeten '> ' bevatten
+    assert any("> " in ln for ln in lines[1:])
+
+
+def test_markdown_depth0_no_leading_newline():
+    """depth=0 geeft GEEN leading newline terug (template staat al op positie)."""
+    result = md0("Regel 1\nRegel 2")
+    assert not result.startswith("\n")
+
+
+# ---------------------------------------------------------------------------
+# depth=1: standaard blockquote met leading newline
+# ---------------------------------------------------------------------------
+
+
+def test_markdown_depth1_multiline():
+    """depth=1: alle regels krijgen '> ' prefix, leading newline aanwezig."""
+    result = md1("Regel 1\nRegel 2\nRegel 3")
+    assert result.startswith("\n")
+    for ln in result.strip().split("\n"):
+        if ln.strip():
+            assert ln.startswith("> "), f"Regel heeft geen '> ' prefix: {repr(ln)}"
+
+
+# ---------------------------------------------------------------------------
+# ■ bullets → Markdown lijstitems in blockquote
+# ---------------------------------------------------------------------------
+
+
+def test_markdown_square_bullets_recognized():
+    """■ bullets worden herkend als lijstitems."""
+    text = "Introductie:\n■ item één\n■ item twee\n■ item drie"
+    result = md0(text)
+    assert "item één" in result
+    assert "item twee" in result
+    assert "item drie" in result
+
+
+def test_markdown_square_bullets_blockquote():
+    """■ bullets in blockquote: vervolg-regels hebben '> ' prefix."""
+    text = "Introductie:\n■ item één\n■ item twee"
+    result = md0(text)
+    lines = result.split("\n")
+    # Er moeten regels zijn met '> ' (vervolg-regels)
+    continuation = [ln for ln in lines[1:] if ln.strip()]
+    assert all(
+        ln.startswith("> ") or ln == ">" for ln in continuation
+    ), f"Niet alle vervolg-regels hebben '> ' prefix: {result!r}"
+
+
+def test_markdown_square_bullets_no_raw_square():
+    """■-teken zelf mag niet meer in de output staan (omgezet naar list item)."""
+    text = "Intro:\n■ item1\n■ item2"
+    result = md0(text)
+    assert "■" not in result
+
+
+def test_markdown_square_bullets_no_backref():
+    """Geen letterlijke \\1 backreference in output."""
+    text = "Intro:\n■ item A\n■ item B"
+    result = md0(text)
+    assert r"\1" not in result
+
+
+def test_markdown_square_bullets_only_no_intro():
+    """■ bullets zonder intro-tekst worden ook correct verwerkt."""
+    text = "■ eerste punt\n■ tweede punt\n■ derde punt"
+    result = md0(text)
+    assert "eerste punt" in result
+    assert "tweede punt" in result
+    assert "derde punt" in result
+    assert "■" not in result
+
+
+# ---------------------------------------------------------------------------
+# Numbered plain-text lists in markdown mode
+# ---------------------------------------------------------------------------
+
+
+def test_markdown_numbered_list_plain():
+    """Plain-text genummerde lijst wordt correct omgezet."""
+    text = "Stappen:\n1. Eerste stap\n2. Tweede stap\n3. Derde stap"
+    result = md0(text)
+    assert "Eerste stap" in result
+    assert "Tweede stap" in result
+    assert "Derde stap" in result
+    assert r"\1" not in result
+
+
+# ---------------------------------------------------------------------------
+# HTML lijsten in markdown mode
+# ---------------------------------------------------------------------------
+
+
+def test_markdown_html_ul_in_blockquote():
+    """HTML <ul><li> wordt correct als Markdown list in blockquote gezet."""
+    html = "<p>De opties:</p><ul><li>Optie A</li><li>Optie B</li></ul>"
+    result = md0(html)
+    assert "De opties:" in result
+    assert "Optie A" in result
+    assert "Optie B" in result
+    # Geen rauwe HTML-tags in output
+    assert "<ul>" not in result
+    assert "<li>" not in result
+
+
+def test_markdown_html_ol_in_blockquote():
+    """HTML <ol><li> wordt correct als Markdown genummerde list in blockquote gezet."""
+    html = "<ol><li>Stap één</li><li>Stap twee</li></ol>"
+    result = md0(html)
+    assert "Stap één" in result
+    assert "Stap twee" in result
+    assert "<ol>" not in result
+
+
+# ---------------------------------------------------------------------------
+# Witregel voor en na lijsten
+# ---------------------------------------------------------------------------
+
+
+def test_markdown_blank_line_before_list():
+    """Er is een lege regel ('>') vóór de lijst als er intro-tekst is."""
+    text = "Introductie:\n■ item1\n■ item2"
+    result = md0(text)
+    lines = result.split("\n")
+    # Er moet een lege blokkwote-regel zijn ('>') of lege regel
+    has_separator = any(ln.strip() in ("", ">") for ln in lines[1:])
+    assert has_separator, f"Geen lege scheidingsregel gevonden: {result!r}"
+
+
+def test_markdown_blank_line_after_list():
+    """Er is een lege regel na de lijst als er slottekst is."""
+    text = "Intro:\n■ item1\nSlottekst."
+    result = md0(text)
+    assert "Slottekst." in result
+    lines = result.split("\n")
+    # Lege/separator regel aanwezig
+    has_separator = any(ln.strip() in ("", ">") for ln in lines)
+    assert has_separator, f"Geen separator tussen lijst en slottekst: {result!r}"
+
+
+# ---------------------------------------------------------------------------
+# Integratietest markdown mode
+# ---------------------------------------------------------------------------
+
+
+def test_markdown_complex_definition():
+    """Realistische definitie met ■ bullets: volledig correct in blockquote."""
+    text = (
+        "Dienstverleningsonderdelen binnen de schuldregelingsfase:\n"
+        "■ Saneringskredieten (SK)\n"
+        "■ Schuldbemiddelingen (SB)\n"
+        "■ Herfinancieringen (HF)\n"
+        "■ Betalingsregelingen (BR)"
+    )
+    result = md0(text)
+
+    # Inhoud aanwezig
+    assert "Dienstverleningsonderdelen" in result
+    assert "Saneringskredieten" in result
+    assert "Schuldbemiddelingen" in result
+    assert "Herfinancieringen" in result
+    assert "Betalingsregelingen" in result
+
+    # Structuur
+    assert "■" not in result  # geen rauwe ■
+    assert r"\1" not in result  # geen backreference bug
+    assert not result.startswith("\n")  # geen leading newline (depth=0)
+    lines = result.split("\n")
+    continuation = [ln for ln in lines[1:] if ln.strip()]
+    assert all(ln.startswith("> ") or ln == ">" for ln in continuation)
