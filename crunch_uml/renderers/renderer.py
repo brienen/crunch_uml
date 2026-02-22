@@ -100,6 +100,27 @@ def add_args(argumentparser, subparser_dict):
         f" existing tags and adding new tags, {const.TAG_STRATEGY_REPLACE} for replacing all tags.",
     )
     output_subparser.add_argument(
+        "--ea_allow_insert",
+        action="store_true",
+        default=False,
+        help=(
+            "Used only for Enterprise Architect Repository Updater! "
+            "When set, new Packages, Classes, Enumerations, Attributes, Literals and Relations "
+            "that do not yet exist in the EA repository are inserted as new records."
+        ),
+    )
+    output_subparser.add_argument(
+        "--ea_allow_delete",
+        action="store_true",
+        default=False,
+        help=(
+            "Used only for Enterprise Architect Repository Updater! "
+            "When set, Packages, Classes, Enumerations, Attributes, Literals and Relations "
+            "that exist in the EA repository but are no longer present in the source model "
+            "are permanently deleted from the EA repository. Use with caution."
+        ),
+    )
+    output_subparser.add_argument(
         "-lan",
         "--language",
         type=str,

@@ -22,10 +22,11 @@ logger = logging.getLogger()
 
 @RendererRegistry.register(
     "earepo",
-    descr="Updates as Enterprise Architect v16+ repository. "
-    + "Only updates existing Classes and attributes, Enumerations and literals, Packages and Associations. "
-    + "Does not add new things, updates only."
-    + "provide the EA Repo through the --file parameter.",
+    descr="Updates an Enterprise Architect v16+ repository. "
+    + "Updates existing Classes and attributes, Enumerations and literals, Packages and Associations/Generalizations. "
+    + "Use --ea_allow_insert to also add new elements that are missing in the EA repo. "
+    + "Use --ea_allow_delete to also remove elements from the EA repo that are no longer in the source model. "
+    + "Provide the EA Repo through the --file parameter.",
 )
 class EARepoUpdater(ModelRenderer):
     """
@@ -200,13 +201,14 @@ class EARepoUpdater(ModelRenderer):
         tag_table=None,
         tag_strategy=const.TAG_STRATEGY_REPLACE,
         recordtype=None,
+        allow_insert=False,
     ):
         ea_guid = const.EA_REPO_MAPPER["id"]
+        guid_value = None
 
         try:
             # Haal de tabelstructuur op
             table = self.get_table_structure(table_name, metadata)
-            # columns = table.columns.keys()
 
             if table is None:
                 logger.warning(
@@ -240,6 +242,9 @@ class EARepoUpdater(ModelRenderer):
                     tag_strategy,
                     recordtype=recordtype,
                 )
+            elif allow_insert:
+                logger.debug(f"No record found with GUID {guid_value} in table {table_name}. Inserting new record.")
+                self.create_new_record(data_dict, table_name, session, metadata, recordtype)
             else:
                 logger.debug(
                     f"No record found with GUID {guid_value} in table {table} and data dict {data_dict}. No update performed."
@@ -464,6 +469,7 @@ class EARepoUpdater(ModelRenderer):
         batch_size=100,
         tag_strategy=const.TAG_STRATEGY_REPLACE,
         recordtype=None,
+        allow_insert=False,
     ):
         # Verwerk de data in batches
         for i in range(0, len(source_data), batch_size):
@@ -479,6 +485,7 @@ class EARepoUpdater(ModelRenderer):
                     tag_table,
                     tag_strategy=tag_strategy,
                     recordtype=recordtype,
+                    allow_insert=allow_insert,
                 )
 
     def deduplicate_tags(
@@ -550,6 +557,429 @@ class EARepoUpdater(ModelRenderer):
         except Exception as e:
             logger.error(f"Fout tijdens deduplicatie van '{tag_table}': {e}")
 
+    # ------------------------------------------------------------------
+    # Helper: GUID resolution
+    # ------------------------------------------------------------------
+    def resolve_object_id(self, ea_guid_str, session, metadata):
+        """Convert an EAID_/EAPK_ GUID to the Object_ID in t_object. Returns None if not found."""
+        if not ea_guid_str:
+            return None
+        obj_table = metadata.tables.get("t_object")
+        if obj_table is None:
+            return None
+        try:
+            repo_guid = util.fromEAGuid(ea_guid_str)
+            row = session.query(obj_table.c.Object_ID).filter(obj_table.c.ea_guid == repo_guid).first()
+            return row.Object_ID if row else None
+        except Exception as e:
+            logger.warning(f"Could not resolve Object_ID for GUID {ea_guid_str}: {e}")
+            return None
+
+    # ------------------------------------------------------------------
+    # Insert helpers (one per target table)
+    # ------------------------------------------------------------------
+    def insert_new_t_object(self, data_dict, session, metadata, object_type, package_id):
+        """Insert a new row in t_object and return the new Object_ID."""
+        table = metadata.tables.get("t_object")
+        if table is None:
+            raise CrunchException("Table t_object not found in EA repository.")
+
+        seq_id = self.update_sequence(session, "t_object")
+        ea_guid_raw = data_dict.get("ea_guid")
+        repo_guid = util.fromEAGuid(ea_guid_raw) if ea_guid_raw else util.get_repo_guid()
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        insert_item = {
+            "Object_ID": seq_id,
+            "ea_guid": repo_guid,
+            "Object_Type": object_type,
+            "Package_ID": package_id,
+            "Name": data_dict.get("Name") or "",
+            "Note": data_dict.get("Note") or data_dict.get("Notes") or "",
+            "Alias": data_dict.get("Alias") or "",
+            "Author": data_dict.get("Author") or "",
+            "Version": data_dict.get("Version") or "1.0",
+            "Stereotype": data_dict.get("Stereotype") or "",
+            "Scope": "Public",
+            "CreatedDate": data_dict.get("CreatedDate") or now,
+            "ModifiedDate": now,
+        }
+        valid_insert = {k: v for k, v in insert_item.items() if k in table.columns.keys()}
+        session.execute(insert(table).values(valid_insert))
+        logger.info(f"Inserted new {object_type} '{data_dict.get('Name')}' (GUID {repo_guid}) into t_object.")
+        return seq_id
+
+    def insert_new_t_package(self, data_dict, session, metadata, package_id, parent_package_id):
+        """Insert a new row in t_package. package_id must match the Object_ID in t_object."""
+        table = metadata.tables.get("t_package")
+        if table is None:
+            raise CrunchException("Table t_package not found in EA repository.")
+
+        ea_guid_raw = data_dict.get("ea_guid")
+        repo_guid = util.fromEAGuid(ea_guid_raw) if ea_guid_raw else util.get_repo_guid()
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        insert_item = {
+            "Package_ID": package_id,
+            "ea_guid": repo_guid,
+            "Name": data_dict.get("Name") or "",
+            "Parent_ID": parent_package_id or 0,
+            "Notes": data_dict.get("Note") or data_dict.get("Notes") or "",
+            "Stereotype": data_dict.get("Stereotype") or "",
+            "CreatedDate": data_dict.get("CreatedDate") or now,
+            "ModifiedDate": now,
+        }
+        valid_insert = {k: v for k, v in insert_item.items() if k in table.columns.keys()}
+        session.execute(insert(table).values(valid_insert))
+        logger.info(f"Inserted new Package '{data_dict.get('Name')}' (GUID {repo_guid}) into t_package.")
+
+    def insert_new_t_attribute(self, data_dict, session, metadata, parent_object_id):
+        """Insert a new row in t_attribute and return the new ID."""
+        table = metadata.tables.get("t_attribute")
+        if table is None:
+            raise CrunchException("Table t_attribute not found in EA repository.")
+
+        seq_id = self.update_sequence(session, "t_attribute")
+        ea_guid_raw = data_dict.get("ea_guid")
+        repo_guid = util.fromEAGuid(ea_guid_raw) if ea_guid_raw else util.get_repo_guid()
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        insert_item = {
+            "ID": seq_id,
+            "ea_guid": repo_guid,
+            "Object_ID": parent_object_id,
+            "Name": data_dict.get("Name") or "",
+            "Type": data_dict.get("Type") or "",
+            "Notes": data_dict.get("Notes") or data_dict.get("Note") or "",
+            "Alias": data_dict.get("Alias") or "",
+            "Scope": data_dict.get("Scope") or "Public",
+            "CreatedDate": data_dict.get("CreatedDate") or now,
+            "ModifiedDate": now,
+        }
+        valid_insert = {k: v for k, v in insert_item.items() if k in table.columns.keys()}
+        session.execute(insert(table).values(valid_insert))
+        logger.info(f"Inserted new attribute/literal '{data_dict.get('Name')}' (GUID {repo_guid}) into t_attribute.")
+        return seq_id
+
+    def insert_new_t_connector(self, data_dict, session, metadata, connector_type, start_object_id, end_object_id):
+        """Insert a new row in t_connector and return the new Connector_ID."""
+        table = metadata.tables.get("t_connector")
+        if table is None:
+            raise CrunchException("Table t_connector not found in EA repository.")
+
+        seq_id = self.update_sequence(session, "t_connector")
+        ea_guid_raw = data_dict.get("ea_guid")
+        repo_guid = util.fromEAGuid(ea_guid_raw) if ea_guid_raw else util.get_repo_guid()
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        insert_item = {
+            "Connector_ID": seq_id,
+            "ea_guid": repo_guid,
+            "Connector_Type": connector_type,
+            "Start_Object_ID": start_object_id,
+            "End_Object_ID": end_object_id,
+            "Name": data_dict.get("Name") or "",
+            "Notes": data_dict.get("Notes") or data_dict.get("Note") or "",
+            "Alias": data_dict.get("Alias") or "",
+            "Stereotype": data_dict.get("Stereotype") or "",
+            "CreatedDate": data_dict.get("CreatedDate") or now,
+            "ModifiedDate": now,
+        }
+        valid_insert = {k: v for k, v in insert_item.items() if k in table.columns.keys()}
+        session.execute(insert(table).values(valid_insert))
+        logger.info(f"Inserted new {connector_type} '{data_dict.get('Name')}' (GUID {repo_guid}) into t_connector.")
+        return seq_id
+
+    # ------------------------------------------------------------------
+    # Insert dispatcher
+    # ------------------------------------------------------------------
+    def create_new_record(self, data_dict, table_name, session, metadata, recordtype):
+        """
+        Insert a completely new record into the EA repository.
+        data_dict is expected to already have field names mapped via field_mapper.
+        Parent GUIDs (package_id, clazz_id, etc.) are still in EAID_ format.
+        """
+        try:
+            if recordtype in [const.RECORDTYPE_CLASS, const.RECORDTYPE_ENUMERATION]:
+                if table_name == "t_object":
+                    object_type = "Class" if recordtype == const.RECORDTYPE_CLASS else "Enumeration"
+                    package_id = self.resolve_object_id(data_dict.get("package_id"), session, metadata)
+                    if package_id is None:
+                        logger.warning(
+                            f"Cannot insert {object_type} '{data_dict.get('Name')}': "
+                            "parent package not found in EA repo."
+                        )
+                        return
+                    self.insert_new_t_object(data_dict, session, metadata, object_type, package_id)
+
+            elif recordtype == const.RECORDTYPE_PACKAGE:
+                if table_name == "t_object":
+                    parent_object_id = self.resolve_object_id(data_dict.get("parent_package_id"), session, metadata)
+                    self.insert_new_t_object(data_dict, session, metadata, "Package", parent_object_id)
+                elif table_name == "t_package":
+                    # The t_object row for this package must already have been inserted above
+                    ea_guid_raw = data_dict.get("ea_guid")
+                    repo_guid = util.fromEAGuid(ea_guid_raw) if ea_guid_raw else None
+                    obj_table = metadata.tables.get("t_object")
+                    obj_row = (
+                        session.query(obj_table).filter_by(ea_guid=repo_guid).first()
+                        if obj_table is not None and repo_guid
+                        else None
+                    )
+                    if obj_row is None:
+                        logger.warning(
+                            f"Cannot insert t_package row for GUID {ea_guid_raw}: "
+                            "corresponding t_object row not found."
+                        )
+                        return
+                    parent_package_id = self.resolve_object_id(data_dict.get("parent_package_id"), session, metadata)
+                    self.insert_new_t_package(data_dict, session, metadata, obj_row.Object_ID, parent_package_id)
+
+            elif recordtype == const.RECORDTYPE_ATTRIBUTE:
+                if table_name == "t_attribute":
+                    parent_object_id = self.resolve_object_id(data_dict.get("clazz_id"), session, metadata)
+                    if parent_object_id is None:
+                        logger.warning(
+                            f"Cannot insert attribute '{data_dict.get('Name')}': parent class not found in EA repo."
+                        )
+                        return
+                    self.insert_new_t_attribute(data_dict, session, metadata, parent_object_id)
+
+            elif recordtype == const.RECORDTYPE_LITERAL:
+                if table_name == "t_attribute":
+                    parent_object_id = self.resolve_object_id(data_dict.get("enumeratie_id"), session, metadata)
+                    if parent_object_id is None:
+                        logger.warning(
+                            f"Cannot insert literal '{data_dict.get('Name')}': parent enumeration not found in EA repo."
+                        )
+                        return
+                    self.insert_new_t_attribute(data_dict, session, metadata, parent_object_id)
+
+            elif recordtype == const.RECORDTYPE_ASSOCIATION:
+                if table_name == "t_connector":
+                    start_object_id = self.resolve_object_id(data_dict.get("src_class_id"), session, metadata)
+                    end_object_id = self.resolve_object_id(data_dict.get("dst_class_id"), session, metadata)
+                    if start_object_id is None or end_object_id is None:
+                        logger.warning(
+                            f"Cannot insert association '{data_dict.get('Name')}': "
+                            "source or destination class not found in EA repo."
+                        )
+                        return
+                    self.insert_new_t_connector(
+                        data_dict, session, metadata, "Association", start_object_id, end_object_id
+                    )
+
+            elif recordtype == const.RECORDTYPE_GENERALIZATION:
+                if table_name == "t_connector":
+                    start_object_id = self.resolve_object_id(data_dict.get("subclass_id"), session, metadata)
+                    end_object_id = self.resolve_object_id(data_dict.get("superclass_id"), session, metadata)
+                    if start_object_id is None or end_object_id is None:
+                        logger.warning("Cannot insert generalization: subclass or superclass not found in EA repo.")
+                        return
+                    self.insert_new_t_connector(
+                        data_dict, session, metadata, "Generalization", start_object_id, end_object_id
+                    )
+
+            else:
+                logger.debug(f"No insert logic defined for recordtype '{recordtype}' in table '{table_name}'.")
+
+        except Exception as e:
+            msg = f"Error while inserting new record (recordtype={recordtype}, table={table_name}): {e}"
+            logger.error(msg)
+            raise CrunchException(msg)
+
+    # ------------------------------------------------------------------
+    # Delete helpers
+    # ------------------------------------------------------------------
+    def delete_stale_objects(self, known_guids, session, metadata, object_type):
+        """
+        Delete t_object records of the given object_type whose ea_guid is NOT in known_guids.
+        Also removes child t_objectproperties, t_attribute rows (with tags) and t_connector rows.
+        """
+        obj_table = metadata.tables.get("t_object")
+        if obj_table is None:
+            logger.warning("t_object not found – cannot delete stale objects.")
+            return
+
+        repo_guids = {util.fromEAGuid(g) for g in known_guids if g}
+
+        stale_records = (
+            session.query(obj_table)
+            .filter(obj_table.c.Object_Type == object_type, obj_table.c.ea_guid.notin_(repo_guids))
+            .all()
+        )
+        if not stale_records:
+            logger.debug(f"No stale {object_type} records found.")
+            return
+
+        stale_ids = [r.Object_ID for r in stale_records]
+        logger.info(f"Deleting {len(stale_records)} stale {object_type} record(s) from EA repository.")
+
+        # 1. Object properties / tags
+        prop_table = metadata.tables.get("t_objectproperties")
+        if prop_table is not None:
+            session.query(prop_table).filter(prop_table.c.Object_ID.in_(stale_ids)).delete(synchronize_session=False)
+
+        # 2. Attributes (and their tags)
+        attr_table = metadata.tables.get("t_attribute")
+        if attr_table is not None:
+            stale_attr_ids = [
+                row.ID for row in session.query(attr_table.c.ID).filter(attr_table.c.Object_ID.in_(stale_ids)).all()
+            ]
+            if stale_attr_ids:
+                attr_tag_table = metadata.tables.get("t_attributetag")
+                if attr_tag_table is not None:
+                    session.query(attr_tag_table).filter(attr_tag_table.c.ElementID.in_(stale_attr_ids)).delete(
+                        synchronize_session=False
+                    )
+                session.query(attr_table).filter(attr_table.c.Object_ID.in_(stale_ids)).delete(
+                    synchronize_session=False
+                )
+
+        # 3. Connectors referencing these objects
+        conn_table = metadata.tables.get("t_connector")
+        if conn_table is not None:
+            session.query(conn_table).filter(
+                or_(
+                    conn_table.c.Start_Object_ID.in_(stale_ids),
+                    conn_table.c.End_Object_ID.in_(stale_ids),
+                )
+            ).delete(synchronize_session=False)
+
+        # 4. Xref entries
+        xref_table = metadata.tables.get("t_xref")
+        if xref_table is not None and "Client" in {c.name for c in xref_table.columns}:
+            stale_ea_guids = [r.ea_guid for r in stale_records]
+            session.query(xref_table).filter(xref_table.c.Client.in_(stale_ea_guids)).delete(synchronize_session=False)
+
+        # 5. Finally delete from t_object
+        session.query(obj_table).filter(
+            obj_table.c.Object_Type == object_type, obj_table.c.ea_guid.notin_(repo_guids)
+        ).delete(synchronize_session=False)
+
+        logger.info(f"Deleted {len(stale_records)} stale {object_type} record(s) and all child records.")
+
+    def delete_stale_packages(self, known_guids, session, metadata):
+        """
+        Delete Package records from both t_package and t_object whose ea_guid is NOT in known_guids.
+        Only deletes the package rows themselves; child classes/enums should be deleted separately.
+        """
+        obj_table = metadata.tables.get("t_object")
+        pkg_table = metadata.tables.get("t_package")
+        if obj_table is None or pkg_table is None:
+            logger.warning("t_object or t_package not found – cannot delete stale packages.")
+            return
+
+        repo_guids = {util.fromEAGuid(g) for g in known_guids if g}
+
+        stale_records = (
+            session.query(obj_table)
+            .filter(obj_table.c.Object_Type == "Package", obj_table.c.ea_guid.notin_(repo_guids))
+            .all()
+        )
+        if not stale_records:
+            logger.debug("No stale Package records found.")
+            return
+
+        stale_ea_guids = [r.ea_guid for r in stale_records]
+        stale_ids = [r.Object_ID for r in stale_records]
+        logger.info(f"Deleting {len(stale_records)} stale Package record(s) from EA repository.")
+
+        # 1. Object properties
+        prop_table = metadata.tables.get("t_objectproperties")
+        if prop_table is not None:
+            session.query(prop_table).filter(prop_table.c.Object_ID.in_(stale_ids)).delete(synchronize_session=False)
+
+        # 2. t_package rows
+        session.query(pkg_table).filter(pkg_table.c.ea_guid.in_(stale_ea_guids)).delete(synchronize_session=False)
+
+        # 3. t_object rows
+        session.query(obj_table).filter(
+            obj_table.c.Object_Type == "Package", obj_table.c.ea_guid.notin_(repo_guids)
+        ).delete(synchronize_session=False)
+
+        logger.info(f"Deleted {len(stale_records)} stale Package record(s).")
+
+    def delete_stale_attributes(self, known_attr_guids, session, metadata, managed_object_guids=None):
+        """
+        Delete t_attribute rows whose ea_guid is NOT in known_attr_guids.
+        If managed_object_guids is provided, only delete attributes belonging to those objects.
+        """
+        attr_table = metadata.tables.get("t_attribute")
+        if attr_table is None:
+            logger.warning("t_attribute not found – cannot delete stale attributes.")
+            return
+
+        repo_attr_guids = {util.fromEAGuid(g) for g in known_attr_guids if g}
+
+        query = session.query(attr_table.c.ID).filter(attr_table.c.ea_guid.notin_(repo_attr_guids))
+
+        if managed_object_guids:
+            obj_table = metadata.tables.get("t_object")
+            if obj_table is not None:
+                repo_obj_guids = [util.fromEAGuid(g) for g in managed_object_guids if g]
+                managed_obj_ids = [
+                    row.Object_ID
+                    for row in session.query(obj_table.c.Object_ID)
+                    .filter(obj_table.c.ea_guid.in_(repo_obj_guids))
+                    .all()
+                ]
+                if managed_obj_ids:
+                    query = query.filter(attr_table.c.Object_ID.in_(managed_obj_ids))
+
+        stale_attr_ids = [row.ID for row in query.all()]
+        if not stale_attr_ids:
+            logger.debug("No stale attribute/literal records found in t_attribute.")
+            return
+
+        logger.info(f"Deleting {len(stale_attr_ids)} stale attribute/literal record(s) from EA repository.")
+
+        attr_tag_table = metadata.tables.get("t_attributetag")
+        if attr_tag_table is not None:
+            session.query(attr_tag_table).filter(attr_tag_table.c.ElementID.in_(stale_attr_ids)).delete(
+                synchronize_session=False
+            )
+
+        session.query(attr_table).filter(attr_table.c.ID.in_(stale_attr_ids)).delete(synchronize_session=False)
+
+        logger.info(f"Deleted {len(stale_attr_ids)} stale attribute/literal record(s).")
+
+    def delete_stale_connectors(self, known_guids, session, metadata, connector_type):
+        """
+        Delete t_connector records of the given connector_type whose ea_guid is NOT in known_guids.
+        """
+        conn_table = metadata.tables.get("t_connector")
+        if conn_table is None:
+            logger.warning("t_connector not found – cannot delete stale connectors.")
+            return
+
+        repo_guids = {util.fromEAGuid(g) for g in known_guids if g}
+
+        stale_records = (
+            session.query(conn_table)
+            .filter(
+                conn_table.c.Connector_Type == connector_type,
+                conn_table.c.ea_guid.notin_(repo_guids),
+            )
+            .all()
+        )
+        if not stale_records:
+            logger.debug(f"No stale {connector_type} records found in t_connector.")
+            return
+
+        stale_ids = [r.Connector_ID for r in stale_records]
+        stale_ea_guids = [r.ea_guid for r in stale_records]
+        logger.info(f"Deleting {len(stale_records)} stale {connector_type} connector(s) from EA repository.")
+
+        # Remove xref entries linked to these connectors
+        xref_table = metadata.tables.get("t_xref")
+        if xref_table is not None and "Client" in {c.name for c in xref_table.columns}:
+            session.query(xref_table).filter(xref_table.c.Client.in_(stale_ea_guids)).delete(synchronize_session=False)
+
+        session.query(conn_table).filter(conn_table.c.Connector_ID.in_(stale_ids)).delete(synchronize_session=False)
+
+        logger.info(f"Deleted {len(stale_records)} stale {connector_type} connector(s).")
+
     def render(self, args, schema: sch.Schema):
 
         # Check to see if a list of Package ids is provided
@@ -561,9 +991,11 @@ class EARepoUpdater(ModelRenderer):
         if target_session and target_metadata:
             version_type = args.version_type
             tag_strategy = args.tag_strategy
+            allow_insert = getattr(args, "ea_allow_insert", False)
+            allow_delete = getattr(args, "ea_allow_delete", False)
             logger.info(
-                f"Updating EA Repository {args.outputfile} with version type {version_type} and tag_strategy"
-                f" {tag_strategy}..."
+                f"Updating EA Repository {args.outputfile} with version type {version_type}, "
+                f"tag_strategy {tag_strategy}, allow_insert={allow_insert}, allow_delete={allow_delete}..."
             )
 
             try:
@@ -585,6 +1017,34 @@ class EARepoUpdater(ModelRenderer):
                     tag_value_column="VALUE",
                 )
 
+                # Process all packages first (insert order matters: packages before classes)
+                logger.info("Updating packages...")
+                packages = schema.get_all_packages()
+                dict_packages = [record.to_dict() for record in packages]
+                self.process_batch(
+                    dict_packages,
+                    "t_object",
+                    target_session,
+                    target_metadata,
+                    version_type=version_type,
+                    field_mapper=const.EA_REPO_MAPPER,
+                    tag_table="t_objectproperties",
+                    tag_strategy=tag_strategy,
+                    recordtype=const.RECORDTYPE_PACKAGE,
+                    allow_insert=allow_insert,
+                )
+                self.process_batch(
+                    dict_packages,
+                    "t_package",
+                    target_session,
+                    target_metadata,
+                    version_type=version_type,
+                    field_mapper=const.EA_REPO_MAPPER,
+                    tag_strategy=tag_strategy,
+                    recordtype=const.RECORDTYPE_PACKAGE,
+                    allow_insert=allow_insert,
+                )
+
                 # Process all classes
                 logger.info("Updating classes...")
                 classes = schema.get_all_classes()
@@ -599,38 +1059,7 @@ class EARepoUpdater(ModelRenderer):
                     field_mapper=const.EA_REPO_MAPPER,
                     tag_strategy=tag_strategy,
                     recordtype=const.RECORDTYPE_CLASS,
-                )
-
-                # Process all attributes
-                logger.info("Updating attributes...")
-                attributes = schema.get_all_attributes()
-                dict_attributes = [record.to_dict() for record in attributes]
-                self.process_batch(
-                    dict_attributes,
-                    "t_attribute",
-                    target_session,
-                    target_metadata,
-                    version_type=version_type,
-                    field_mapper=const.EA_REPO_MAPPER_ATTRIBUTES,
-                    tag_table="t_attributetag",
-                    tag_strategy=tag_strategy,
-                    recordtype=const.RECORDTYPE_ATTRIBUTE,
-                )
-
-                # Process all literals
-                logger.info("Updating literals...")
-                literals = schema.get_all_literals()
-                dict_literals = [record.to_dict() for record in literals]
-                self.process_batch(
-                    dict_literals,
-                    "t_attribute",
-                    target_session,
-                    target_metadata,
-                    version_type=version_type,
-                    field_mapper=const.EA_REPO_MAPPER_LITERALS,
-                    tag_table="t_attributetag",
-                    tag_strategy=tag_strategy,
-                    recordtype=const.RECORDTYPE_LITERAL,
+                    allow_insert=allow_insert,
                 )
 
                 # Process all enumerations
@@ -647,32 +1076,41 @@ class EARepoUpdater(ModelRenderer):
                     tag_table="t_objectproperties",
                     tag_strategy=tag_strategy,
                     recordtype=const.RECORDTYPE_ENUMERATION,
+                    allow_insert=allow_insert,
                 )
 
-                # Process all packages
-                logger.info("Updating packages...")
-                packages = schema.get_all_packages()
-                dict_packages = [record.to_dict() for record in packages]
+                # Process all attributes
+                logger.info("Updating attributes...")
+                attributes = schema.get_all_attributes()
+                dict_attributes = [record.to_dict() for record in attributes]
                 self.process_batch(
-                    dict_packages,
-                    "t_object",
+                    dict_attributes,
+                    "t_attribute",
                     target_session,
                     target_metadata,
                     version_type=version_type,
-                    field_mapper=const.EA_REPO_MAPPER,
-                    tag_table="t_objectproperties",
+                    field_mapper=const.EA_REPO_MAPPER_ATTRIBUTES,
+                    tag_table="t_attributetag",
                     tag_strategy=tag_strategy,
-                    recordtype=const.RECORDTYPE_PACKAGE,
+                    recordtype=const.RECORDTYPE_ATTRIBUTE,
+                    allow_insert=allow_insert,
                 )
+
+                # Process all literals
+                logger.info("Updating literals...")
+                literals = schema.get_all_literals()
+                dict_literals = [record.to_dict() for record in literals]
                 self.process_batch(
-                    dict_packages,
-                    "t_package",
+                    dict_literals,
+                    "t_attribute",
                     target_session,
                     target_metadata,
                     version_type=version_type,
-                    field_mapper=const.EA_REPO_MAPPER,
+                    field_mapper=const.EA_REPO_MAPPER_LITERALS,
+                    tag_table="t_attributetag",
                     tag_strategy=tag_strategy,
-                    recordtype=const.RECORDTYPE_PACKAGE,
+                    recordtype=const.RECORDTYPE_LITERAL,
+                    allow_insert=allow_insert,
                 )
 
                 # Process all associations
@@ -688,6 +1126,7 @@ class EARepoUpdater(ModelRenderer):
                     field_mapper=const.EA_REPO_MAPPER_ASSOCIATION,
                     tag_strategy=tag_strategy,
                     recordtype=const.RECORDTYPE_ASSOCIATION,
+                    allow_insert=allow_insert,
                 )
 
                 # Process all generalizations
@@ -703,6 +1142,7 @@ class EARepoUpdater(ModelRenderer):
                     field_mapper=const.EA_REPO_MAPPER_GENERALIZATION,
                     tag_strategy=tag_strategy,
                     recordtype=const.RECORDTYPE_GENERALIZATION,
+                    allow_insert=allow_insert,
                 )
 
                 # Process all diagrams
@@ -719,6 +1159,33 @@ class EARepoUpdater(ModelRenderer):
                     tag_strategy=tag_strategy,
                     recordtype=const.RECORDTYPE_DIAGRAM,
                 )
+
+                # Delete stale records if requested
+                if allow_delete:
+                    logger.info("Deleting stale records from EA repository...")
+
+                    class_guids = [c.id for c in classes]
+                    enum_guids = [e.id for e in enums]
+                    package_guids = [p.id for p in packages]
+                    attribute_guids = [a.id for a in attributes]
+                    literal_guids = [li.id for li in literals]
+                    association_guids = [a.id for a in associations]
+                    generalization_guids = [g.id for g in generalizations]
+
+                    # Delete order: connectors/attributes first, then objects, then packages
+                    self.delete_stale_connectors(association_guids, target_session, target_metadata, "Association")
+                    self.delete_stale_connectors(
+                        generalization_guids, target_session, target_metadata, "Generalization"
+                    )
+                    self.delete_stale_attributes(
+                        attribute_guids + literal_guids,
+                        target_session,
+                        target_metadata,
+                        managed_object_guids=class_guids + enum_guids,
+                    )
+                    self.delete_stale_objects(class_guids, target_session, target_metadata, "Class")
+                    self.delete_stale_objects(enum_guids, target_session, target_metadata, "Enumeration")
+                    self.delete_stale_packages(package_guids, target_session, target_metadata)
 
                 logger.info(f"All data updated in repo {args.outputfile}, commiting...")
                 target_session.commit()
