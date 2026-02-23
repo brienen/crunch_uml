@@ -12,3 +12,5 @@ venv
 test/output/*
 build
 *.log
+.claude
+.*_cache
