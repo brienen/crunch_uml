@@ -63,7 +63,7 @@ class XLSXRenderer(Renderer):
                     for col_num, column in enumerate(columns, 1):
                         # Pas de mapper toe op de waarde als nodig
                         if column == const.COLUMN_DOMEIN_IV3 and (
-                            isinstance(model, db.Class) or isinstance(model, db.Enumeratie)
+                            isinstance(model, db.Class) or isinstance(model, db.Enumeratie) or isinstance(model, db.Datatype)
                         ):
                             package = session.query(db.Package).filter(db.Package.id == record.package_id).one_or_none()
                             value = package.domain_name if package is not None else None

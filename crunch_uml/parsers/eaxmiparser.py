@@ -154,6 +154,28 @@ class EAXMIParser(XMIParser):
 
                 schema.save(enum)
 
+        logger.info("Processing references to datatypes")
+        datatyperefs = extension.xpath(".//element[@xmi:type='uml:DataType' and @xmi:idref]", namespaces=ns)  # type: ignore
+        for datatyperef in datatyperefs:
+            idref = datatyperef.get("{" + ns["xmi"] + "}idref")
+            datatype = schema.get_datatype(idref)
+
+            if datatype is not None:
+                # First set tags that might be overridden
+                tags = get_sorted_tags(datatyperef.xpath("./tags/tag"))
+                for tag in tags:
+                    if hasattr(datatype, fixtag(tag.get("name"))):
+                        setattr(datatype, fixtag(tag.get("name")), tag.get("value"))
+
+                properties = datatyperef.xpath("./properties")[0]
+                if properties is not None:
+                    datatype.definitie = properties.get("documentation")
+                project = datatyperef.xpath("./project")
+                copy_values(project, datatype)
+                copy_values(properties, datatype)
+
+                schema.save(datatype)
+
         """
         Third find all attributes, like
             <attribute xmi:idref="EAID_B2AE8AFC_C1D5_4d83_BFD3_EBF1663F3468" name="rijksmonument" scope="Public">

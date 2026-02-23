@@ -316,6 +316,7 @@ class Package(Base, UMLBase, UMLTagsDomain):  # type: ignore
     subpackages = relationship("Package", back_populates="parent_package", cascade="all, delete-orphan")
 
     classes = relationship("Class", back_populates="package", cascade="all, delete-orphan")
+    datatypes = relationship("Datatype", back_populates="package", cascade="all, delete-orphan")
     enumerations = relationship("Enumeratie", back_populates="package", cascade="all, delete-orphan")
     diagrams = relationship("Diagram", back_populates="package", cascade="all, delete-orphan")
     modelnaam_kort = Column(String)
@@ -361,10 +362,10 @@ class Package(Base, UMLBase, UMLTagsDomain):  # type: ignore
 
     # Logic for models
     def get_classes(self):
-        return [c for c in self.classes if not c.is_datatype]
+        return self.classes
 
     def get_datatypes(self):
-        return [c for c in self.classes if c.is_datatype]
+        return self.datatypes
 
     def is_model(self):
         return self.modelnaam_kort is not None or self.parent_package is None
@@ -515,6 +516,9 @@ class Package(Base, UMLBase, UMLTagsDomain):  # type: ignore
                 )
                 clazz_copy.package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
                 # copy_instance.classes.append(clazz_copy)
+        for dt in self.datatypes:
+            dt_copy = dt.get_copy(copy_instance)
+            dt_copy.package_id = copy_instance.id
         for enum in self.enumerations:
             enum_copy = enum.get_copy(copy_instance)
             enum_copy.package_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
@@ -556,6 +560,10 @@ class Package(Base, UMLBase, UMLTagsDomain):  # type: ignore
                         recursive=recursive,
                         materialize_generalizations=materialize_generalizations,
                     )
+            for dt in self.datatypes:
+                dt_copy = dt.make_copy_to_schema(sch)
+                dt_copy.package_id = copy_instance.id
+                copy_instance.datatypes.append(dt_copy)
             for enum in self.enumerations:
                 enum_copy = enum.make_copy_to_schema(sch, parent=copy_instance)
                 copy_instance.enumerations.append(enum_copy)
@@ -609,7 +617,6 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
     indicatie_formele_historie = Column(String)
     authentiek = Column(String)
     nullable = Column(String)
-    is_datatype = Column(Boolean, default=False)
 
     # @hybrid_property
     # def domain(self):
@@ -728,14 +735,45 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
         return copy_instance
 
 
+class Datatype(Base, UMLBase, UMLTags):  # type: ignore
+    __tablename__ = "datatypes"
+
+    package_id = Column(String, index=True)
+    package = relationship("Package", back_populates="datatypes", lazy="joined")
+    attributes = relationship(
+        "Attribute",
+        back_populates="datatype_owner",
+        lazy="joined",
+        foreign_keys="[Attribute.datatype_owner_id, Attribute.schema_id]",
+        cascade="all, delete-orphan",
+        overlaps="attributes",
+    )
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["package_id", "schema_id"],
+            ["packages.id", "packages.schema_id"],
+            deferrable=True,
+        ),
+    )
+
+
 class Attribute(Base, UML_Generic, UMLTagsAttribute):  # type: ignore
     __tablename__ = "attributes"
 
-    clazz_id = Column(String, index=True, nullable=False)
+    clazz_id = Column(String, index=True)
     clazz = relationship(
         "Class",
         back_populates="attributes",
         foreign_keys="[Attribute.clazz_id, Attribute.schema_id]",
+        overlaps="attributes,datatype_owner",
+    )
+    datatype_owner_id = Column(String, index=True)
+    datatype_owner = relationship(
+        "Datatype",
+        back_populates="attributes",
+        foreign_keys="[Attribute.datatype_owner_id, Attribute.schema_id]",
+        overlaps="attributes,clazz,enumeration,type_class,type_datatype",
     )
     primitive = Column(String)
     enumeration_id = Column(String, index=True)
@@ -745,6 +783,12 @@ class Attribute(Base, UML_Generic, UMLTagsAttribute):  # type: ignore
         "Class",
         foreign_keys="[Attribute.type_class_id, Attribute.schema_id]",
         overlaps="attributes,clazz,enumeration",
+    )
+    type_datatype_id = Column(String, index=True)
+    type_datatype = relationship(
+        "Datatype",
+        foreign_keys="[Attribute.type_datatype_id, Attribute.schema_id]",
+        overlaps="attributes,clazz,enumeration,type_class",
     )
     verplicht = Column(Boolean, default=False)
 
@@ -767,10 +811,22 @@ class Attribute(Base, UML_Generic, UMLTagsAttribute):  # type: ignore
             deferrable=True,
             name="FK_type_class",
         ),
+        ForeignKeyConstraint(
+            ["type_datatype_id", "schema_id"],
+            ["datatypes.id", "datatypes.schema_id"],
+            deferrable=True,
+            name="FK_type_datatype",
+        ),
+        ForeignKeyConstraint(
+            ["datatype_owner_id", "schema_id"],
+            ["datatypes.id", "datatypes.schema_id"],
+            deferrable=True,
+            name="FK_datatype_owner",
+        ),
     )
 
     def get_copy(self, parent, materialize_generalizations=False):
-        if not parent or not isinstance(parent, Class):
+        if not parent or not isinstance(parent, (Class, Datatype)):
             raise CrunchException(
                 "Error: wrong parent type for attribute while copying. Parent must be of type Class and cannot be of"
                 f" type {type(parent)}"
@@ -778,9 +834,10 @@ class Attribute(Base, UML_Generic, UMLTagsAttribute):  # type: ignore
 
         # Roep de get_copy methode van de superklasse aan
         copy_instance = super().get_copy(parent)
-        copy_instance.clazz = parent
-        # copy_instance.enumeration_id = None
-        # copy_instance.type_class_id = None
+        if isinstance(parent, Datatype):
+            copy_instance.datatype_owner = parent
+        else:
+            copy_instance.clazz = parent
         return copy_instance
 
     def getDatatype(self):
@@ -790,18 +847,23 @@ class Attribute(Base, UML_Generic, UMLTagsAttribute):  # type: ignore
             return self.enumeration
         elif self.type_class is not None:
             return self.type_class
+        elif self.type_datatype is not None:
+            return self.type_datatype
         else:
             return None
 
     def make_copy_to_schema(self, sch, parent=None, recursive=True, materialize_generalizations=False):
-        if not isinstance(parent, Class):
+        if not isinstance(parent, (Class, Datatype)):
             raise CrunchException(
-                f"Error: wrong parent type for package while copying. Parent cannot be of type {type(parent)}"
+                f"Error: wrong parent type for attribute while copying. Parent cannot be of type {type(parent)}"
             )
 
         # Roep de get_copy methode van de superklasse aan
         copy_instance = super().make_copy_to_schema(sch)
-        copy_instance.clazz = parent
+        if isinstance(parent, Datatype):
+            copy_instance.datatype_owner = parent
+        else:
+            copy_instance.clazz = parent
 
         # Voer eventuele extra stappen uit voor de literals
         if recursive:
@@ -1220,10 +1282,13 @@ class Database:
         return self.session.get(Package, id)
 
     def get_class(self, id):
-        return self.session.query(Class).filter_by(id=id, is_datatype=False).first()
+        return self.session.query(Class).filter_by(id=id).first()
 
     def get_datatype(self, id):
-        return self.session.query(Class).filter_by(id=id, is_datatype=True).first()
+        return self.session.query(Datatype).filter_by(id=id).first()
+
+    def get_all_datatypes(self):
+        return self.session.query(Datatype).all()
 
     def get_enumeration(self, id):
         return self.session.get(Enumeratie, id)
@@ -1241,10 +1306,10 @@ class Database:
         return self.session.query(Enumeratie).all()
 
     def count_class(self):
-        return self.session.query(Class).filter_by(is_datatype=False).count()
+        return self.session.query(Class).count()
 
     def count_datatype(self):
-        return self.session.query(Class).filter_by(is_datatype=True).count()
+        return self.session.query(Datatype).count()
 
     def count_attribute(self):
         return self.session.query(Attribute).count()

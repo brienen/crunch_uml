@@ -148,12 +148,27 @@ class QEAParser(Parser):
                 )
                 logger.debug(f"Enumeration {name} met id {eaid}")
                 schema.save(enum)
+            elif obj_type == "DataType":
+                datatype = db.Datatype(
+                    id=eaid,
+                    name=name,
+                    package_id=pkg_eapk,
+                    definitie=note,
+                    stereotype=stereotype,
+                    author=author,
+                    version=version,
+                    created=created,
+                    modified=modified,
+                    status=status,
+                    alias=alias,
+                )
+                logger.debug(f"Datatype {name} met id {eaid}")
+                schema.save(datatype)
             else:
                 clazz = db.Class(
                     id=eaid,
                     name=name,
                     package_id=pkg_eapk,
-                    is_datatype=(obj_type == "DataType"),
                     definitie=note,
                     stereotype=stereotype,
                     author=author,
@@ -166,7 +181,11 @@ class QEAParser(Parser):
                 logger.debug(f"Class {name} ({obj_type}) met id {eaid}")
                 schema.save(clazz)
 
-        logger.info(f"Phase 2 done: {schema.count_class()} classes, " f"{schema.count_enumeratie()} enumerations")
+        logger.info(
+            f"Phase 2 done: {schema.count_class()} classes, "
+            f"{schema.count_datatype()} datatypes, "
+            f"{schema.count_enumeratie()} enumerations"
+        )
 
     def _phase3_attributes(self, conn, schema: sch.Schema):
         """Parse t_attribute into Attribute and EnumerationLiteral objects."""
@@ -213,28 +232,46 @@ class QEAParser(Parser):
                 )
                 logger.debug(f"EnumerationLiteral {name} met id {eaid}")
                 schema.save(literal)
+            elif parent_type == "DataType":
+                # Attribute belongs to a Datatype
+                attribute = db.Attribute(
+                    id=eaid,
+                    name=name,
+                    datatype_owner_id=parent_eaid,
+                    primitive=attr_type if attr_type else None,
+                    definitie=notes,
+                    stereotype=stereotype,
+                )
+                logger.debug(f"Attribute {name} (DataType eigenaar) met id {eaid}")
+                schema.save(attribute)
             else:
-                # Determine type_class_id or enumeration_id from classifier
+                # Determine type_class_id, type_datatype_id or enumeration_id from classifier
                 type_class_id = None
+                type_datatype_id = None
                 enumeration_id = None
                 if classifier and classifier != 0:
                     classifier_eaid = self._obj_id_map.get(int(classifier))
                     if classifier_eaid is not None:
-                        # Determine if classifier is Class or Enumeration
+                        # Determine if classifier is Class, Datatype or Enumeration
                         classifier_obj = schema.get_class(classifier_eaid)
                         if classifier_obj is not None:
                             type_class_id = classifier_eaid
                         else:
-                            enum_obj = schema.get_enumeration(classifier_eaid)
-                            if enum_obj is not None:
-                                enumeration_id = classifier_eaid
+                            datatype_obj = schema.get_datatype(classifier_eaid)
+                            if datatype_obj is not None:
+                                type_datatype_id = classifier_eaid
+                            else:
+                                enum_obj = schema.get_enumeration(classifier_eaid)
+                                if enum_obj is not None:
+                                    enumeration_id = classifier_eaid
 
                 attribute = db.Attribute(
                     id=eaid,
                     name=name,
                     clazz_id=parent_eaid,
-                    primitive=attr_type if not type_class_id and not enumeration_id else None,
+                    primitive=attr_type if not type_class_id and not type_datatype_id and not enumeration_id else None,
                     type_class_id=type_class_id,
+                    type_datatype_id=type_datatype_id,
                     enumeration_id=enumeration_id,
                     definitie=notes,
                     stereotype=stereotype,
@@ -344,6 +381,8 @@ class QEAParser(Parser):
                 continue
             field = fixtag(prop)
             obj = schema.get_class(eaid)
+            if obj is None:
+                obj = schema.get_datatype(eaid)
             if obj is None:
                 obj = schema.get_enumeration(eaid)
             if obj is not None and hasattr(obj, field):

@@ -464,8 +464,8 @@ class SchemaDiffMarkdownRenderer(Renderer):
         # Load entities
         a_pkgs = schema.get_all_packages()
         b_pkgs = other.get_all_packages()
-        a_classes = schema.get_all_classes()  # includes datatypes
-        b_classes = other.get_all_classes()
+        a_classes = schema.get_all_classes() + schema.get_all_datatypes()
+        b_classes = other.get_all_classes() + other.get_all_datatypes()
         a_enums = schema.get_all_enumerations()
         b_enums = other.get_all_enumerations()
         a_attrs = schema.get_all_attributes()
@@ -525,7 +525,7 @@ class SchemaDiffMarkdownRenderer(Renderer):
 
         # Field-level diffs
         labels = {"notes": "notes/toelichting", "definition": "definition/definitie"}
-        class_fields = ["name", "stereotype", "alias", "uri", "notes", "definition", "package_id", "is_datatype"]
+        class_fields = ["name", "stereotype", "alias", "uri", "notes", "definition", "package_id"]
         enum_fields = ["name", "stereotype", "alias", "uri", "notes", "definition", "package_id"]
         attr_fields = [
             "name",
@@ -624,7 +624,7 @@ class SchemaDiffMarkdownRenderer(Renderer):
 
         def is_datatype(cid: str) -> bool:
             c = B_cls.get(cid) or A_cls.get(cid)
-            return bool(getattr(c, "is_datatype", False))
+            return isinstance(c, db.Datatype)
 
         # Markdown
         lines: List[str] = []

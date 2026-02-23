@@ -29,12 +29,13 @@ def test_modelafhandeling():
     assert root.name == "Test met Datatypes"
 
     dt = schema.get_datatype("EAID_25E904A8_6978_420e_ABA4_0EF9D5E2EB5A")
+    assert dt is not None
     assert dt.name == "DataType1"
-    assert dt.is_datatype is True
+    assert isinstance(dt, db.Datatype)
 
     klass = schema.get_class("EAID_8402693C_E188_D047_97BD_8814FC8A637A")
     assert klass.name == "Class B"
-    assert klass.is_datatype is False
+    assert isinstance(klass, db.Class)
 
     dt = schema.get_datatype("EAID_8402693C_E188_D047_97BD_8814FC8A637A")
     assert dt is None

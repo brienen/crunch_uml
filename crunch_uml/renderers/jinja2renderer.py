@@ -521,6 +521,8 @@ def getJSONDatatype(
         return f'"$ref": "#/$defs/{self.enumeration.name}"'  # Needs to be defined in Jinja2 template
     elif self.type_class is not None:
         return f'"$ref": "#/$defs/{self.type_class.name}"'  # Needs to be defined in Jinja2 template
+    elif self.type_datatype is not None:
+        return f'"$ref": "#/$defs/{self.type_datatype.name}"'  # Needs to be defined in Jinja2 template
     else:
         return '"type": "string"'
 

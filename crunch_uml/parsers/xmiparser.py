@@ -83,12 +83,42 @@ class XMIParser(Parser):
             else:
                 logger.debug(f"Package with {name} does not have id value: discarded")
 
-        elif tp in ["uml:Class", "uml:DataType"]:
+        elif tp == "uml:DataType":
+            datatype = db.Datatype(
+                id=node.get("{" + ns["xmi"] + "}id"),
+                name=node.get("name"),
+                package_id=parent_package_id,
+            )
+            logger.debug(f"Datatype {datatype.name} met id {datatype.id} ingelezen")
+            schema.save(datatype)
+
+            for childnode in node:
+                sub_tp = childnode.get("{" + ns["xmi"] + "}type")
+                if sub_tp == "uml:Property":
+                    attribute = db.Attribute(
+                        id=childnode.get("{" + ns["xmi"] + "}id"),
+                        name=childnode.get("name"),
+                        datatype_owner_id=datatype.id,
+                    )
+                    type_nodes = childnode.xpath("./type")
+                    if len(type_nodes) != 0:
+                        type_ref = type_nodes[0].get("{" + ns["xmi"] + "}idref")
+                        if type_ref is None:
+                            pass
+                        elif type_ref.startswith("EAID_"):
+                            attribute.primitive = zetOpLeeg()
+                        else:
+                            attribute.primitive = remove_EADatatype(type_ref)
+                    logger.debug(
+                        f"Attribute {attribute.name} met id {attribute.id} ingelezen (DataType eigenaar)"
+                    )
+                    schema.save(attribute)
+
+        elif tp == "uml:Class":
             clazz = db.Class(
                 id=node.get("{" + ns["xmi"] + "}id"),
                 name=node.get("name"),
                 package_id=parent_package_id,
-                is_datatype=(tp == "uml:DataType"),
             )
             logger.debug(f"Class {clazz.name} met id {clazz.id} ingelezen met inhoud: {clazz}")
             schema.save(clazz)
@@ -326,7 +356,7 @@ class XMIParser(Parser):
                     id = property.get("{" + ns["xmi"] + "}id")
                     attribute = schema.get_attribute(id)
                     if attribute is not None:
-                        attribute.type_class_id = dt.id
+                        attribute.type_datatype_id = dt.id
                         attribute.primitive = dt.name
                         schema.save(attribute)
 

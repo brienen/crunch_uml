@@ -65,8 +65,8 @@ class LodRenderer(ModelRenderer):
                 logger.error(msg)
                 raise CrunchException(msg)
 
-            class_dict = {}  # used to find all classes by guid
-            # First add all classes
+            class_dict = {}  # used to find all classes and datatypes by guid
+            # First add all classes and datatypes
             try:
                 for model in models:
                     modelname = util.remove_substring(model.name, "model").lower()
@@ -108,6 +108,34 @@ class LodRenderer(ModelRenderer):
                                         )
                                     )
 
+                    for datatype in model.datatypes:
+                        if not datatype.name:
+                            logger.warning(f"Datatype zonder naam gevonden: {datatype.id}")
+                            continue
+                        datatype_uri = ns[slugify(datatype.name)]
+                        class_dict[datatype.id] = datatype_uri
+
+                        g.add((datatype_uri, RDF.type, OWL.Class))
+                        g.add((datatype_uri, RDFS.label, Literal(datatype.name)))
+                        g.add((datatype_uri, DCTERMS.identifier, Literal(datatype.id)))
+                        if datatype.definitie is not None:
+                            g.add((datatype_uri, RDFS.comment, Literal(datatype.definitie)))
+
+                        for attribute in datatype.attributes:
+                            if attribute.name is not None and attribute.primitive is not None:
+                                attr_uri = (
+                                    ns[slugify(datatype.name) + "/" + slugify(attribute.name)]
+                                    if attribute.name
+                                    else ns[slugify(datatype.name) + "/" + slugify(attribute.id)]
+                                )
+                                g.add((attr_uri, RDF.type, OWL.DatatypeProperty))
+                                g.add((attr_uri, RDFS.domain, datatype_uri))
+                                g.add((attr_uri, RDFS.label, Literal(attribute.name)))
+                                g.add((attr_uri, RDFS.range, XSD.string))
+                                g.add((attr_uri, DCTERMS.identifier, Literal(attribute.id)))
+                                if attribute.definitie is not None:
+                                    g.add((attr_uri, RDFS.comment, Literal(attribute.definitie)))
+
                     # Add SHACL NodeShapes for each class
                     for cls in model.classes:
                         if not cls.name:
@@ -137,7 +165,38 @@ class LodRenderer(ModelRenderer):
                                 g.add((prop_bnode, SH.name, Literal(attribute.name)))
                                 if attribute.definitie:
                                     g.add((prop_bnode, SH.description, Literal(attribute.definitie)))
-                logger.info(f"Aantal klassen verwerkt in model '{modelname}': {len(model.classes)}")
+
+                    # Add SHACL NodeShapes for each datatype
+                    for datatype in model.datatypes:
+                        if not datatype.name:
+                            logger.warning(f"SHACL-shape overgeslagen voor datatype zonder naam: {datatype.id}")
+                            continue
+                        datatype_uri = ns[slugify(datatype.name)]
+                        shape_uri = shape_ns[slugify(modelname) + "/" + slugify(datatype.name)]
+                        g.add((shape_uri, RDF.type, SH.NodeShape))
+                        g.add((shape_uri, SH.targetClass, datatype_uri))
+                        g.add((shape_uri, RDFS.label, Literal(datatype.name)))
+                        g.add((shape_uri, DCTERMS.identifier, Literal(f"{datatype.id}")))
+
+                        for attribute in datatype.attributes:
+                            if attribute.name is not None and attribute.primitive is not None:
+                                prop_bnode = BNode()
+                                attr_uri = (
+                                    ns[slugify(datatype.name) + "/" + slugify(attribute.name)]
+                                    if attribute.name
+                                    else ns[slugify(datatype.name) + "/" + slugify(attribute.id)]
+                                )
+                                g.add((shape_uri, SH.property, prop_bnode))
+                                g.add((prop_bnode, SH.path, attr_uri))
+                                shacl_type = TYPEMAP.get(attribute.primitive.lower(), XSD.string)
+                                g.add((prop_bnode, SH.datatype, shacl_type))
+                                g.add((prop_bnode, SH.minCount, Literal(0)))
+                                g.add((prop_bnode, SH.maxCount, Literal(1)))
+                                g.add((prop_bnode, SH.name, Literal(attribute.name)))
+                                if attribute.definitie:
+                                    g.add((prop_bnode, SH.description, Literal(attribute.definitie)))
+
+                logger.info(f"Aantal klassen verwerkt in model '{modelname}': {len(model.classes)}, datatypes: {len(model.datatypes)}")
             except Exception as e:
                 logger.exception("Fout tijdens het renderen van modellen:")
                 raise CrunchException(f"Renderproces mislukt: {e}") from e

@@ -320,7 +320,7 @@ class EARepoUpdater(ModelRenderer):
             ) = self.get_tablefields(tag_table)
             if tag_table and tag_id_parent_column and tag_id_child_column and tag_property_column and tag_value_column:
                 # Haal de bestaande tags op uit de definities
-                if recordtype in [const.RECORDTYPE_CLASS, const.RECORDTYPE_ENUMERATION]:
+                if recordtype in [const.RECORDTYPE_CLASS, const.RECORDTYPE_ENUMERATION, const.RECORDTYPE_DATATYPE]:
                     uml_tag_names = [name for name, attr in inspect.getmembers(UMLTags) if isinstance(attr, Column)]
                 elif recordtype == const.RECORDTYPE_ATTRIBUTE:
                     uml_tag_names = [
@@ -712,6 +712,17 @@ class EARepoUpdater(ModelRenderer):
                         return
                     self.insert_new_t_object(data_dict, session, metadata, object_type, package_id)
 
+            elif recordtype == const.RECORDTYPE_DATATYPE:
+                if table_name == "t_object":
+                    package_id = self.resolve_object_id(data_dict.get("package_id"), session, metadata)
+                    if package_id is None:
+                        logger.warning(
+                            f"Cannot insert DataType '{data_dict.get('Name')}': "
+                            "parent package not found in EA repo."
+                        )
+                        return
+                    self.insert_new_t_object(data_dict, session, metadata, "DataType", package_id)
+
             elif recordtype == const.RECORDTYPE_PACKAGE:
                 if table_name == "t_object":
                     parent_object_id = self.resolve_object_id(data_dict.get("parent_package_id"), session, metadata)
@@ -1062,6 +1073,23 @@ class EARepoUpdater(ModelRenderer):
                     allow_insert=allow_insert,
                 )
 
+                # Process all datatypes
+                logger.info("Updating datatypes...")
+                datatypes = schema.get_all_datatypes()
+                dict_datatypes = [record.to_dict() for record in datatypes]
+                self.process_batch(
+                    dict_datatypes,
+                    "t_object",
+                    target_session,
+                    target_metadata,
+                    version_type=version_type,
+                    tag_table="t_objectproperties",
+                    field_mapper=const.EA_REPO_MAPPER,
+                    tag_strategy=tag_strategy,
+                    recordtype=const.RECORDTYPE_DATATYPE,
+                    allow_insert=allow_insert,
+                )
+
                 # Process all enumerations
                 logger.info("Updating enumerations...")
                 enums = schema.get_all_enumerations()
@@ -1165,6 +1193,7 @@ class EARepoUpdater(ModelRenderer):
                     logger.info("Deleting stale records from EA repository...")
 
                     class_guids = [c.id for c in classes]
+                    datatype_guids = [d.id for d in datatypes]
                     enum_guids = [e.id for e in enums]
                     package_guids = [p.id for p in packages]
                     attribute_guids = [a.id for a in attributes]
@@ -1181,9 +1210,10 @@ class EARepoUpdater(ModelRenderer):
                         attribute_guids + literal_guids,
                         target_session,
                         target_metadata,
-                        managed_object_guids=class_guids + enum_guids,
+                        managed_object_guids=class_guids + enum_guids + datatype_guids,
                     )
                     self.delete_stale_objects(class_guids, target_session, target_metadata, "Class")
+                    self.delete_stale_objects(datatype_guids, target_session, target_metadata, "DataType")
                     self.delete_stale_objects(enum_guids, target_session, target_metadata, "Enumeration")
                     self.delete_stale_packages(package_guids, target_session, target_metadata)
 
