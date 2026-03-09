@@ -1,0 +1,123 @@
+site_name: "crunch_uml"
+site_description: "Documentatie voor crunch_uml — UML model transformatie en export"
+site_author: "Arjen Brienen"
+site_url: ""
+
+repo_url: https://github.com/brienen/crunch_uml
+repo_name: brienen/crunch_uml
+
+docs_dir: docs
+
+theme:
+  name: material
+  language: nl
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: orange
+      toggle:
+        icon: material/brightness-7
+        name: Donker thema
+    - scheme: slate
+      primary: indigo
+      accent: orange
+      toggle:
+        icon: material/brightness-4
+        name: Licht thema
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.indexes
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+  font:
+    text: Inter
+    code: JetBrains Mono
+
+plugins:
+  - search
+  - tags
+  - glightbox:
+      touchNavigation: true
+      loop: false
+      effect: zoom
+      slide_effect: slide
+      width: "100%"
+      height: auto
+      zoomable: true
+      draggable: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - attr_list
+  - md_in_html
+  - def_list
+  - tables
+  - footnotes
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/brienen/crunch_uml
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/crunch_uml
+
+extra_css:
+  - assets/extra.css
+
+nav:
+  - Home: index.md
+  - Handleiding:
+    - handleiding/index.md
+    - handleiding/installatie.md
+    - handleiding/import.md
+    - handleiding/transform.md
+    - handleiding/export.md
+    - handleiding/cli-referentie.md
+  - Voorbeelden: voorbeelden.md
+  - Technisch Ontwerp:
+    - technisch/index.md
+    - Architectuur:
+      - technisch/architectuur/index.md
+      - technisch/architectuur/lagen.md
+      - technisch/architectuur/dataflows.md
+      - technisch/architectuur/design-patterns.md
+    - Componenten:
+      - technisch/componenten/index.md
+      - technisch/componenten/parsers.md
+      - technisch/componenten/transformers.md
+      - technisch/componenten/renderers.md
+      - technisch/componenten/persistentie.md
+    - technisch/datamodel.md
+    - technisch/kwetsbaarheden.md
+    - technisch/roadmap.md
+    - technisch/stack.md
