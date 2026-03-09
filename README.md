@@ -42,6 +42,10 @@ Crunch_UML is a tool for parsing, transforming and exporting UML information mod
 - **Pipeline approach** — Import, transform and export are independent steps that can be combined into automated workflows
 - **Upsert support** — Import different datasets or incremental changes into the same database
 
+## Documentation
+
+Documentation is avalailable on [GitHub Pages](https://brienen.github.io/crunch_uml)
+
 ## Install and Usage
 
 Install using pip:
