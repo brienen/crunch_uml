@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>./</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href=""/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/"/>
+    </url>
+    <url>
+        <loc>voorbeelden/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="voorbeelden/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/voorbeelden/"/>
+    </url>
+    <url>
+        <loc>handleiding/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="handleiding/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/handleiding/"/>
+    </url>
+    <url>
+        <loc>handleiding/cli-referentie/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="handleiding/cli-referentie/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/handleiding/cli-referentie/"/>
+    </url>
+    <url>
+        <loc>handleiding/export/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="handleiding/export/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/handleiding/export/"/>
+    </url>
+    <url>
+        <loc>handleiding/import/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="handleiding/import/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/handleiding/import/"/>
+    </url>
+    <url>
+        <loc>handleiding/installatie/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="handleiding/installatie/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/handleiding/installatie/"/>
+    </url>
+    <url>
+        <loc>handleiding/transform/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="handleiding/transform/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/handleiding/transform/"/>
+    </url>
+    <url>
+        <loc>technisch/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/"/>
+    </url>
+    <url>
+        <loc>technisch/datamodel/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/datamodel/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/datamodel/"/>
+    </url>
+    <url>
+        <loc>technisch/kwetsbaarheden/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/kwetsbaarheden/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/kwetsbaarheden/"/>
+    </url>
+    <url>
+        <loc>technisch/roadmap/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/roadmap/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/roadmap/"/>
+    </url>
+    <url>
+        <loc>technisch/stack/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/stack/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/stack/"/>
+    </url>
+    <url>
+        <loc>technisch/architectuur/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/architectuur/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/architectuur/"/>
+    </url>
+    <url>
+        <loc>technisch/architectuur/dataflows/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/architectuur/dataflows/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/architectuur/dataflows/"/>
+    </url>
+    <url>
+        <loc>technisch/architectuur/design-patterns/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/architectuur/design-patterns/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/architectuur/design-patterns/"/>
+    </url>
+    <url>
+        <loc>technisch/architectuur/lagen/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/architectuur/lagen/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/architectuur/lagen/"/>
+    </url>
+    <url>
+        <loc>technisch/componenten/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/componenten/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/componenten/"/>
+    </url>
+    <url>
+        <loc>technisch/componenten/parsers/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/componenten/parsers/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/componenten/parsers/"/>
+    </url>
+    <url>
+        <loc>technisch/componenten/persistentie/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/componenten/persistentie/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/componenten/persistentie/"/>
+    </url>
+    <url>
+        <loc>technisch/componenten/renderers/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/componenten/renderers/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/componenten/renderers/"/>
+    </url>
+    <url>
+        <loc>technisch/componenten/transformers/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/componenten/transformers/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/componenten/transformers/"/>
+    </url>
+    <url>
+        <loc>en/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href=""/>
+    </url>
+    <url>
+        <loc>en/voorbeelden/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/voorbeelden/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="voorbeelden/"/>
+    </url>
+    <url>
+        <loc>en/handleiding/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/handleiding/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="handleiding/"/>
+    </url>
+    <url>
+        <loc>en/handleiding/cli-referentie/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/handleiding/cli-referentie/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="handleiding/cli-referentie/"/>
+    </url>
+    <url>
+        <loc>en/handleiding/export/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/handleiding/export/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="handleiding/export/"/>
+    </url>
+    <url>
+        <loc>en/handleiding/import/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/handleiding/import/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="handleiding/import/"/>
+    </url>
+    <url>
+        <loc>en/handleiding/installatie/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/handleiding/installatie/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="handleiding/installatie/"/>
+    </url>
+    <url>
+        <loc>en/handleiding/transform/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/handleiding/transform/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="handleiding/transform/"/>
+    </url>
+    <url>
+        <loc>en/technisch/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/"/>
+    </url>
+    <url>
+        <loc>en/technisch/datamodel/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/datamodel/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/datamodel/"/>
+    </url>
+    <url>
+        <loc>en/technisch/kwetsbaarheden/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/kwetsbaarheden/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/kwetsbaarheden/"/>
+    </url>
+    <url>
+        <loc>en/technisch/roadmap/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/roadmap/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/roadmap/"/>
+    </url>
+    <url>
+        <loc>en/technisch/stack/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/stack/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/stack/"/>
+    </url>
+    <url>
+        <loc>en/technisch/architectuur/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/architectuur/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/architectuur/"/>
+    </url>
+    <url>
+        <loc>en/technisch/architectuur/dataflows/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/architectuur/dataflows/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/architectuur/dataflows/"/>
+    </url>
+    <url>
+        <loc>en/technisch/architectuur/design-patterns/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/architectuur/design-patterns/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/architectuur/design-patterns/"/>
+    </url>
+    <url>
+        <loc>en/technisch/architectuur/lagen/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/architectuur/lagen/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/architectuur/lagen/"/>
+    </url>
+    <url>
+        <loc>en/technisch/componenten/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/componenten/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/componenten/"/>
+    </url>
+    <url>
+        <loc>en/technisch/componenten/parsers/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/componenten/parsers/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/componenten/parsers/"/>
+    </url>
+    <url>
+        <loc>en/technisch/componenten/persistentie/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/componenten/persistentie/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/componenten/persistentie/"/>
+    </url>
+    <url>
+        <loc>en/technisch/componenten/renderers/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/componenten/renderers/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/componenten/renderers/"/>
+    </url>
+    <url>
+        <loc>en/technisch/componenten/transformers/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="en/technisch/componenten/transformers/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="technisch/componenten/transformers/"/>
+    </url>
+</urlset>
