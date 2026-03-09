@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/voorbeelden/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/voorbeelden/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/voorbeelden/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/handleiding/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/handleiding/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/handleiding/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/handleiding/cli-referentie/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/handleiding/cli-referentie/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/handleiding/cli-referentie/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/handleiding/export/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/handleiding/export/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/handleiding/export/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/handleiding/import/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/handleiding/import/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/handleiding/import/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/handleiding/installatie/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/handleiding/installatie/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/handleiding/installatie/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/handleiding/transform/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/handleiding/transform/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/handleiding/transform/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/technisch/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/technisch/datamodel/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/datamodel/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/datamodel/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/technisch/kwetsbaarheden/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/kwetsbaarheden/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/kwetsbaarheden/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/technisch/roadmap/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/roadmap/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/roadmap/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/technisch/stack/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/stack/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/stack/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/technisch/architectuur/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/architectuur/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/architectuur/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/technisch/architectuur/dataflows/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/architectuur/dataflows/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/architectuur/dataflows/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/technisch/architectuur/design-patterns/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/architectuur/design-patterns/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/architectuur/design-patterns/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/technisch/architectuur/lagen/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/architectuur/lagen/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/architectuur/lagen/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/technisch/componenten/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/componenten/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/componenten/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/technisch/componenten/parsers/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/componenten/parsers/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/componenten/parsers/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/technisch/componenten/persistentie/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/componenten/persistentie/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/componenten/persistentie/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/technisch/componenten/renderers/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/componenten/renderers/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/componenten/renderers/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/technisch/componenten/transformers/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/componenten/transformers/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/componenten/transformers/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/voorbeelden/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/voorbeelden/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/voorbeelden/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/handleiding/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/handleiding/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/handleiding/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/handleiding/cli-referentie/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/handleiding/cli-referentie/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/handleiding/cli-referentie/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/handleiding/export/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/handleiding/export/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/handleiding/export/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/handleiding/import/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/handleiding/import/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/handleiding/import/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/handleiding/installatie/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/handleiding/installatie/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/handleiding/installatie/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/handleiding/transform/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/handleiding/transform/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/handleiding/transform/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/technisch/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/technisch/datamodel/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/datamodel/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/datamodel/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/technisch/kwetsbaarheden/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/kwetsbaarheden/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/kwetsbaarheden/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/technisch/roadmap/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/roadmap/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/roadmap/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/technisch/stack/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/stack/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/stack/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/technisch/architectuur/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/architectuur/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/architectuur/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/technisch/architectuur/dataflows/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/architectuur/dataflows/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/architectuur/dataflows/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/technisch/architectuur/design-patterns/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/architectuur/design-patterns/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/architectuur/design-patterns/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/technisch/architectuur/lagen/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/architectuur/lagen/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/architectuur/lagen/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/technisch/componenten/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/componenten/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/componenten/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/technisch/componenten/parsers/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/componenten/parsers/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/componenten/parsers/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/technisch/componenten/persistentie/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/componenten/persistentie/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/componenten/persistentie/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/technisch/componenten/renderers/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/componenten/renderers/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/componenten/renderers/"/>
+    </url>
+    <url>
+        <loc>https://brienen.github.io/crunch_uml/en/technisch/componenten/transformers/</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://brienen.github.io/crunch_uml/en/technisch/componenten/transformers/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://brienen.github.io/crunch_uml/technisch/componenten/transformers/"/>
+    </url>
+</urlset>

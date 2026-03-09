@@ -1,0 +1,60 @@
+/* crunch_uml docs — custom styling */
+
+/* Mermaid diagram sizing */
+.mermaid {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+/* Make SVG images (draw.io exports) clickable and responsive */
+img[src$=".svg"],
+img[src$=".drawio.svg"] {
+  cursor: zoom-in;
+  max-width: 100%;
+  height: auto;
+  transition: transform 0.2s ease;
+}
+img[src$=".svg"]:hover,
+img[src$=".drawio.svg"]:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+/* Risk badges */
+.badge-high {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.85em;
+}
+.badge-medium {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.85em;
+}
+.badge-low {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.85em;
+}
+
+/* Component cards */
+.component-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+/* Status indicators */
+.status-current::before { content: "✅ "; }
+.status-planned::before { content: "🔮 "; }
+.status-risk::before { content: "⚠️ "; }

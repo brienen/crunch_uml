@@ -1,7 +1,7 @@
 site_name: "crunch_uml"
 site_description: "Documentatie voor crunch_uml — UML model transformatie en export"
 site_author: "Arjen Brienen"
-site_url: ""
+site_url: "https://brienen.github.io/crunch_uml/"
 
 repo_url: https://github.com/brienen/crunch_uml
 repo_name: brienen/crunch_uml
@@ -10,7 +10,6 @@ docs_dir: docs
 
 theme:
   name: material
-  language: nl
   palette:
     - scheme: default
       primary: indigo
@@ -45,6 +44,40 @@ theme:
 plugins:
   - search
   - tags
+  - i18n:
+      docs_structure: suffix
+      fallback_to_default: true
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+        - locale: nl
+          default: true
+          name: Nederlands
+          build: true
+          theme:
+            palette:
+              - toggle:
+                  name: Donker thema
+              - toggle:
+                  name: Licht thema
+        - locale: en
+          name: English
+          build: true
+          site_name: "crunch_uml"
+          site_description: "Documentation for crunch_uml — UML model transformation and export"
+          theme:
+            palette:
+              - toggle:
+                  name: Dark theme
+              - toggle:
+                  name: Light theme
+          nav_translations:
+            Home: Home
+            Handleiding: User Guide
+            Voorbeelden: Examples
+            Technisch Ontwerp: Technical Design
+            Architectuur: Architecture
+            Componenten: Components
   - glightbox:
       touchNavigation: true
       loop: false
