@@ -51,3 +51,36 @@ def test_import_monumenten_qea():
     type_monument = schema.get_enumeration("EAID_5C808AC9_CB09_4f4d_813E_821829856BA8")
     assert type_monument is not None
     assert type_monument.name == "TypeMonument"
+
+
+def test_import_qea_with_null_ea_guid_attributes():
+    """EA leaves t_attribute.ea_guid NULL for some literals/attributes. The
+    parser must mint synthetic ids for those rows instead of crashing on
+    None.strip()."""
+    test_args = [
+        "-sch",
+        "inkomenmim_qea_null",
+        "import",
+        "-f",
+        "./test/data/InkomenMIM.qea",
+        "-t",
+        "qea",
+        "-db_create",
+    ]
+    cli.main(test_args)
+
+    database = db.Database(const.DATABASE_URL, db_create=False)
+    schema = sch.Schema(database, schema_name="inkomenmim_qea_null")
+
+    # The enumeration CdSrtKostenBijzBijstand has 65 literals, all with NULL
+    # ea_guid in the source. They must all be present after import.
+    enum = next(
+        (e for e in schema.get_all_enumerations() if e.name == "CdSrtKostenBijzBijstand"),
+        None,
+    )
+    assert enum is not None
+    assert len(enum.literals) == 65
+
+    # All synthetic ids follow the EAID_attr_<n> pattern.
+    synth = [lit for lit in enum.literals if lit.id.startswith("EAID_attr_")]
+    assert len(synth) == 65

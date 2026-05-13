@@ -13,16 +13,35 @@ logger = logging.getLogger()
 #                  and EAPK_XXXXXXXX_XXXX_XXXX_XXXX_XXXXXXXXXXXX (for packages)
 
 
-def guid_to_eaid(guid: str) -> str:
-    """Convert EA GUID {XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX} to EAID_ format."""
+def guid_to_eaid(guid):
+    """Convert EA GUID {XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX} to EAID_ format.
+
+    Returns None when guid is None/empty so callers can supply a fallback id.
+    """
+    if not guid:
+        return None
     clean = guid.strip("{}").replace("-", "_")
     return f"EAID_{clean}"
 
 
-def guid_to_eapk(guid: str) -> str:
-    """Convert EA GUID {XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX} to EAPK_ format."""
+def guid_to_eapk(guid):
+    """Convert EA GUID {XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX} to EAPK_ format.
+
+    Returns None when guid is None/empty so callers can supply a fallback id.
+    """
+    if not guid:
+        return None
     clean = guid.strip("{}").replace("-", "_")
     return f"EAPK_{clean}"
+
+
+def synth_attr_eaid(attr_id) -> str:
+    """Synthetic id for a t_attribute row that has no ea_guid set in the QEA.
+
+    EA itself produces a generated identifier for these rows when exporting to
+    XMI; we mirror that approach with a stable, collision-free format.
+    """
+    return f"EAID_attr_{attr_id}"
 
 
 @ParserRegistry.register(
@@ -184,6 +203,10 @@ class QEAParser(Parser):
             )
         ).fetchall()
 
+        # Attribute numeric ID -> eaid (used by phase 5 to apply tagged values)
+        self._attr_id_map = {}
+        missing_guid_count = 0
+
         for row in rows:
             (
                 attr_id,
@@ -201,6 +224,13 @@ class QEAParser(Parser):
             ) = row
 
             eaid = guid_to_eaid(ea_guid)
+            if eaid is None:
+                # EA leaves ea_guid NULL for some attributes/enum literals; mint a
+                # stable synthetic id so the row can still be imported and later
+                # matched by tagged-value processing.
+                eaid = synth_attr_eaid(attr_id)
+                missing_guid_count += 1
+            self._attr_id_map[attr_id] = eaid
             parent_eaid = self._obj_id_map.get(obj_id)
 
             if parent_type == "Enumeration":
@@ -242,6 +272,11 @@ class QEAParser(Parser):
                 logger.debug(f"Attribute {name} met id {eaid}")
                 schema.save(attribute)
 
+        if missing_guid_count:
+            logger.info(
+                f"Phase 3: {missing_guid_count} attributes/literals had NULL ea_guid; "
+                "synthetic ids assigned."
+            )
         logger.info(
             f"Phase 3 done: {schema.count_attribute()} attributes, "
             f"{schema.count_enumeratieliteral()} enumeration literals"
@@ -363,14 +398,9 @@ class QEAParser(Parser):
         ).fetchall()
 
         for elem_id, prop, value in attr_rows:
-            # Find attribute by matching numeric ID via ea_guid lookup
-            attr_rows2 = conn.execute(
-                sa.text("SELECT ea_guid FROM t_attribute WHERE ID = :id"),
-                {"id": elem_id},
-            ).fetchone()
-            if attr_rows2 is None:
+            eaid = self._attr_id_map.get(elem_id)
+            if eaid is None:
                 continue
-            eaid = guid_to_eaid(attr_rows2[0])
             field = fixtag(prop)
             attr = schema.get_attribute(eaid)
             if attr is not None and hasattr(attr, field):
