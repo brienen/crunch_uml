@@ -398,9 +398,333 @@ class _DiffItem:
     changes: List[str]
 
 
+# ---------------------------------------------------------------------------
+# Helpers shared by the diff renderer.
+# ---------------------------------------------------------------------------
+
+
+# Field labels (Dutch where the model uses Dutch column names).
+_FIELD_LABELS: Dict[str, str] = {
+    "name": "naam",
+    "alias": "alias",
+    "definitie": "definitie",
+    "toelichting": "toelichting",
+    "bron": "bron",
+    "stereotype": "stereotype",
+    "status": "status",
+    "version": "versie",
+    "phase": "fase",
+    "author": "auteur",
+    "uri": "uri",
+    "visibility": "zichtbaarheid",
+    "is_datatype": "is_datatype",
+    "verplicht": "verplicht",
+    "primitive": "primitieve type",
+    "enumeration_id": "enumeratie",
+    "type_class_id": "type (class)",
+    "package_id": "package",
+    "clazz_id": "class",
+    "src_class_id": "src class",
+    "dst_class_id": "dst class",
+    "src_mult_start": "src mult. start",
+    "src_mult_end": "src mult. end",
+    "src_role": "src role",
+    "src_documentation": "src documentatie",
+    "dst_mult_start": "dst mult. start",
+    "dst_mult_end": "dst mult. end",
+    "dst_role": "dst role",
+    "dst_documentation": "dst documentatie",
+    "superclass_id": "superclass",
+    "subclass_id": "subclass",
+    # Tagged-value groups
+    "herkomst": "herkomst",
+    "herkomst_definitie": "herkomst definitie",
+    "begrip": "begrip",
+    "datum_opname": "datum opname",
+    "gemma_naam": "gemma_naam",
+    "gemma_type": "gemma_type",
+    "gemma_url": "gemma_url",
+    "gemma_definitie": "gemma_definitie",
+    "gemma_toelichting": "gemma_toelichting",
+    "domein_dcat": "domein_dcat",
+    "domein_iv3": "domein_iv3",
+    "heeft_tijdlijn_geldigheid": "tijdlijn geldigheid",
+    "heeft_tijdlijn_registratie": "tijdlijn registratie",
+    "indicatie_formele_historie": "formele historie",
+    "indicatie_materiele_historie": "materiele historie",
+    "indicatie_in_onderzoek": "in onderzoek",
+    "minimumwaarde_inclusief": "min. inclusief",
+    "minimumwaarde_exclusief": "min. exclusief",
+    "maximumwaarde_inclusief": "max. inclusief",
+    "maximumwaarde_exclusief": "max. exclusief",
+    "eenheid": "eenheid",
+    "populatie": "populatie",
+    "kwaliteit": "kwaliteit",
+    "synoniemen": "synoniemen",
+    "authentiek": "authentiek",
+    "lengte": "lengte",
+    "patroon": "patroon",
+    "formeel_patroon": "formeel patroon",
+    "indicatie_classificerend": "classificerend",
+    "mogelijk_geen_waarde": "mogelijk geen waarde",
+    "nullable": "nullable",
+    "modelnaam_kort": "modelnaam (kort)",
+    "afkorting": "afkorting",
+    "release": "release",
+}
+
+
+# Fields per entity type. Timestamp/identity fields are skipped to avoid noise.
+_PACKAGE_FIELDS = [
+    "name",
+    "alias",
+    "stereotype",
+    "status",
+    "version",
+    "phase",
+    "author",
+    "uri",
+    "visibility",
+    "definitie",
+    "toelichting",
+    "bron",
+    "afkorting",
+    "release",
+    "modelnaam_kort",
+    "parent_package_id",
+    "herkomst",
+    "herkomst_definitie",
+    "begrip",
+    "datum_opname",
+    "gemma_naam",
+    "gemma_type",
+    "gemma_url",
+    "gemma_definitie",
+    "gemma_toelichting",
+    "domein_dcat",
+    "domein_iv3",
+]
+
+_CLASS_FIELDS = [
+    "name",
+    "alias",
+    "stereotype",
+    "status",
+    "version",
+    "phase",
+    "author",
+    "uri",
+    "visibility",
+    "definitie",
+    "toelichting",
+    "bron",
+    "is_datatype",
+    "package_id",
+    "indicatie_formele_historie",
+    "authentiek",
+    "nullable",
+    "herkomst",
+    "herkomst_definitie",
+    "begrip",
+    "datum_opname",
+    "gemma_naam",
+    "gemma_type",
+    "gemma_url",
+    "gemma_definitie",
+    "gemma_toelichting",
+    "domein_dcat",
+    "domein_iv3",
+    "populatie",
+    "kwaliteit",
+    "synoniemen",
+]
+
+_ENUM_FIELDS = [
+    "name",
+    "alias",
+    "stereotype",
+    "status",
+    "version",
+    "phase",
+    "author",
+    "uri",
+    "visibility",
+    "definitie",
+    "toelichting",
+    "bron",
+    "package_id",
+    "herkomst",
+    "herkomst_definitie",
+    "begrip",
+    "datum_opname",
+    "gemma_naam",
+    "gemma_type",
+    "gemma_url",
+    "gemma_definitie",
+    "gemma_toelichting",
+    "domein_dcat",
+    "domein_iv3",
+]
+
+_ATTR_FIELDS = [
+    "name",
+    "stereotype",
+    "definitie",
+    "toelichting",
+    "bron",
+    "primitive",
+    "enumeration_id",
+    "type_class_id",
+    "verplicht",
+    "clazz_id",
+    "lengte",
+    "patroon",
+    "formeel_patroon",
+    "indicatie_classificerend",
+    "mogelijk_geen_waarde",
+    "heeft_tijdlijn_geldigheid",
+    "heeft_tijdlijn_registratie",
+    "indicatie_formele_historie",
+    "indicatie_materiele_historie",
+    "indicatie_in_onderzoek",
+    "minimumwaarde_inclusief",
+    "minimumwaarde_exclusief",
+    "maximumwaarde_inclusief",
+    "maximumwaarde_exclusief",
+    "eenheid",
+    "populatie",
+    "kwaliteit",
+    "synoniemen",
+    "authentiek",
+    "herkomst",
+    "herkomst_definitie",
+    "begrip",
+    "datum_opname",
+]
+
+_ASSOC_FIELDS = [
+    "name",
+    "stereotype",
+    "definitie",
+    "toelichting",
+    "bron",
+    "src_class_id",
+    "src_mult_start",
+    "src_mult_end",
+    "src_role",
+    "src_documentation",
+    "dst_class_id",
+    "dst_mult_start",
+    "dst_mult_end",
+    "dst_role",
+    "dst_documentation",
+    "herkomst",
+    "herkomst_definitie",
+    "begrip",
+    "datum_opname",
+    "heeft_tijdlijn_geldigheid",
+    "heeft_tijdlijn_registratie",
+    "indicatie_formele_historie",
+    "indicatie_materiele_historie",
+    "indicatie_in_onderzoek",
+]
+
+_GEN_FIELDS = [
+    "name",
+    "stereotype",
+    "definitie",
+    "toelichting",
+    "bron",
+    "subclass_id",
+    "superclass_id",
+]
+
+
+# A change in a *structural* field impacts the model itself: identifiers,
+# typing, multiplicity, mandatory-ness, links. A change in a descriptive field
+# only updates metadata / documentation (definitie, toelichting, gemma tags,
+# release/version/auteur, etc.) without altering the model structure.
+_STRUCTURAL_FIELDS: Set[str] = {
+    # Identity & containment
+    "name",
+    "stereotype",
+    "is_datatype",
+    "package_id",
+    "parent_package_id",
+    "clazz_id",
+    # Attribute typing
+    "primitive",
+    "enumeration_id",
+    "type_class_id",
+    "verplicht",
+    "lengte",
+    "patroon",
+    "formeel_patroon",
+    "indicatie_classificerend",
+    "mogelijk_geen_waarde",
+    "nullable",
+    "authentiek",
+    # Value-range constraints
+    "minimumwaarde_inclusief",
+    "minimumwaarde_exclusief",
+    "maximumwaarde_inclusief",
+    "maximumwaarde_exclusief",
+    "eenheid",
+    # Historiek-flags affect storage shape
+    "indicatie_formele_historie",
+    "indicatie_materiele_historie",
+    "heeft_tijdlijn_geldigheid",
+    "heeft_tijdlijn_registratie",
+    "indicatie_in_onderzoek",
+    # Associations
+    "src_class_id",
+    "dst_class_id",
+    "src_mult_start",
+    "src_mult_end",
+    "dst_mult_start",
+    "dst_mult_end",
+    "src_role",
+    "dst_role",
+    # Generalisaties
+    "subclass_id",
+    "superclass_id",
+}
+
+
+def _split_changes(
+    by_key: Dict[str, List[Dict[str, str]]],
+) -> "tuple[Dict[str, List[Dict[str, str]]], Dict[str, List[Dict[str, str]]]]":
+    """Split each field-change list into (structural, descriptive) dicts."""
+    s: Dict[str, List[Dict[str, str]]] = {}
+    d: Dict[str, List[Dict[str, str]]] = {}
+    for key, changes in by_key.items():
+        sc = [c for c in changes if c["field"] in _STRUCTURAL_FIELDS]
+        dc = [c for c in changes if c["field"] not in _STRUCTURAL_FIELDS]
+        if sc:
+            s[key] = sc
+        if dc:
+            d[key] = dc
+    return s, d
+
+
 def _norm(v: Any) -> Any:
+    """Normalise field values so '' and None compare equal.
+
+    Also collapses leading/trailing whitespace and the literal string ``"nan"``
+    (which the XMI parser occasionally produces for empty cells) to ``""`` so
+    that they don't show up as fake changes.
+    """
     if v is None:
         return ""
+    if isinstance(v, bool):
+        return "true" if v else "false"
+    if isinstance(v, str):
+        # Normalise line endings — EA on Windows writes CRLF, other sources LF.
+        # Without this every multi-line definition appears as "changed".
+        s = v.replace("\r\n", "\n").replace("\r", "\n").strip()
+        if s.lower() == "nan":
+            return ""
+        return s
     return v
 
 
@@ -408,35 +732,137 @@ def _safe_get(obj: Any, field: str) -> Any:
     return getattr(obj, field) if obj is not None and hasattr(obj, field) else None
 
 
-def _diff_fields(
-    a: Any,
-    b: Any,
-    fields: Iterable[str],
-    labels: Optional[Dict[str, str]] = None,
-    formatters: Optional[Dict[str, Any]] = None,
-) -> List[str]:
-    out: List[str] = []
-    for f in fields:
-        av = _norm(_safe_get(a, f))
-        bv = _norm(_safe_get(b, f))
-        if av != bv:
-            label = labels.get(f, f) if labels else f
-            if formatters and f in formatters:
-                out.append(formatters[f](label, av, bv))
-            else:
-                out.append(f"- **{label}**: `{av}` → `{bv}`")
-    return out
-
-
-def _md_list(items: List[str], indent: int = 0) -> str:
-    if not items:
-        return ""
-    pad = " " * indent
-    return "\n".join(pad + it for it in items)
-
-
-def _md_escape(s: str) -> str:
+def _md_escape(s: Any) -> str:
     return str(s).replace("\n", " ").strip()
+
+
+def _md_anchor(s: str) -> str:
+    """GitHub-style anchor: lowercase, spaces to dashes, drop punctuation."""
+    out = []
+    for ch in s.lower():
+        if ch.isalnum() or ch == "-":
+            out.append(ch)
+        elif ch in (" ", "_"):
+            out.append("-")
+    return "".join(out)
+
+
+def _clean_name(v: Any) -> str:
+    """Strip whitespace and treat 'nan' as empty so cosmetic differences in
+    names don't ripple into every child's qualified key."""
+    if v is None:
+        return ""
+    s = str(v).strip()
+    if s.lower() == "nan":
+        return ""
+    return s
+
+
+def _qualified_pkg_path(pkg: Any, max_depth: int = 32) -> str:
+    """Walk parent_package chain and return 'Top/Sub/Leaf'."""
+    if pkg is None:
+        return ""
+    parts: List[str] = []
+    seen: Set[int] = set()
+    node = pkg
+    for _ in range(max_depth):
+        if node is None or id(node) in seen:
+            break
+        seen.add(id(node))
+        parts.append(_clean_name(getattr(node, "name", None)))
+        node = getattr(node, "parent_package", None)
+    return "/".join(reversed(parts))
+
+
+def _stable_key(obj: Any, kind: str) -> str:
+    """Build a name-based key that survives ea_guid regeneration."""
+    if obj is None:
+        return ""
+    if kind == "package":
+        return _qualified_pkg_path(obj)
+    if kind in ("class", "enum"):
+        pkg_path = _qualified_pkg_path(getattr(obj, "package", None))
+        return f"{pkg_path}::{_clean_name(getattr(obj, 'name', None))}"
+    if kind == "attribute":
+        cls_key = _stable_key(getattr(obj, "clazz", None), "class")
+        return f"{cls_key}#{_clean_name(getattr(obj, 'name', None))}"
+    if kind == "literal":
+        enum_key = _stable_key(getattr(obj, "enumeratie", None), "enum")
+        return f"{enum_key}={_clean_name(getattr(obj, 'name', None))}"
+    if kind == "association":
+        src = _stable_key(getattr(obj, "src_class", None), "class")
+        dst = _stable_key(getattr(obj, "dst_class", None), "class")
+        return f"{src} --[{_clean_name(getattr(obj, 'name', None))}]--> {dst}"
+    if kind == "generalization":
+        sub = _stable_key(getattr(obj, "subclass", None), "class")
+        sup = _stable_key(getattr(obj, "superclass", None), "class")
+        return f"{sub} --> {sup}"
+    return getattr(obj, "id", "") or ""
+
+
+def _match_by_key_or_id(
+    a_items: Iterable[Any],
+    b_items: Iterable[Any],
+    kind: str,
+) -> Dict[str, Any]:
+    """Match entities from schema A to schema B.
+
+    Strategy: first match by id (zero-change case), then by qualified name
+    (catches re-imported entities where ea_guid was regenerated).
+
+    Returns a dict with keys: ``pairs`` (list of (a, b)), ``added`` (B-only),
+    ``removed`` (A-only).
+    """
+    a_list = list(a_items)
+    b_list = list(b_items)
+    a_by_id: Dict[str, Any] = {str(getattr(a, "id", "")): a for a in a_list if getattr(a, "id", None)}
+    b_by_id: Dict[str, Any] = {str(getattr(b, "id", "")): b for b in b_list if getattr(b, "id", None)}
+    a_by_key: Dict[str, Any] = {}
+    for a in a_list:
+        k = _stable_key(a, kind)
+        if k and k not in a_by_key:
+            a_by_key[k] = a
+    b_by_key: Dict[str, Any] = {}
+    for b in b_list:
+        k = _stable_key(b, kind)
+        if k and k not in b_by_key:
+            b_by_key[k] = b
+
+    matched_a: Set[int] = set()
+    matched_b: Set[int] = set()
+    pairs: List[Any] = []
+
+    # Pass 1: identical ids.
+    for aid, a in a_by_id.items():
+        b = b_by_id.get(aid)
+        if b is not None:
+            pairs.append((a, b))
+            matched_a.add(id(a))
+            matched_b.add(id(b))
+
+    # Pass 2: qualified-name fallback on leftovers.
+    for key, a in a_by_key.items():
+        if id(a) in matched_a:
+            continue
+        b = b_by_key.get(key)
+        if b is None or id(b) in matched_b:
+            continue
+        pairs.append((a, b))
+        matched_a.add(id(a))
+        matched_b.add(id(b))
+
+    added = [b for b in b_list if id(b) not in matched_b]
+    removed = [a for a in a_list if id(a) not in matched_a]
+    return {"pairs": pairs, "added": added, "removed": removed}
+
+
+def _fmt_value(v: Any) -> str:
+    s = _md_escape(v) if v not in (None, "") else ""
+    if not s:
+        return "_(leeg)_"
+    if len(s) > 240:
+        s = s[:237] + "…"
+    return f"`{s}`"
 
 
 @RendererRegistry.register(
@@ -444,374 +870,851 @@ def _md_escape(s: str) -> str:
     descr="Top-down Markdown diff between two schema versions (Package → Class/Datatype/Enum → Attribute/Literal).",
 )
 class SchemaDiffMarkdownRenderer(Renderer):
+    """Markdown diff between two schemas.
+
+    Entities are matched first by id, then by qualified-name fallback so that a
+    re-import (which can regenerate ea_guid) is recognised as the same logical
+    entity instead of being reported as a remove + add pair. Foreign-key fields
+    (``enumeration_id``, ``type_class_id``, etc.) are resolved to their target
+    entity in each schema and compared by qualified name, which removes the
+    misleading ``Enumeratie: X → Enumeratie: X`` noise that the previous
+    id-only comparison produced.
+    """
+
     def _get_other_schema(self, schema: sch.Schema, args) -> sch.Schema:
         other_name = getattr(args, "compare_schema_name", None)
         if not other_name:
             raise ValueError("diff_md requires --compare_schema_name <schema_id/schema_name>.")
         return sch.Schema(schema.database, schema_name=other_name)
 
-    def _index_by_id(self, items: Iterable[Any]) -> Dict[str, Any]:
-        out: Dict[str, Any] = {}
-        for it in items:
-            if getattr(it, "id", None) is not None:
-                out[str(it.id)] = it
+    # ------------------------------------------------------------------
+    # FK resolution
+    # ------------------------------------------------------------------
+
+    def _resolve_target(
+        self,
+        field: str,
+        value: Any,
+        side_a: bool,
+        ctx: Dict[str, Any],
+    ) -> str:
+        """Return a human-readable qualified key for an FK column value.
+
+        Resolves the id within the *correct* schema (A or B) so that two
+        different ea_guids that point to the same logical target collapse to
+        the same string and produce no false-positive diff.
+        """
+        v = str(value or "")
+        if not v:
+            return ""
+        side = "a" if side_a else "b"
+        if field == "enumeration_id":
+            obj = ctx["enums_by_id"][side].get(v)
+            return f"Enumeratie: {_stable_key(obj, 'enum')}" if obj else f"Enumeratie: <onbekend:{v}>"
+        if field in ("type_class_id", "clazz_id", "src_class_id", "dst_class_id", "subclass_id", "superclass_id"):
+            obj = ctx["classes_by_id"][side].get(v)
+            kind = "Datatype" if obj is not None and getattr(obj, "is_datatype", False) else "Class"
+            return f"{kind}: {_stable_key(obj, 'class')}" if obj else f"Class: <onbekend:{v}>"
+        if field in ("package_id", "parent_package_id"):
+            obj = ctx["packages_by_id"][side].get(v)
+            return f"Package: {_stable_key(obj, 'package')}" if obj else f"Package: <onbekend:{v}>"
+        return v
+
+    def _value_for_diff(self, field: str, raw: Any, side_a: bool, ctx: Dict[str, Any]) -> str:
+        """Normalise a field value to a comparable string (with FK resolution)."""
+        if field.endswith("_id") and field != "ea_guid":
+            return self._resolve_target(field, raw, side_a, ctx)
+        return str(_norm(raw))
+
+    def _diff_entity_fields(
+        self,
+        a: Any,
+        b: Any,
+        fields: List[str],
+        ctx: Dict[str, Any],
+    ) -> List[Dict[str, str]]:
+        """Compare field-by-field. Returns list of {field, label, old, new}."""
+        out: List[Dict[str, str]] = []
+        for f in fields:
+            av = self._value_for_diff(f, _safe_get(a, f), side_a=True, ctx=ctx)
+            bv = self._value_for_diff(f, _safe_get(b, f), side_a=False, ctx=ctx)
+            if av != bv:
+                out.append(
+                    {
+                        "field": f,
+                        "label": _FIELD_LABELS.get(f, f),
+                        "old": av,
+                        "new": bv,
+                    }
+                )
         return out
+
+    # ------------------------------------------------------------------
+    # Rendering
+    # ------------------------------------------------------------------
+
+    def _render_field_changes(self, changes: List[Dict[str, str]], indent: int = 2) -> List[str]:
+        pad = " " * indent
+        out: List[str] = []
+        for c in changes:
+            old = _fmt_value(c["old"])
+            new = _fmt_value(c["new"])
+            out.append(f"{pad}- **{c['label']}**: {old} → {new}")
+        return out
+
+    def _pkg_of_class(self, obj: Any) -> Any:
+        return getattr(obj, "package", None)
+
+    def _pkg_of_enum(self, obj: Any) -> Any:
+        return getattr(obj, "package", None)
+
+    def _pkg_of_attr(self, obj: Any) -> Any:
+        cls = getattr(obj, "clazz", None)
+        return getattr(cls, "package", None) if cls is not None else None
+
+    def _pkg_of_assoc(self, obj: Any) -> Any:
+        src = getattr(obj, "src_class", None)
+        return getattr(src, "package", None) if src is not None else None
+
+    def _pkg_of_gen(self, obj: Any) -> Any:
+        sub = getattr(obj, "subclass", None)
+        return getattr(sub, "package", None) if sub is not None else None
 
     def render(self, args, schema: sch.Schema):
         other = self._get_other_schema(schema, args)
-        title = getattr(args, "compare_title", None) or f"Diff: {schema.schema_id} → {other.schema_id}"
+        a_name = getattr(other, "schema_id", None) or "old"
+        b_name = getattr(schema, "schema_id", None) or "new"
+        title = getattr(args, "compare_title", None) or f"Changes from {a_name} to {b_name}"
 
-        # Load entities
-        a_pkgs = schema.get_all_packages()
-        b_pkgs = other.get_all_packages()
-        a_classes = schema.get_all_classes()  # includes datatypes
-        b_classes = other.get_all_classes()
-        a_enums = schema.get_all_enumerations()
-        b_enums = other.get_all_enumerations()
-        a_attrs = schema.get_all_attributes()
-        b_attrs = other.get_all_attributes()
-        a_literals = schema.get_all_literals()
-        b_literals = other.get_all_literals()
+        # Load entities. NB: A = old (compare schema), B = new (current schema).
+        a_pkgs = list(other.get_all_packages())
+        b_pkgs = list(schema.get_all_packages())
+        a_classes = list(other.get_all_classes())  # includes datatypes
+        b_classes = list(schema.get_all_classes())
+        a_enums = list(other.get_all_enumerations())
+        b_enums = list(schema.get_all_enumerations())
+        a_attrs = list(other.get_all_attributes())
+        b_attrs = list(schema.get_all_attributes())
+        a_literals = list(other.get_all_literals())
+        b_literals = list(schema.get_all_literals())
+        try:
+            a_assocs = list(other.get_all_associations())
+            b_assocs = list(schema.get_all_associations())
+        except Exception:
+            a_assocs, b_assocs = [], []
+        try:
+            a_gens = list(other.get_all_generalizations())
+            b_gens = list(schema.get_all_generalizations())
+        except Exception:
+            a_gens, b_gens = [], []
 
-        A_pkg = self._index_by_id(a_pkgs)
-        B_pkg = self._index_by_id(b_pkgs)
-        A_cls = self._index_by_id(a_classes)
-        B_cls = self._index_by_id(b_classes)
-        A_enum = self._index_by_id(a_enums)
-        B_enum = self._index_by_id(b_enums)
-        A_attr = self._index_by_id(a_attrs)
-        B_attr = self._index_by_id(b_attrs)
-
-        # Human-readable ID lookups
-        enum_name_by_id: Dict[str, str] = {}
-        for _eid, _e in {**A_enum, **B_enum}.items():
-            enum_name_by_id[_eid] = str(getattr(_e, "name", _eid))
-
-        class_name_by_id: Dict[str, str] = {}
-        for _cid, _c in {**A_cls, **B_cls}.items():
-            class_name_by_id[_cid] = str(getattr(_c, "name", _cid))
-
-        def _fmt_enum(label: str, old: Any, new: Any) -> str:
-            o = str(old) if old not in (None, "") else ""
-            n = str(new) if new not in (None, "") else ""
-            o_txt = f"Enumeratie: {enum_name_by_id.get(o, o)}" if o else ""
-            n_txt = f"Enumeratie: {enum_name_by_id.get(n, n)}" if n else ""
-            return f"- **{label}**: `{o_txt}` → `{n_txt}`"
-
-        def _fmt_class(label: str, old: Any, new: Any) -> str:
-            o = str(old) if old not in (None, "") else ""
-            n = str(new) if new not in (None, "") else ""
-            o_txt = f"Objecttype: {class_name_by_id.get(o, o)}" if o else ""
-            n_txt = f"Objecttype: {class_name_by_id.get(n, n)}" if n else ""
-            return f"- **{label}**: `{o_txt}` → `{n_txt}`"
-
-        attr_formatters: Dict[str, Any] = {
-            "enumeration_id": _fmt_enum,
-            "type_class_id": _fmt_class,
+        # Indexes used by FK resolution.
+        ctx: Dict[str, Any] = {
+            "packages_by_id": {
+                "a": {str(p.id): p for p in a_pkgs if getattr(p, "id", None)},
+                "b": {str(p.id): p for p in b_pkgs if getattr(p, "id", None)},
+            },
+            "classes_by_id": {
+                "a": {str(c.id): c for c in a_classes if getattr(c, "id", None)},
+                "b": {str(c.id): c for c in b_classes if getattr(c, "id", None)},
+            },
+            "enums_by_id": {
+                "a": {str(e.id): e for e in a_enums if getattr(e, "id", None)},
+                "b": {str(e.id): e for e in b_enums if getattr(e, "id", None)},
+            },
         }
 
-        # Sets
-        cls_added = sorted(set(B_cls) - set(A_cls))
-        cls_removed = sorted(set(A_cls) - set(B_cls))
-        cls_common = sorted(set(A_cls) & set(B_cls))
+        # Match by id, then by qualified key.
+        m_pkg = _match_by_key_or_id(a_pkgs, b_pkgs, "package")
+        m_cls = _match_by_key_or_id(a_classes, b_classes, "class")
+        m_enum = _match_by_key_or_id(a_enums, b_enums, "enum")
+        m_attr = _match_by_key_or_id(a_attrs, b_attrs, "attribute")
+        m_assoc = _match_by_key_or_id(a_assocs, b_assocs, "association")
+        m_gen = _match_by_key_or_id(a_gens, b_gens, "generalization")
 
-        enum_added = sorted(set(B_enum) - set(A_enum))
-        enum_removed = sorted(set(A_enum) - set(B_enum))
-        enum_common = sorted(set(A_enum) & set(B_enum))
+        # Compute field-level diffs on common pairs.
+        pkg_changes: Dict[str, List[Dict[str, str]]] = {}
+        for a, b in m_pkg["pairs"]:
+            ch = self._diff_entity_fields(a, b, _PACKAGE_FIELDS, ctx)
+            if ch:
+                pkg_changes[_stable_key(b, "package")] = ch
 
-        attr_added = sorted(set(B_attr) - set(A_attr))
-        attr_removed = sorted(set(A_attr) - set(B_attr))
-        attr_common = sorted(set(A_attr) & set(B_attr))
+        class_changes: Dict[str, List[Dict[str, str]]] = {}
+        for a, b in m_cls["pairs"]:
+            ch = self._diff_entity_fields(a, b, _CLASS_FIELDS, ctx)
+            if ch:
+                class_changes[_stable_key(b, "class")] = ch
 
-        # Field-level diffs
-        labels = {"notes": "notes/toelichting", "definition": "definition/definitie"}
-        class_fields = ["name", "stereotype", "alias", "uri", "notes", "definition", "package_id", "is_datatype"]
-        enum_fields = ["name", "stereotype", "alias", "uri", "notes", "definition", "package_id"]
-        attr_fields = [
-            "name",
-            "stereotype",
-            "alias",
-            "uri",
-            "notes",
-            "definition",
-            "clazz_id",
-            "primitive",
-            "enumeration_id",
-            "type_class_id",
-            "verplicht",
-        ]
+        enum_changes: Dict[str, List[Dict[str, str]]] = {}
+        for a, b in m_enum["pairs"]:
+            ch = self._diff_entity_fields(a, b, _ENUM_FIELDS, ctx)
+            if ch:
+                enum_changes[_stable_key(b, "enum")] = ch
 
-        class_changes: List[_DiffItem] = []
-        enum_changes: List[_DiffItem] = []
-        attr_changes: List[_DiffItem] = []
+        attr_changes: Dict[str, List[Dict[str, str]]] = {}
+        for a, b in m_attr["pairs"]:
+            ch = self._diff_entity_fields(a, b, _ATTR_FIELDS, ctx)
+            if ch:
+                attr_changes[_stable_key(b, "attribute")] = ch
 
-        for cid in cls_common:
-            field_changes = _diff_fields(A_cls[cid], B_cls[cid], class_fields, labels=labels)
-            if field_changes:
-                class_changes.append(
-                    _DiffItem(
-                        key=cid,
-                        title=str(_safe_get(B_cls[cid], "name") or cid),
-                        changes=field_changes,
-                    )
-                )
+        assoc_changes: Dict[str, List[Dict[str, str]]] = {}
+        for a, b in m_assoc["pairs"]:
+            ch = self._diff_entity_fields(a, b, _ASSOC_FIELDS, ctx)
+            if ch:
+                assoc_changes[_stable_key(b, "association")] = ch
 
-        for eid in enum_common:
-            field_changes = _diff_fields(A_enum[eid], B_enum[eid], enum_fields, labels=labels)
-            if field_changes:
-                enum_changes.append(
-                    _DiffItem(
-                        key=eid,
-                        title=str(_safe_get(B_enum[eid], "name") or eid),
-                        changes=field_changes,
-                    )
-                )
+        gen_changes: Dict[str, List[Dict[str, str]]] = {}
+        for a, b in m_gen["pairs"]:
+            ch = self._diff_entity_fields(a, b, _GEN_FIELDS, ctx)
+            if ch:
+                gen_changes[_stable_key(b, "generalization")] = ch
 
-        for aid in attr_common:
-            field_changes = _diff_fields(
-                A_attr[aid],
-                B_attr[aid],
-                attr_fields,
-                labels=labels,
-                formatters=attr_formatters,
-            )
-            if field_changes:
-                nm = str(_safe_get(B_attr[aid], "name") or aid)
-                clsid = str(_safe_get(B_attr[aid], "clazz_id") or "")
-                attr_changes.append(
-                    _DiffItem(
-                        key=aid,
-                        title=f"{nm} (class={clsid})",
-                        changes=field_changes,
-                    )
-                )
+        # Literals are diffed by name within each enum (using the matched pairs).
+        lit_changes: Dict[str, Dict[str, List[str]]] = {}  # enum_stable_key -> {added, removed}
 
-        changed_class_ids: Set[str] = {d.key for d in class_changes}
-        changed_enum_ids: Set[str] = {d.key for d in enum_changes}
-        changed_attr_ids: Set[str] = {d.key for d in attr_changes}
+        def _names_for_enum(lits: Iterable[Any], enum: Any) -> Set[str]:
+            eid = str(getattr(enum, "id", "") or "")
+            return {
+                str(getattr(lol, "name", "") or "").strip()
+                for lol in lits
+                if str(getattr(lol, "enumeratie_id", "") or "") == eid and getattr(lol, "name", None)
+            }
 
-        # Fast lookups (and avoids mypy issues with next(..., None))
-        class_changes_by_id: Dict[str, _DiffItem] = {d.key: d for d in class_changes}
-        enum_changes_by_id: Dict[str, _DiffItem] = {d.key: d for d in enum_changes}
-        attr_changes_by_id: Dict[str, _DiffItem] = {d.key: d for d in attr_changes}
-
-        # Literals diff per enum
-        lit_changes: Dict[str, Dict[str, List[str]]] = {}
-        for eid in set(A_enum) | set(B_enum):
-            a_lits = [lol for lol in a_literals if str(getattr(lol, "enumeratie_id", "")) == str(eid)]
-            b_lits = [lol for lol in b_literals if str(getattr(lol, "enumeratie_id", "")) == str(eid)]
-            a_names = {str(getattr(lol, "name", "")) for lol in a_lits if getattr(lol, "name", None)}
-            b_names = {str(getattr(lol, "name", "")) for lol in b_lits if getattr(lol, "name", None)}
+        for a, b in m_enum["pairs"]:
+            a_names = _names_for_enum(a_literals, a)
+            b_names = _names_for_enum(b_literals, b)
             added = sorted(b_names - a_names)
             removed = sorted(a_names - b_names)
             if added or removed:
-                lit_changes[str(eid)] = {"added": added, "removed": removed}
+                lit_changes[_stable_key(b, "enum")] = {"added": added, "removed": removed}
+        # Literals for newly added enumerations: everything counts as added.
+        for e in m_enum["added"]:
+            names = sorted(_names_for_enum(b_literals, e))
+            if names:
+                lit_changes[_stable_key(e, "enum")] = {"added": names, "removed": []}
+        # Literals for removed enumerations: everything counts as removed.
+        for e in m_enum["removed"]:
+            names = sorted(_names_for_enum(a_literals, e))
+            if names:
+                lit_changes[_stable_key(e, "enum")] = {"added": [], "removed": names}
 
-        changed_enum_ids |= set(lit_changes.keys())
+        # Split each field-level diff into structural and descriptive parts.
+        pkg_s, pkg_d = _split_changes(pkg_changes)
+        class_s, class_d = _split_changes(class_changes)
+        enum_s, enum_d = _split_changes(enum_changes)
+        attr_s, attr_d = _split_changes(attr_changes)
+        assoc_s, assoc_d = _split_changes(assoc_changes)
+        gen_s, gen_d = _split_changes(gen_changes)
 
-        # Helpers
-        def pkg_name(pid: str) -> str:
-            p = B_pkg.get(pid) or A_pkg.get(pid)
-            return str(getattr(p, "name", pid))
+        # Build buckets per category. Structural also carries added/removed and
+        # literal diffs; descriptive only has field updates on common entities.
+        struct_buckets = self._build_buckets(
+            pkg_changes=pkg_s,
+            class_changes=class_s,
+            enum_changes=enum_s,
+            attr_changes=attr_s,
+            assoc_changes=assoc_s,
+            gen_changes=gen_s,
+            lit_changes=lit_changes,
+            m_cls=m_cls,
+            m_enum=m_enum,
+            m_attr=m_attr,
+            m_assoc=m_assoc,
+            m_gen=m_gen,
+            include_added_removed=True,
+        )
+        descr_buckets = self._build_buckets(
+            pkg_changes=pkg_d,
+            class_changes=class_d,
+            enum_changes=enum_d,
+            attr_changes=attr_d,
+            assoc_changes=assoc_d,
+            gen_changes=gen_d,
+            lit_changes={},
+            m_cls=m_cls,
+            m_enum=m_enum,
+            m_attr=m_attr,
+            m_assoc=m_assoc,
+            m_gen=m_gen,
+            include_added_removed=False,
+        )
 
-        def cls_pkg_id(cid: str) -> str:
-            c = B_cls.get(cid) or A_cls.get(cid)
-            return str(getattr(c, "package_id", "") or "")
-
-        def enum_pkg_id(eid: str) -> str:
-            e = B_enum.get(eid) or A_enum.get(eid)
-            return str(getattr(e, "package_id", "") or "")
-
-        def is_datatype(cid: str) -> bool:
-            c = B_cls.get(cid) or A_cls.get(cid)
-            return bool(getattr(c, "is_datatype", False))
-
-        # Markdown
-        lines: List[str] = []
-        lines.append(f"# {title}\n")
-
+        s_counts = self._count_section(struct_buckets)
+        d_counts = self._count_section(descr_buckets)
         lit_added_total = sum(len(v.get("added", [])) for v in lit_changes.values())
         lit_removed_total = sum(len(v.get("removed", [])) for v in lit_changes.values())
 
-        cls_added_dt = [cid for cid in cls_added if is_datatype(cid)]
-        cls_added_cl = [cid for cid in cls_added if not is_datatype(cid)]
-        cls_removed_dt = [cid for cid in cls_removed if is_datatype(cid)]
-        cls_removed_cl = [cid for cid in cls_removed if not is_datatype(cid)]
-        cls_changed_dt = [cid for cid in changed_class_ids if is_datatype(cid)]
-        cls_changed_cl = [cid for cid in changed_class_ids if not is_datatype(cid)]
-
-        lines.append("## Summary\n")
+        # ------------------------------------------------------------------
+        # Compose Markdown.
+        # ------------------------------------------------------------------
+        lines: List[str] = []
+        lines.append(f"# {title}")
+        lines.append("")
         lines.append(
-            "\n".join(
-                [
-                    f"- **Classes**: +{len(cls_added_cl)} / -{len(cls_removed_cl)} / ~{len(cls_changed_cl)}",
-                    f"- **Datatypes**: +{len(cls_added_dt)} / -{len(cls_removed_dt)} / ~{len(cls_changed_dt)}",
-                    f"- **Enumerations**: +{len(enum_added)} / -{len(enum_removed)} / ~{len(changed_enum_ids)}",
-                    f"- **Attributes**: +{len(attr_added)} / -{len(attr_removed)} / ~{len(changed_attr_ids)}",
-                    f"- **Literals**: +{lit_added_total} / -{lit_removed_total}",
-                ]
-            )
+            "Entiteiten worden vergeleken op naam (gekwalificeerd met pakketpad), zodat een nieuwe "
+            "`ea_guid` voor hetzelfde logische element niet als _Removed + Added_ verschijnt. "
+            "Verwijzingen naar andere entiteiten (FK-velden zoals `enumeration_id`) worden vergeleken "
+            "op de naam van het doel — niet op de interne sleutel."
+        )
+        lines.append("")
+        lines.append(
+            "**Structurele wijzigingen** raken het model zelf: toegevoegde of verwijderde elementen, "
+            "naamswijzigingen, type/verplicht/multipliciteit/lengte/patroon en links tussen elementen. "
+            "**Beschrijvende wijzigingen** updaten alleen metadata of documentatie (definitie, "
+            "toelichting, gemma-tags, versie, auteur, herkomst, …) zonder de structuur van het model "
+            "te veranderen."
         )
         lines.append("")
 
-        # Overview
-        touched: Set[str] = set()
-        for cid in set(cls_added) | set(cls_removed) | changed_class_ids:
-            pid = cls_pkg_id(cid)
-            if pid:
-                touched.add(pid)
-        for eid in set(enum_added) | set(enum_removed) | changed_enum_ids:
-            pid = enum_pkg_id(eid)
-            if pid:
-                touched.add(pid)
-        for aid in set(attr_added) | set(attr_removed) | changed_attr_ids:
-            a = B_attr.get(aid) or A_attr.get(aid)
-            parent = str(getattr(a, "clazz_id", "") or "")
-            pid = cls_pkg_id(parent) if parent else ""
-            if pid:
-                touched.add(pid)
-
-        lines.append("## Overview\n")
+        # Summary table — both categories side by side.
+        lines.append("## Samenvatting")
+        lines.append("")
         lines.append(
-            "**Packages touched:** "
-            + ", ".join(f"`{_md_escape(pkg_name(pid))}`" for pid in sorted(touched, key=pkg_name))
+            "| Element | + (struct.) | − (struct.) | ~ (struct.) | ~ (beschr.) |"
         )
-        lines.append("\n")
+        lines.append("| --- | ---: | ---: | ---: | ---: |")
+        for key, label in [
+            ("classes", "Classes"),
+            ("datatypes", "Datatypes"),
+            ("enums", "Enumeraties"),
+            ("attrs", "Attributen"),
+            ("assocs", "Associaties"),
+            ("gens", "Generalisaties"),
+        ]:
+            sa = s_counts[key]["added"]
+            sr = s_counts[key]["removed"]
+            sc = s_counts[key]["changed"]
+            dc = d_counts[key]["changed"]
+            lines.append(f"| {label} | {sa} | {sr} | {sc} | {dc} |")
+        lines.append(f"| Enum-literals | {lit_added_total} | {lit_removed_total} | — | — |")
+        # Packages alleen op metadata vergeleken — toon onder de tabel.
+        s_pkg_changed = len(pkg_s)
+        d_pkg_changed = len(pkg_d)
+        lines.append(f"| Pakketten (metadata) | 0 | 0 | {s_pkg_changed} | {d_pkg_changed} |")
+        lines.append("")
 
-        # Top-down
-        lines.append("## Top-down changes\n")
-
-        def status(i: str, added: Set[str], removed: Set[str], changed: Set[str]) -> str:
-            if i in added:
-                return "Added"
-            if i in removed:
-                return "Removed"
-            if i in changed:
-                return "Changed"
-            return "Unchanged"
-
-        set_cls_added, set_cls_removed = set(cls_added), set(cls_removed)
-        set_enum_added, set_enum_removed = set(enum_added), set(enum_removed)
-        set_attr_added, set_attr_removed = set(attr_added), set(attr_removed)
-
-        pkg_classes: Dict[str, Set[str]] = {}
-        pkg_enums: Dict[str, Set[str]] = {}
-
-        def bucket_class(cid: str):
-            pid = cls_pkg_id(cid)
-            if pid:
-                pkg_classes.setdefault(pid, set()).add(cid)
-
-        def bucket_enum(eid: str):
-            pid = enum_pkg_id(eid)
-            if pid:
-                pkg_enums.setdefault(pid, set()).add(eid)
-
-        for cid in set_cls_added | set_cls_removed | changed_class_ids:
-            bucket_class(cid)
-        for eid in set_enum_added | set_enum_removed | changed_enum_ids:
-            bucket_enum(eid)
-
-        attrs_by_class: Dict[str, Set[str]] = {}
-        for aid in set_attr_added | set_attr_removed | changed_attr_ids:
-            a = B_attr.get(aid) or A_attr.get(aid)
-            parent = str(getattr(a, "clazz_id", "") or "")
-            if parent:
-                attrs_by_class.setdefault(parent, set()).add(aid)
-                bucket_class(parent)
-
-        def sort_by_name(ids: Iterable[str], lookup: Dict[str, Any]) -> List[str]:
-            return sorted(ids, key=lambda x: _md_escape(str(_safe_get(lookup.get(x), "name") or x)))
-
-        for pid in sorted(set(pkg_classes) | set(pkg_enums), key=pkg_name):
-            lines.append(f"## Package: {_md_escape(pkg_name(pid))}\n")
-
-            all_cls_ids = pkg_classes.get(pid, set())
-            class_ids = sort_by_name([cid for cid in all_cls_ids if not is_datatype(cid)], {**A_cls, **B_cls})
-            dtype_ids = sort_by_name([cid for cid in all_cls_ids if is_datatype(cid)], {**A_cls, **B_cls})
-
-            if class_ids:
-                lines.append("### Classes\n")
-                for cid in class_ids:
-                    c = B_cls.get(cid) or A_cls.get(cid)
-                    cname = _md_escape(getattr(c, "name", "(no name)"))
-                    lines.append(
-                        f"#### {cname} — **{status(cid, set_cls_added, set_cls_removed, changed_class_ids)}**\n"
+        # TOC.
+        s_paths = sorted(p for p in struct_buckets if p)
+        d_paths = sorted(p for p in descr_buckets if p)
+        all_paths = sorted(set(s_paths) | set(d_paths))
+        if all_paths:
+            lines.append("## Geraakte packages")
+            lines.append("")
+            for path in all_paths:
+                markers = []
+                if path in struct_buckets:
+                    markers.append(
+                        f"[structureel](#structureel-{_md_anchor(path)})"
                     )
-                    class_diff = class_changes_by_id.get(cid)
-                    if class_diff:
-                        lines.append(_md_list(class_diff.changes) + "\n")
-                    a_ids = sort_by_name(attrs_by_class.get(cid, set()), {**A_attr, **B_attr})
-                    if a_ids:
-                        lines.append("##### Attributes\n")
-                        for aid in a_ids:
-                            aobj = B_attr.get(aid) or A_attr.get(aid)
-                            raw_name = getattr(aobj, "name", None) if aobj is not None else None
-                            if raw_name is None or str(raw_name).strip() == "":
-                                # Skip unnamed/None attributes (these are usually incomplete rows)
-                                continue
-                            an = _md_escape(str(raw_name))
-                            lines.append(
-                                f"- {an} — **{status(aid, set_attr_added, set_attr_removed, changed_attr_ids)}**"
-                            )
-                            ach = attr_changes_by_id.get(aid)
-                            if ach:
-                                lines.append(_md_list(ach.changes, indent=2))
-                        lines.append("")
-            else:
-                lines.append("_No class changes in this package._\n")
-
-            if dtype_ids:
-                lines.append("### Datatypes\n")
-                for cid in dtype_ids:
-                    c = B_cls.get(cid) or A_cls.get(cid)
-                    cname = _md_escape(getattr(c, "name", "(no name)"))
-                    lines.append(
-                        f"#### {cname} — **{status(cid, set_cls_added, set_cls_removed, changed_class_ids)}**\n"
+                if path in descr_buckets:
+                    markers.append(
+                        f"[beschrijvend](#beschrijvend-{_md_anchor(path)})"
                     )
-                    class_diff = class_changes_by_id.get(cid)
-                    if class_diff:
-                        lines.append(_md_list(class_diff.changes) + "\n")
-                    a_ids = sort_by_name(attrs_by_class.get(cid, set()), {**A_attr, **B_attr})
-                    if a_ids:
-                        lines.append("##### Attributes\n")
-                        for aid in a_ids:
-                            aobj = B_attr.get(aid) or A_attr.get(aid)
-                            raw_name = getattr(aobj, "name", None) if aobj is not None else None
-                            if raw_name is None or str(raw_name).strip() == "":
-                                # Skip unnamed/None attributes (these are usually incomplete rows)
-                                continue
-                            an = _md_escape(str(raw_name))
-                            lines.append(
-                                f"- {an} — **{status(aid, set_attr_added, set_attr_removed, changed_attr_ids)}**"
-                            )
-                            ach = attr_changes_by_id.get(aid)
-                            if ach:
-                                lines.append(_md_list(ach.changes, indent=2))
-                        lines.append("")
-            else:
-                lines.append("_No datatype changes in this package._\n")
+                lines.append(f"- **{path}** — {' · '.join(markers)}")
+            lines.append("")
 
-            enum_ids = sort_by_name(pkg_enums.get(pid, set()), {**A_enum, **B_enum})
-            if enum_ids:
-                lines.append("### Enumerations\n")
-                for eid in enum_ids:
-                    e = B_enum.get(eid) or A_enum.get(eid)
-                    en = _md_escape(getattr(e, "name", "(no name)"))
-                    lines.append(f"#### {en} — **{status(eid, set_enum_added, set_enum_removed, changed_enum_ids)}**\n")
-                    enum_diff = enum_changes_by_id.get(eid)
-                    if enum_diff:
-                        lines.append(_md_list(enum_diff.changes) + "\n")
-                    lc = lit_changes.get(eid)
-                    if lc:
-                        lines.append("##### Literals\n")
-                        for n in lc.get("added", []):
-                            lines.append(f"- `{_md_escape(n)}` — **Added**")
-                        for n in lc.get("removed", []):
-                            lines.append(f"- `{_md_escape(n)}` — **Removed**")
-                        lines.append("")
-            else:
-                lines.append("_No enumeration changes in this package._\n")
+        # Structural section.
+        lines.append("## Structurele wijzigingen")
+        lines.append("")
+        if not s_paths:
+            lines.append("_Geen structurele wijzigingen._")
+            lines.append("")
+        else:
+            for path in s_paths:
+                self._render_package(
+                    lines,
+                    path,
+                    bucket=struct_buckets[path],
+                    pkg_changes=pkg_s,
+                    class_changes=class_s,
+                    enum_changes=enum_s,
+                    attr_changes=attr_s,
+                    assoc_changes=assoc_s,
+                    gen_changes=gen_s,
+                    lit_changes=lit_changes,
+                    anchor_prefix="structureel",
+                )
+
+        # Descriptive section.
+        lines.append("## Beschrijvende wijzigingen")
+        lines.append("")
+        if not d_paths:
+            lines.append("_Geen beschrijvende wijzigingen._")
+            lines.append("")
+        else:
+            for path in d_paths:
+                self._render_package(
+                    lines,
+                    path,
+                    bucket=descr_buckets[path],
+                    pkg_changes=pkg_d,
+                    class_changes=class_d,
+                    enum_changes=enum_d,
+                    attr_changes=attr_d,
+                    assoc_changes=assoc_d,
+                    gen_changes=gen_d,
+                    lit_changes={},
+                    anchor_prefix="beschrijvend",
+                )
 
         with open(args.outputfile, "w", encoding="utf-8") as f:
             f.write("\n".join(lines).rstrip() + "\n")
+
+    # ------------------------------------------------------------------
+    # Bucket building / summary / per-package rendering
+    # ------------------------------------------------------------------
+
+    def _build_buckets(
+        self,
+        *,
+        pkg_changes: Dict[str, List[Dict[str, str]]],
+        class_changes: Dict[str, List[Dict[str, str]]],
+        enum_changes: Dict[str, List[Dict[str, str]]],
+        attr_changes: Dict[str, List[Dict[str, str]]],
+        assoc_changes: Dict[str, List[Dict[str, str]]],
+        gen_changes: Dict[str, List[Dict[str, str]]],
+        lit_changes: Dict[str, Dict[str, List[str]]],
+        m_cls: Dict[str, Any],
+        m_enum: Dict[str, Any],
+        m_attr: Dict[str, Any],
+        m_assoc: Dict[str, Any],
+        m_gen: Dict[str, Any],
+        include_added_removed: bool,
+    ) -> Dict[str, Dict[str, Any]]:
+        buckets: Dict[str, Dict[str, Any]] = {}
+
+        def _bucket(path: str) -> Dict[str, Any]:
+            return buckets.setdefault(
+                path,
+                {
+                    "classes_changed": [],
+                    "classes_added": [],
+                    "classes_removed": [],
+                    "datatypes_changed": [],
+                    "datatypes_added": [],
+                    "datatypes_removed": [],
+                    "enums_changed": [],
+                    "enums_added": [],
+                    "enums_removed": [],
+                    "attrs_changed": [],
+                    "attrs_added": [],
+                    "attrs_removed": [],
+                    "assocs_changed": [],
+                    "assocs_added": [],
+                    "assocs_removed": [],
+                    "gens_changed": [],
+                    "gens_added": [],
+                    "gens_removed": [],
+                    "pkg_changes_key": None,
+                },
+            )
+
+        def _path(obj: Any, getter) -> str:
+            return _qualified_pkg_path(getter(obj)) if obj is not None else ""
+
+        def _push_class(obj: Any, bucket_field: str):
+            b = _bucket(_path(obj, self._pkg_of_class))
+            prefix = "datatypes" if bool(getattr(obj, "is_datatype", False)) else "classes"
+            b[f"{prefix}_{bucket_field}"].append(obj)
+
+        for key in pkg_changes:
+            _bucket(key)["pkg_changes_key"] = key
+
+        if include_added_removed:
+            for c in m_cls["added"]:
+                _push_class(c, "added")
+            for c in m_cls["removed"]:
+                _push_class(c, "removed")
+            for e in m_enum["added"]:
+                _bucket(_path(e, self._pkg_of_enum))["enums_added"].append(e)
+            for e in m_enum["removed"]:
+                _bucket(_path(e, self._pkg_of_enum))["enums_removed"].append(e)
+            for a in m_attr["added"]:
+                _bucket(_path(a, self._pkg_of_attr))["attrs_added"].append(a)
+            for a in m_attr["removed"]:
+                _bucket(_path(a, self._pkg_of_attr))["attrs_removed"].append(a)
+            for assoc in m_assoc["added"]:
+                _bucket(_path(assoc, self._pkg_of_assoc))["assocs_added"].append(assoc)
+            for assoc in m_assoc["removed"]:
+                _bucket(_path(assoc, self._pkg_of_assoc))["assocs_removed"].append(assoc)
+            for g in m_gen["added"]:
+                _bucket(_path(g, self._pkg_of_gen))["gens_added"].append(g)
+            for g in m_gen["removed"]:
+                _bucket(_path(g, self._pkg_of_gen))["gens_removed"].append(g)
+
+        for _, b in m_cls["pairs"]:
+            if _stable_key(b, "class") in class_changes:
+                _push_class(b, "changed")
+        for _, b in m_enum["pairs"]:
+            key = _stable_key(b, "enum")
+            if key in enum_changes or key in lit_changes:
+                _bucket(_path(b, self._pkg_of_enum))["enums_changed"].append(b)
+        for _, b in m_attr["pairs"]:
+            if _stable_key(b, "attribute") in attr_changes:
+                _bucket(_path(b, self._pkg_of_attr))["attrs_changed"].append(b)
+        for _, b in m_assoc["pairs"]:
+            if _stable_key(b, "association") in assoc_changes:
+                _bucket(_path(b, self._pkg_of_assoc))["assocs_changed"].append(b)
+        for _, b in m_gen["pairs"]:
+            if _stable_key(b, "generalization") in gen_changes:
+                _bucket(_path(b, self._pkg_of_gen))["gens_changed"].append(b)
+
+        return buckets
+
+    def _count_section(self, buckets: Dict[str, Dict[str, Any]]) -> Dict[str, Dict[str, int]]:
+        out: Dict[str, Dict[str, int]] = {}
+        for kind in ("classes", "datatypes", "enums", "attrs", "assocs", "gens"):
+            added = removed = changed = 0
+            for b in buckets.values():
+                added += len(b.get(f"{kind}_added", []))
+                removed += len(b.get(f"{kind}_removed", []))
+                changed += len(b.get(f"{kind}_changed", []))
+            out[kind] = {"added": added, "removed": removed, "changed": changed}
+        return out
+
+    def _render_package(
+        self,
+        lines: List[str],
+        path: str,
+        *,
+        bucket: Dict[str, Any],
+        pkg_changes: Dict[str, List[Dict[str, str]]],
+        class_changes: Dict[str, List[Dict[str, str]]],
+        enum_changes: Dict[str, List[Dict[str, str]]],
+        attr_changes: Dict[str, List[Dict[str, str]]],
+        assoc_changes: Dict[str, List[Dict[str, str]]],
+        gen_changes: Dict[str, List[Dict[str, str]]],
+        lit_changes: Dict[str, Dict[str, List[str]]],
+        anchor_prefix: str,
+    ) -> None:
+        # Use an explicit anchor so the same package can appear in both the
+        # structural and descriptive section without colliding heading slugs.
+        anchor = f"{anchor_prefix}-{_md_anchor(path)}"
+        lines.append(f'<a id="{anchor}"></a>')
+        lines.append(f"### Package: {_md_escape(path)}")
+        lines.append("")
+
+        pkey = bucket.get("pkg_changes_key")
+        if pkey and pkg_changes.get(pkey):
+            lines.append("**Pakket-metadata gewijzigd:**")
+            lines.append("")
+            lines.extend(self._render_field_changes(pkg_changes[pkey], indent=0))
+            lines.append("")
+
+        self._render_class_group(
+            lines,
+            heading="Classes",
+            added=bucket["classes_added"],
+            removed=bucket["classes_removed"],
+            changed=bucket["classes_changed"],
+            field_changes_by_key=class_changes,
+            attrs_added=bucket["attrs_added"],
+            attrs_removed=bucket["attrs_removed"],
+            attrs_changed=bucket["attrs_changed"],
+            attr_changes_by_key=attr_changes,
+            stable_key_kind="class",
+        )
+        self._render_class_group(
+            lines,
+            heading="Datatypes",
+            added=bucket["datatypes_added"],
+            removed=bucket["datatypes_removed"],
+            changed=bucket["datatypes_changed"],
+            field_changes_by_key=class_changes,
+            attrs_added=bucket["attrs_added"],
+            attrs_removed=bucket["attrs_removed"],
+            attrs_changed=bucket["attrs_changed"],
+            attr_changes_by_key=attr_changes,
+            stable_key_kind="class",
+        )
+        self._render_enum_group(
+            lines,
+            added=bucket["enums_added"],
+            removed=bucket["enums_removed"],
+            changed=bucket["enums_changed"],
+            field_changes_by_key=enum_changes,
+            lit_changes_by_key=lit_changes,
+        )
+        self._render_relation_group(
+            lines,
+            heading="Associaties",
+            added=bucket["assocs_added"],
+            removed=bucket["assocs_removed"],
+            changed=bucket["assocs_changed"],
+            field_changes_by_key=assoc_changes,
+            stable_key_kind="association",
+            title_fn=self._assoc_title,
+        )
+        self._render_relation_group(
+            lines,
+            heading="Generalisaties",
+            added=bucket["gens_added"],
+            removed=bucket["gens_removed"],
+            changed=bucket["gens_changed"],
+            field_changes_by_key=gen_changes,
+            stable_key_kind="generalization",
+            title_fn=self._gen_title,
+        )
+
+    # ------------------------------------------------------------------
+    # Section renderers
+    # ------------------------------------------------------------------
+
+    def _attrs_for_class(
+        self,
+        cls: Any,
+        attrs: List[Any],
+    ) -> List[Any]:
+        cid = str(getattr(cls, "id", "") or "")
+        cls_key = _stable_key(cls, "class")
+        out = []
+        for a in attrs:
+            # Match either by direct id link or by qualified class key (in case
+            # the same logical class has a different ea_guid between sides).
+            if str(getattr(a, "clazz_id", "") or "") == cid:
+                out.append(a)
+                continue
+            parent_cls = getattr(a, "clazz", None)
+            if parent_cls is not None and _stable_key(parent_cls, "class") == cls_key:
+                out.append(a)
+        return out
+
+    def _render_class_group(
+        self,
+        lines: List[str],
+        heading: str,
+        added: List[Any],
+        removed: List[Any],
+        changed: List[Any],
+        field_changes_by_key: Dict[str, List[Dict[str, str]]],
+        attrs_added: List[Any],
+        attrs_removed: List[Any],
+        attrs_changed: List[Any],
+        attr_changes_by_key: Dict[str, List[Dict[str, str]]],
+        stable_key_kind: str,
+    ) -> None:
+        attrs_added_orphans: List[Any] = []
+        attrs_removed_orphans: List[Any] = []
+        attrs_changed_orphans: List[Any] = []
+
+        # Build a quick lookup: which classes are themselves in this section?
+        in_section_keys = {_stable_key(c, stable_key_kind) for c in added + removed + changed}
+
+        # Attributes whose parent class is not in the section (because the
+        # class itself didn't change). Group them under their parent below.
+        attrs_added_keyed: Dict[str, List[Any]] = {}
+        attrs_removed_keyed: Dict[str, List[Any]] = {}
+        attrs_changed_keyed: Dict[str, List[Any]] = {}
+
+        def _parent_key(a: Any) -> str:
+            return _stable_key(getattr(a, "clazz", None), stable_key_kind)
+
+        for a in attrs_added:
+            k = _parent_key(a)
+            if k in in_section_keys:
+                attrs_added_keyed.setdefault(k, []).append(a)
+            else:
+                attrs_added_orphans.append(a)
+        for a in attrs_removed:
+            k = _parent_key(a)
+            if k in in_section_keys:
+                attrs_removed_keyed.setdefault(k, []).append(a)
+            else:
+                attrs_removed_orphans.append(a)
+        for a in attrs_changed:
+            k = _parent_key(a)
+            if k in in_section_keys:
+                attrs_changed_keyed.setdefault(k, []).append(a)
+            else:
+                attrs_changed_orphans.append(a)
+
+        # Build a set of class keys that have orphan attribute changes — these
+        # need a stub class entry too so the attributes are reported.
+        orphan_class_keys: Dict[str, Any] = {}
+        for a in attrs_added_orphans + attrs_removed_orphans + attrs_changed_orphans:
+            cls = getattr(a, "clazz", None)
+            if cls is None:
+                continue
+            k = _stable_key(cls, stable_key_kind)
+            # We can only place datatypes vs classes correctly using the
+            # caller's heading — orphans of the *other* kind will silently be
+            # filtered out by the caller (they end up in the matching group).
+            if heading == "Datatypes" and not bool(getattr(cls, "is_datatype", False)):
+                continue
+            if heading == "Classes" and bool(getattr(cls, "is_datatype", False)):
+                continue
+            orphan_class_keys.setdefault(k, cls)
+
+        has_section_content = bool(added or removed or changed or orphan_class_keys)
+        if not has_section_content:
+            return
+
+        lines.append(f"#### {heading}")
+        lines.append("")
+
+        def _emit_class(cls: Any, status: str):
+            name = _md_escape(getattr(cls, "name", "(no name)"))
+            key = _stable_key(cls, stable_key_kind)
+            badge = {"Added": "🟢 Toegevoegd", "Removed": "🔴 Verwijderd", "Changed": "🟡 Gewijzigd"}.get(
+                status, status
+            )
+            lines.append(f"##### `{name}` — {badge}")
+            lines.append("")
+            field_changes = field_changes_by_key.get(key)
+            if status == "Changed" and field_changes:
+                lines.extend(self._render_field_changes(field_changes, indent=0))
+                lines.append("")
+            self._emit_attrs_for_class(
+                lines,
+                cls,
+                attrs_added_keyed.get(key, []),
+                attrs_removed_keyed.get(key, []),
+                attrs_changed_keyed.get(key, []),
+                attr_changes_by_key,
+            )
+
+        for cls in sorted(added, key=lambda c: (getattr(c, "name", "") or "").lower()):
+            _emit_class(cls, "Added")
+        for cls in sorted(removed, key=lambda c: (getattr(c, "name", "") or "").lower()):
+            _emit_class(cls, "Removed")
+        for cls in sorted(changed, key=lambda c: (getattr(c, "name", "") or "").lower()):
+            _emit_class(cls, "Changed")
+
+        # Orphan parents: the class itself didn't change, but attributes did.
+        already_emitted = {_stable_key(c, stable_key_kind) for c in added + removed + changed}
+        for k, cls in sorted(orphan_class_keys.items()):
+            if k in already_emitted:
+                continue
+            name = _md_escape(getattr(cls, "name", "(no name)"))
+            lines.append(f"##### `{name}` — 🟡 Attributen gewijzigd")
+            lines.append("")
+            self._emit_attrs_for_class(
+                lines,
+                cls,
+                [a for a in attrs_added_orphans if _stable_key(getattr(a, "clazz", None), stable_key_kind) == k],
+                [a for a in attrs_removed_orphans if _stable_key(getattr(a, "clazz", None), stable_key_kind) == k],
+                [a for a in attrs_changed_orphans if _stable_key(getattr(a, "clazz", None), stable_key_kind) == k],
+                attr_changes_by_key,
+            )
+
+    def _emit_attrs_for_class(
+        self,
+        lines: List[str],
+        cls: Any,
+        attrs_added: List[Any],
+        attrs_removed: List[Any],
+        attrs_changed: List[Any],
+        attr_changes_by_key: Dict[str, List[Dict[str, str]]],
+    ) -> None:
+        def _named(a):
+            n = getattr(a, "name", None)
+            return n is not None and str(n).strip() != ""
+
+        attrs_added = [a for a in attrs_added if _named(a)]
+        attrs_removed = [a for a in attrs_removed if _named(a)]
+        attrs_changed = [a for a in attrs_changed if _named(a)]
+        if not (attrs_added or attrs_removed or attrs_changed):
+            return
+
+        lines.append("**Attributen:**")
+        lines.append("")
+        for a in sorted(attrs_added, key=lambda x: (getattr(x, "name", "") or "").lower()):
+            lines.append(f"- 🟢 `{_md_escape(getattr(a, 'name', ''))}` — Toegevoegd")
+        for a in sorted(attrs_removed, key=lambda x: (getattr(x, "name", "") or "").lower()):
+            lines.append(f"- 🔴 `{_md_escape(getattr(a, 'name', ''))}` — Verwijderd")
+        for a in sorted(attrs_changed, key=lambda x: (getattr(x, "name", "") or "").lower()):
+            name = _md_escape(getattr(a, "name", ""))
+            lines.append(f"- 🟡 `{name}` — Gewijzigd")
+            ch = attr_changes_by_key.get(_stable_key(a, "attribute"))
+            if ch:
+                lines.extend(self._render_field_changes(ch, indent=4))
+        lines.append("")
+
+    def _render_enum_group(
+        self,
+        lines: List[str],
+        added: List[Any],
+        removed: List[Any],
+        changed: List[Any],
+        field_changes_by_key: Dict[str, List[Dict[str, str]]],
+        lit_changes_by_key: Dict[str, Dict[str, List[str]]],
+    ) -> None:
+        if not (added or removed or changed):
+            return
+        lines.append("#### Enumeraties")
+        lines.append("")
+
+        def _emit(e: Any, status: str):
+            name = _md_escape(getattr(e, "name", "(no name)"))
+            key = _stable_key(e, "enum")
+            badge = {"Added": "🟢 Toegevoegd", "Removed": "🔴 Verwijderd", "Changed": "🟡 Gewijzigd"}.get(
+                status, status
+            )
+            lines.append(f"##### `{name}` — {badge}")
+            lines.append("")
+            field_changes = field_changes_by_key.get(key)
+            if status == "Changed" and field_changes:
+                lines.extend(self._render_field_changes(field_changes, indent=0))
+                lines.append("")
+            lc = lit_changes_by_key.get(key)
+            if lc:
+                lines.append("**Literals:**")
+                lines.append("")
+                for n in lc.get("added", []):
+                    lines.append(f"- 🟢 `{_md_escape(n)}` — Toegevoegd")
+                for n in lc.get("removed", []):
+                    lines.append(f"- 🔴 `{_md_escape(n)}` — Verwijderd")
+                lines.append("")
+
+        for e in sorted(added, key=lambda x: (getattr(x, "name", "") or "").lower()):
+            _emit(e, "Added")
+        for e in sorted(removed, key=lambda x: (getattr(x, "name", "") or "").lower()):
+            _emit(e, "Removed")
+        for e in sorted(changed, key=lambda x: (getattr(x, "name", "") or "").lower()):
+            _emit(e, "Changed")
+
+    def _assoc_title(self, a: Any) -> str:
+        src = getattr(getattr(a, "src_class", None), "name", "?") or "?"
+        dst = getattr(getattr(a, "dst_class", None), "name", "?") or "?"
+        nm = (getattr(a, "name", "") or "").strip()
+        label = f" «{nm}»" if nm else ""
+        return f"`{src}`{label} → `{dst}`"
+
+    def _gen_title(self, g: Any) -> str:
+        sub = getattr(getattr(g, "subclass", None), "name", "?") or "?"
+        sup = getattr(getattr(g, "superclass", None), "name", "?") or "?"
+        return f"`{sub}` ⟶ `{sup}`"
+
+    def _render_relation_group(
+        self,
+        lines: List[str],
+        heading: str,
+        added: List[Any],
+        removed: List[Any],
+        changed: List[Any],
+        field_changes_by_key: Dict[str, List[Dict[str, str]]],
+        stable_key_kind: str,
+        title_fn,
+    ) -> None:
+        if not (added or removed or changed):
+            return
+        lines.append(f"#### {heading}")
+        lines.append("")
+
+        def _emit(item: Any, status: str):
+            badge = {"Added": "🟢 Toegevoegd", "Removed": "🔴 Verwijderd", "Changed": "🟡 Gewijzigd"}.get(
+                status, status
+            )
+            lines.append(f"- {badge}: {title_fn(item)}")
+            if status == "Changed":
+                ch = field_changes_by_key.get(_stable_key(item, stable_key_kind))
+                if ch:
+                    lines.extend(self._render_field_changes(ch, indent=2))
+
+        for it in sorted(added, key=lambda x: title_fn(x).lower()):
+            _emit(it, "Added")
+        for it in sorted(removed, key=lambda x: title_fn(x).lower()):
+            _emit(it, "Removed")
+        for it in sorted(changed, key=lambda x: title_fn(x).lower()):
+            _emit(it, "Changed")
+        lines.append("")
