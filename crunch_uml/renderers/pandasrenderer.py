@@ -2,7 +2,7 @@ import json
 import logging
 import os
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Set
+from typing import Any, Dict, Iterable, List, Set
 
 import pandas as pd
 import sqlalchemy
@@ -1169,9 +1169,7 @@ class SchemaDiffMarkdownRenderer(Renderer):
         # Summary table — both categories side by side.
         lines.append("## Samenvatting")
         lines.append("")
-        lines.append(
-            "| Element | + (struct.) | − (struct.) | ~ (struct.) | ~ (beschr.) |"
-        )
+        lines.append("| Element | + (struct.) | − (struct.) | ~ (struct.) | ~ (beschr.) |")
         lines.append("| --- | ---: | ---: | ---: | ---: |")
         for key, label in [
             ("classes", "Classes"),
@@ -1203,13 +1201,9 @@ class SchemaDiffMarkdownRenderer(Renderer):
             for path in all_paths:
                 markers = []
                 if path in struct_buckets:
-                    markers.append(
-                        f"[structureel](#structureel-{_md_anchor(path)})"
-                    )
+                    markers.append(f"[structureel](#structureel-{_md_anchor(path)})")
                 if path in descr_buckets:
-                    markers.append(
-                        f"[beschrijvend](#beschrijvend-{_md_anchor(path)})"
-                    )
+                    markers.append(f"[beschrijvend](#beschrijvend-{_md_anchor(path)})")
                 lines.append(f"- **{path}** — {' · '.join(markers)}")
             lines.append("")
 

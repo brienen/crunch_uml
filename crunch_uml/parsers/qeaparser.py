@@ -274,8 +274,7 @@ class QEAParser(Parser):
 
         if missing_guid_count:
             logger.info(
-                f"Phase 3: {missing_guid_count} attributes/literals had NULL ea_guid; "
-                "synthetic ids assigned."
+                f"Phase 3: {missing_guid_count} attributes/literals had NULL ea_guid; " "synthetic ids assigned."
             )
         logger.info(
             f"Phase 3 done: {schema.count_attribute()} attributes, "
