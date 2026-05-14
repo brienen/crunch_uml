@@ -1,3 +1,26 @@
+---
+title: Export — UML model naar JSON, XLSX, Markdown, JSON-Schema, EA repo, …
+description: >-
+  Genereer output uit de crunch_uml database in vrijwel elk gangbaar formaat:
+  JSON, CSV, Excel, Markdown-documentatie, JSON-Schema, OpenAPI, Linked Data
+  (RDF/Turtle/JSON-LD), SQLAlchemy, en updates naar Enterprise Architect.
+tags:
+  - export
+  - renderer
+  - cli
+  - json
+  - excel
+  - markdown
+  - i18n
+keywords:
+  - crunch_uml export
+  - UML naar JSON
+  - UML naar JSON-Schema
+  - UML naar Markdown
+  - Linked Data export
+  - Enterprise Architect repository update
+---
+
 # Export
 
 Het `export`-commando genereert output vanuit de database in het gewenste formaat.
@@ -84,6 +107,12 @@ crunch_uml -sch mijn_schema export -t <type> -f <bestand>
 | `--language` | Taal voor i18n export |
 | `--translate` | Vertaal automatisch naar opgegeven taal |
 | `--from_language` | Brontaal voor vertalingen (standaard: `nl`) |
+| `--translate_backend` | Backend: `translators` (default, Google/Bing) of `ollama` (lokaal LLM). Zie [Vertalingen](vertalingen.md). |
+| `--ollama_model` | Ollama model-tag (default `mistral-small3.1:24b`) |
+| `--ollama_url` | URL van de Ollama-server (default `http://localhost:11434`) |
+| `--ollama_timeout` | Timeout per Ollama-call in seconden (default `120`) |
+| `--translate_workers` | Aantal parallelle vertaal-threads (default `8`) |
+| `--translate_context` | Stuur section/field-hints in de prompt voor consistentere domeintermen |
 
 ## Voorbeelden
 
@@ -137,3 +166,17 @@ crunch_uml -sch mijn_model export -t csv \
     --mapper '{"name": "Naam", "definitie": "Omschrijving"}' \
     --entity_name classes
 ```
+
+### i18n-export met lokale LLM (Ollama / Mistral)
+
+```bash
+crunch_uml -sch mijn_model export -t i18n \
+    -f mijn_model.i18n.json \
+    --language en --translate True --from_language nl \
+    --translate_backend ollama \
+    --ollama_model mistral-small3.1:24b \
+    --translate_context
+```
+
+Voor uitgebreide uitleg (model-keuze, casing-behoud, opake tokens) zie
+de aparte [Vertalingen-pagina](vertalingen.md).

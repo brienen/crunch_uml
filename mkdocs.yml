@@ -1,15 +1,28 @@
 site_name: "crunch_uml"
-site_description: "Documentatie voor crunch_uml — UML model transformatie en export"
+site_description: >-
+  crunch_uml — universele UML model converter en transformator. Importeer
+  XMI, EA QEA, Excel, JSON en CSV; transformeer; exporteer naar JSON Schema,
+  Linked Data (RDF/Turtle/JSON-LD), Markdown, SQLAlchemy, en Enterprise
+  Architect repositories. Inclusief multi-schema versievergelijking en
+  i18n-export met lokale LLM-vertaling (Mistral via Ollama).
 site_author: "Arjen Brienen"
 site_url: "https://brienen.github.io/crunch_uml/"
 
 repo_url: https://github.com/brienen/crunch_uml
 repo_name: brienen/crunch_uml
 
+# Used by mkdocs-material to render canonical, Open Graph and Twitter Card
+# meta tags on every page. Critical for SEO and link previews.
+copyright: "Copyright &copy; Arjen Brienen — MIT License"
+
 docs_dir: docs
 
 theme:
   name: material
+  # Custom dir houses overrides/main.html which injects JSON-LD structured
+  # data (Schema.org SoftwareApplication + TechArticle) into every page for
+  # rich-result eligibility in Google Search.
+  custom_dir: docs/overrides
   palette:
     - scheme: default
       primary: indigo
@@ -135,6 +148,7 @@ nav:
     - handleiding/import.md
     - handleiding/transform.md
     - handleiding/export.md
+    - handleiding/vertalingen.md
     - handleiding/cli-referentie.md
   - Voorbeelden: voorbeelden.md
   - Technisch Ontwerp:

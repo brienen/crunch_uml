@@ -1,3 +1,27 @@
+---
+title: Export — UML model to JSON, XLSX, Markdown, JSON-Schema, EA repo, …
+description: >-
+  Generate output from the crunch_uml database in nearly every common
+  format: JSON, CSV, Excel, Markdown documentation, JSON-Schema, OpenAPI,
+  Linked Data (RDF/Turtle/JSON-LD), SQLAlchemy, and Enterprise Architect
+  repository updates.
+tags:
+  - export
+  - renderer
+  - cli
+  - json
+  - excel
+  - markdown
+  - i18n
+keywords:
+  - crunch_uml export
+  - UML to JSON
+  - UML to JSON Schema
+  - UML to Markdown
+  - Linked Data export
+  - Enterprise Architect repository update
+---
+
 # Export
 
 The `export` command generates output from the database in the desired format.
@@ -84,6 +108,12 @@ crunch_uml -sch my_schema export -t <type> -f <file>
 | `--language` | Language for i18n export |
 | `--translate` | Automatically translate to specified language |
 | `--from_language` | Source language for translations (default: `nl`) |
+| `--translate_backend` | Backend: `translators` (default, Google/Bing) or `ollama` (local LLM). See [Translations](vertalingen.md). |
+| `--ollama_model` | Ollama model tag (default `mistral-small3.1:24b`) |
+| `--ollama_url` | URL of the Ollama server (default `http://localhost:11434`) |
+| `--ollama_timeout` | Timeout per Ollama call in seconds (default `120`) |
+| `--translate_workers` | Number of parallel translation threads (default `8`) |
+| `--translate_context` | Send section/field hints in the prompt for more consistent domain terms |
 
 ## Examples
 
@@ -137,3 +167,17 @@ crunch_uml -sch my_model export -t csv \
     --mapper '{"name": "Name", "definition": "Description"}' \
     --entity_name classes
 ```
+
+### i18n export with a local LLM (Ollama / Mistral)
+
+```bash
+crunch_uml -sch my_model export -t i18n \
+    -f my_model.i18n.json \
+    --language en --translate True --from_language nl \
+    --translate_backend ollama \
+    --ollama_model mistral-small3.1:24b \
+    --translate_context
+```
+
+See the dedicated [Translations page](vertalingen.md) for the full story
+(model choice, casing preservation, opaque tokens, performance numbers).

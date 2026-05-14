@@ -1,4 +1,5 @@
 
+
 <!doctype html>
 <html lang="nl" class="no-js">
   <head>
@@ -6,7 +7,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Documentatie voor crunch_uml — UML model transformatie en export">
+        <meta name="description" content="crunch_uml leest UML-modellen uit XMI, Enterprise Architect QEA, Excel, JSON en CSV; transformeert ze; en exporteert naar JSON Schema, Linked Data (RDF/Turtle/JSON-LD), Markdown, SQLAlchemy, OpenAPI en Enterprise Architect repositories. Inclusief multi-schema versievergelijking, i18n-export en lokale LLM-vertaling via Mistral op Ollama.">
       
       
         <meta name="author" content="Arjen Brienen">
@@ -24,7 +25,7 @@
     
     
       
-        <title>crunch_uml</title>
+        <title>crunch_uml — Universele UML model converter en transformator - crunch_uml</title>
       
     
     
@@ -59,6 +60,108 @@
     
     
     
+  
+
+  
+  
+
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+      <link rel="canonical" href="https://brienen.github.io/crunch_uml/">
+    
+
+    
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="crunch_uml — Universele UML model converter en transformator">
+    <meta property="og:description" content="crunch_uml leest UML-modellen uit XMI, Enterprise Architect QEA, Excel, JSON en CSV; transformeert ze; en exporteert naar JSON Schema, Linked Data (RDF/Turtle/JSON-LD), Markdown, SQLAlchemy, OpenAPI en Enterprise Architect repositories. Inclusief multi-schema versievergelijking, i18n-export en lokale LLM-vertaling via Mistral op Ollama.">
+    
+      <meta property="og:url" content="https://brienen.github.io/crunch_uml/">
+    
+    <meta property="og:site_name" content="crunch_uml">
+    
+      <meta property="og:locale" content="nl">
+    
+
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="crunch_uml — Universele UML model converter en transformator">
+    <meta name="twitter:description" content="crunch_uml leest UML-modellen uit XMI, Enterprise Architect QEA, Excel, JSON en CSV; transformeert ze; en exporteert naar JSON Schema, Linked Data (RDF/Turtle/JSON-LD), Markdown, SQLAlchemy, OpenAPI en Enterprise Architect repositories. Inclusief multi-schema versievergelijking, i18n-export en lokale LLM-vertaling via Mistral op Ollama.">
+
+    
+    <meta name="description" content="crunch_uml leest UML-modellen uit XMI, Enterprise Architect QEA, Excel, JSON en CSV; transformeert ze; en exporteert naar JSON Schema, Linked Data (RDF/Turtle/JSON-LD), Markdown, SQLAlchemy, OpenAPI en Enterprise Architect repositories. Inclusief multi-schema versievergelijking, i18n-export en lokale LLM-vertaling via Mistral op Ollama.">
+    
+      <meta name="author" content="Arjen Brienen">
+    
+
+    
+    
+      <meta name="keywords" content="crunch_uml, UML converter, XMI parser, Enterprise Architect QEA, JSON Schema generator, Linked Data RDF UML, GEMMA RSGB MIM, UML model vergelijking, i18n vertaling UML, lokale LLM Mistral Ollama">
+    
+
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "crunch_uml \u2014 Universele UML model converter en transformator",
+      "description": "crunch_uml leest UML-modellen uit XMI, Enterprise Architect QEA, Excel, JSON en CSV; transformeert ze; en exporteert naar JSON Schema, Linked Data (RDF/Turtle/JSON-LD), Markdown, SQLAlchemy, OpenAPI en Enterprise Architect repositories. Inclusief multi-schema versievergelijking, i18n-export en lokale LLM-vertaling via Mistral op Ollama.",
+      "author": {
+        "@type": "Person",
+        "name": "Arjen Brienen"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "crunch_uml",
+        "url": "https://brienen.github.io/crunch_uml/"
+      },
+      "url": "https://brienen.github.io/crunch_uml/",
+      "inLanguage": "nl",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "crunch_uml",
+        "url": "https://brienen.github.io/crunch_uml/"
+      }
+    }
+    </script>
+
+    
+    
+      <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "crunch_uml",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "macOS, Linux, Windows",
+        "description": "crunch_uml \u2014 universele UML model converter en transformator. Importeer XMI, EA QEA, Excel, JSON en CSV; transformeer; exporteer naar JSON Schema, Linked Data (RDF/Turtle/JSON-LD), Markdown, SQLAlchemy, en Enterprise Architect repositories. Inclusief multi-schema versievergelijking en i18n-export met lokale LLM-vertaling (Mistral via Ollama).",
+        "url": "https://brienen.github.io/crunch_uml/",
+        "codeRepository": "https://github.com/brienen/crunch_uml",
+        "license": "https://opensource.org/licenses/MIT",
+        "programmingLanguage": "Python",
+        "author": {
+          "@type": "Person",
+          "name": "Arjen Brienen"
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "EUR"
+        },
+        "keywords": "UML, XMI, Enterprise Architect, QEA, JSON Schema, Linked Data, RDF, OWL, OpenAPI, SQLAlchemy, GEMMA, RSGB, MIM, model transformation, i18n, Ollama, Mistral, LLM translation"
+      }
+      </script>
+    
+
+  
+
    <link href="assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
     html.glightbox-open { overflow: initial; height: 100%; }
     .gslide-title { margin-top: 0px; user-select: text; }
@@ -121,7 +224,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Home
+              crunch_uml — Universele UML model converter en transformator
             
           </span>
         </div>
@@ -511,6 +614,8 @@
       
         
       
+        
+      
     
     
       
@@ -630,7 +735,28 @@
         
   
   <span class="md-ellipsis">
-    Export
+    Export — UML model naar JSON, XLSX, Markdown, JSON-Schema, EA repo, …
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="handleiding/vertalingen/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertalingen — i18n export met Ollama LLM
   </span>
   
 
@@ -1155,6 +1281,59 @@
               <article class="md-content__inner md-typeset">
                 
                   
+  
+<nav class="md-tags" >
+  
+    
+    
+    
+      <span class="md-tag">uml</span>
+    
+  
+    
+    
+    
+      <span class="md-tag">xmi</span>
+    
+  
+    
+    
+    
+      <span class="md-tag">enterprise-architect</span>
+    
+  
+    
+    
+    
+      <span class="md-tag">qea</span>
+    
+  
+    
+    
+    
+      <span class="md-tag">json-schema</span>
+    
+  
+    
+    
+    
+      <span class="md-tag">linked-data</span>
+    
+  
+    
+    
+    
+      <span class="md-tag">gemma</span>
+    
+  
+    
+    
+    
+      <span class="md-tag">mim</span>
+    
+  
+</nav>
+
 
   
   
@@ -1249,6 +1428,9 @@
 
 
 
+  
+  
+
 
 
 
@@ -1277,6 +1459,10 @@
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; Arjen Brienen — MIT License
+    </div>
   
   
     Made with

@@ -7,19 +7,19 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="crunch_uml — universele UML model converter en transformator. Importeer XMI, EA QEA, Excel, JSON en CSV; transformeer; exporteer naar JSON Schema, Linked Data (RDF/Turtle/JSON-LD), Markdown, SQLAlchemy, en Enterprise Architect repositories. Inclusief multi-schema versievergelijking en i18n-export met lokale LLM-vertaling (Mistral via Ollama).">
+        <meta name="description" content="Vertaal UML-modellen automatisch via de externe translators-API of via een lokaal draaiend LLM (Mistral via Ollama). Behoudt camelCase, PascalCase en snake_case identifiers, en respecteert domeintermen als BAG, BRP en GEMMA.">
       
       
         <meta name="author" content="Arjen Brienen">
       
       
-        <link rel="canonical" href="https://brienen.github.io/crunch_uml/technisch/kwetsbaarheden/">
+        <link rel="canonical" href="https://brienen.github.io/crunch_uml/handleiding/vertalingen/">
       
       
-        <link rel="prev" href="../datamodel/">
+        <link rel="prev" href="../export/">
       
       
-        <link rel="next" href="../roadmap/">
+        <link rel="next" href="../cli-referentie/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -27,7 +27,7 @@
     
     
       
-        <title>Kwetsbaarheden & Technische Schuld - crunch_uml</title>
+        <title>Vertalingen — i18n export met Ollama LLM - crunch_uml</title>
       
     
     
@@ -77,15 +77,15 @@
 
     
     
-      <link rel="canonical" href="https://brienen.github.io/crunch_uml/technisch/kwetsbaarheden/">
+      <link rel="canonical" href="https://brienen.github.io/crunch_uml/handleiding/vertalingen/">
     
 
     
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Kwetsbaarheden & Technische Schuld">
-    <meta property="og:description" content="crunch_uml — universele UML model converter en transformator. Importeer XMI, EA QEA, Excel, JSON en CSV; transformeer; exporteer naar JSON Schema, Linked Data (RDF/Turtle/JSON-LD), Markdown, SQLAlchemy, en Enterprise Architect repositories. Inclusief multi-schema versievergelijking en i18n-export met lokale LLM-vertaling (Mistral via Ollama).">
+    <meta property="og:title" content="Vertalingen — i18n export met Ollama LLM">
+    <meta property="og:description" content="Vertaal UML-modellen automatisch via de externe translators-API of via een lokaal draaiend LLM (Mistral via Ollama). Behoudt camelCase, PascalCase en snake_case identifiers, en respecteert domeintermen als BAG, BRP en GEMMA.">
     
-      <meta property="og:url" content="https://brienen.github.io/crunch_uml/technisch/kwetsbaarheden/">
+      <meta property="og:url" content="https://brienen.github.io/crunch_uml/handleiding/vertalingen/">
     
     <meta property="og:site_name" content="crunch_uml">
     
@@ -94,16 +94,18 @@
 
     
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Kwetsbaarheden & Technische Schuld">
-    <meta name="twitter:description" content="crunch_uml — universele UML model converter en transformator. Importeer XMI, EA QEA, Excel, JSON en CSV; transformeer; exporteer naar JSON Schema, Linked Data (RDF/Turtle/JSON-LD), Markdown, SQLAlchemy, en Enterprise Architect repositories. Inclusief multi-schema versievergelijking en i18n-export met lokale LLM-vertaling (Mistral via Ollama).">
+    <meta name="twitter:title" content="Vertalingen — i18n export met Ollama LLM">
+    <meta name="twitter:description" content="Vertaal UML-modellen automatisch via de externe translators-API of via een lokaal draaiend LLM (Mistral via Ollama). Behoudt camelCase, PascalCase en snake_case identifiers, en respecteert domeintermen als BAG, BRP en GEMMA.">
 
     
-    <meta name="description" content="crunch_uml — universele UML model converter en transformator. Importeer XMI, EA QEA, Excel, JSON en CSV; transformeer; exporteer naar JSON Schema, Linked Data (RDF/Turtle/JSON-LD), Markdown, SQLAlchemy, en Enterprise Architect repositories. Inclusief multi-schema versievergelijking en i18n-export met lokale LLM-vertaling (Mistral via Ollama).">
+    <meta name="description" content="Vertaal UML-modellen automatisch via de externe translators-API of via een lokaal draaiend LLM (Mistral via Ollama). Behoudt camelCase, PascalCase en snake_case identifiers, en respecteert domeintermen als BAG, BRP en GEMMA.">
     
       <meta name="author" content="Arjen Brienen">
     
 
     
+    
+      <meta name="keywords" content="crunch_uml vertalingen, i18n export, ollama mistral nederlands, UML-model vertalen, GEMMA terminologie, lokale LLM vertaling">
     
 
     
@@ -111,8 +113,8 @@
     {
       "@context": "https://schema.org",
       "@type": "TechArticle",
-      "headline": "Kwetsbaarheden \u0026 Technische Schuld",
-      "description": "crunch_uml \u2014 universele UML model converter en transformator. Importeer XMI, EA QEA, Excel, JSON en CSV; transformeer; exporteer naar JSON Schema, Linked Data (RDF/Turtle/JSON-LD), Markdown, SQLAlchemy, en Enterprise Architect repositories. Inclusief multi-schema versievergelijking en i18n-export met lokale LLM-vertaling (Mistral via Ollama).",
+      "headline": "Vertalingen \u2014 i18n export met Ollama LLM",
+      "description": "Vertaal UML-modellen automatisch via de externe translators-API of via een lokaal draaiend LLM (Mistral via Ollama). Behoudt camelCase, PascalCase en snake_case identifiers, en respecteert domeintermen als BAG, BRP en GEMMA.",
       "author": {
         "@type": "Person",
         "name": "Arjen Brienen"
@@ -122,7 +124,7 @@
         "name": "crunch_uml",
         "url": "https://brienen.github.io/crunch_uml/"
       },
-      "url": "https://brienen.github.io/crunch_uml/technisch/kwetsbaarheden/",
+      "url": "https://brienen.github.io/crunch_uml/handleiding/vertalingen/",
       "inLanguage": "nl",
       "isPartOf": {
         "@type": "WebSite",
@@ -165,7 +167,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#kwetsbaarheden-technische-schuld" class="md-skip">
+        <a href="#vertalingen" class="md-skip">
           Ga naar inhoud
         </a>
       
@@ -199,7 +201,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Kwetsbaarheden &amp; Technische Schuld
+              Vertalingen — i18n export met Ollama LLM
             
           </span>
         </div>
@@ -252,7 +254,7 @@
           </li>
         
           <li class="md-select__item">
-            <a href="../../en/technisch/kwetsbaarheden/" hreflang="en" class="md-select__link">
+            <a href="../../en/handleiding/vertalingen/" hreflang="en" class="md-select__link">
               English
             </a>
           </li>
@@ -349,11 +351,13 @@
         
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../handleiding/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
           
   
     
@@ -386,13 +390,11 @@
         
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../technisch/" class="md-tabs__link">
           
   
     
@@ -476,6 +478,8 @@
       
   
   
+    
+  
   
   
     
@@ -500,23 +504,24 @@
     
     
       
+        
+        
+      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../handleiding/" class="md-nav__link ">
+            <a href="../" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -527,13 +532,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Handleiding
@@ -549,7 +554,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../handleiding/installatie/" class="md-nav__link">
+      <a href="../installatie/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -570,7 +575,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../handleiding/import/" class="md-nav__link">
+      <a href="../import/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -591,7 +596,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../handleiding/transform/" class="md-nav__link">
+      <a href="../transform/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -612,7 +617,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../handleiding/export/" class="md-nav__link">
+      <a href="../export/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -630,10 +635,30 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../handleiding/vertalingen/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Vertalingen — i18n export met Ollama LLM
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -642,6 +667,155 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Inhoudsopgave">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Inhoudsopgave
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#het-simpele-pad-externe-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      Het simpele pad — externe API
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#het-lokale-pad-ollama-mistral" class="md-nav__link">
+    <span class="md-ellipsis">
+      Het lokale pad — Ollama + Mistral
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Het lokale pad — Ollama + Mistral">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-installeer-en-pull-het-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Installeer en pull het model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-activeer-de-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Activeer de backend
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alle-knoppen-op-een-rij" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alle knoppen op een rij
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Alle knoppen op een rij">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#one-liner-met-alleen-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      One-liner met alleen CLI
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#welk-mistral-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Welk Mistral-model?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#casing-wordt-behouden" class="md-nav__link">
+    <span class="md-ellipsis">
+      Casing wordt behouden
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#opake-tokens-zijn-beschermd" class="md-nav__link">
+    <span class="md-ellipsis">
+      Opake tokens zijn beschermd
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#context-bewust-vertalen" class="md-nav__link">
+    <span class="md-ellipsis">
+      Context-bewust vertalen
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#update_i18n-bestaande-vertalingen-hergebruiken" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_i18n — bestaande vertalingen hergebruiken
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prestaties-wat-te-verwachten" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prestaties — wat te verwachten
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verder-lezen" class="md-nav__link">
+    <span class="md-ellipsis">
+      Verder lezen
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -654,7 +828,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../handleiding/cli-referentie/" class="md-nav__link">
+      <a href="../cli-referentie/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -699,8 +873,6 @@
       
   
   
-    
-  
   
   
     
@@ -725,24 +897,23 @@
     
     
       
-        
-        
-      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../" class="md-nav__link ">
+            <a href="../../technisch/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -753,13 +924,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             Technisch Ontwerp
@@ -792,13 +963,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -809,7 +977,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../architectuur/" class="md-nav__link ">
+            <a href="../../technisch/architectuur/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -820,7 +988,7 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_2" id="__nav_4_2_label" tabindex="">
+              <label class="md-nav__link " for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
@@ -842,7 +1010,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../architectuur/lagen/" class="md-nav__link">
+      <a href="../../technisch/architectuur/lagen/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -863,7 +1031,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../architectuur/dataflows/" class="md-nav__link">
+      <a href="../../technisch/architectuur/dataflows/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -884,7 +1052,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../architectuur/design-patterns/" class="md-nav__link">
+      <a href="../../technisch/architectuur/design-patterns/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -932,13 +1100,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -949,7 +1114,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../componenten/" class="md-nav__link ">
+            <a href="../../technisch/componenten/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -960,7 +1125,7 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_3" id="__nav_4_3_label" tabindex="">
+              <label class="md-nav__link " for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
@@ -982,7 +1147,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../componenten/parsers/" class="md-nav__link">
+      <a href="../../technisch/componenten/parsers/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1003,7 +1168,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../componenten/transformers/" class="md-nav__link">
+      <a href="../../technisch/componenten/transformers/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1024,7 +1189,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../componenten/renderers/" class="md-nav__link">
+      <a href="../../technisch/componenten/renderers/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1045,7 +1210,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../componenten/persistentie/" class="md-nav__link">
+      <a href="../../technisch/componenten/persistentie/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1074,7 +1239,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../datamodel/" class="md-nav__link">
+      <a href="../../technisch/datamodel/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1092,30 +1257,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Kwetsbaarheden &amp; Technische Schuld
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../technisch/kwetsbaarheden/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1124,152 +1269,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Inhoudsopgave">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Inhoudsopgave
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#risicomatrix" class="md-nav__link">
-    <span class="md-ellipsis">
-      Risicomatrix
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#hoog-risico" class="md-nav__link">
-    <span class="md-ellipsis">
-      Hoog risico
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Hoog risico">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#xmi-parsing-foutgevoeligheid" class="md-nav__link">
-    <span class="md-ellipsis">
-      XMI Parsing — Foutgevoeligheid
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#inconsistenties-metaschema" class="md-nav__link">
-    <span class="md-ellipsis">
-      Inconsistenties Metaschema
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#medium-risico" class="md-nav__link">
-    <span class="md-ellipsis">
-      Medium risico
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Medium risico">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#validatie-overhead" class="md-nav__link">
-    <span class="md-ellipsis">
-      Validatie Overhead
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#inheritance-interpretatie-variaties" class="md-nav__link">
-    <span class="md-ellipsis">
-      Inheritance Interpretatie-variaties
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#singleton-database-pattern" class="md-nav__link">
-    <span class="md-ellipsis">
-      Singleton Database Pattern
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#laag-risico" class="md-nav__link">
-    <span class="md-ellipsis">
-      Laag risico
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Laag risico">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ea-repo-updater-destructieve-operaties" class="md-nav__link">
-    <span class="md-ellipsis">
-      EA Repo Updater — Destructieve Operaties
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#translators-library-externe-afhankelijkheid" class="md-nav__link">
-    <span class="md-ellipsis">
-      Translators Library — Externe Afhankelijkheid
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#grote-dbpy-1200-regels" class="md-nav__link">
-    <span class="md-ellipsis">
-      Grote db.py (1200+ regels)
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1282,7 +1281,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../roadmap/" class="md-nav__link">
+      <a href="../../technisch/roadmap/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1303,7 +1302,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../stack/" class="md-nav__link">
+      <a href="../../technisch/stack/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1337,145 +1336,311 @@
               <article class="md-content__inner md-typeset">
                 
                   
+  
+<nav class="md-tags" >
+  
+    
+    
+    
+      <span class="md-tag">i18n</span>
+    
+  
+    
+    
+    
+      <span class="md-tag">vertaling</span>
+    
+  
+    
+    
+    
+      <span class="md-tag">ollama</span>
+    
+  
+    
+    
+    
+      <span class="md-tag">mistral</span>
+    
+  
+    
+    
+    
+      <span class="md-tag">llm</span>
+    
+  
+    
+    
+    
+      <span class="md-tag">export</span>
+    
+  
+</nav>
+
 
   
   
 
 
-<h1 id="kwetsbaarheden-technische-schuld">Kwetsbaarheden &amp; Technische Schuld<a class="headerlink" href="#kwetsbaarheden-technische-schuld" title="Permanent link">&para;</a></h1>
-<h2 id="risicomatrix">Risicomatrix<a class="headerlink" href="#risicomatrix" title="Permanent link">&para;</a></h2>
+<h1 id="vertalingen">Vertalingen<a class="headerlink" href="#vertalingen" title="Permanent link">&para;</a></h1>
+<p>Het <code>i18n</code>-export-formaat kan modelvelden (namen, definities, toelichtingen,
+GEMMA-tags) automatisch naar een doeltaal vertalen. Er zijn twee backends:</p>
 <table>
 <thead>
 <tr>
-<th>Risico</th>
-<th style="text-align: center;">Kans</th>
-<th style="text-align: center;">Impact</th>
-<th style="text-align: center;">Score</th>
-<th>Component</th>
-<th>Mitigatie</th>
+<th>Backend</th>
+<th>Wanneer kiezen</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>XMI parsing fouten door brondiversiteit</td>
-<td style="text-align: center;">Hoog</td>
-<td style="text-align: center;">Hoog</td>
-<td style="text-align: center;"><strong>9</strong></td>
-<td>XMI Parser, EA XMI Parser</td>
-<td>Encoding detectie, recovery, error logging</td>
+<td><code>translators</code> (standaard)</td>
+<td>Snelle exports zonder extra setup. Gebruikt Google/Bing endpoints.</td>
 </tr>
 <tr>
-<td>Inconsistenties repository vs. werkelijk metaschema</td>
-<td style="text-align: center;">Hoog</td>
-<td style="text-align: center;">Hoog</td>
-<td style="text-align: center;"><strong>9</strong></td>
-<td>Gecentraliseerde Repo (beoogd)</td>
-<td>Schema-validatie, versie-tracking</td>
-</tr>
-<tr>
-<td>Geheugenbelasting geïndexeerde gegevens</td>
-<td style="text-align: center;">Hoog</td>
-<td style="text-align: center;">Medium</td>
-<td style="text-align: center;"><strong>6</strong></td>
-<td>Indexering (beoogd)</td>
-<td>Lazy loading, paginatie, streaming</td>
-</tr>
-<tr>
-<td>Concurrentieproblemen cache/validatie</td>
-<td style="text-align: center;">Medium</td>
-<td style="text-align: center;">Hoog</td>
-<td style="text-align: center;"><strong>6</strong></td>
-<td>Caching Engine (beoogd)</td>
-<td>Locking-strategie, versioned cache</td>
-</tr>
-<tr>
-<td>Complexiteit mapping-configuratie</td>
-<td style="text-align: center;">Medium</td>
-<td style="text-align: center;">Medium</td>
-<td style="text-align: center;"><strong>4</strong></td>
-<td>Mapping Layer (beoogd)</td>
-<td>DSL, test-driven development</td>
-</tr>
-<tr>
-<td>Singleton pattern bij concurrent gebruik</td>
-<td style="text-align: center;">Laag</td>
-<td style="text-align: center;">Medium</td>
-<td style="text-align: center;"><strong>3</strong></td>
-<td>Database klasse</td>
-<td>Connection pooling</td>
-</tr>
-<tr>
-<td>Destructieve EA Repo operaties</td>
-<td style="text-align: center;">Laag</td>
-<td style="text-align: center;">Hoog</td>
-<td style="text-align: center;"><strong>3</strong></td>
-<td>EA Repo Updater</td>
-<td>Flags, dry-run modus</td>
+<td><code>ollama</code></td>
+<td>Hogere kwaliteit, offline, context-bewust. Draait een lokaal LLM (Mistral) via Ollama.</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="hoog-risico">Hoog risico<a class="headerlink" href="#hoog-risico" title="Permanent link">&para;</a></h2>
-<h3 id="xmi-parsing-foutgevoeligheid">XMI Parsing — Foutgevoeligheid<a class="headerlink" href="#xmi-parsing-foutgevoeligheid" title="Permanent link">&para;</a></h3>
-<p>Parsen van XMI-data is kwetsbaar door diversiteit in bronformaten en repositories. Elk bronsysteem heeft een eigen structuur, wat resulteert in error-gevoelige parsing. De twee-fasen aanpak (structuur → relaties) vermindert dit maar elimineert het niet.</p>
-<p><strong>Impact</strong>: Dataverlies, inconsistente modellen</p>
-<p><strong>Huidige mitigatie</strong>: Encoding detectie, recovery mechanismen, uitgebreide error logging</p>
-<div class="admonition danger">
-<p class="admonition-title">Kern van het probleem</p>
-<p>Door beperkte ondersteuning van Python-bibliotheken voor XMI moeten alle XMI-bibliotheken in huis worden ontwikkeld. Dit leidt tot verminderde efficiëntie en verhoogde kans op onherleidbare fouten.</p>
+<div class="admonition tip">
+<p class="admonition-title">Casing wordt automatisch behouden</p>
+<p>Een veel-voorkomende valkuil bij automatisch vertalen: <code>aanvangAanwezigheid</code>
+wordt door Google als "start attendance" teruggegeven en breekt zo de
+identifier. Crunch_uml herkent het oorspronkelijke casing-patroon en zet
+het resultaat deterministisch terug in camelCase, PascalCase, snake_case
+of kebab-case. <code>aanvangAanwezigheid</code> → <code>startAttendance</code>.</p>
 </div>
-<h3 id="inconsistenties-metaschema">Inconsistenties Metaschema<a class="headerlink" href="#inconsistenties-metaschema" title="Permanent link">&para;</a></h3>
-<p>Het risico dat het repository-metaschema afwijkt van de werkelijk gebruikte metaschema's in bronsystemen.</p>
-<p><strong>Impact</strong>: Verkeerde interpretaties van datastructuren</p>
-<p><strong>Huidige mitigatie</strong>: Nog niet volledig geadresseerd — beoogde oplossing via gecentraliseerde repository met hiërarchie-documentatie.</p>
-<hr />
-<h2 id="medium-risico">Medium risico<a class="headerlink" href="#medium-risico" title="Permanent link">&para;</a></h2>
-<h3 id="validatie-overhead">Validatie Overhead<a class="headerlink" href="#validatie-overhead" title="Permanent link">&para;</a></h3>
-<p>Herhaalde validaties bij onvolledige relaties vereisen aanzienlijke rekenkracht. Er is momenteel geen caching van validatieresultaten.</p>
-<p><strong>Impact</strong>: Onaanvaardbare vertragingen bij grote modellen</p>
-<p><strong>Beoogde mitigatie</strong>: Caching &amp; Validatie Engine met:</p>
-<ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Cache-mechanisme voor opgeslagen validaties</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Controlemodule voor beheer van gecachte resultaten</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Concurrent-safe cache-invalidatie</li>
+<h2 id="het-simpele-pad-externe-api">Het simpele pad — externe API<a class="headerlink" href="#het-simpele-pad-externe-api" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_model<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>i18n<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span>-f<span class="w"> </span>mijn_model.i18n.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span>--language<span class="w"> </span>en<span class="w"> </span>--translate<span class="w"> </span>True<span class="w"> </span>--from_language<span class="w"> </span>nl
+</code></pre></div>
+<p>Geen extra setup nodig. De vertalingen lopen via Google/Bing en zijn
+geparalleliseerd (8 worker threads tegelijk) met deduplicatie van identieke
+strings — een GGM-grootte model is doorgaans binnen 1-2 minuten klaar.</p>
+<h2 id="het-lokale-pad-ollama-mistral">Het lokale pad — Ollama + Mistral<a class="headerlink" href="#het-lokale-pad-ollama-mistral" title="Permanent link">&para;</a></h2>
+<p>Geen rate-limits, geen netwerkverkeer naar buiten, en betere kwaliteit op
+domeinjargon (<code>objecttype</code>, <code>attribuutsoort</code>, <code>BAG</code>, <code>RSGB</code>, …).</p>
+<h3 id="1-installeer-en-pull-het-model">1. Installeer en pull het model<a class="headerlink" href="#1-installeer-en-pull-het-model" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Installeer Ollama — zie https://ollama.com</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>ollama<span class="w"> </span>pull<span class="w"> </span>mistral-small3.1:24b<span class="w">   </span><span class="c1"># ~14 GB Q4_K_M — aanbevolen default</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>ollama<span class="w"> </span>serve<span class="w">                       </span><span class="c1"># als de daemon nog niet draait</span>
+</code></pre></div>
+<h3 id="2-activeer-de-backend">2. Activeer de backend<a class="headerlink" href="#2-activeer-de-backend" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_model<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>i18n<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span>-f<span class="w"> </span>mijn_model.i18n.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span>--language<span class="w"> </span>en<span class="w"> </span>--translate<span class="w"> </span>True<span class="w"> </span>--from_language<span class="w"> </span>nl<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span>--translate_backend<span class="w"> </span>ollama
+</code></pre></div>
+<p>Of, als environment variable die voor de hele sessie geldt:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">CRUNCH_UML_TRANSLATE_BACKEND</span><span class="o">=</span>ollama
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_model<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>i18n<span class="w"> </span>-f<span class="w"> </span>mijn_model.i18n.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span>--language<span class="w"> </span>en<span class="w"> </span>--translate<span class="w"> </span>True<span class="w"> </span>--from_language<span class="w"> </span>nl
+</code></pre></div>
+<p>Als Ollama onverhoopt onbereikbaar is (server uit, model niet gepulld), valt
+de renderer transparant terug op de externe API. Een ontbrekende Ollama
+breekt nooit een bestaande pijplijn.</p>
+<h2 id="alle-knoppen-op-een-rij">Alle knoppen op een rij<a class="headerlink" href="#alle-knoppen-op-een-rij" title="Permanent link">&para;</a></h2>
+<p>Elke instelling kan zowel als CLI-flag als als environment variable. <strong>CLI
+heeft voorrang op env-var, env-var op de default.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Instelling</th>
+<th>CLI-flag</th>
+<th>Env-var</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Backend</td>
+<td><code>--translate_backend {translators,ollama}</code></td>
+<td><code>CRUNCH_UML_TRANSLATE_BACKEND</code></td>
+<td><code>translators</code></td>
+</tr>
+<tr>
+<td>Model</td>
+<td><code>--ollama_model TAG</code></td>
+<td><code>CRUNCH_UML_OLLAMA_MODEL</code></td>
+<td><code>mistral-small3.1:24b</code></td>
+</tr>
+<tr>
+<td>Server URL</td>
+<td><code>--ollama_url URL</code></td>
+<td><code>CRUNCH_UML_OLLAMA_URL</code></td>
+<td><code>http://localhost:11434</code></td>
+</tr>
+<tr>
+<td>Timeout</td>
+<td><code>--ollama_timeout SEC</code></td>
+<td><code>CRUNCH_UML_OLLAMA_TIMEOUT</code></td>
+<td><code>120</code></td>
+</tr>
+<tr>
+<td>Workers</td>
+<td><code>--translate_workers N</code></td>
+<td><code>CRUNCH_UML_TRANSLATE_WORKERS</code></td>
+<td><code>8</code></td>
+</tr>
+<tr>
+<td>Context-prompt</td>
+<td><code>--translate_context</code></td>
+<td><code>CRUNCH_UML_TRANSLATE_CONTEXT=1</code></td>
+<td>uit</td>
+</tr>
+</tbody>
+</table>
+<h3 id="one-liner-met-alleen-cli">One-liner met alleen CLI<a class="headerlink" href="#one-liner-met-alleen-cli" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_model<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>i18n<span class="w"> </span>-f<span class="w"> </span>out.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span>--language<span class="w"> </span>en<span class="w"> </span>--translate<span class="w"> </span>True<span class="w"> </span>--from_language<span class="w"> </span>nl<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span>--translate_backend<span class="w"> </span>ollama<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span>--ollama_model<span class="w"> </span>mistral-small3.1:24b<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span>--translate_workers<span class="w"> </span><span class="m">8</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span>--translate_context
+</code></pre></div>
+<h2 id="welk-mistral-model">Welk Mistral-model?<a class="headerlink" href="#welk-mistral-model" title="Permanent link">&para;</a></h2>
+<p>Alle drie passen ruim in een Mac met 32 GB+ unified memory; voor een M4 met
+128 GB is <code>mistral-large</code> ook prima.</p>
+<table>
+<thead>
+<tr>
+<th>Tag</th>
+<th>Grootte</th>
+<th>Snelheid op M4</th>
+<th>Wanneer kiezen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mistral-small3.1:24b</code> ⭐</td>
+<td>~14 GB</td>
+<td>30-40 tok/s</td>
+<td><strong>Default.</strong> Beste balans.</td>
+</tr>
+<tr>
+<td><code>mistral-nemo:12b</code></td>
+<td>~7 GB</td>
+<td>50-70 tok/s</td>
+<td>Iteratie / dev-loop. Sterk in NL via de Tekken-tokenizer.</td>
+</tr>
+<tr>
+<td><code>mistral-large:123b</code></td>
+<td>~70 GB</td>
+<td>10-15 tok/s</td>
+<td>Publicatie-kwaliteit.</td>
+</tr>
+</tbody>
+</table>
+<p>Schakelen kost één environment-variable of CLI-flag:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>crunch_uml<span class="w"> </span>…<span class="w"> </span>--ollama_model<span class="w"> </span>mistral-large:123b
+</code></pre></div>
+<h2 id="casing-wordt-behouden">Casing wordt behouden<a class="headerlink" href="#casing-wordt-behouden" title="Permanent link">&para;</a></h2>
+<p>Veel velden in een UML-model zijn identifiers, geen prozaregels. De
+Ollama-backend instrueert het model expliciet in zijn system prompt én
+herstelt achteraf deterministisch met <code>reconcile_case</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Source (NL)</th>
+<th>Output (EN)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>aanvangAanwezigheid</code></td>
+<td><code>startAttendance</code></td>
+</tr>
+<tr>
+<td><code>redenWijzigingAdres</code></td>
+<td><code>reasonAddressChange</code></td>
+</tr>
+<tr>
+<td><code>Bouwactiviteit</code></td>
+<td><code>ConstructionActivity</code></td>
+</tr>
+<tr>
+<td><code>BeschermdeStatus</code></td>
+<td><code>ProtectedStatus</code></td>
+</tr>
+<tr>
+<td><code>MigratieIngeschrevenNatuurlijkPersoon</code></td>
+<td><code>MigrationRegisteredNaturalPerson</code></td>
+</tr>
+<tr>
+<td><code>datum_opname</code></td>
+<td><code>recording_date</code></td>
+</tr>
+<tr>
+<td><code>indicatie_in_onderzoek</code></td>
+<td><code>under_investigation_indication</code></td>
+</tr>
+<tr>
+<td><code>gemma-type</code></td>
+<td><code>gemma-type</code></td>
+</tr>
+<tr>
+<td><code>BAG</code>, <code>BRP</code>, <code>RSGB</code></td>
+<td>ongewijzigd</td>
+</tr>
+<tr>
+<td><code>Het bouwen van een bouwwerk.</code></td>
+<td><code>The construction of a building.</code></td>
+</tr>
+</tbody>
+</table>
+<p>Acroniemen als BAG, BRP en RSGB blijven onveranderd door zowel de prompt-
+instructies als de ALL_CAPS-detectie in het vangnet.</p>
+<h2 id="opake-tokens-zijn-beschermd">Opake tokens zijn beschermd<a class="headerlink" href="#opake-tokens-zijn-beschermd" title="Permanent link">&para;</a></h2>
+<p>Bepaalde waarden hebben geen zinvolle vertaling en zorgden voorheen voor
+LLM-hallucinatie (b.v. "expand <code>&lt;memo&gt;</code>" → fictieve inhoud). De Ollama-
+backend skipt deze patronen volledig — geen model-call, brontekst
+verbatim terug:</p>
+<ul>
+<li>XML/HTML-achtige enkelvoudige tags: <code>&lt;memo&gt;</code>, <code>&lt;typing&gt;</code>, <code>&lt;/br&gt;</code>, <code>&lt;UML:Class&gt;</code></li>
+<li>EA-identifiers: <code>EAID_…</code>, <code>EAPK_…</code>, <code>EAID_attr_…</code></li>
+<li>URLs: <code>http://…</code>, <code>https://…</code>, <code>www.…</code></li>
+<li>ISO-datums en -timestamps: <code>2024-05-13</code>, <code>2024-05-13T10:30:00Z</code></li>
+<li>Pure leestekens of cijfers</li>
 </ul>
-<h3 id="inheritance-interpretatie-variaties">Inheritance Interpretatie-variaties<a class="headerlink" href="#inheritance-interpretatie-variaties" title="Permanent link">&para;</a></h3>
-<p>Diversiteit in hoe inheritance-relaties worden gemodelleerd en geïnterpreteerd bij vertaling naar fysieke databasemodellen.</p>
-<p><strong>Impact</strong>: Inconsistente output bij complexe modellen</p>
-<p><strong>Beoogde mitigatie</strong>: Universele Mapping Layer met standaard-strategieën</p>
-<h3 id="singleton-database-pattern">Singleton Database Pattern<a class="headerlink" href="#singleton-database-pattern" title="Permanent link">&para;</a></h3>
-<p>De Database-klasse gebruikt een singleton pattern dat problematisch kan zijn bij multi-threaded of concurrent gebruik. Er is geen connection pooling of thread-safety afhandeling.</p>
-<p><strong>Impact</strong>: Concurrentieproblemen, potentiële memory leaks</p>
-<p><strong>Mogelijke mitigatie</strong>:</p>
-<ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> SQLAlchemy session-per-request pattern</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Connection pooling configuratie</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Thread-local sessions</li>
+<h2 id="context-bewust-vertalen">Context-bewust vertalen<a class="headerlink" href="#context-bewust-vertalen" title="Permanent link">&para;</a></h2>
+<p>Met <code>--translate_context</code> (of <code>CRUNCH_UML_TRANSLATE_CONTEXT=1</code>) krijgt het
+LLM per call extra hints over wáár de string vandaan komt — bijvoorbeeld
+"the 'definitie' field of a classes entry". Dat verbetert consistentie op
+ambigue termen (b.v. "code" als attribuutnaam vs. als enum-waarde).</p>
+<p>Belangrijke trade-off: met context aan wordt de dedup-sleutel
+<code>(value, section, field)</code> in plaats van alleen <code>value</code>. Identieke strings
+in verschillende contexten worden dus apart vertaald — kleinere dedup,
+meer API-calls.</p>
+<h2 id="update_i18n-bestaande-vertalingen-hergebruiken"><code>update_i18n</code> — bestaande vertalingen hergebruiken<a class="headerlink" href="#update_i18n-bestaande-vertalingen-hergebruiken" title="Permanent link">&para;</a></h2>
+<p>Standaard (<code>--update_i18n True</code>) hergebruikt de renderer al-bestaande
+vertalingen uit een vorig run i18n-bestand. Alleen ontbrekende velden
+worden opnieuw vertaald. Dit werkt voor beide backends.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Eerste run: vertaalt alles.</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>crunch_uml<span class="w"> </span>…<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>i18n<span class="w"> </span>-f<span class="w"> </span>mijn.i18n.json<span class="w"> </span>--language<span class="w"> </span>en<span class="w"> </span>--translate<span class="w"> </span>True
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Tweede run: hergebruikt bestaande EN-vertalingen, vertaalt alleen nieuwe</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="c1"># of gewijzigde velden.</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>crunch_uml<span class="w"> </span>…<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>i18n<span class="w"> </span>-f<span class="w"> </span>mijn.i18n.json<span class="w"> </span>--language<span class="w"> </span>en<span class="w"> </span>--translate<span class="w"> </span>True<span class="w"> </span>--update_i18n<span class="w"> </span>True
+</code></pre></div>
+<h2 id="prestaties-wat-te-verwachten">Prestaties — wat te verwachten<a class="headerlink" href="#prestaties-wat-te-verwachten" title="Permanent link">&para;</a></h2>
+<p>Op een Mac M4 met <code>mistral-small3.1:24b</code>:</p>
+<ul>
+<li>Korte identifier (≤ 5 woorden): ~0.3 s</li>
+<li>Volledige definitie-zin: ~0.5-1 s</li>
+<li>Spotcheck op 19 GGM-strings: 6.6 s totaal, gemiddeld 0.35 s per call</li>
+<li><code>test_16_export_i18n.py</code> (Monumenten + RSGBPlus): 78 s totaal voor de hele
+  pipeline inclusief i18n-export, EA-repo update en validaties</li>
 </ul>
-<hr />
-<h2 id="laag-risico">Laag risico<a class="headerlink" href="#laag-risico" title="Permanent link">&para;</a></h2>
-<h3 id="ea-repo-updater-destructieve-operaties">EA Repo Updater — Destructieve Operaties<a class="headerlink" href="#ea-repo-updater-destructieve-operaties" title="Permanent link">&para;</a></h3>
-<p>De EA Repo Updater kan via <code>--ea_allow_insert</code> en <code>--ea_allow_delete</code> records toevoegen en verwijderen in productie EA-repositories.</p>
-<p><strong>Impact</strong>: Potentieel onherstelbaar dataverlies</p>
-<p><strong>Huidige mitigatie</strong>: Flags achter CLI-argumenten, documentatie</p>
-<p><strong>Aanvullende suggesties</strong>:</p>
-<ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Dry-run modus (<code>--ea_dry_run</code>)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Automatische backup voor wijzigingen</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Bevestigingsprompt bij destructieve operaties</li>
-</ul>
-<h3 id="translators-library-externe-afhankelijkheid">Translators Library — Externe Afhankelijkheid<a class="headerlink" href="#translators-library-externe-afhankelijkheid" title="Permanent link">&para;</a></h3>
-<p>De vertaalmodule (lang.py) is afhankelijk van de <code>translators</code> library. Externe diensten kunnen onbeschikbaar zijn of rate-limits opleggen.</p>
-<p><strong>Impact</strong>: Falende i18n-exports</p>
-<p><strong>Huidige mitigatie</strong>: Retry-logica, fallback translator</p>
-<h3 id="grote-dbpy-1200-regels">Grote db.py (1200+ regels)<a class="headerlink" href="#grote-dbpy-1200-regels" title="Permanent link">&para;</a></h3>
-<p>Het database-modelbestand combineert modeldefinities, business logica en hulpmethoden in één bestand.</p>
-<p><strong>Impact</strong>: Verhoogde onderhoudslast</p>
-<p><strong>Suggestie</strong>:</p>
-<ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Splits naar <code>models/package.py</code>, <code>models/clazz.py</code>, etc.</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Verplaats business logica naar service-laag</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Extraheer mixins naar apart bestand</li>
+<p>Met de externe <code>translators</code>-API zijn korte strings doorgaans iets sneller
+(~0.1 s netwerklatentie), maar de kwaliteit op identifiers en domeintermen
+is duidelijk lager.</p>
+<h2 id="verder-lezen">Verder lezen<a class="headerlink" href="#verder-lezen" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../export/">Export-commando</a> — volledige opties van het <code>export</code>-subcommando.</li>
+<li><a href="../../technisch/componenten/renderers/">Renderers technisch</a> — hoe de
+  i18n-renderer intern werkt (deduplicatie, parallel pool, fallback).</li>
 </ul>
 
 
@@ -1483,6 +1648,9 @@
 
 
 
+
+  
+  
 
 
 

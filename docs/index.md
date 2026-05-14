@@ -1,3 +1,33 @@
+---
+title: crunch_uml — Universele UML model converter en transformator
+description: >-
+  crunch_uml leest UML-modellen uit XMI, Enterprise Architect QEA, Excel,
+  JSON en CSV; transformeert ze; en exporteert naar JSON Schema, Linked
+  Data (RDF/Turtle/JSON-LD), Markdown, SQLAlchemy, OpenAPI en Enterprise
+  Architect repositories. Inclusief multi-schema versievergelijking,
+  i18n-export en lokale LLM-vertaling via Mistral op Ollama.
+tags:
+  - uml
+  - xmi
+  - enterprise-architect
+  - qea
+  - json-schema
+  - linked-data
+  - gemma
+  - mim
+keywords:
+  - crunch_uml
+  - UML converter
+  - XMI parser
+  - Enterprise Architect QEA
+  - JSON Schema generator
+  - Linked Data RDF UML
+  - GEMMA RSGB MIM
+  - UML model vergelijking
+  - i18n vertaling UML
+  - lokale LLM Mistral Ollama
+---
+
 # crunch_uml
 
 ## Het probleem: incompatibele UML-uitwisselformaten

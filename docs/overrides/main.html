@@ -1,0 +1,114 @@
+{# Material for MkDocs override that injects semantic metadata into every
+   page: Open Graph + Twitter Card meta tags, Schema.org JSON-LD structured
+   data, and a canonical link. Improves search-engine ranking and rich-result
+   eligibility for crunch_uml documentation. #}
+{% extends "base.html" %}
+
+{% block extrahead %}
+  {{ super() }}
+
+  {# Skip the whole block on the 404 page — it has no ``page`` context and
+     the search engines don't index it anyway. #}
+  {% if page %}
+
+    {# Defensive lookups: Jinja's Undefined value crashes |tojson, so coerce
+       optional fields to plain strings first. #}
+    {% set _canonical = (page.canonical_url | default("", true)) | string %}
+    {% set _description = (page.meta.description if page.meta and page.meta.description else config.site_description) | string %}
+    {% set _title = (page.meta.title if page.meta and page.meta.title else (page.title | default(config.site_name, true))) | string %}
+    {% set _site_url = (config.site_url | default("", true)) | string %}
+    {% set _repo_url = (config.repo_url | default("", true)) | string %}
+    {% set _author = (config.site_author | default("", true)) | string %}
+
+    {# Canonical URL — required for Google to consolidate localised variants. #}
+    {% if _canonical %}
+      <link rel="canonical" href="{{ _canonical }}">
+    {% endif %}
+
+    {# Open Graph — used by LinkedIn, Slack, Facebook, Discord, etc. #}
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="{{ _title | striptags }}">
+    <meta property="og:description" content="{{ _description | striptags }}">
+    {% if _canonical %}
+      <meta property="og:url" content="{{ _canonical }}">
+    {% endif %}
+    <meta property="og:site_name" content="{{ config.site_name }}">
+    {% if config.theme.language %}
+      <meta property="og:locale" content="{{ config.theme.language | replace('-', '_') }}">
+    {% endif %}
+
+    {# Twitter Card — large summary so previews render with a banner. #}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ _title | striptags }}">
+    <meta name="twitter:description" content="{{ _description | striptags }}">
+
+    {# Plain meta description — still important for search results that
+       don't parse Open Graph. #}
+    <meta name="description" content="{{ _description | striptags }}">
+    {% if _author %}
+      <meta name="author" content="{{ _author }}">
+    {% endif %}
+
+    {# Optional keywords from per-page front-matter (`keywords:` list). #}
+    {% if page.meta and page.meta.keywords %}
+      <meta name="keywords" content="{{ page.meta.keywords | join(', ') }}">
+    {% endif %}
+
+    {# Schema.org JSON-LD — TechArticle wraps each documentation page in
+       structured data so Google can show rich snippets. #}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": {{ (_title | striptags) | tojson }},
+      "description": {{ (_description | striptags) | tojson }},
+      "author": {
+        "@type": "Person",
+        "name": {{ _author | tojson }}
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": {{ config.site_name | tojson }},
+        "url": {{ _site_url | tojson }}
+      },
+      "url": {{ _canonical | tojson }},
+      "inLanguage": {{ (config.theme.language or "nl") | tojson }},
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": {{ config.site_name | tojson }},
+        "url": {{ _site_url | tojson }}
+      }
+    }
+    </script>
+
+    {# SoftwareApplication only on the homepage — describes the project
+       itself for rich-result eligibility. #}
+    {% if page.is_homepage %}
+      <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "crunch_uml",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "macOS, Linux, Windows",
+        "description": {{ config.site_description | tojson }},
+        "url": {{ _site_url | tojson }},
+        "codeRepository": {{ _repo_url | tojson }},
+        "license": "https://opensource.org/licenses/MIT",
+        "programmingLanguage": "Python",
+        "author": {
+          "@type": "Person",
+          "name": {{ _author | tojson }}
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "EUR"
+        },
+        "keywords": "UML, XMI, Enterprise Architect, QEA, JSON Schema, Linked Data, RDF, OWL, OpenAPI, SQLAlchemy, GEMMA, RSGB, MIM, model transformation, i18n, Ollama, Mistral, LLM translation"
+      }
+      </script>
+    {% endif %}
+
+  {% endif %}{# page #}
+{% endblock %}

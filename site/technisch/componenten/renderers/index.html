@@ -1,4 +1,5 @@
 
+
 <!doctype html>
 <html lang="nl" class="no-js">
   <head>
@@ -6,7 +7,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Documentatie voor crunch_uml — UML model transformatie en export">
+        <meta name="description" content="crunch_uml — universele UML model converter en transformator. Importeer XMI, EA QEA, Excel, JSON en CSV; transformeer; exporteer naar JSON Schema, Linked Data (RDF/Turtle/JSON-LD), Markdown, SQLAlchemy, en Enterprise Architect repositories. Inclusief multi-schema versievergelijking en i18n-export met lokale LLM-vertaling (Mistral via Ollama).">
       
       
         <meta name="author" content="Arjen Brienen">
@@ -61,6 +62,81 @@
     
     
     
+  
+
+  
+  
+
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+      <link rel="canonical" href="https://brienen.github.io/crunch_uml/technisch/componenten/renderers/">
+    
+
+    
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Renderers (Exportlaag)">
+    <meta property="og:description" content="crunch_uml — universele UML model converter en transformator. Importeer XMI, EA QEA, Excel, JSON en CSV; transformeer; exporteer naar JSON Schema, Linked Data (RDF/Turtle/JSON-LD), Markdown, SQLAlchemy, en Enterprise Architect repositories. Inclusief multi-schema versievergelijking en i18n-export met lokale LLM-vertaling (Mistral via Ollama).">
+    
+      <meta property="og:url" content="https://brienen.github.io/crunch_uml/technisch/componenten/renderers/">
+    
+    <meta property="og:site_name" content="crunch_uml">
+    
+      <meta property="og:locale" content="nl">
+    
+
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Renderers (Exportlaag)">
+    <meta name="twitter:description" content="crunch_uml — universele UML model converter en transformator. Importeer XMI, EA QEA, Excel, JSON en CSV; transformeer; exporteer naar JSON Schema, Linked Data (RDF/Turtle/JSON-LD), Markdown, SQLAlchemy, en Enterprise Architect repositories. Inclusief multi-schema versievergelijking en i18n-export met lokale LLM-vertaling (Mistral via Ollama).">
+
+    
+    <meta name="description" content="crunch_uml — universele UML model converter en transformator. Importeer XMI, EA QEA, Excel, JSON en CSV; transformeer; exporteer naar JSON Schema, Linked Data (RDF/Turtle/JSON-LD), Markdown, SQLAlchemy, en Enterprise Architect repositories. Inclusief multi-schema versievergelijking en i18n-export met lokale LLM-vertaling (Mistral via Ollama).">
+    
+      <meta name="author" content="Arjen Brienen">
+    
+
+    
+    
+
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Renderers (Exportlaag)",
+      "description": "crunch_uml \u2014 universele UML model converter en transformator. Importeer XMI, EA QEA, Excel, JSON en CSV; transformeer; exporteer naar JSON Schema, Linked Data (RDF/Turtle/JSON-LD), Markdown, SQLAlchemy, en Enterprise Architect repositories. Inclusief multi-schema versievergelijking en i18n-export met lokale LLM-vertaling (Mistral via Ollama).",
+      "author": {
+        "@type": "Person",
+        "name": "Arjen Brienen"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "crunch_uml",
+        "url": "https://brienen.github.io/crunch_uml/"
+      },
+      "url": "https://brienen.github.io/crunch_uml/technisch/componenten/renderers/",
+      "inLanguage": "nl",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "crunch_uml",
+        "url": "https://brienen.github.io/crunch_uml/"
+      }
+    }
+    </script>
+
+    
+    
+
+  
+
    <link href="../../../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
     html.glightbox-open { overflow: initial; height: 100%; }
     .gslide-title { margin-top: 0px; user-select: text; }
@@ -419,6 +495,8 @@
       
         
       
+        
+      
     
     
       
@@ -538,7 +616,28 @@
         
   
   <span class="md-ellipsis">
-    Export
+    Export — UML model naar JSON, XLSX, Markdown, JSON-Schema, EA repo, …
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../handleiding/vertalingen/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertalingen — i18n export met Ollama LLM
   </span>
   
 
@@ -998,6 +1097,57 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#i18n-renderer-en-vertaal-backends" class="md-nav__link">
+    <span class="md-ellipsis">
+      I18n-renderer en vertaal-backends
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="I18n-renderer en vertaal-backends">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pipeline-van-translate_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pipeline van translate_data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#drie-passes-in-i18nrenderertranslate_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Drie passes in I18nRenderer.translate_data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ollama-backend-specifieke-logica" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ollama-backend specifieke logica
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fallback-keten" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fallback-keten
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#template-renderers" class="md-nav__link">
     <span class="md-ellipsis">
       Template Renderers
@@ -1353,6 +1503,101 @@
 <li>Meerdere record-types: <code>RECORD_TYPE_RECORD</code> (array) of <code>RECORD_TYPE_INDEXED</code> (object met ID als key)</li>
 </ul>
 <hr />
+<h2 id="i18n-renderer-en-vertaal-backends">I18n-renderer en vertaal-backends<a class="headerlink" href="#i18n-renderer-en-vertaal-backends" title="Permanent link">&para;</a></h2>
+<p>De <code>I18nRenderer</code> exporteert vertaalbare velden naar een JSON-i18n-bestand
+en kan deze optioneel direct vertalen. Twee backends zijn beschikbaar:</p>
+<table>
+<thead>
+<tr>
+<th>Backend</th>
+<th>Bron</th>
+<th>Snelheid</th>
+<th>Kwaliteit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>translators</code> (default)</td>
+<td>Google/Bing via de <code>translators</code>-library</td>
+<td>~0.1 s per call (netwerklatency)</td>
+<td>OK voor prozaregels, zwak op identifiers</td>
+</tr>
+<tr>
+<td><code>ollama</code></td>
+<td>Lokaal LLM (Mistral) via Ollama</td>
+<td>~0.3-1 s per call (lokaal)</td>
+<td>Sterk op domeinjargon, casing wordt behouden</td>
+</tr>
+</tbody>
+</table>
+<h3 id="pipeline-van-translate_data">Pipeline van <code>translate_data</code><a class="headerlink" href="#pipeline-van-translate_data" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>flowchart LR
+    A[All entries] --&gt; B{Existing translation?&lt;br/&gt;update_i18n=True}
+    B --&gt;|yes| C[Reuse from original_i18n]
+    B --&gt;|no| D[Add to to_translate set]
+    D --&gt; E[Dedup unique strings]
+    E --&gt; F[ThreadPool, 8 workers]
+    F --&gt; G[lang.translate per worker]
+    G --&gt; H{Backend?}
+    H --&gt;|translators| I[ts.translate_text]
+    H --&gt;|ollama| J[ollama_translator.translate]
+    J --&gt;|fail| I
+    I --&gt; K[Splat translations&lt;br/&gt;back into structure]
+    J --&gt; K
+    C --&gt; K</code></pre>
+<h3 id="drie-passes-in-i18nrenderertranslate_data">Drie passes in <code>I18nRenderer.translate_data</code><a class="headerlink" href="#drie-passes-in-i18nrenderertranslate_data" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Verzamel</strong> — wandel door alle entries, sla unieke strings op in een set;
+   sla strings over die al een vertaling hebben in <code>original_i18n</code>.</li>
+<li><strong>Vertaal parallel</strong> — <code>ThreadPoolExecutor(max_workers=8)</code> (configureerbaar
+   via <code>--translate_workers</code> of <code>CRUNCH_UML_TRANSLATE_WORKERS</code>). De GIL wordt
+   vrijgegeven tijdens HTTP-calls; scaling is bijna lineair.</li>
+<li><strong>Rebuild</strong> — herbouw de output-structuur, vul vertalingen in vanuit de
+   dedup-cache.</li>
+</ol>
+<p>Effect: een GGM-model met ~500 unieke strings vertaalt in 1-2 minuten in
+plaats van 10+ minuten (oude per-call pipeline).</p>
+<h3 id="ollama-backend-specifieke-logica">Ollama-backend specifieke logica<a class="headerlink" href="#ollama-backend-specifieke-logica" title="Permanent link">&para;</a></h3>
+<p><code>crunch_uml/ollama_translator.py</code> voegt drie deterministische
+beschermingslagen toe rondom de LLM-call:</p>
+<table>
+<thead>
+<tr>
+<th>Laag</th>
+<th>Doel</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Opaque-token preserve-filter</strong></td>
+<td>XML-tags (<code>&lt;memo&gt;</code>), EAID-identifiers, URLs, ISO-datums en pure punctuatie worden zonder LLM-call verbatim teruggegeven. Voorkomt hallucinatie rondom <code>&lt;memo&gt;</code> en GUIDs.</td>
+</tr>
+<tr>
+<td><strong><code>num_predict</code> cap</strong></td>
+<td>Limit op output-tokens (4× input + 128, max 2048). Voorkomt runaway-generatie.</td>
+</tr>
+<tr>
+<td><strong><code>reconcile_case</code> safety net</strong></td>
+<td>Als de bron een <code>camelCase</code> / <code>PascalCase</code> / <code>snake_case</code> / <code>kebab-case</code> / <code>ALL_CAPS</code> identifier is en het LLM-resultaat spaties bevat, splitst de helper de output en zet hem deterministisch terug in de bron-casing.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fallback-keten">Fallback-keten<a class="headerlink" href="#fallback-keten" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>flowchart TD
+    A[lang.translate value] --&gt; B{CRUNCH_UML_TRANSLATE_BACKEND=ollama?}
+    B --&gt;|nee| F[translators-library]
+    B --&gt;|ja| C[ollama_translator.translate]
+    C --&gt;|success| D[reconcile_case]
+    D --&gt; Z[result]
+    C --&gt;|RequestException| E[log warning]
+    E --&gt; F
+    F --&gt;|success| Z
+    F --&gt;|fail x3| G[behoud bron-tekst]
+    G --&gt; Z</code></pre>
+<p>Een ontbrekende Ollama-server breekt nooit een pijplijn; de bestaande
+externe API vangt elke fout op.</p>
+<p>Voor de eindgebruikers-handleiding zie <a href="../../../handleiding/vertalingen/">Vertalingen</a>.</p>
+<hr />
 <h2 id="template-renderers">Template Renderers<a class="headerlink" href="#template-renderers" title="Permanent link">&para;</a></h2>
 <p><strong>Jinja2, GGM Markdown, JSON Schema</strong> — Gebaseerd op Jinja2 templates in <code>crunch_uml/templates/</code>:</p>
 <table>
@@ -1493,6 +1738,10 @@
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; Arjen Brienen — MIT License
+    </div>
   
   
     Made with

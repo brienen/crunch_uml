@@ -80,6 +80,82 @@ classDiagram
 
 ---
 
+## I18n renderer and translation backends
+
+The `I18nRenderer` exports translatable fields to a JSON i18n file and can
+optionally translate them in-flight. Two backends are available:
+
+| Backend | Source | Speed | Quality |
+| --- | --- | --- | --- |
+| `translators` (default) | Google/Bing via the `translators` library | ~0.1 s per call (network) | OK for prose, weak on identifiers |
+| `ollama` | Local LLM (Mistral) via Ollama | ~0.3-1 s per call (local) | Strong on domain jargon, casing preserved |
+
+### Pipeline of `translate_data`
+
+```mermaid
+flowchart LR
+    A[All entries] --> B{Existing translation?<br/>update_i18n=True}
+    B -->|yes| C[Reuse from original_i18n]
+    B -->|no| D[Add to to_translate set]
+    D --> E[Dedup unique strings]
+    E --> F[ThreadPool, 8 workers]
+    F --> G[lang.translate per worker]
+    G --> H{Backend?}
+    H -->|translators| I[ts.translate_text]
+    H -->|ollama| J[ollama_translator.translate]
+    J -->|fail| I
+    I --> K[Splat translations<br/>back into structure]
+    J --> K
+    C --> K
+```
+
+### Three passes in `I18nRenderer.translate_data`
+
+1. **Collect** — walk through every entry, gather unique strings in a set;
+   skip any string already translated in `original_i18n`.
+2. **Translate in parallel** — `ThreadPoolExecutor(max_workers=8)`,
+   configurable via `--translate_workers` or `CRUNCH_UML_TRANSLATE_WORKERS`.
+   The GIL is released during HTTP calls, so scaling is near-linear.
+3. **Rebuild** — reconstruct the output structure, filling in the
+   translations from the dedup cache.
+
+Effect: a GGM model with ~500 unique strings translates in 1-2 minutes
+instead of 10+ minutes (old per-call pipeline).
+
+### Ollama backend specifics
+
+`crunch_uml/ollama_translator.py` wraps three deterministic safety layers
+around the LLM call:
+
+| Layer | Purpose |
+| --- | --- |
+| **Opaque-token preserve filter** | XML tags (`<memo>`), EAID identifiers, URLs, ISO dates and pure punctuation are returned verbatim without an LLM call. Prevents hallucination around `<memo>` and GUIDs. |
+| **`num_predict` cap** | Cap on output tokens (4× input + 128, max 2048). Prevents runaway generation. |
+| **`reconcile_case` safety net** | If the source is a `camelCase` / `PascalCase` / `snake_case` / `kebab-case` / `ALL_CAPS` identifier and the LLM output contains whitespace, the helper splits the output and deterministically re-cases it. |
+
+### Fallback chain
+
+```mermaid
+flowchart TD
+    A[lang.translate value] --> B{CRUNCH_UML_TRANSLATE_BACKEND=ollama?}
+    B -->|no| F[translators library]
+    B -->|yes| C[ollama_translator.translate]
+    C -->|success| D[reconcile_case]
+    D --> Z[result]
+    C -->|RequestException| E[log warning]
+    E --> F
+    F -->|success| Z
+    F -->|fail x3| G[keep source text]
+    G --> Z
+```
+
+A missing Ollama server never breaks the pipeline; the external API
+catches every failure.
+
+End-user guide: see [Translations](../../handleiding/vertalingen.md).
+
+---
+
 ## Template Renderers
 
 **Jinja2, GGM Markdown, JSON Schema** — Based on Jinja2 templates in `crunch_uml/templates/`:
