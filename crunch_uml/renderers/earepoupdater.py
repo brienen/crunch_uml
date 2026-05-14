@@ -2,7 +2,18 @@ import inspect
 import logging
 from datetime import datetime
 
-from sqlalchemy import Column, MetaData, and_, create_engine, func, insert, or_, text
+from sqlalchemy import (
+    Column,
+    MetaData,
+    and_,
+    bindparam,
+    create_engine,
+    func,
+    insert,
+    or_,
+    text,
+    update,
+)
 from sqlalchemy.orm import sessionmaker
 
 import crunch_uml.schema as sch
@@ -142,53 +153,74 @@ class EARepoUpdater(ModelRenderer):
             raise CrunchException(msg)
 
     def update_repo(self, update_dict, session, table_name, metadata, object_id):
+        """Batched UPDATE — one prepared statement, many parameter sets."""
+        if not update_dict:
+            return
         table = self.get_table_structure(table_name, metadata)
         (
-            tag_id_parent_column,
-            tag_id_child_column,
-            tag_property_column,
+            _tag_id_parent_column,
+            _tag_id_child_column,
+            _tag_property_column,
             tag_value_column,
             ea_guid_column,
         ) = self.get_tablefields(table_name)
 
-        for key, value in update_dict.items():
-            session.query(table).filter_by(**{ea_guid_column: key}).update({tag_value_column: value})
+        stmt = (
+            update(table)
+            .where(table.c[ea_guid_column] == bindparam("_ea_guid"))
+            .values({tag_value_column: bindparam("_value")})
+        )
+        params = [{"_ea_guid": key, "_value": value} for key, value in update_dict.items()]
+        session.execute(stmt, params)
 
     def insert_repo(self, insert_dict, session, table_name, metadata, object_id):
+        """Batched INSERT — one sequence-allocation for the whole batch,
+        followed by a single ``executemany`` for the rows."""
+        if not insert_dict:
+            return
         table = self.get_table_structure(table_name, metadata)
         (
-            tag_id_parent_column,
+            _tag_id_parent_column,
             tag_id_child_column,
             tag_property_column,
             tag_value_column,
-            ea_guid_column,
+            _ea_guid_column,
         ) = self.get_tablefields(table_name)
 
-        for key, value in insert_dict.items():
-            seq = self.update_sequence(session, table_name)
+        # Allocate a contiguous PropertyID range in one go. update_sequence
+        # returns the new high-water value after incrementing by N, so the
+        # range we get is [high - N + 1, high].
+        n = len(insert_dict)
+        high = self.update_sequence(session, table_name, increment=n)
+        first_id = high - n + 1
 
-            insert_item = {
-                "PropertyID": seq,
+        rows = [
+            {
+                "PropertyID": first_id + i,
                 tag_id_child_column: object_id,
                 tag_property_column: key,
                 tag_value_column: value,
                 "ea_guid": util.get_repo_guid(),
             }
-            # Voer de insert statement uit
-            session.execute(insert(table).values(insert_item))
+            for i, (key, value) in enumerate(insert_dict.items())
+        ]
+        session.execute(insert(table), rows)
 
     def delete_repo(self, delete_dict, session, table_name, metadata, object_id):
+        """Batched DELETE — one statement with an ``IN (...)`` clause."""
+        if not delete_dict:
+            return
         table = self.get_table_structure(table_name, metadata)
         (
-            tag_id_parent_column,
-            tag_id_child_column,
-            tag_property_column,
-            tag_value_column,
+            _tag_id_parent_column,
+            _tag_id_child_column,
+            _tag_property_column,
+            _tag_value_column,
             ea_guid_column,
         ) = self.get_tablefields(table_name)
 
-        for key, value in delete_dict.items():
-            session.query(table).filter_by(**{ea_guid_column: key}).delete()
+        keys = list(delete_dict.keys())
+        session.query(table).filter(table.c[ea_guid_column].in_(keys)).delete(synchronize_session=False)
 
     def check_and_update_record(
         self,

@@ -1,3 +1,4 @@
+import functools
 import logging
 from abc import ABC, abstractmethod
 
@@ -71,6 +72,7 @@ def add_args(argumentparser, subparser_dict):
     import_subparser.epilog = epilog
 
 
+@functools.lru_cache(maxsize=1024)
 def fixtag(tag):
     return tag.replace("-", "_").replace(" ", "_").lower()
 

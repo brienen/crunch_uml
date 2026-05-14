@@ -171,6 +171,11 @@ class XMIParser(Parser):
         """
         logger.info("Entering second phase parsing: associations and generalisations")
         try:
+            ns_xmi_id = "{" + ns["xmi"] + "}id"
+            # Build a single dict {xmi:id -> element} for the whole subtree so
+            # the per-memberEnd endpoint lookup becomes an O(1) dict access
+            # instead of an O(N) xpath descent on every iteration.
+            xmi_id_index = {el.get(ns_xmi_id): el for el in node.iter() if el.get(ns_xmi_id) is not None}
             associations_xmi = node.xpath(".//packagedElement[@xmi:type='uml:Association']", namespaces=ns)  # type: ignore
             for association_xp in associations_xmi:
                 logger.debug(
@@ -184,7 +189,8 @@ class XMIParser(Parser):
                 memberends = association_xp.xpath("./memberEnd", namespaces=ns)
                 for memberend in memberends:
                     id = memberend.get("{" + ns["xmi"] + "}idref")
-                    endpoints = node.xpath(f".//*[@xmi:id='{id}']", namespaces=ns)
+                    ep = xmi_id_index.get(id)
+                    endpoints = [ep] if ep is not None else []
                     if len(endpoints) == 0:
                         clsid = util.getEAGuid()
                         msg = (

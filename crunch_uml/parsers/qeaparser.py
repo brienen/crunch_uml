@@ -358,10 +358,33 @@ class QEAParser(Parser):
         )
 
     def _phase5_tagged_values(self, conn, schema: sch.Schema):
-        """Apply tagged values from t_objectproperties, t_attributetag, t_connectortag."""
+        """Apply tagged values from t_objectproperties, t_attributetag, t_connectortag.
+
+        Performance note: previously this phase did ``schema.get_*(id)`` + a
+        per-row ``schema.save(obj)`` (which flushes), turning every tagged
+        value into a SQL round-trip. We now preload one dict per entity type,
+        mutate attached objects in place (which marks them dirty), and let a
+        single ``session.flush()`` at the end of the phase write everything in
+        one batch. On GGM v2.5.1 (~6k tagged values) this brings phase 5 from
+        ~53s down to a few seconds.
+        """
         logger.info("Phase 5: applying tagged values")
 
-        # Object tagged values (classes, enumerations)
+        # Pre-load identity maps for the entities touched in this phase.
+        classes_by_id = {c.id: c for c in schema.get_all_classes()}
+        classes_by_id.update({c.id: c for c in schema.get_all_datatypes()})
+        enums_by_id = {e.id: e for e in schema.get_all_enumerations()}
+        attrs_by_id = {a.id: a for a in schema.get_all_attributes()}
+        assocs_by_id = {a.id: a for a in schema.get_all_associations()}
+
+        # Pre-resolve connector numeric ID -> ea_guid once (was a per-row
+        # subquery before).
+        connector_eaid_by_id = {
+            row[0]: guid_to_eaid(row[1])
+            for row in conn.execute(sa.text("SELECT Connector_ID, ea_guid FROM t_connector")).fetchall()
+        }
+
+        # Object tagged values (classes, datatypes, enumerations).
         rows = conn.execute(
             sa.text(
                 "SELECT op.Object_ID, op.Property, op.Value "
@@ -377,14 +400,11 @@ class QEAParser(Parser):
             if eaid is None:
                 continue
             field = fixtag(prop)
-            obj = schema.get_class(eaid)
-            if obj is None:
-                obj = schema.get_enumeration(eaid)
+            obj = classes_by_id.get(eaid) or enums_by_id.get(eaid)
             if obj is not None and hasattr(obj, field):
                 setattr(obj, field, value)
-                schema.save(obj)
 
-        # Attribute tagged values
+        # Attribute tagged values.
         attr_rows = conn.execute(
             sa.text(
                 "SELECT at.ElementID, at.Property, at.VALUE "
@@ -401,12 +421,11 @@ class QEAParser(Parser):
             if eaid is None:
                 continue
             field = fixtag(prop)
-            attr = schema.get_attribute(eaid)
+            attr = attrs_by_id.get(eaid)
             if attr is not None and hasattr(attr, field):
                 setattr(attr, field, value)
-                schema.save(attr)
 
-        # Connector tagged values (associations)
+        # Connector tagged values (associations / realisations).
         conn_rows = conn.execute(
             sa.text(
                 "SELECT ct.ElementID, ct.Property, ct.VALUE "
@@ -418,18 +437,16 @@ class QEAParser(Parser):
         ).fetchall()
 
         for elem_id, prop, value in conn_rows:
-            conn_row = conn.execute(
-                sa.text("SELECT ea_guid FROM t_connector WHERE Connector_ID = :id"),
-                {"id": elem_id},
-            ).fetchone()
-            if conn_row is None:
+            eaid = connector_eaid_by_id.get(elem_id)
+            if eaid is None:
                 continue
-            eaid = guid_to_eaid(conn_row[0])
             field = fixtag(prop)
-            assoc = schema.get_association(eaid)
+            assoc = assocs_by_id.get(eaid)
             if assoc is not None and hasattr(assoc, field):
                 setattr(assoc, field, value)
-                schema.save(assoc)
+
+        # One batched write for all in-memory mutations of this phase.
+        schema.database.session.flush()
 
         logger.info("Phase 5 done: tagged values applied")
 

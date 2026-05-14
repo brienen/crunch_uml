@@ -44,6 +44,19 @@ class EAXMIParser(XMIParser):
             return
         extension = extensions[0]  # type: ignore
 
+        # Pre-load identity maps once per phase. Each map matches the semantics
+        # of the corresponding ``schema.get_*`` helper so the existing logic
+        # stays correct, but we replace per-row DB queries (and per-row save +
+        # flush) with O(1) dict lookups + one terminal flush.
+        packages_by_id = {p.id: p for p in schema.get_all_packages()}
+        classes_by_id = {c.id: c for c in schema.get_all_classes()}
+        # datatypes_by_id = {c.id: c for c in schema.get_all_datatypes()}
+        enums_by_id = {e.id: e for e in schema.get_all_enumerations()}
+        literals_by_id = {lit.id: lit for lit in schema.get_all_literals()}
+        attrs_by_id = {a.id: a for a in schema.get_all_attributes()}
+        assocs_by_id = {a.id: a for a in schema.get_all_associations()}
+        gens_by_id = {g.id: g for g in schema.get_all_generalizations()}
+
         """
         First find all package modifiers that look like:
             <element xmi:idref="EAPK_5B6708DC_CE09_4284_8DCE_DD1B744BB652" xmi:type="uml:Package" name="Diagram" scope="public">
@@ -65,9 +78,10 @@ class EAXMIParser(XMIParser):
         logger.info("Processing references to packages")
         packagerefs = extension.xpath(".//element[@xmi:type='uml:Package' and @xmi:idref]", namespaces=ns)  # type: ignore
         for packageref in packagerefs:
-            # First set tags that might be overridden
             idref = packageref.get("{" + ns["xmi"] + "}idref")
-            package = schema.get_package(idref)
+            package = packages_by_id.get(idref)
+            if package is None:
+                continue
 
             tags = get_sorted_tags(packageref.xpath("./tags/tag"))
             for tag in tags:
@@ -81,8 +95,6 @@ class EAXMIParser(XMIParser):
             if properties is not None:
                 package.definitie = properties.get("documentation")
             copy_values(properties, package)
-
-            schema.save(package)
 
         """
         Second find all class modifiers, like:
@@ -110,49 +122,41 @@ class EAXMIParser(XMIParser):
         clazzrefs = extension.xpath(".//element[@xmi:type='uml:Class' and @xmi:idref]", namespaces=ns)  # type: ignore
         for clazzref in clazzrefs:
             idref = clazzref.get("{" + ns["xmi"] + "}idref")
-            clazz = schema.get_class(idref)
+            clazz = classes_by_id.get(idref)
+            if clazz is None:
+                continue
 
-            if clazz is not None:
-                # First set tags that might be overridden
-                tags = get_sorted_tags(clazzref.xpath("./tags/tag"))
-                for tag in tags:
-                    if hasattr(clazz, fixtag(tag.get("name"))):
-                        setattr(clazz, fixtag(tag.get("name")), tag.get("value"))
-                    # if hasattr(clazz, fixtag(util.map_field_name_from_EARepo(tag.get("name")))):
-                    #    setattr(clazz, fixtag(util.map_field_name_from_EARepo(tag.get("name"))), tag.get("value"))
+            tags = get_sorted_tags(clazzref.xpath("./tags/tag"))
+            for tag in tags:
+                if hasattr(clazz, fixtag(tag.get("name"))):
+                    setattr(clazz, fixtag(tag.get("name")), tag.get("value"))
 
-                properties = clazzref.xpath("./properties")[0]
-                if properties is not None:
-                    clazz.definitie = properties.get("documentation")
-                project = clazzref.xpath("./project")
-                copy_values(project, clazz)
-                copy_values(properties, clazz)
-
-                schema.save(clazz)
+            properties = clazzref.xpath("./properties")[0]
+            if properties is not None:
+                clazz.definitie = properties.get("documentation")
+            project = clazzref.xpath("./project")
+            copy_values(project, clazz)
+            copy_values(properties, clazz)
 
         logger.info("Processing references to enumerations")
         enumrefs = extension.xpath(".//element[@xmi:type='uml:Enumeration' and @xmi:idref]", namespaces=ns)  # type: ignore
         for enumref in enumrefs:
             idref = enumref.get("{" + ns["xmi"] + "}idref")
-            enum = schema.get_enumeration(idref)
+            enum = enums_by_id.get(idref)
+            if enum is None:
+                continue
 
-            if enum is not None:
-                # First set tags that might be overridden
-                tags = get_sorted_tags(enumref.xpath("./tags/tag"))
-                for tag in tags:
-                    if hasattr(enum, fixtag(tag.get("name"))):
-                        setattr(enum, fixtag(tag.get("name")), tag.get("value"))
-                    # if hasattr(enum, fixtag(util.map_field_name_from_EARepo(tag.get("name")))):
-                    #    setattr(enum, fixtag(util.map_field_name_from_EARepo(tag.get("name"))), tag.get("value"))
+            tags = get_sorted_tags(enumref.xpath("./tags/tag"))
+            for tag in tags:
+                if hasattr(enum, fixtag(tag.get("name"))):
+                    setattr(enum, fixtag(tag.get("name")), tag.get("value"))
 
-                properties = enumref.xpath("./properties")[0]
-                if properties is not None:
-                    enum.definitie = properties.get("documentation")
-                project = enumref.xpath("./project")
-                copy_values(project, enum)
-                copy_values(properties, enum)
-
-                schema.save(enum)
+            properties = enumref.xpath("./properties")[0]
+            if properties is not None:
+                enum.definitie = properties.get("documentation")
+            project = enumref.xpath("./project")
+            copy_values(project, enum)
+            copy_values(properties, enum)
 
         """
         Third find all attributes, like
@@ -176,7 +180,7 @@ class EAXMIParser(XMIParser):
         attrrefs = extension.xpath(".//attribute[@xmi:idref]", namespaces=ns)  # type: ignore
         for attrref in attrrefs:
             idref = attrref.get("{" + ns["xmi"] + "}idref")
-            attr = schema.get_attribute(idref)
+            attr = attrs_by_id.get(idref)
             if attr is not None:
                 properties = attrref.xpath("./properties")
                 copy_values(properties, attr)
@@ -189,68 +193,42 @@ class EAXMIParser(XMIParser):
                 for tag in tags:
                     if hasattr(attr, fixtag(tag.get("name"))):
                         setattr(attr, fixtag(tag.get("name")), tag.get("value"))
-                # First set tags that might be overridden
-                # tags = attrref.xpath("./tags/tag")
-                # for tag in tags:
-                #    if hasattr(attr, fixtag(tag.get("name"))):
-                #        setattr(attr, fixtag(tag.get("name")), tag.get("value"))
-                #    if hasattr(attr, fixtag(util.map_field_name_from_EARepo(tag.get("name")))):
-                #        setattr(attr, fixtag(util.map_field_name_from_EARepo(tag.get("name"))), tag.get("value"))
+                continue
 
-                schema.save(attr)  # can also reference to enumeration literals
-            else:
-                literal = schema.get_enumeration_literal(idref)
-                if literal is not None:
-                    properties = attrref.xpath("./properties")
-                    copy_values(properties, literal)
-                    documentation = attrref.xpath("./documentation")
-                    literal.definitie = documentation[0].get("value") if documentation is not None else None
-                    stereotype = attrref.xpath("./stereotype")
-                    copy_values(stereotype, literal)
-                    style = attrref.xpath("./style")
-                    literal.alias = style[0].get("value") if style else None
+            literal = literals_by_id.get(idref)
+            if literal is not None:
+                properties = attrref.xpath("./properties")
+                copy_values(properties, literal)
+                documentation = attrref.xpath("./documentation")
+                literal.definitie = documentation[0].get("value") if documentation is not None else None
+                stereotype = attrref.xpath("./stereotype")
+                copy_values(stereotype, literal)
+                style = attrref.xpath("./style")
+                literal.alias = style[0].get("value") if style else None
 
-                    tags = get_sorted_tags(attrref.xpath("./tags/tag"))
-                    for tag in tags:
-                        if hasattr(literal, fixtag(tag.get("name"))):
-                            setattr(literal, fixtag(tag.get("name")), tag.get("value"))
-
-                    # First set tags that might be overridden
-                    # tags = attrref.xpath("./tags/tag")
-                    # for tag in tags:
-                    #    if hasattr(literal, fixtag(tag.get("name"))):
-                    #        setattr(literal, fixtag(tag.get("name")), tag.get("value"))
-                    #    if hasattr(literal, fixtag(util.map_field_name_from_EARepo(tag.get("name")))):
-                    #        setattr(literal, fixtag(util.map_field_name_from_EARepo(tag.get("name"))), tag.get("value"))
-
-                    schema.save(literal)
+                tags = get_sorted_tags(attrref.xpath("./tags/tag"))
+                for tag in tags:
+                    if hasattr(literal, fixtag(tag.get("name"))):
+                        setattr(literal, fixtag(tag.get("name")), tag.get("value"))
 
         logger.info("Processing references to associations")
         connectorrefs = extension.xpath(".//connector[@xmi:idref and properties/@ea_type='Association']", namespaces=ns)  # type: ignore
         for connectorref in connectorrefs:
             idref = connectorref.get("{" + ns["xmi"] + "}idref")
-            association = schema.get_association(idref)
-            if association is not None:
-                association.src_role = connectorref.xpath("./source/role", namespaces=ns)[0].get("name")
-                association.dst_role = connectorref.xpath("./target/role", namespaces=ns)[0].get("name")
+            association = assocs_by_id.get(idref)
+            if association is None:
+                continue
+            association.src_role = connectorref.xpath("./source/role", namespaces=ns)[0].get("name")
+            association.dst_role = connectorref.xpath("./target/role", namespaces=ns)[0].get("name")
 
-                documentation = connectorref.xpath("./documentation")
-                if len(documentation) == 1:
-                    association.definitie = documentation[0].get("value")
+            documentation = connectorref.xpath("./documentation")
+            if len(documentation) == 1:
+                association.definitie = documentation[0].get("value")
 
-                tags = get_sorted_tags(connectorref.xpath("./tags/tag"))
-                for tag in tags:
-                    if hasattr(association, fixtag(tag.get("name"))):
-                        setattr(association, fixtag(tag.get("name")), tag.get("value"))
-                # First set tags that might be overridden
-                # tags = connectorref.xpath("./tags/tag")
-                # for tag in tags:
-                #    if hasattr(association, fixtag(tag.get("name"))):
-                #        setattr(association, fixtag(tag.get("name")), tag.get("value"))
-                #    if hasattr(association, fixtag(util.map_field_name_from_EARepo(tag.get("name")))):
-                #        setattr(association, fixtag(util.map_field_name_from_EARepo(tag.get("name"))), tag.get("value"))
-
-                schema.save(association)
+            tags = get_sorted_tags(connectorref.xpath("./tags/tag"))
+            for tag in tags:
+                if hasattr(association, fixtag(tag.get("name"))):
+                    setattr(association, fixtag(tag.get("name")), tag.get("value"))
 
         """
         Voorbeeld van Diagram
@@ -304,31 +282,32 @@ class EAXMIParser(XMIParser):
 
             for element in diagramref.xpath("./elements/element"):
                 element_id = element.get("subject")
-                logger.debug(f'Found element with id {element.get("subject")} in diagram {name}')
-                if schema.get_class(element_id) is not None:
-                    diagram.classes.append(schema.get_class(element_id))
-                    logger.debug(
-                        f'Element {element.get("subject")} in diagram {name} is een class met naam'
-                        f' {schema.get_class(element_id).name}'
-                    )
-                elif schema.get_association(element_id) is not None:
-                    diagram.associations.append(schema.get_association(element_id))
-                    logger.debug(f'Element {element.get("subject")} in diagram {name} is een association')
-                elif schema.get_enumeration(element_id) is not None:
-                    diagram.enumerations.append(schema.get_enumeration(element_id))
-                    logger.debug(
-                        f'Element {element.get("subject")} in diagram {name} is een enumeration met naam'
-                        f' {schema.get_enumeration(element_id).name}'
-                    )
-                elif schema.get_generalization(element_id) is not None:
-                    diagram.generalizations.append(schema.get_generalization(element_id))
-                    logger.debug(f'Element {element.get("subject")} in diagram {name} is een generalisatie')
-                else:
-                    logger.debug(
-                        f'Element {element.get("subject")} in diagram {name} is niet gevonden in de database. Kan een'
-                        ' niet geimplemneteerde type zijn zoals: Note of Constraint, of kan een relatie zij naar een'
-                        ' element buiten het model.'
-                    )
+                logger.debug(f'Found element with id {element_id} in diagram {name}')
+                cls = classes_by_id.get(element_id)
+                if cls is not None:
+                    diagram.classes.append(cls)
+                    continue
+                assoc = assocs_by_id.get(element_id)
+                if assoc is not None:
+                    diagram.associations.append(assoc)
+                    continue
+                enum = enums_by_id.get(element_id)
+                if enum is not None:
+                    diagram.enumerations.append(enum)
+                    continue
+                gen = gens_by_id.get(element_id)
+                if gen is not None:
+                    diagram.generalizations.append(gen)
+                    continue
+                logger.debug(
+                    f'Element {element_id} in diagram {name} is niet gevonden in de database. Kan een'
+                    ' niet geimplemneteerde type zijn zoals: Note of Constraint, of kan een relatie zij naar een'
+                    ' element buiten het model.'
+                )
 
             logger.debug(f"Diagram {diagram.name} met id {diagram.id} ingelezen met inhoud: {diagram}")
             schema.save(diagram)
+
+        # One flush at the end of phase 3 commits all in-place mutations to
+        # packages / classes / enums / attrs / literals / associations.
+        schema.database.session.flush()

@@ -1204,14 +1204,15 @@ class Database:
             Base.metadata.create_all(bind=self.engine)
 
     def save(self, obj):
-        merged_obj = self.session.merge(obj)
-        self.session.flush()
-        return merged_obj
+        # NB: no per-call flush. autoflush=True ensures any subsequent ORM
+        # query in the same unit-of-work sees pending changes; parsers that
+        # touch many rows in a tight loop call session.flush() explicitly at
+        # phase boundaries instead. Flushing per save() turns each row into a
+        # SQL round-trip — that was the dominant cost on large imports.
+        return self.session.merge(obj)
 
     def add(self, obj):
-        added_obj = self.session.add(obj)
-        self.session.flush()
-        return added_obj
+        return self.session.add(obj)
 
     def count_package(self):
         return self.session.query(Package).count()

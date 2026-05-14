@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Set
 
@@ -152,45 +153,104 @@ class I18nRenderer(JSONRenderer):
         return const.RECORD_TYPE_INDEXED
 
     def translate_data(self, data, to_language, from_language="auto", update_i18n=True, original_i18n={}):
+        """Translate every string field of ``data`` into ``to_language``.
+
+        Two optimisations over the original per-string loop:
+
+        * **Dedup** — many strings repeat across the model (codelijst-namen,
+          shared phrases like "Datum begin geldigheid"). We collect the
+          unique values that still need translating and call the translator
+          once per value.
+        * **Parallel** — the ``translators`` library does one synchronous
+          HTTP request per call; running them on a small ThreadPool reduces
+          the total wall time roughly linearly with the worker count, up to
+          the free translator API's rate limit. The pool size is
+          configurable via ``CRUNCH_UML_TRANSLATE_WORKERS`` (default 8).
+
+        Behaviour-preserving: when ``update_i18n=True`` and a previous
+        translation for a (section, key, field) exists in ``original_i18n``,
+        that value is reused unchanged, just like the old code.
+        """
         logger.info(
             f"Starting Translating data to language '{to_language}'. This may take a while:"
             f" {util.count_dict_elements(data)} entries..."
         )
-        translated_data = {}
+
+        # Index existing translations once: section -> key -> {field: value}.
+        existing_index: Dict[str, Dict[str, Dict[str, Any]]] = {}
+        for section, entries in original_i18n.get(to_language, {}).items():
+            sec_idx: Dict[str, Dict[str, Any]] = {}
+            for entry in entries:
+                if not isinstance(entry, dict):
+                    continue
+                for key, fields in entry.items():
+                    if isinstance(fields, dict):
+                        sec_idx[key] = fields
+            existing_index[section] = sec_idx
+
+        def _existing(section: str, key: str, field: str):
+            if not update_i18n:
+                return None
+            return existing_index.get(section, {}).get(key, {}).get(field)
+
+        # Pass 1 — collect the unique source strings that need a live
+        # translation. Strings that already have an entry in original_i18n
+        # are skipped (their cached value is reused in pass 3).
+        to_translate: Set[str] = set()
+        for section, entries in data.items():
+            for entry in entries:
+                for key, record in entry.items():
+                    for field, value in record.items():
+                        if not isinstance(value, str) or util.is_empty_or_none(value):
+                            continue
+                        if _existing(section, key, field) is not None:
+                            continue
+                        to_translate.add(value)
+
+        # Pass 2 — translate the unique strings on a ThreadPool. Each call
+        # is independent and synchronous; the GIL is released during the
+        # underlying HTTP request, so this scales near-linearly.
+        translations: Dict[str, str] = {}
+        if to_translate:
+            workers = max(1, int(os.environ.get("CRUNCH_UML_TRANSLATE_WORKERS", "8")))
+            logger.info(f"Translating {len(to_translate)} unique strings using {workers} worker(s)...")
+
+            def _do_translate(v: str) -> str:
+                return lang.translate(
+                    v,
+                    to_language=to_language,
+                    from_language=from_language,
+                    max_retries=1,
+                )
+
+            unique_list = list(to_translate)
+            with ThreadPoolExecutor(max_workers=workers) as pool:
+                results = list(pool.map(_do_translate, unique_list))
+            translations = dict(zip(unique_list, results))
+
+        # Pass 3 — rebuild the output structure, preserving the exact shape
+        # and ordering of the original implementation (one entry per input
+        # entry, keyed by the entry's last key).
+        translated_data: Dict[str, List[Dict[str, Any]]] = {}
         for section, entries in data.items():
             logger.info(f"Translating section {section}...")
-            translated_data[section] = []
-            original_i18n_section = original_i18n.get(to_language, {}).get(section, [])
+            out_entries: List[Dict[str, Any]] = []
             for entry in entries:
-                translated_record = {}
+                translated_record: Dict[str, Any] = {}
+                last_key = None
                 for key, record in entry.items():
-                    original_record = [record for record in original_i18n_section if key in record]
-                    original_record = original_record[0] if len(original_record) > 0 else {}
-                    original_record = original_record.get(key, {})
+                    last_key = key
                     for field, value in record.items():
-                        if not isinstance(value, str):
-                            next
-                        if not (util.is_empty_or_none(value)):
-                            if update_i18n:
-                                # Check if the field is already translated
-                                translated_value = original_record.get(field, None)
-                                if translated_value is None:
-                                    # Translate the value
-                                    translated_value = lang.translate(
-                                        value,
-                                        to_language=to_language,
-                                        from_language=from_language,
-                                        max_retries=1,
-                                    )
-                                translated_record[field] = translated_value
-                            else:
-                                translated_record[field] = lang.translate(  #
-                                    value,
-                                    to_language=to_language,
-                                    from_language=from_language,
-                                    max_retries=1,
-                                )
-                translated_data[section].append({key: translated_record})
+                        if not isinstance(value, str) or util.is_empty_or_none(value):
+                            continue
+                        pre = _existing(section, key, field)
+                        if pre is not None:
+                            translated_record[field] = pre
+                        else:
+                            translated_record[field] = translations.get(value, value)
+                if last_key is not None:
+                    out_entries.append({last_key: translated_record})
+            translated_data[section] = out_entries
 
         logger.info(f"Finished translating data to language '{to_language}'.")
         return translated_data
