@@ -217,6 +217,91 @@ crunch_uml -sch v1 export -t diff_md -f changes.md \
     --compare_schema_name v2 --compare_title "Changes v1 → v2"
 ```
 
+## Local LLM translations via Ollama
+
+The `i18n` exporter ships with two translation backends:
+
+| Backend          | When to use                                       |
+| ---------------- | ------------------------------------------------- |
+| `translators` (default) | Quick exports, no extra setup. Uses public Google/Bing endpoints. |
+| `ollama`         | Higher quality, offline, context-aware. Runs a local LLM (Mistral) via Ollama. |
+
+### Set up Ollama
+
+```bash
+# Install Ollama: https://ollama.com
+ollama pull mistral-small3.1:24b   # ~14 GB Q4_K_M — recommended default
+ollama serve                       # if not already running
+```
+
+### Activate
+
+```bash
+export CRUNCH_UML_TRANSLATE_BACKEND=ollama
+export OLLAMA_NUM_PARALLEL=8       # server-side, match the worker count
+
+crunch_uml export -t i18n -f out.json --language en --translate True --from_language nl
+```
+
+If Ollama is unreachable or returns an error the renderer transparently
+falls back to the `translators` API, so adding the env-var never breaks
+an existing pipeline.
+
+### Tuning knobs
+
+Every setting is configurable both as an environment variable **and** as a
+CLI flag on `crunch_uml export`. The CLI flag wins when both are set; the
+env-var wins over the baked-in default.
+
+| Setting | CLI flag | Env-var | Default | Purpose |
+| --- | --- | --- | --- | --- |
+| Backend | `--translate_backend {translators,ollama}` | `CRUNCH_UML_TRANSLATE_BACKEND` | `translators` | Pick the translation engine |
+| Model | `--ollama_model TAG` | `CRUNCH_UML_OLLAMA_MODEL` | `mistral-small3.1:24b` | Any Ollama tag |
+| Server URL | `--ollama_url URL` | `CRUNCH_UML_OLLAMA_URL` | `http://localhost:11434` | Remote Ollama instance |
+| Timeout | `--ollama_timeout SEC` | `CRUNCH_UML_OLLAMA_TIMEOUT` | `120` | Seconds per call |
+| Workers | `--translate_workers N` | `CRUNCH_UML_TRANSLATE_WORKERS` | `8` | Parallel translation threads |
+| Context prompt | `--translate_context` (flag) | `CRUNCH_UML_TRANSLATE_CONTEXT=1` | off | Include section/field hints in the prompt |
+
+#### One-liner with CLI flags
+
+```bash
+crunch_uml export -t i18n -f out.json --language en --translate True \
+    --from_language nl \
+    --translate_backend ollama \
+    --ollama_model mistral-small3.1:24b \
+    --translate_workers 8 \
+    --translate_context
+```
+
+### Identifier casing
+
+Many model fields are `camelCase`, `PascalCase` or `snake_case` identifiers
+rather than prose. The prompt instructs the LLM to translate the words and
+rejoin them in the same style, and a deterministic post-processing step
+(`reconcile_case`) repairs any leftover whitespace. So
+`"aanvangAanwezigheid"` reliably comes back as `"startAttendance"` even
+when the model briefly drops the camelCase shape.
+
+### Opaque tokens are never translated
+
+Some values have no meaningful translation and previously made the LLM
+hallucinate. The Ollama backend short-circuits these patterns: the source
+is returned verbatim without any model call.
+
+* XML/HTML-like single tags: `<memo>`, `<typing>`, `</br>`, `<UML:Class>`
+* EA-generated identifiers: `EAID_…`, `EAPK_…`, `EAID_attr_…`
+* URLs (`http://`, `https://`, `www.…`)
+* ISO dates and timestamps (`2024-05-13`, `2024-05-13T10:30:00Z`)
+* Pure punctuation / numbers
+
+### Model recommendation
+
+| Tag                    | Size   | Speed on M4 | When                                  |
+| ---------------------- | ------ | ----------- | ------------------------------------- |
+| `mistral-small3.1:24b` | ~14 GB | 30-40 tok/s | **Default.** Best balance.            |
+| `mistral-nemo:12b`     | ~7 GB  | 50-70 tok/s | Iteration / dev loop.                 |
+| `mistral-large:123b`   | ~70 GB | 10-15 tok/s | Publication-quality batch runs.       |
+
 ## Development
 
 ```bash

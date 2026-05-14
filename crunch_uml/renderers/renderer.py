@@ -195,6 +195,65 @@ def add_args(argumentparser, subparser_dict):
             'Example: --compare_title "v2.4.0 vs v2.5.0"'
         ),
     )
+    # i18n translation backend (mirrors the CRUNCH_UML_* env vars). When set,
+    # the CLI args win over any env-var; when omitted, env-vars (and the
+    # baked-in defaults) are used.
+    output_subparser.add_argument(
+        "--translate_backend",
+        type=str,
+        choices=["translators", "ollama"],
+        default=None,
+        help=(
+            "i18n renderer: which translation backend to use. 'translators' (default) calls "
+            "Google/Bing via the translators library; 'ollama' calls a local LLM. Overrides "
+            "CRUNCH_UML_TRANSLATE_BACKEND."
+        ),
+    )
+    output_subparser.add_argument(
+        "--ollama_model",
+        type=str,
+        default=None,
+        help=(
+            "i18n renderer (Ollama backend): model tag to use. Default 'mistral-small3.1:24b'. "
+            "Overrides CRUNCH_UML_OLLAMA_MODEL."
+        ),
+    )
+    output_subparser.add_argument(
+        "--ollama_url",
+        type=str,
+        default=None,
+        help=(
+            "i18n renderer (Ollama backend): URL of the Ollama server. Default "
+            "'http://localhost:11434'. Overrides CRUNCH_UML_OLLAMA_URL."
+        ),
+    )
+    output_subparser.add_argument(
+        "--ollama_timeout",
+        type=int,
+        default=None,
+        help=(
+            "i18n renderer (Ollama backend): seconds to wait per translation call. "
+            "Default 120. Overrides CRUNCH_UML_OLLAMA_TIMEOUT."
+        ),
+    )
+    output_subparser.add_argument(
+        "--translate_workers",
+        type=int,
+        default=None,
+        help=(
+            "i18n renderer: number of parallel threads used to translate. Default 8. "
+            "Overrides CRUNCH_UML_TRANSLATE_WORKERS."
+        ),
+    )
+    output_subparser.add_argument(
+        "--translate_context",
+        action="store_true",
+        default=False,
+        help=(
+            "i18n renderer (Ollama backend): include section/field hints in the prompt for "
+            "better domain consistency. Equivalent to CRUNCH_UML_TRANSLATE_CONTEXT=1."
+        ),
+    )
 
     # Set the epilog help text
     entries = RendererRegistry.entries()

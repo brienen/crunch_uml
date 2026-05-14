@@ -41,7 +41,10 @@ def _make_data(n_entries: int, n_unique: int):
 def _record_calls(monkeypatch):
     calls: List[str] = []
 
-    def fake_translate(value, to_language, from_language="auto", max_retries=1):
+    def fake_translate(value, to_language, from_language="auto", **kwargs):
+        # **kwargs accepts the optional ``context`` (and any other future
+        # forwarded kwargs) so this stub stays compatible with the public
+        # lang.translate signature.
         calls.append(value)
         return f"<{to_language}:{value}>"
 

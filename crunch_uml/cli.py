@@ -44,6 +44,30 @@ logging.basicConfig(
 logger = logging.getLogger()
 
 
+# Mapping of (CLI arg name → env-var name) for the i18n translation backend.
+# An arg value of None means "not specified" → leave the env-var untouched
+# so externally exported env-vars and the baked-in defaults still apply.
+_TRANSLATE_ENV_MAP = [
+    ("translate_backend", "CRUNCH_UML_TRANSLATE_BACKEND"),
+    ("ollama_model", "CRUNCH_UML_OLLAMA_MODEL"),
+    ("ollama_url", "CRUNCH_UML_OLLAMA_URL"),
+    ("ollama_timeout", "CRUNCH_UML_OLLAMA_TIMEOUT"),
+    ("translate_workers", "CRUNCH_UML_TRANSLATE_WORKERS"),
+]
+
+
+def _propagate_translate_args_to_env(args):
+    """Push any explicitly-set translation CLI args into ``os.environ`` so
+    deeper modules see them without needing args threaded through."""
+    for attr, env_var in _TRANSLATE_ENV_MAP:
+        value = getattr(args, attr, None)
+        if value is not None:
+            os.environ[env_var] = str(value)
+    # Boolean flag — only force-on when explicitly passed.
+    if getattr(args, "translate_context", False):
+        os.environ["CRUNCH_UML_TRANSLATE_CONTEXT"] = "1"
+
+
 def main(args=None):
     """The main entrypoint for this script used in the setup.py file."""
     argumentparser = argparse.ArgumentParser(description=const.DESCRIPTION)
@@ -83,6 +107,11 @@ def main(args=None):
     renderers.add_args(argumentparser, subparser_dict)
     transformers.add_args(argumentparser, subparser_dict)
     args = argumentparser.parse_args(args)
+
+    # Propagate translation-backend CLI args into env-vars so the rest of the
+    # code (lang.py, ollama_translator.py, I18nRenderer) which reads from
+    # os.environ picks them up without further plumbing. CLI > env > default.
+    _propagate_translate_args_to_env(args)
 
     # Bepaal het logniveau op basis van commandline argumenten
     if args.debug:

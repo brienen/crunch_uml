@@ -193,10 +193,21 @@ class I18nRenderer(JSONRenderer):
                 return None
             return existing_index.get(section, {}).get(key, {}).get(field)
 
-        # Pass 1 — collect the unique source strings that need a live
+        # Per-call context support. When CRUNCH_UML_TRANSLATE_CONTEXT=1, the
+        # dedup cache is keyed by (value, section, field) and each call to
+        # lang.translate gets a context dict — improves consistency on
+        # domain terminology when the Ollama backend is active. With the env
+        # var unset (default) the behaviour is identical to before: dedup on
+        # value alone, no context passed.
+        context_enabled = os.environ.get("CRUNCH_UML_TRANSLATE_CONTEXT", "0") == "1"
+
+        # Pass 1 — collect the unique cache keys that need a live
         # translation. Strings that already have an entry in original_i18n
         # are skipped (their cached value is reused in pass 3).
-        to_translate: Set[str] = set()
+        # Cache key shape:
+        #   context disabled: just the source string
+        #   context enabled:  (value, section, field) — context-aware
+        to_translate: Set[Any] = set()
         for section, entries in data.items():
             for entry in entries:
                 for key, record in entry.items():
@@ -205,21 +216,29 @@ class I18nRenderer(JSONRenderer):
                             continue
                         if _existing(section, key, field) is not None:
                             continue
-                        to_translate.add(value)
+                        cache_key = (value, section, field) if context_enabled else value
+                        to_translate.add(cache_key)
 
-        # Pass 2 — translate the unique strings on a ThreadPool. Each call
+        # Pass 2 — translate the unique entries on a ThreadPool. Each call
         # is independent and synchronous; the GIL is released during the
         # underlying HTTP request, so this scales near-linearly.
-        translations: Dict[str, str] = {}
+        translations: Dict[Any, str] = {}
         if to_translate:
             workers = max(1, int(os.environ.get("CRUNCH_UML_TRANSLATE_WORKERS", "8")))
             logger.info(f"Translating {len(to_translate)} unique strings using {workers} worker(s)...")
 
-            def _do_translate(v: str) -> str:
+            def _do_translate(item: Any) -> str:
+                if context_enabled:
+                    v, section, field = item
+                    ctx = {"section": section, "field": field}
+                else:
+                    v = item
+                    ctx = None
                 return lang.translate(
                     v,
                     to_language=to_language,
                     from_language=from_language,
+                    context=ctx,
                     max_retries=1,
                 )
 
@@ -247,7 +266,8 @@ class I18nRenderer(JSONRenderer):
                         if pre is not None:
                             translated_record[field] = pre
                         else:
-                            translated_record[field] = translations.get(value, value)
+                            cache_key = (value, section, field) if context_enabled else value
+                            translated_record[field] = translations.get(cache_key, value)
                 if last_key is not None:
                     out_entries.append({last_key: translated_record})
             translated_data[section] = out_entries

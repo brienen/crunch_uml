@@ -196,5 +196,8 @@ def test_import_monumenten_met_update():
         # Eclazz = data["en"]["classes"][2]["EAID_4AD539EC_A308_43da_B025_17A1647303F3"]
         clazz = [clazz for clazz in data["en"]["classes"] if "EAID_4AD539EC_A308_43da_B025_17A1647303F3" in clazz][0]
         clazz = clazz.get("EAID_4AD539EC_A308_43da_B025_17A1647303F3")
-        assert clazz["name"] == 'Construction activity'
+        # Accept either "Construction activity" (translators API; sentence-cased)
+        # or "ConstructionActivity" (Ollama backend with case preservation).
+        # The source is "Bouwactiviteit" (PascalCase class name).
+        assert clazz["name"].lower().replace(" ", "") == "constructionactivity"
         assert len(clazz["definitie"]) > 0
