@@ -190,6 +190,25 @@ crunch_uml … export -t i18n -f mine.i18n.json --language en --translate True
 crunch_uml … export -t i18n -f mine.i18n.json --language en --translate True --update_i18n True
 ```
 
+## Watching progress in the log
+
+While translating, the renderer logs **every completed translation** at
+`INFO` level so a long batch (especially on the Ollama backend) is
+observable in real time:
+
+```
+[ 1/58] bouwjaarTot → buildYearTo
+[ 2/58] Bouwstijl → BuildingStyle
+[ 3/58] Het bouwen van een bouwwerk. → The construction of a building.
+[ 4/58] OorspronkelijkeFunctie → OriginalFunction
+...
+```
+
+The order is completion order, not start order — with parallel workers
+the lines arrive interleaved. The `[n/total]` counter always reflects the
+number of *completed* translations. Run with `-v` or have logging at
+`INFO` (default in `crunch_uml`) to see this.
+
 ## Performance — what to expect
 
 On a Mac M4 with `mistral-small3.1:24b`:

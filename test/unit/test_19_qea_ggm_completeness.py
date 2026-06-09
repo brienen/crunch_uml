@@ -87,25 +87,21 @@ def test_enumerations_count_matches_source(imported_schema, src_cursor):
 
 @pytest.mark.slow
 def test_attributes_count_matches_source(imported_schema, src_cursor):
-    src_n = src_cursor.execute(
-        """
+    src_n = src_cursor.execute("""
         SELECT COUNT(*) FROM t_attribute a
         JOIN t_object o ON a.Object_ID = o.Object_ID
         WHERE o.Object_Type IN ('Class', 'DataType')
-        """
-    ).fetchone()[0]
+        """).fetchone()[0]
     assert imported_schema.count_attribute() == src_n
 
 
 @pytest.mark.slow
 def test_enum_literals_count_matches_source(imported_schema, src_cursor):
-    src_n = src_cursor.execute(
-        """
+    src_n = src_cursor.execute("""
         SELECT COUNT(*) FROM t_attribute a
         JOIN t_object o ON a.Object_ID = o.Object_ID
         WHERE o.Object_Type = 'Enumeration'
-        """
-    ).fetchone()[0]
+        """).fetchone()[0]
     assert imported_schema.count_enumeratieliteral() == src_n
 
 
@@ -120,16 +116,14 @@ def test_associations_count_matches_source_after_filter(imported_schema, src_cur
     """Phase 4 of the QEA parser only keeps connectors whose endpoints are
     Class/DataType/Enumeration objects. The handful of connectors that point
     at ProxyConnector/Component/Actor must NOT inflate the imported count."""
-    src_n = src_cursor.execute(
-        """
+    src_n = src_cursor.execute("""
         SELECT COUNT(*) FROM t_connector c
         JOIN t_object so ON c.Start_Object_ID = so.Object_ID
         JOIN t_object eo ON c.End_Object_ID   = eo.Object_ID
         WHERE c.Connector_Type IN ('Association', 'Realisation')
           AND so.Object_Type IN ('Class', 'DataType', 'Enumeration')
           AND eo.Object_Type IN ('Class', 'DataType', 'Enumeration')
-        """
-    ).fetchone()[0]
+        """).fetchone()[0]
     assert imported_schema.count_association() == src_n
 
 
@@ -146,13 +140,11 @@ def test_class_definitie_from_t_object_note(imported_schema, src_cursor):
     Regression guard for the historical bug where the diff renderer compared
     a non-existent 'definition' column and so silently ignored these.
     """
-    rows = src_cursor.execute(
-        """
+    rows = src_cursor.execute("""
         SELECT ea_guid, Note FROM t_object
         WHERE Object_Type IN ('Class', 'DataType')
           AND Note IS NOT NULL AND TRIM(Note) != ''
-        """
-    ).fetchall()
+        """).fetchall()
     assert len(rows) > 100, "Expected many classes with a Note in the GGM fixture"
 
     sample = rows[: min(100, len(rows))]
@@ -170,16 +162,14 @@ def test_class_definitie_from_t_object_note(imported_schema, src_cursor):
 @pytest.mark.slow
 def test_attribute_definitie_from_t_attribute_notes(imported_schema, src_cursor):
     """Attribute.definitie is filled from t_attribute.Notes (phase 3)."""
-    rows = src_cursor.execute(
-        """
+    rows = src_cursor.execute("""
         SELECT a.ea_guid, a.Notes
         FROM t_attribute a
         JOIN t_object o ON a.Object_ID = o.Object_ID
         WHERE o.Object_Type IN ('Class', 'DataType')
           AND a.ea_guid IS NOT NULL
           AND a.Notes IS NOT NULL AND TRIM(a.Notes) != ''
-        """
-    ).fetchall()
+        """).fetchall()
     assert len(rows) > 100, "Expected many attributes with Notes in the GGM fixture"
 
     sample = rows[: min(100, len(rows))]
@@ -200,16 +190,14 @@ def test_object_tagged_values_are_applied(imported_schema, src_cursor):
     gemma-type, gemma-url, populatie, …) must reach the matching ORM
     column. This exercises phase 5 — the same loop where dropping the
     per-row save() saved ~50 seconds on this fixture."""
-    rows = src_cursor.execute(
-        """
+    rows = src_cursor.execute("""
         SELECT o.ea_guid, LOWER(op.Property) AS prop, op.Value
         FROM t_objectproperties op
         JOIN t_object o ON op.Object_ID = o.Object_ID
         WHERE o.Object_Type IN ('Class', 'DataType', 'Enumeration')
           AND LOWER(op.Property) IN ('herkomst', 'gemma-type', 'gemma-url', 'populatie', 'kwaliteit')
           AND op.Value IS NOT NULL AND op.Value != ''
-        """
-    ).fetchall()
+        """).fetchall()
     assert len(rows) > 100, "Expected many tagged values in the GGM fixture"
 
     field_map = {
@@ -244,8 +232,7 @@ def test_attribute_tagged_values_are_applied(imported_schema, src_cursor):
     """Tagged values on attributes live in t_attributetag and are resolved
     via the parser's _attr_id_map (numeric ID → eaid). Verify a real
     sample reaches the ORM column."""
-    rows = src_cursor.execute(
-        """
+    rows = src_cursor.execute("""
         SELECT a.ea_guid, LOWER(at.Property) AS prop, at.VALUE
         FROM t_attributetag at
         JOIN t_attribute a ON at.ElementID = a.ID
@@ -254,8 +241,7 @@ def test_attribute_tagged_values_are_applied(imported_schema, src_cursor):
           AND a.ea_guid IS NOT NULL
           AND LOWER(at.Property) IN ('herkomst', 'populatie', 'lengte', 'patroon', 'mogelijk-geen-waarde')
           AND at.VALUE IS NOT NULL AND at.VALUE != ''
-        """
-    ).fetchall()
+        """).fetchall()
     assert len(rows) > 50, "Expected many attribute tagged values in the GGM fixture"
 
     field_map = {
@@ -292,14 +278,12 @@ def test_literals_with_null_ea_guid_are_imported_with_synthetic_ids(imported_sch
     """The QEA file has enum literals (and some attributes) with ea_guid IS
     NULL. The parser mints synthetic IDs of the form ``EAID_attr_<n>`` so
     these rows are preserved instead of crashing the import."""
-    src_n = src_cursor.execute(
-        """
+    src_n = src_cursor.execute("""
         SELECT COUNT(*) FROM t_attribute a
         JOIN t_object o ON a.Object_ID = o.Object_ID
         WHERE o.Object_Type IN ('Class', 'DataType', 'Enumeration')
           AND a.ea_guid IS NULL
-        """
-    ).fetchone()[0]
+        """).fetchone()[0]
     assert src_n > 0, "Fixture is expected to contain some NULL-ea_guid rows"
 
     from sqlalchemy.orm import Session

@@ -134,6 +134,36 @@ def test_translate_data_overwrites_when_update_i18n_false(monkeypatch):
     assert out["classes"][0]["id_1"]["name"] == "<en:Aap>"
 
 
+def test_translate_data_logs_progress_per_call(monkeypatch, caplog):
+    """Every completed translation must be logged at INFO level with an
+    ``[n/total]`` progress counter so a long batch is observable in real
+    time."""
+    _record_calls(monkeypatch)
+    data = {
+        "classes": [
+            {"id_1": {"name": "Aap"}},
+            {"id_2": {"name": "Beer"}},
+            {"id_3": {"name": "Koe"}},
+        ]
+    }
+
+    with caplog.at_level("INFO", logger="root"):
+        I18nRenderer().translate_data(data, to_language="en", from_language="nl")
+
+    progress_lines = [msg for msg in caplog.messages if " → " in msg and "/" in msg]
+    assert len(progress_lines) == 3, f"expected 3 progress lines, got {progress_lines}"
+    # The header line announcing the unique-string count must also appear.
+    assert any("Translating 3 unique strings" in msg for msg in caplog.messages)
+    # Each progress line carries the [n/total] counter and the translation.
+    sources_seen = set()
+    for line in progress_lines:
+        assert any(f"[{i}/3]" in line for i in (1, 2, 3))
+        for src in ("Aap", "Beer", "Koe"):
+            if src in line:
+                sources_seen.add(src)
+    assert sources_seen == {"Aap", "Beer", "Koe"}
+
+
 def test_translate_data_skips_empty_and_non_string_values(monkeypatch):
     """Empty/whitespace strings and non-string values are never translated."""
     calls = _record_calls(monkeypatch)

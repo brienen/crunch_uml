@@ -952,9 +952,9 @@ class EARepoUpdater(ModelRenderer):
                 repo_obj_guids = [util.fromEAGuid(g) for g in managed_object_guids if g]
                 managed_obj_ids = [
                     row.Object_ID
-                    for row in session.query(obj_table.c.Object_ID)
-                    .filter(obj_table.c.ea_guid.in_(repo_obj_guids))
-                    .all()
+                    for row in (
+                        session.query(obj_table.c.Object_ID).filter(obj_table.c.ea_guid.in_(repo_obj_guids)).all()
+                    )
                 ]
                 if managed_obj_ids:
                     query = query.filter(attr_table.c.Object_ID.in_(managed_obj_ids))

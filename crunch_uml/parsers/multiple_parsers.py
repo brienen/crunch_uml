@@ -176,7 +176,7 @@ class XLXSParser(TransformableParser):
             for sheet_name in xls.sheet_names:
                 if sheet_name in tables and sheet_name != "schemas":
                     # Lees de gegevens van het huidige tabblad als een lijst van woordenboeken
-                    records = xls.parse(sheet_name).to_dict(orient="records")
+                    records = pd.read_excel(xls, sheet_name=sheet_name).to_dict(orient="records")
 
                     for record in records:
                         record = self.map_record(args.mapper, record)

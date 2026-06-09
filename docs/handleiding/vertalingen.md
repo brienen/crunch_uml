@@ -187,6 +187,25 @@ crunch_uml … export -t i18n -f mijn.i18n.json --language en --translate True
 crunch_uml … export -t i18n -f mijn.i18n.json --language en --translate True --update_i18n True
 ```
 
+## Voortgang volgen in de log
+
+Tijdens het vertalen logt de renderer **elke voltooide vertaling** op
+`INFO`-niveau, zodat een lange batch (zeker met de Ollama-backend) live te
+volgen is:
+
+```
+[ 1/58] bouwjaarTot → buildYearTo
+[ 2/58] Bouwstijl → BuildingStyle
+[ 3/58] Het bouwen van een bouwwerk. → The construction of a building.
+[ 4/58] OorspronkelijkeFunctie → OriginalFunction
+...
+```
+
+De volgorde is die van voltooiing, niet van starten — bij parallel
+draaiende workers verschijnen de regels door elkaar. De teller `[n/total]`
+geeft altijd het aantal *afgeronde* vertalingen weer. Run met `-v` of zet
+het logniveau op `INFO` (default in `crunch_uml`) om dit te zien.
+
 ## Prestaties — wat te verwachten
 
 Op een Mac M4 met `mistral-small3.1:24b`:

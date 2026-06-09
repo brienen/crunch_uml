@@ -1,3 +1,4 @@
+import itertools
 import json
 import logging
 import os
@@ -221,11 +222,24 @@ class I18nRenderer(JSONRenderer):
 
         # Pass 2 — translate the unique entries on a ThreadPool. Each call
         # is independent and synchronous; the GIL is released during the
-        # underlying HTTP request, so this scales near-linearly.
+        # underlying HTTP request, so this scales near-linearly. We also
+        # log every completed translation at INFO level so users running a
+        # long batch (especially via Ollama) can watch progress in real
+        # time. ``itertools.count`` is GIL-atomic so it works across the
+        # worker threads without an explicit lock.
         translations: Dict[Any, str] = {}
         if to_translate:
             workers = max(1, int(os.environ.get("CRUNCH_UML_TRANSLATE_WORKERS", "8")))
-            logger.info(f"Translating {len(to_translate)} unique strings using {workers} worker(s)...")
+            total = len(to_translate)
+            logger.info(f"Translating {total} unique strings using {workers} worker(s)...")
+
+            progress = itertools.count(1)
+            # Width for the [n/total] counter, padded so logs align visually.
+            width = len(str(total))
+
+            def _trim(text: Any, limit: int = 80) -> str:
+                s = str(text).replace("\n", "\\n").replace("\r", "")
+                return s if len(s) <= limit else s[: limit - 1] + "…"
 
             def _do_translate(item: Any) -> str:
                 if context_enabled:
@@ -234,13 +248,16 @@ class I18nRenderer(JSONRenderer):
                 else:
                     v = item
                     ctx = None
-                return lang.translate(
+                result = lang.translate(
                     v,
                     to_language=to_language,
                     from_language=from_language,
                     context=ctx,
                     max_retries=1,
                 )
+                idx = next(progress)
+                logger.info(f"[{idx:{width}d}/{total}] {_trim(v)} → {_trim(result)}")
+                return result
 
             unique_list = list(to_translate)
             with ThreadPoolExecutor(max_workers=workers) as pool:
