@@ -28,7 +28,7 @@ python ./crunch_uml/cli.py --help
 
 ## Vereisten
 
-- Python 3.9, 3.10, 3.11 of 3.12
+- Python 3.10, 3.11 of 3.12
 - Afhankelijkheden worden automatisch geïnstalleerd (SQLAlchemy, lxml, pandas, etc.)
 
 ## Database

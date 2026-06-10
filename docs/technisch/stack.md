@@ -48,7 +48,7 @@
 
 ## Python Compatibiliteit
 
-crunch_uml ondersteunt Python 3.9 t/m 3.12.
+crunch_uml ondersteunt Python 3.10 t/m 3.12.
 
 ## Configuratie
 
