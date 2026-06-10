@@ -1,10 +1,10 @@
-# python_requires is >=3.10,<3.13. Prebuilt wheels for the pinned dependencies
+# python_requires is >=3.10,<3.14. Prebuilt wheels for the pinned dependencies
 # (e.g. lxml<5) are not published for newer Pythons, so building against a
 # 3.13/3.14 `python3` fails to compile. `install` uses $(PYTHON_BINARY) when it
 # satisfies this range and otherwise falls back to the newest supported
 # python3.x found on PATH.
 PYTHON_BINARY := python3
-PYTHON_VERSION_OK := -c 'import sys; raise SystemExit(0 if (3,10) <= sys.version_info < (3,13) else 1)'
+PYTHON_VERSION_OK := -c 'import sys; raise SystemExit(0 if (3,10) <= sys.version_info < (3,14) else 1)'
 VIRTUAL_ENV := .venv
 VIRTUAL_BIN := $(VIRTUAL_ENV)/bin
 crunch_uml := crunch_uml
@@ -41,17 +41,17 @@ format: black isort lint mypy
 ## format-check - Checks if the project is formatted correctly against all formatting rules
 format-check: black-check isort-check lint mypy
 
-## install - Install the project locally (auto-selects a supported Python 3.10-3.12)
+## install - Install the project locally (auto-selects a supported Python 3.10-3.13)
 install:
 	@PYBIN="$(PYTHON_BINARY)"; \
 	if ! command -v "$$PYBIN" >/dev/null 2>&1 || ! "$$PYBIN" $(PYTHON_VERSION_OK) 2>/dev/null; then \
 		PYBIN=""; \
-		for c in python3.12 python3.11 python3.10; do \
+		for c in python3.13 python3.12 python3.11 python3.10; do \
 			if command -v "$$c" >/dev/null 2>&1 && "$$c" $(PYTHON_VERSION_OK) 2>/dev/null; then PYBIN="$$c"; break; fi; \
 		done; \
 	fi; \
 	if [ -z "$$PYBIN" ]; then \
-		echo "ERROR: no Python >=3.10,<3.13 found on PATH (required for the pinned dependencies)."; \
+		echo "ERROR: no Python >=3.10,<3.14 found on PATH (required for the pinned dependencies)."; \
 		echo "Install one (e.g. 'brew install python@3.12') or run 'make install PYTHON_BINARY=/path/to/python'."; \
 		exit 1; \
 	fi; \

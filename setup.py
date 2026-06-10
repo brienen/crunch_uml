@@ -45,7 +45,7 @@ setuptools.setup(
             'build == 1.1.*',
             'flake8 == 7.*',
             'isort == 5.*',
-            'mypy == 1.11.*',
+            'mypy == 1.14.*',
             'pytest >= 9.0.3, < 10',
             'pytest-cov == 7.*',
             'twine == 5.*']
@@ -55,5 +55,5 @@ setuptools.setup(
             'crunch_uml=crunch_uml.cli:main',
         ]
     },
-    python_requires='>=3.10, <3.13',
+    python_requires='>=3.10, <3.14',
 )
