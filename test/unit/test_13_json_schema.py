@@ -63,6 +63,50 @@ def test_import_schuldhulp():
     assert schema.count_package() == 1
 
 
+def test_enum_attributes_render_as_ref():
+    """Regression test for the 'primitive shadows enumeration' bug.
+
+    An attribute typed by an enumeration must render as a ``$ref`` to that
+    enum definition, not silently degrade to ``{"type": "string"}``. The bug
+    occurred because the importer leaves ``primitive`` filled (empty string or
+    the type name) for classifier-typed attributes, while the renderer used to
+    check ``primitive`` before the ``enumeration``/``type_class`` reference.
+    """
+
+    def load_json_file(file_path):
+        with open(file_path, "r") as file:
+            return json.load(file)
+
+    schema = load_json_file("./test/output/json_schema_Schuldhulptraject.json")
+
+    referenced = set()
+
+    def collect_refs(node):
+        if isinstance(node, dict):
+            ref = node.get("$ref")
+            if isinstance(ref, str):
+                referenced.add(ref.rsplit("/", 1)[-1])
+            for value in node.values():
+                collect_refs(value)
+        elif isinstance(node, list):
+            for value in node:
+                collect_refs(value)
+
+    collect_refs(schema)
+
+    expected_enums = {
+        "EnumBegeleidingssoort",
+        "EnumOplossingssoort",
+        "EnumSchuldensoort",
+        "EnumUitstroomreden",
+    }
+    missing = expected_enums - referenced
+    assert not missing, (
+        "enumeration-typed attributes degraded to 'type: string' instead of "
+        f"a '$ref'; missing enum references: {sorted(missing)}"
+    )
+
+
 def test_validate_json_schema():
     def load_json_file(file_path):
         with open(file_path, "r") as file:

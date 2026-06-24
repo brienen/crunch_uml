@@ -500,7 +500,16 @@ class GGM_MDRenderer(Jinja2Renderer):
 def getJSONDatatype(
     self,  # "koppel_{{ associatie.name | snake_case }}_{{ associatie.id}}"
 ):
-    if self.primitive is not None:
+    # A type reference (enumeration / class) takes precedence over the
+    # primitive value. The import can leave 'primitive' as an empty string
+    # (or even the type name) for classifier-typed attributes; checking the
+    # references first prevents such attributes from silently degrading to
+    # "type": "string" instead of their "$ref".
+    if self.enumeration is not None:
+        return f'"$ref": "#/$defs/{self.enumeration.name}"'  # Needs to be defined in Jinja2 template
+    elif self.type_class is not None:
+        return f'"$ref": "#/$defs/{self.type_class.name}"'  # Needs to be defined in Jinja2 template
+    elif self.primitive is not None and str(self.primitive) != "":
         if str(self.primitive).lower().startswith("bool"):
             return '"type": "boolean"'
         elif str(self.primitive).lower().startswith("int"):
@@ -517,10 +526,6 @@ def getJSONDatatype(
             return '"$ref": "#/$defs/datum-tijd"'  # Needs to be defined in Jinja2 template
         else:
             return '"type": "string"'
-    elif self.enumeration is not None:
-        return f'"$ref": "#/$defs/{self.enumeration.name}"'  # Needs to be defined in Jinja2 template
-    elif self.type_class is not None:
-        return f'"$ref": "#/$defs/{self.type_class.name}"'  # Needs to be defined in Jinja2 template
     else:
         return '"type": "string"'
 
