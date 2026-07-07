@@ -201,12 +201,61 @@ def add_args(argumentparser, subparser_dict):
     output_subparser.add_argument(
         "--translate_backend",
         type=str,
-        choices=["translators", "ollama"],
+        choices=["translators", "ollama", "pipeline"],
         default=None,
         help=(
             "i18n renderer: which translation backend to use. 'translators' (default) calls "
-            "Google/Bing via the translators library; 'ollama' calls a local LLM. Overrides "
+            "Google/Bing via the translators library; 'ollama' calls a local LLM; 'pipeline' runs "
+            "the layered deterministic pipeline (termbanks + local LLMs, see docs). Overrides "
             "CRUNCH_UML_TRANSLATE_BACKEND."
+        ),
+    )
+    output_subparser.add_argument(
+        "--termbanks",
+        type=str,
+        default=None,
+        help=(
+            "i18n renderer (pipeline backend): comma-separated paths (files or directories) to "
+            "termbank sources (SKOS/RDF/TTL/JSON-LD or IATE TBX); order = priority. Overrides "
+            "CRUNCH_UML_TERMBANKS."
+        ),
+    )
+    output_subparser.add_argument(
+        "--llm_workhorses",
+        type=str,
+        default=None,
+        help=(
+            "i18n renderer (pipeline backend): comma-separated Ollama model prefixes; the first is "
+            "the primary workhorse, the second the independent vote on names. Overrides "
+            "CRUNCH_UML_LLM_WORKHORSES."
+        ),
+    )
+    output_subparser.add_argument(
+        "--llm_heavy",
+        type=str,
+        default=None,
+        help=(
+            "i18n renderer (pipeline backend): Ollama model prefix for the heavy escalation model. "
+            "Overrides CRUNCH_UML_LLM_HEAVY."
+        ),
+    )
+    output_subparser.add_argument(
+        "--nmt_model",
+        type=str,
+        default=None,
+        help=(
+            "i18n renderer (pipeline backend): Hugging Face model name for the optional NMT safety "
+            "net; {from}/{to} placeholders allowed. Overrides CRUNCH_UML_NMT_MODEL."
+        ),
+    )
+    output_subparser.add_argument(
+        "--translate_allow_online",
+        action="store_true",
+        default=False,
+        help=(
+            "i18n renderer (pipeline backend): allow the online translators route (Google/Bing) as "
+            "last-resort fallback. Not reproducible, therefore off by default. Equivalent to "
+            "CRUNCH_UML_TRANSLATE_ALLOW_ONLINE=1."
         ),
     )
     output_subparser.add_argument(

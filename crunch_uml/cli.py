@@ -53,6 +53,11 @@ _TRANSLATE_ENV_MAP = [
     ("ollama_url", "CRUNCH_UML_OLLAMA_URL"),
     ("ollama_timeout", "CRUNCH_UML_OLLAMA_TIMEOUT"),
     ("translate_workers", "CRUNCH_UML_TRANSLATE_WORKERS"),
+    # Pipeline backend (zie crunch_uml/translation en docs/technisch/vertaalpijplijn.md)
+    ("termbanks", "CRUNCH_UML_TERMBANKS"),
+    ("llm_workhorses", "CRUNCH_UML_LLM_WORKHORSES"),
+    ("llm_heavy", "CRUNCH_UML_LLM_HEAVY"),
+    ("nmt_model", "CRUNCH_UML_NMT_MODEL"),
 ]
 
 
@@ -63,9 +68,11 @@ def _propagate_translate_args_to_env(args):
         value = getattr(args, attr, None)
         if value is not None:
             os.environ[env_var] = str(value)
-    # Boolean flag — only force-on when explicitly passed.
+    # Boolean flags — only force-on when explicitly passed.
     if getattr(args, "translate_context", False):
         os.environ["CRUNCH_UML_TRANSLATE_CONTEXT"] = "1"
+    if getattr(args, "translate_allow_online", False):
+        os.environ["CRUNCH_UML_TRANSLATE_ALLOW_ONLINE"] = "1"
 
 
 def main(args=None):
