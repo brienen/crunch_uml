@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Klein IATE-achtig TBX-bestand voor tests: klassieke martif-structuur
+     met releasedatum in de header, subjectField en reliabilityCode. -->
+<martif type="TBX" xml:lang="en">
+  <martifHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Test IATE export</title>
+      </titleStmt>
+      <sourceDesc>
+        <p>Export produced on 2019-06-30 for testing purposes.</p>
+      </sourceDesc>
+    </fileDesc>
+  </martifHeader>
+  <text>
+    <body>
+      <termEntry id="IATE-1001">
+        <descrip type="subjectField">LAW</descrip>
+        <langSet xml:lang="nl">
+          <tig>
+            <term>bouwwerk</term>
+            <termNote type="reliabilityCode">3</termNote>
+          </tig>
+          <descripGrp>
+            <descrip type="definition">Constructie van enige omvang die met de grond verbonden is.</descrip>
+          </descripGrp>
+        </langSet>
+        <langSet xml:lang="en">
+          <tig>
+            <term>structure</term>
+            <termNote type="reliabilityCode">3</termNote>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="IATE-1002">
+        <descrip type="subjectField">LAW</descrip>
+        <langSet xml:lang="nl">
+          <tig>
+            <term>vergunning</term>
+            <termNote type="reliabilityCode">4</termNote>
+          </tig>
+        </langSet>
+        <langSet xml:lang="en">
+          <tig>
+            <term>licence</term>
+            <termNote type="reliabilityCode">2</termNote>
+          </tig>
+        </langSet>
+      </termEntry>
+    </body>
+  </text>
+</martif>

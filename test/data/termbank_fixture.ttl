@@ -1,0 +1,44 @@
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix ex:   <http://example.org/begrippen/> .
+
+# Klein SKOS-begrippenkader voor tests: bevat een homoniem ("partij") dat
+# alleen op definitie te onderscheiden is, en versie-informatie in de data
+# zelf (owl:versionInfo + dcterms:modified) zoals EuroVoc die draagt.
+
+ex:scheme a skos:ConceptScheme ;
+    dct:title "Testbegrippenkader"@nl ;
+    owl:versionInfo "4.22" ;
+    dct:modified "2020-01-15"^^<http://www.w3.org/2001/XMLSchema#date> .
+
+ex:vergunning a skos:Concept ;
+    skos:inScheme ex:domein-recht ;
+    skos:prefLabel "vergunning"@nl ;
+    skos:prefLabel "permit"@en ;
+    skos:altLabel "toestemming"@nl ;
+    skos:definition "Officiële toestemming van een bestuursorgaan om een activiteit uit te voeren."@nl ;
+    skos:definition "Official permission from an administrative body to carry out an activity."@en .
+
+# Homoniem 1: partij als rechtspersoon in een overeenkomst.
+ex:partij-recht a skos:Concept ;
+    skos:inScheme ex:domein-recht ;
+    skos:prefLabel "partij"@nl ;
+    skos:prefLabel "party"@en ;
+    skos:definition "Natuurlijke persoon of rechtspersoon die deelneemt aan een overeenkomst of rechtszaak."@nl .
+
+# Homoniem 2: partij als politieke organisatie.
+ex:partij-politiek a skos:Concept ;
+    skos:inScheme ex:domein-politiek ;
+    skos:prefLabel "partij"@nl ;
+    skos:prefLabel "political party"@en ;
+    skos:definition "Politieke organisatie die kandidaten stelt bij verkiezingen."@nl .
+
+# Concept zonder Engelse term: mag nooit als kandidaat voor nl->en opduiken.
+ex:doorzonwoning a skos:Concept ;
+    skos:prefLabel "doorzonwoning"@nl ;
+    skos:definition "Woning met woonkamer over de volle diepte."@nl .
+
+ex:domein-recht rdfs:label "Recht"@nl .
+ex:domein-politiek rdfs:label "Politiek"@nl .
