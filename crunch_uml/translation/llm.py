@@ -208,8 +208,7 @@ def translate_element_once(
         value = parsed.get(name)
         if not isinstance(value, str) or not value.strip():
             logger.warning(
-                f"LLM-respons voor element {element.section}/{element.key} mist veld '{name}';"
-                " bronwaarde behouden."
+                f"LLM-respons voor element {element.section}/{element.key} mist veld '{name}';" " bronwaarde behouden."
             )
             result[name] = source_value
             continue
@@ -244,15 +243,13 @@ def _term_in_text(term: str, text: str) -> bool:
     return re.search(rf"(?<!\w){re.escape(term)}(?!\w)", text, flags=re.IGNORECASE) is not None
 
 
-def glossary_violations(
-    source_text: str, translated_text: str, glossary: Dict[str, str]
-) -> List[Tuple[str, str]]:
+def glossary_violations(source_text: str, translated_text: str, glossary: Dict[str, str]) -> List[Tuple[str, str]]:
     """Return the glossary pairs that are violated: the source term occurs
     in the source text but the required target term is absent from the
     translation. This is the deterministic compliance check for definitions
     (voting does not work there — two LLMs rarely produce the same
     sentence)."""
-    violations = []
+    violations: List[Tuple[str, str]] = []
     if not source_text or not translated_text:
         return violations
     for src_term, tgt_term in glossary.items():

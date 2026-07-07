@@ -19,7 +19,6 @@ Covered behaviour:
 
 from __future__ import annotations
 
-import os
 import shutil
 
 from crunch_uml.translation import termbank

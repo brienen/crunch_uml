@@ -20,12 +20,15 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-import pytest
 import requests
 
 from crunch_uml.translation import preflight
 from crunch_uml.translation.config import TranslationConfig
-from crunch_uml.translation.preflight import compare_versions, resolve_model, run_preflight
+from crunch_uml.translation.preflight import (
+    compare_versions,
+    resolve_model,
+    run_preflight,
+)
 
 TTL_FIXTURE = "./test/data/termbank_fixture.ttl"
 

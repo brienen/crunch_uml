@@ -327,9 +327,7 @@ class I18nRenderer(JSONRenderer):
         # prompts): 'auto' falls back to the model's default language.
         from_lang = from_language if from_language and from_language != "auto" else const.DEFAULT_LANGUAGE
         if from_lang != from_language:
-            logger.info(
-                f"Brontaal 'auto' wordt door de pijplijn niet ondersteund; brontaal '{from_lang}' aangenomen."
-            )
+            logger.info(f"Brontaal 'auto' wordt door de pijplijn niet ondersteund; brontaal '{from_lang}' aangenomen.")
 
         existing_index = self._index_existing_i18n(original_i18n, to_language) if update_i18n else {}
 
@@ -351,7 +349,9 @@ class I18nRenderer(JSONRenderer):
                     }
                     if pending:
                         elements.append(
-                            Element(section=section, key=key, fields=pending, context=context_map.get((section, key), {}))
+                            Element(
+                                section=section, key=key, fields=pending, context=context_map.get((section, key), {})
+                            )
                         )
 
         results: Dict[Any, Dict[str, str]] = {}

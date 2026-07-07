@@ -39,8 +39,9 @@ from __future__ import annotations
 
 import logging
 from concurrent.futures import ThreadPoolExecutor
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
+from crunch_uml.ollama_translator import reconcile_case
 from crunch_uml.translation.disambiguate import disambiguate
 from crunch_uml.translation.llm import (
     NAME_FIELDS,
@@ -51,7 +52,6 @@ from crunch_uml.translation.llm import (
     translate_element_once,
 )
 from crunch_uml.translation.preflight import PreflightResult
-from crunch_uml.ollama_translator import reconcile_case
 
 logger = logging.getLogger()
 
@@ -95,9 +95,7 @@ class TranslationPipeline:
         whose source term actually occurs in the element's source text, plus
         the element's own deterministically fixed name."""
         source_text = " ".join(element.fields.values())
-        entries = {
-            src: tgt for src, tgt in self.global_glossary.items() if _term_in_text(src, source_text)
-        }
+        entries = {src: tgt for src, tgt in self.global_glossary.items() if _term_in_text(src, source_text)}
         if len(entries) > MAX_GLOSSARY_ENTRIES:
             entries = dict(sorted(entries.items())[:MAX_GLOSSARY_ENTRIES])
         name = element.fields.get("name")
@@ -127,8 +125,7 @@ class TranslationPipeline:
         if chosen is not None:
             fixed["name"] = reconcile_case(name, chosen.term)
             logger.info(
-                f"Term '{name}' deterministisch vertaald als '{fixed['name']}' via {chosen.source}"
-                f" ({chosen.uri})"
+                f"Term '{name}' deterministisch vertaald als '{fixed['name']}' via {chosen.source}" f" ({chosen.uri})"
             )
         return fixed
 
@@ -160,13 +157,16 @@ class TranslationPipeline:
             )
             try:
                 result = translate_element_once(
-                    sub_element, to_language, from_language, model=model_tag, config=self.config,
+                    sub_element,
+                    to_language,
+                    from_language,
+                    model=model_tag,
+                    config=self.config,
                     glossary=glossaries[key],
                 )
             except Exception as e:
                 logger.warning(
-                    f"LLM-call ({label}) voor {element.section}/{element.key} mislukt ({e});"
-                    " bronwaarden behouden."
+                    f"LLM-call ({label}) voor {element.section}/{element.key} mislukt ({e});" " bronwaarden behouden."
                 )
                 result = dict(pending[key])
             logger.info(f"[{i + 1}/{total}] ({label}) {element.section}/{element.key} vertaald")
@@ -229,7 +229,12 @@ class TranslationPipeline:
                 logger.info(f"Escalatie {key[0]}/{key[1]}: {reason}")
             if llm_status.heavy is not None:
                 heavy_results = self._llm_pass(
-                    hard_cases, pending, glossaries, llm_status.heavy.tag, to_language, from_language,
+                    hard_cases,
+                    pending,
+                    glossaries,
+                    llm_status.heavy.tag,
+                    to_language,
+                    from_language,
                     label="zwaar-model",
                 )
                 results.update(heavy_results)
@@ -293,7 +298,9 @@ class TranslationPipeline:
             if not level_elements:
                 continue
             sections = sorted({e.section for e in level_elements})
-            logger.info(f"Vertaalniveau {level + 1}/{level_count} ({', '.join(sections)}): {len(level_elements)} elementen")
+            logger.info(
+                f"Vertaalniveau {level + 1}/{level_count} ({', '.join(sections)}): {len(level_elements)} elementen"
+            )
 
             fixed_per_element: Dict[ResultKey, Dict[str, str]] = {}
             pending: Dict[ResultKey, Dict[str, str]] = {}

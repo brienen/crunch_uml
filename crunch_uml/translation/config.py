@@ -95,13 +95,13 @@ class TranslationConfig:
         nmt = os.environ.get(ENV_NMT_MODEL, "").strip() or None
         return cls(
             termbank_paths=_split_csv(os.environ.get(ENV_TERMBANKS)),
-            termbank_max_age_days=_optional_int(
-                os.environ.get(ENV_TERMBANK_MAX_AGE_DAYS), ENV_TERMBANK_MAX_AGE_DAYS
-            ),
+            termbank_max_age_days=_optional_int(os.environ.get(ENV_TERMBANK_MAX_AGE_DAYS), ENV_TERMBANK_MAX_AGE_DAYS),
             workhorses=workhorses,
             heavy_model=heavy,
             ollama_url=os.environ.get(ENV_OLLAMA_URL, DEFAULT_OLLAMA_URL).rstrip("/"),
-            ollama_timeout=_int_or_default(os.environ.get(ENV_OLLAMA_TIMEOUT), DEFAULT_OLLAMA_TIMEOUT, ENV_OLLAMA_TIMEOUT),
+            ollama_timeout=_int_or_default(
+                os.environ.get(ENV_OLLAMA_TIMEOUT), DEFAULT_OLLAMA_TIMEOUT, ENV_OLLAMA_TIMEOUT
+            ),
             ollama_min_version=os.environ.get(ENV_OLLAMA_MIN_VERSION, "").strip() or None,
             nmt_model=nmt,
             allow_online=os.environ.get(ENV_ALLOW_ONLINE, "0").strip() == "1",

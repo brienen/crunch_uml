@@ -194,11 +194,11 @@ def _load_lod(path: str, source_name: str, priority: int) -> Tuple[List[Concept]
             for obj in graph.objects(subj, prop):
                 # Prefer a label of the domain resource; fall back to the
                 # last URI segment so EuroVoc scheme URIs stay readable.
-                domain = None
+                domain: Optional[str] = None
                 for label_prop in _LABEL_PROPS:
-                    for label in graph.objects(obj, label_prop):
-                        if isinstance(label, Literal):
-                            domain = str(label).strip()
+                    for label_node in graph.objects(obj, label_prop):
+                        if isinstance(label_node, Literal):
+                            domain = str(label_node).strip()
                             break
                     if domain:
                         break
@@ -244,7 +244,7 @@ def _load_tbx(path: str, source_name: str, priority: int) -> Tuple[List[Concept]
     date = None
     for elem in root.iter():
         if _strip_ns(elem.tag).lower() in ("martifheader", "tbxheader"):
-            header_text = " ".join(t for t in elem.itertext())
+            header_text = " ".join(str(t) for t in elem.itertext())
             m = _DATE_RE.search(header_text)
             if m:
                 date = m.group(0)
@@ -335,9 +335,7 @@ def load_source(path: str, priority: int) -> Tuple[Optional[List[Concept]], Sour
         logger.warning(f"Termbank '{path}' kon niet worden gelezen ({e}); bron overgeslagen.")
         return None, SourceReport(name=name, path=path, loaded=False, error=str(e))
 
-    report = SourceReport(
-        name=name, path=path, loaded=True, concepts=len(concepts), version=version, date=date
-    )
+    report = SourceReport(name=name, path=path, loaded=True, concepts=len(concepts), version=version, date=date)
     return concepts, report
 
 

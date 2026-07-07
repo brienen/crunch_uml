@@ -31,7 +31,7 @@ _pipelines: Dict[str, object] = {}
 def available() -> bool:
     """True when the optional 'transformers' dependency is importable."""
     try:
-        import transformers  # noqa: F401
+        import transformers  # type: ignore[import-not-found, import-untyped]  # noqa: F401
 
         return True
     except ImportError:
@@ -45,7 +45,9 @@ def resolve_model_name(template: str, from_lang: str, to_lang: str) -> str:
 
 def _get_pipeline(model_name: str):
     if model_name not in _pipelines:
-        from transformers import pipeline  # import bewust hier: optionele dependency
+        from transformers import (  # type: ignore[import-not-found, import-untyped]
+            pipeline,
+        )
 
         logger.info(f"NMT-model '{model_name}' wordt geladen (eenmalig per taalpaar)...")
         _pipelines[model_name] = pipeline("translation", model=model_name)

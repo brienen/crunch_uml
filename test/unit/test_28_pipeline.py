@@ -20,8 +20,6 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-import pytest
-
 import crunch_uml.translation.pipeline as pipeline_mod
 from crunch_uml.translation import termbank
 from crunch_uml.translation.config import TranslationConfig
@@ -156,7 +154,9 @@ def test_package_translation_propagates_into_class_glossary(monkeypatch):
     pipe = TranslationPipeline(_preflight(termbanks=()))
 
     elements = [
-        Element(section="classes", key="CLS", fields={"name": "Aanvraag", "definitie": "Een aanvraag binnen Vergunningen."}),
+        Element(
+            section="classes", key="CLS", fields={"name": "Aanvraag", "definitie": "Een aanvraag binnen Vergunningen."}
+        ),
         Element(section="packages", key="PKG", fields={"name": "Vergunningen"}),
     ]
     results = pipe.translate_elements(elements, "en", "nl")

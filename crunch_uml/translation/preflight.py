@@ -113,9 +113,7 @@ def _check_ollama(config: TranslationConfig) -> LLMStatus:
         resp.raise_for_status()
         installed = resp.json().get("models", [])
     except Exception as e:
-        logger.warning(
-            f"Ollama-server op {config.ollama_url} is niet bereikbaar ({e}); LLM-laag uitgeschakeld."
-        )
+        logger.warning(f"Ollama-server op {config.ollama_url} is niet bereikbaar ({e}); LLM-laag uitgeschakeld.")
         return status
 
     try:
@@ -158,9 +156,7 @@ def _check_ollama(config: TranslationConfig) -> LLMStatus:
             )
 
     if not status.workhorses:
-        logger.warning(
-            "Geen van de geconfigureerde werkpaardmodellen is lokaal aanwezig; LLM-laag uitgeschakeld."
-        )
+        logger.warning("Geen van de geconfigureerde werkpaardmodellen is lokaal aanwezig; LLM-laag uitgeschakeld.")
         return status
 
     status.enabled = True

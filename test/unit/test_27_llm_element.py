@@ -130,7 +130,10 @@ def test_prompt_contains_context_glossary_candidates_and_fields(monkeypatch):
     assert "GLOSSARY (binding):" in user_msg
     assert "- vergunning -> permit" in user_msg
     assert 'CANDIDATES for "Partij"' in user_msg
-    assert "1. party — Persoon of rechtspersoon in een overeenkomst. (source: eurovoc; domain: Recht; reliability: 3)" in user_msg
+    assert (
+        "1. party — Persoon of rechtspersoon in een overeenkomst. (source: eurovoc; domain: Recht; reliability: 3)"
+        in user_msg
+    )
     # De bronvelden gaan als één JSON-object mee.
     assert json.dumps(element.fields, ensure_ascii=False) in user_msg
 
