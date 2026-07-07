@@ -219,12 +219,13 @@ crunch_uml -sch v1 export -t diff_md -f changes.md \
 
 ## Local LLM translations via Ollama
 
-The `i18n` exporter ships with two translation backends:
+The `i18n` exporter ships with three translation backends:
 
 | Backend          | When to use                                       |
 | ---------------- | ------------------------------------------------- |
 | `translators` (default) | Quick exports, no extra setup. Uses public Google/Bing endpoints. |
 | `ollama`         | Higher quality, offline, context-aware. Runs a local LLM (Mistral) via Ollama. |
+| `pipeline`       | Best quality and reproducible. Layered deterministic pipeline: termbanks (IATE/EuroVoc/own LOD) + local LLMs with voting. See [the pipeline section](#deterministic-translation-pipeline) below. |
 
 ### Set up Ollama
 
@@ -301,6 +302,98 @@ is returned verbatim without any model call.
 | `mistral-small3.1:24b` | ~14 GB | 30-40 tok/s | **Default.** Best balance.            |
 | `mistral-nemo:12b`     | ~7 GB  | 50-70 tok/s | Iteration / dev loop.                 |
 | `mistral-large:123b`   | ~70 GB | 10-15 tok/s | Publication-quality batch runs.       |
+
+## Deterministic translation pipeline
+
+The `pipeline` backend is the recommended route for authoritative,
+reproducible translations. Official EU/government terminology is the basis;
+the context from the source model decides the meaning. Same input + same
+sources + same (logged) model digests → same output. Full design:
+[docs/technisch/vertaalpijplijn.md](docs/technisch/vertaalpijplijn.md).
+
+The cascade, per model element (name, definition and other fields translated
+together in one call, so they stay consistent):
+
+1. **i18n file as translation memory** — existing translations per
+   (section, GUID, field) are reused, never re-translated. Reviewed
+   translations in the i18n file always win.
+2. **Termbanks** — candidates from IATE (TBX), EuroVoc and any other Linked
+   Open Data source (SKOS/RDFS/OWL, all rdflib serialisations, format
+   auto-detected). An exact hit that is unambiguous after deterministic
+   disambiguation (domain + source definition overlap) is taken without any
+   model, concept URI logged.
+3. **Local LLMs via Ollama** — two *workhorse* models translate
+   independently with a binding glossary; agreement on the name accepts,
+   disagreement escalates to the *heavy* model. Definitions are checked
+   deterministically against the glossary instead. Hierarchical order
+   (packages → classes → attributes) feeds each level's fixed name
+   translations into the glossary of the level below.
+4. **NMT safety net** (optional `transformers` dependency) below the LLM.
+5. **Online services** (Google/Bing) only when explicitly allowed — they are
+   not reproducible.
+
+A **preflight** establishes what is available before anything is translated
+and logs a compact overview (resolved model tags + digests + pull dates,
+loaded termbanks with their version read from the data itself). Missing or
+outdated resources produce a warning and a skipped layer — never a crash,
+never silent wrong output. Model names are *prefixes*: `mistral-small`
+resolves to the highest locally installed tag, so minor model upgrades need
+no config change.
+
+### Configure
+
+```bash
+export CRUNCH_UML_TRANSLATE_BACKEND=pipeline
+
+# Termbanks: comma-separated files or directories; order = priority.
+# Formats are auto-detected (.ttl/.rdf/.jsonld/... via rdflib, .tbx as IATE).
+export CRUNCH_UML_TERMBANKS="resources/gemma_begrippen.ttl,resources/lod/,resources/IATE_export.tbx"
+
+# LLM roles: first = primary workhorse (definitions), second = second vote on names.
+export CRUNCH_UML_LLM_WORKHORSES="qwen2.5:14b,mistral-small3.1:24b"
+export CRUNCH_UML_LLM_HEAVY="qwen2.5:32b"          # escalation model (largest you can run)
+
+crunch_uml export -t i18n -f out.json --language en --translate True --from_language nl
+```
+
+All pipeline settings (env-var, with an equivalent CLI flag on `crunch_uml
+export`):
+
+| Env-var | Default | Purpose |
+| --- | --- | --- |
+| `CRUNCH_UML_TERMBANKS` | empty | Comma-separated termbank paths (files or directories); order = priority |
+| `CRUNCH_UML_TERMBANK_MAX_AGE_DAYS` | off | Warn when a source's version/date is older |
+| `CRUNCH_UML_LLM_WORKHORSES` | `mistral-small3.1:24b` | Comma-separated model prefixes; 1 model disables the voting layer (warning) |
+| `CRUNCH_UML_LLM_HEAVY` | off | Escalation model prefix |
+| `CRUNCH_UML_OLLAMA_MIN_VERSION` | off | Warn when the Ollama server is older |
+| `CRUNCH_UML_NMT_MODEL` | off | Hugging Face NMT model, `{from}`/`{to}` placeholders (e.g. `Helsinki-NLP/opus-mt-{from}-{to}`) |
+| `CRUNCH_UML_TRANSLATE_ALLOW_ONLINE` | `0` | `1` allows the online translators route as last resort |
+| `CRUNCH_UML_TRANSLATE_SEED` | `42` | Seed for LLM calls (temperature is fixed at 0) |
+
+### Getting the termbanks
+
+* **IATE** — download the TBX export from
+  [iate.europa.eu/download-iate](https://iate.europa.eu/download-iate) and
+  point `CRUNCH_UML_TERMBANKS` at the `.tbx` file. The release date in the
+  header is reported by the preflight.
+* **EuroVoc** — download the SKOS distribution from
+  [op.europa.eu](https://op.europa.eu/en/web/eu-vocabularies) (any RDF
+  serialisation works) and add the file or its directory to the list.
+* **Own vocabularies** — any SKOS/RDFS/OWL file (e.g. the
+  GEMMA-begrippenkader as Turtle) drops in without code changes; labels,
+  definitions and domains are queried generically.
+
+### Degradation behaviour
+
+| Situation | Behaviour |
+| --- | --- |
+| Ollama unreachable / no models | Warning; LLM layer off, termbank hits still translate, rest falls through to NMT/online/original |
+| Workhorse model not installed | Warning with the exact `ollama pull` command; remaining models are used |
+| Only one workhorse available | Warning; voting layer off, escalation relies on the deterministic glossary check |
+| Heavy model missing | Warning; hard cases keep the primary workhorse's answer |
+| Termbank missing/unreadable | Warning; source skipped, the others keep working |
+| No termbank at all | Emphatic warning: terms are translated without authoritative grounding |
+| Nothing available at all | Source values are kept; the count is reported in a warning |
 
 ## Development
 
