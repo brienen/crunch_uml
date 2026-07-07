@@ -165,6 +165,7 @@ nav:
       - technisch/componenten/renderers.md
       - technisch/componenten/persistentie.md
     - technisch/datamodel.md
+    - technisch/vertaalpijplijn.md
     - technisch/kwetsbaarheden.md
     - technisch/roadmap.md
     - technisch/stack.md
