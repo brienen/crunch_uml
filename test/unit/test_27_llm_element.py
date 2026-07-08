@@ -138,6 +138,23 @@ def test_prompt_contains_context_glossary_candidates_and_fields(monkeypatch):
     assert json.dumps(element.fields, ensure_ascii=False) in user_msg
 
 
+def test_candidate_list_in_prompt_is_capped(monkeypatch):
+    """IATE can yield dozens of near-duplicate candidates for common terms;
+    only the strongest MAX_PROMPT_CANDIDATES reach the prompt."""
+    payloads = _capture_post(monkeypatch, {"name": "Municipality"})
+    candidates = [
+        Candidate(term=f"variant{i}", source_term="gemeente", uri=f"ex:c{i:02d}", source="iate", priority=0, exact=True)
+        for i in range(20)
+    ]
+    element = _element(fields={"name": "Gemeente"}, candidates=candidates)
+
+    llm.translate_element_once(element, "en", "nl", model="m", config=CONFIG)
+
+    user_msg = payloads[0]["payload"]["messages"][1]["content"]
+    assert f"{llm.MAX_PROMPT_CANDIDATES}. variant{llm.MAX_PROMPT_CANDIDATES - 1}" in user_msg
+    assert f"variant{llm.MAX_PROMPT_CANDIDATES}" not in user_msg
+
+
 def test_identifier_casing_is_reconciled_on_name_fields(monkeypatch):
     """The LLM answers with spaces; the source name is PascalCase, so the
     result must be re-cased deterministically."""

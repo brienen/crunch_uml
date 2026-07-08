@@ -47,6 +47,12 @@ logger = logging.getLogger()
 # translation and the "name" field carries the two-workhorse vote.
 NAME_FIELDS = ("name", "alias")
 
+# Common terms can have dozens of termbank candidates (IATE lists regional
+# variants per member state); a long tail of near-duplicates dilutes the
+# prompt. The candidates are already deterministically sorted by (source
+# priority, reliability, uri), so the cap keeps the strongest ones.
+MAX_PROMPT_CANDIDATES = 8
+
 
 @dataclass
 class Element:
@@ -136,7 +142,7 @@ def build_messages(
     if element.candidates:
         name = element.fields.get("name", element.key)
         lines = []
-        for i, cand in enumerate(element.candidates, start=1):
+        for i, cand in enumerate(element.candidates[:MAX_PROMPT_CANDIDATES], start=1):
             bits = [f"{i}. {cand.term}"]
             if cand.definition:
                 bits.append(f"— {cand.definition}")
