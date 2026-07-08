@@ -17,14 +17,14 @@ from crunch_uml.translation.termbank import Candidate
 TTL_FIXTURE = "./test/data/termbank_fixture.ttl"
 
 
-def _candidate(term, uri, definition=None, domains=None, priority=0):
+def _candidate(term, uri, definition=None, domains=None, priority=0, source_term="partij", exact=True):
     return Candidate(
         term=term,
-        source_term="partij",
+        source_term=source_term,
         uri=uri,
         source="test",
         priority=priority,
-        exact=True,
+        exact=exact,
         definition=definition,
         domains=domains or [],
     )
@@ -34,9 +34,66 @@ def test_no_candidates_returns_none():
     assert disambiguate([]) is None
 
 
-def test_single_candidate_is_chosen_without_further_evidence():
-    only = _candidate("permit", "ex:vergunning")
+def test_single_exact_candidate_is_chosen_without_further_evidence():
+    only = _candidate("permit", "ex:vergunning", source_term="vergunning")
     assert disambiguate([only]) is only
+
+
+def test_single_fuzzy_candidate_needs_definition_support():
+    """Regressie uit de GGM-proefrun: 'eindRegistratie' fuzzy-matchte één
+    willekeurig IATE-concept ('lineTrace') en werd zonder bewijs gekozen.
+    Een enkele fuzzy kandidaat mag alleen winnen met definitie-overlap."""
+    guess = _candidate(
+        "line trace",
+        "iate:1592918",
+        source_term="eindRegistratie",
+        exact=False,
+        definition="Trace of a surveyed line in geodesy.",
+    )
+    assert disambiguate([guess]) is None
+    assert disambiguate([guess], source_definition="Datum waarop de registratie is beëindigd.") is None
+
+    supported = _candidate(
+        "end of registration",
+        "iate:x",
+        source_term="eindRegistratie",
+        exact=False,
+        definition="Datum waarop de registratie eindigt of is beëindigd.",
+    )
+    chosen = disambiguate([supported], source_definition="Datum waarop de registratie is beëindigd.")
+    assert chosen is supported
+
+
+def test_short_terms_are_never_autopicked():
+    """Regressie uit de GGM-proefrun: 'Nee' matchte exact op een
+    luchtvaartconcept ('negative') en 'Leeg' fuzzy op 'leegmassa'
+    ('kerb mass'). Korte termen gaan altijd naar de LLM."""
+    nee = _candidate("negative", "iate:1566471", source_term="Nee", exact=True)
+    assert disambiguate([nee]) is None
+    leeg = _candidate("kerb mass", "iate:63105", source_term="Leeg", exact=False)
+    assert disambiguate([leeg]) is None
+
+
+def test_unique_domain_winner_needs_same_credentials():
+    """Een unieke domeintreffer die fuzzy is, wint niet zonder
+    definitie-bewijs; met bewijs wel."""
+    a = _candidate("guess", "ex:a", exact=False, domains=["Recht"], definition="Iets juridisch onduidelijks.")
+    b = _candidate("other", "ex:b", exact=False, domains=["Landbouw"])
+    assert disambiguate([a, b], context_terms=["Recht"]) is None
+
+    a_supported = _candidate(
+        "party",
+        "ex:a",
+        exact=False,
+        domains=["Recht"],
+        definition="Persoon of rechtspersoon die deelneemt aan een overeenkomst.",
+    )
+    chosen = disambiguate(
+        [a_supported, b],
+        source_definition="Rechtspersoon die deelneemt aan een overeenkomst.",
+        context_terms=["Recht"],
+    )
+    assert chosen is a_supported
 
 
 def test_homonym_resolved_by_source_definition():

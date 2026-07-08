@@ -5,9 +5,13 @@ crunch already has: the domain(s) the element lives in (package/model names)
 and, decisively, the source definition. The rules, in order:
 
 1. no candidates → nothing to choose;
-2. exactly one candidate → take it;
+2. exactly one candidate → take it, but only with credentials: an exact
+   match on a term of reasonable length, or definition support. A single
+   *fuzzy* hit or a short term ("Nee", "Leeg") is a guess, not a match —
+   the GGM pilot showed IATE mapping those to arbitrary concepts
+   ('Leeg' → 'kerb mass');
 3. domain filter: candidates whose domains overlap the context narrow the
-   set; a unique survivor wins;
+   set; a unique survivor wins under the same credentials as rule 2;
 4. definition scoring: token overlap between each candidate's definition and
    the source definition; a unique winner with a minimum score *and* a
    minimum margin over the runner-up wins;
@@ -40,6 +44,12 @@ _STOPWORDS = {
 MIN_SCORE = 0.15
 MIN_MARGIN = 0.05
 
+# Short source terms ("Ja", "Nee", "Leeg") are too ambiguous for an
+# autonomous termbank pick, whatever the match quality: IATE matches them to
+# arbitrary specialised concepts ("Nee" → aviation "negative"). Below this
+# length the candidates only travel along to the LLM as suggestions.
+MIN_AUTOPICK_CHARS = 5
+
 
 def _tokens(text: Optional[str]) -> Set[str]:
     if not text:
@@ -67,6 +77,21 @@ def _domain_matches(candidate: Candidate, context_terms: Set[str]) -> bool:
     return False
 
 
+def _autopick_allowed(candidate: Candidate) -> bool:
+    """May this candidate be taken WITHOUT definition evidence?
+
+    Only an exact label match on a term of reasonable length qualifies. A
+    fuzzy match is a guess ('eindregistratie' ~ 'lijnregistratie'), and
+    short terms hit arbitrary specialised concepts — both must prove
+    themselves against the source definition or defer to the LLM.
+    """
+    return candidate.exact and len(candidate.source_term.strip()) >= MIN_AUTOPICK_CHARS
+
+
+def _definition_supported(candidate: Candidate, source_definition: Optional[str]) -> bool:
+    return bool(source_definition) and definition_overlap(candidate.definition, source_definition) >= MIN_SCORE
+
+
 def disambiguate(
     candidates: List[Candidate],
     source_definition: Optional[str] = None,
@@ -81,7 +106,10 @@ def disambiguate(
     if not candidates:
         return None
     if len(candidates) == 1:
-        return candidates[0]
+        only = candidates[0]
+        if _autopick_allowed(only) or _definition_supported(only, source_definition):
+            return only
+        return None
 
     pool = candidates
     context_tokens: Set[str] = set()
@@ -89,7 +117,9 @@ def disambiguate(
         context_tokens |= _tokens(term)
     if context_tokens:
         domain_matched = [c for c in pool if _domain_matches(c, context_tokens)]
-        if len(domain_matched) == 1:
+        if len(domain_matched) == 1 and (
+            _autopick_allowed(domain_matched[0]) or _definition_supported(domain_matched[0], source_definition)
+        ):
             return domain_matched[0]
         if domain_matched:
             pool = domain_matched  # narrowed, definition decides below
