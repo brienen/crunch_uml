@@ -411,7 +411,7 @@ class I18nRenderer(JSONRenderer):
                 all_data,
                 args.language,
                 from_language=args.from_language,
-                update_i18n=True,
+                update_i18n=getattr(args, "update_i18n", True),
                 original_i18n=i18n_data,
                 schema=schema,
             )

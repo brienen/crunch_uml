@@ -111,6 +111,48 @@ def test_pipeline_assumes_default_source_language_for_auto(monkeypatch, caplog):
     assert any("brontaal 'nl' aangenomen" in m.lower() for m in caplog.messages)
 
 
+def test_str2bool_parses_real_booleans():
+    """type=bool was a silent trap: bool("False") is True, so
+    '--update_i18n False' meant True and full re-translation was
+    impossible via the CLI."""
+    import pytest
+
+    from crunch_uml.renderers.renderer import str2bool
+
+    assert str2bool("True") is True and str2bool("true") is True and str2bool("1") is True
+    assert str2bool("False") is False and str2bool("no") is False and str2bool("0") is False
+    assert str2bool(True) is True and str2bool(False) is False
+    with pytest.raises(ValueError):
+        str2bool("misschien")
+
+
+def test_cli_parses_update_i18n_false():
+    """The flag must reach args as a real False so render() can trigger a
+    full re-translation of one language."""
+    import argparse
+
+    from crunch_uml import const, db
+    from crunch_uml import schema as sch
+    from crunch_uml.parsers import parser as parsers
+    from crunch_uml.renderers import renderer as renderers
+    from crunch_uml.transformers import transformer as transformers
+
+    p = argparse.ArgumentParser()
+    subparsers = p.add_subparsers(dest="command")
+    subparser_dict = {
+        cmd: subparsers.add_parser(cmd) for cmd in (const.CMD_IMPORT, const.CMD_TRANSFORM, const.CMD_EXPORT)
+    }
+    db.add_args(p, subparser_dict)
+    sch.add_args(p, subparser_dict)
+    parsers.add_args(p, subparser_dict)
+    renderers.add_args(p, subparser_dict)
+    transformers.add_args(p, subparser_dict)
+
+    args = p.parse_args(["export", "-f", "out.json", "-t", "i18n", "--translate", "True", "--update_i18n", "False"])
+    assert args.translate is True
+    assert args.update_i18n is False
+
+
 def test_string_backend_still_works_with_schema_argument(monkeypatch):
     """The new schema parameter must not disturb the existing flow."""
     monkeypatch.setenv("CRUNCH_UML_TRANSLATE_BACKEND", "translators")

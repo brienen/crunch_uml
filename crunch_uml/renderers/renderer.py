@@ -16,6 +16,18 @@ class RendererRegistry(Registry):
     _descr_registry = {}  # type: ignore
 
 
+def str2bool(value):
+    """Argparse-type for real booleans. ``type=bool`` is a classic trap:
+    bool("False") is True, so '--update_i18n False' silently meant True."""
+    if isinstance(value, bool):
+        return value
+    if value.strip().lower() in ("true", "yes", "1"):
+        return True
+    if value.strip().lower() in ("false", "no", "0"):
+        return False
+    raise ValueError(f"verwacht True of False, kreeg '{value}'")
+
+
 def add_args(argumentparser, subparser_dict):
     output_subparser = subparser_dict.get(const.CMD_EXPORT)
 
@@ -138,21 +150,21 @@ def add_args(argumentparser, subparser_dict):
     output_subparser.add_argument(
         "-trans",
         "--translate",
-        type=bool,
+        type=str2bool,
         default=False,
         help=(
             "Used only for i18n renderer. When set to true the input values will be translated using automatic"
-            " translating."
-        )
-        + f" Default is {const.DEFAULT_LANGUAGE}.",
+            " translating. Default is False."
+        ),
     )
     output_subparser.add_argument(
         "--update_i18n",
-        type=bool,
+        type=str2bool,
         default=True,
         help=(
-            "Used only for i18n renderer in conjunction with '--translate' option. When set to true only missing value"
-            " sin i18n file will be translated. Default is True."
+            "Used only for i18n renderer in conjunction with '--translate' option. True (default): only missing"
+            " values in the i18n file are translated. False: the language is fully re-translated (existing"
+            " translations for that language are replaced; other languages stay untouched)."
         ),
     )
     output_subparser.add_argument(
