@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import datetime
 import logging
+import os
 import re
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
@@ -169,22 +170,34 @@ def _check_ollama(config: TranslationConfig) -> LLMStatus:
     return status
 
 
-def _check_termbanks(config: TranslationConfig) -> Tuple[TermbankIndex, List[SourceReport]]:
-    index, reports = load_termbanks(config.termbank_paths)
+def _check_termbanks(
+    config: TranslationConfig, languages: Optional[set] = None
+) -> Tuple[TermbankIndex, List[SourceReport]]:
+    index, reports = load_termbanks(config.termbank_paths, languages)
 
     if config.termbank_max_age_days is not None:
         today = datetime.date.today()
         for report in reports:
-            if not report.loaded or not report.date:
+            if not report.loaded:
                 continue
-            try:
-                source_date = datetime.date.fromisoformat(report.date)
-            except ValueError:
+            source_date = None
+            date_source = "datum uit de data"
+            if report.date:
+                try:
+                    source_date = datetime.date.fromisoformat(report.date)
+                except ValueError:
+                    source_date = None
+            if source_date is None and os.path.isfile(report.path):
+                # Sommige exports (IATE dca) dragen geen datum in de data;
+                # de bestandsdatum (downloadmoment) is dan de beste maat.
+                source_date = datetime.date.fromtimestamp(os.path.getmtime(report.path))
+                date_source = "bestandsdatum"
+            if source_date is None:
                 continue
             age = (today - source_date).days
             if age > config.termbank_max_age_days:
                 logger.warning(
-                    f"Termbank '{report.name}' is {age} dagen oud (datum {report.date}, drempel"
+                    f"Termbank '{report.name}' is {age} dagen oud ({date_source} {source_date}, drempel"
                     f" {config.termbank_max_age_days} dagen); overweeg een nieuwere release."
                 )
 
@@ -232,13 +245,17 @@ def _log_summary(result: PreflightResult) -> None:
     logger.info("\n".join(lines))
 
 
-def run_preflight(config: Optional[TranslationConfig] = None) -> PreflightResult:
-    """Run all capability checks and log the overview."""
+def run_preflight(config: Optional[TranslationConfig] = None, languages: Optional[set] = None) -> PreflightResult:
+    """Run all capability checks and log the overview.
+
+    ``languages`` (bron- plus doeltaal van de run) begrenst welke langSets
+    van grote termbanken worden ingeladen; zonder filter wordt alles
+    geladen."""
     config = config or TranslationConfig.from_env()
     result = PreflightResult(config=config)
 
     result.llm = _check_ollama(config)
-    result.termbank_index, result.termbank_reports = _check_termbanks(config)
+    result.termbank_index, result.termbank_reports = _check_termbanks(config, languages)
 
     if config.nmt_model:
         result.nmt_enabled = nmt.available()

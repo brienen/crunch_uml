@@ -31,6 +31,7 @@ import difflib
 import logging
 import os
 import re
+import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
@@ -164,15 +165,22 @@ def _graph_version(graph: Graph) -> Tuple[Optional[str], Optional[str]]:
     return version, date
 
 
-def _load_lod(path: str, source_name: str, priority: int) -> Tuple[List[Concept], Optional[str], Optional[str]]:
+def _load_lod(
+    path: str, source_name: str, priority: int, languages: Optional[set] = None
+) -> Tuple[List[Concept], Optional[str], Optional[str]]:
     """Load any RDF serialisation into Concepts by querying label properties
-    generically. Returns (concepts, version, date)."""
+    generically. Returns (concepts, version, date). An optional ``languages``
+    filter (primary subtags) limits which labels/definitions are stored —
+    untagged literals always pass."""
     graph = _parse_graph(path)
+
+    def _lang_ok(lit: Literal) -> bool:
+        return languages is None or not lit.language or _lang_of(lit) in languages
 
     concepts: Dict[str, Concept] = {}
     for prop in _LABEL_PROPS:
         for subj, _, obj in graph.triples((None, prop, None)):
-            if not isinstance(obj, Literal):
+            if not isinstance(obj, Literal) or not _lang_ok(obj):
                 continue
             uri = str(subj)
             concept = concepts.setdefault(uri, Concept(uri=uri, source=source_name, priority=priority))
@@ -187,7 +195,7 @@ def _load_lod(path: str, source_name: str, priority: int) -> Tuple[List[Concept]
         subj = URIRef(uri)
         for prop in _DEFINITION_PROPS:
             for obj in graph.objects(subj, prop):
-                if isinstance(obj, Literal):
+                if isinstance(obj, Literal) and _lang_ok(obj):
                     lang = _lang_of(obj)
                     concept.definitions.setdefault(lang, str(obj).strip())
         for prop in _DOMAIN_PROPS:
@@ -206,8 +214,14 @@ def _load_lod(path: str, source_name: str, priority: int) -> Tuple[List[Concept]
                 if domain and domain not in concept.domains:
                     concept.domains.append(domain)
 
+    result = list(concepts.values())
+    if languages is not None:
+        # Zonder bron- én doeltaal wordt een concept nooit een kandidaat;
+        # wegsnoeien houdt grote bronnen (volledige EuroVoc) geheugen-begrensd.
+        result = [c for c in result if len(c.labels) >= 2]
+
     version, date = _graph_version(graph)
-    return list(concepts.values()), version, date
+    return result, version, date
 
 
 # ---------------------------------------------------------------------------
@@ -235,59 +249,83 @@ def is_tbx_file(path: str) -> bool:
     return False
 
 
-def _load_tbx(path: str, source_name: str, priority: int) -> Tuple[List[Concept], Optional[str], Optional[str]]:
-    """Load a TBX file (classic martif or TBX-core element names)."""
-    tree = etree.parse(path)
-    root = tree.getroot()
+def _parse_tbx_entry(entry, source_name: str, priority: int, index: int, languages: Optional[set]) -> Optional[Concept]:
+    """Parse one termEntry/conceptEntry element into a Concept.
 
-    # Release date: first ISO date anywhere in the header.
+    ``languages`` (primary subtags) restricts which langSets are stored;
+    with a filter active, a concept needs labels in at least two of those
+    languages to be a usable translation candidate — everything else is
+    dropped to keep huge sources (the full IATE export) memory-bounded.
+    """
+    uri = entry.get("id") or f"{source_name}#{index}"
+    concept = Concept(uri=uri, source=source_name, priority=priority)
+    for descrip in entry.iter():
+        if _strip_ns(descrip.tag) == "descrip" and (descrip.get("type") or "").lower() == "subjectfield":
+            domain = (descrip.text or "").strip()
+            if domain and domain not in concept.domains:
+                concept.domains.append(domain)
+    for lang_set in entry:
+        if _strip_ns(lang_set.tag) not in ("langSet", "langSec"):
+            continue
+        lang = _xml_lang(lang_set)
+        if languages is not None and lang not in languages:
+            continue
+        for descrip in lang_set.iter():
+            tag = _strip_ns(descrip.tag)
+            dtype = (descrip.get("type") or "").lower()
+            if tag == "descrip" and dtype == "definition":
+                text = (descrip.text or "").strip()
+                if text:
+                    concept.definitions.setdefault(lang, text)
+            elif tag == "term":
+                term = (descrip.text or "").strip()
+                if term:
+                    concept.labels.setdefault(lang, [])
+                    if term not in concept.labels[lang]:
+                        concept.labels[lang].append(term)
+            elif tag == "termNote" and dtype == "reliabilitycode":
+                try:
+                    code = int((descrip.text or "").strip())
+                except ValueError:
+                    continue
+                # Keep the lowest code seen so the concept is never
+                # presented as more reliable than its weakest term.
+                concept.reliability = code if concept.reliability is None else min(concept.reliability, code)
+    if not concept.labels:
+        return None
+    if languages is not None and len(concept.labels) < 2:
+        return None  # geen bron- én doeltaal → nooit een kandidaat
+    return concept
+
+
+def _load_tbx(
+    path: str, source_name: str, priority: int, languages: Optional[set] = None
+) -> Tuple[List[Concept], Optional[str], Optional[str]]:
+    """Load a TBX file (classic martif or TBX-core element names).
+
+    Streaming via ``iterparse``: the full IATE export is hundreds of MB and
+    must never be materialised as one DOM. Each processed element is cleared
+    and detached, so memory stays bounded by the surviving Concepts."""
     date = None
-    for elem in root.iter():
-        if _strip_ns(elem.tag).lower() in ("martifheader", "tbxheader"):
+    concepts: List[Concept] = []
+    for _, elem in etree.iterparse(path, events=("end",)):
+        tag = _strip_ns(elem.tag)
+        if tag.lower() in ("martifheader", "tbxheader") and date is None:
             header_text = " ".join(str(t) for t in elem.itertext())
             m = _DATE_RE.search(header_text)
             if m:
                 date = m.group(0)
-            break
-
-    concepts: List[Concept] = []
-    for entry in root.iter():
-        if _strip_ns(entry.tag) not in ("termEntry", "conceptEntry"):
+        elif tag in ("termEntry", "conceptEntry"):
+            concept = _parse_tbx_entry(elem, source_name, priority, len(concepts), languages)
+            if concept is not None:
+                concepts.append(concept)
+        else:
             continue
-        uri = entry.get("id") or f"{source_name}#{len(concepts)}"
-        concept = Concept(uri=uri, source=source_name, priority=priority)
-        for descrip in entry.iter():
-            if _strip_ns(descrip.tag) == "descrip" and (descrip.get("type") or "").lower() == "subjectfield":
-                domain = (descrip.text or "").strip()
-                if domain and domain not in concept.domains:
-                    concept.domains.append(domain)
-        for lang_set in entry:
-            if _strip_ns(lang_set.tag) not in ("langSet", "langSec"):
-                continue
-            lang = _xml_lang(lang_set)
-            for descrip in lang_set.iter():
-                tag = _strip_ns(descrip.tag)
-                dtype = (descrip.get("type") or "").lower()
-                if tag == "descrip" and dtype == "definition":
-                    text = (descrip.text or "").strip()
-                    if text:
-                        concept.definitions.setdefault(lang, text)
-                elif tag == "term":
-                    term = (descrip.text or "").strip()
-                    if term:
-                        concept.labels.setdefault(lang, [])
-                        if term not in concept.labels[lang]:
-                            concept.labels[lang].append(term)
-                elif tag == "termNote" and dtype == "reliabilitycode":
-                    try:
-                        code = int((descrip.text or "").strip())
-                    except ValueError:
-                        continue
-                    # Keep the lowest code seen so the concept is never
-                    # presented as more reliable than its weakest term.
-                    concept.reliability = code if concept.reliability is None else min(concept.reliability, code)
-        if concept.labels:
-            concepts.append(concept)
+        # Release the processed subtree and everything before it.
+        elem.clear()
+        parent = elem.getparent()
+        while parent is not None and elem.getprevious() is not None:
+            del parent[0]
 
     return concepts, None, date
 
@@ -319,7 +357,9 @@ def expand_paths(paths) -> List[str]:
     return expanded
 
 
-def load_source(path: str, priority: int) -> Tuple[Optional[List[Concept]], SourceReport]:
+def load_source(
+    path: str, priority: int, languages: Optional[set] = None
+) -> Tuple[Optional[List[Concept]], SourceReport]:
     """Load one termbank file, auto-detecting TBX vs LOD."""
     name = os.path.splitext(os.path.basename(path))[0]
     if not os.path.isfile(path):
@@ -328,9 +368,9 @@ def load_source(path: str, priority: int) -> Tuple[Optional[List[Concept]], Sour
     try:
         ext = os.path.splitext(path)[1].lower()
         if ext in TBX_EXTENSIONS or (ext == ".xml" and is_tbx_file(path)):
-            concepts, version, date = _load_tbx(path, name, priority)
+            concepts, version, date = _load_tbx(path, name, priority, languages)
         else:
-            concepts, version, date = _load_lod(path, name, priority)
+            concepts, version, date = _load_lod(path, name, priority, languages)
     except Exception as e:
         logger.warning(f"Termbank '{path}' kon niet worden gelezen ({e}); bron overgeslagen.")
         return None, SourceReport(name=name, path=path, loaded=False, error=str(e))
@@ -409,14 +449,25 @@ class TermbankIndex:
         return candidates
 
 
-def load_termbanks(paths) -> Tuple[TermbankIndex, List[SourceReport]]:
+def load_termbanks(paths, languages: Optional[set] = None) -> Tuple[TermbankIndex, List[SourceReport]]:
     """Load every source from the (already expanded or raw) path list into a
-    single index. Sources that fail to load are reported and skipped."""
+    single index. Sources that fail to load are reported and skipped.
+
+    ``languages`` is the set of primary language subtags the current run
+    actually needs (source + target). Passing it keeps huge sources like the
+    full IATE export memory-bounded: only the relevant langSets are stored
+    and concepts without at least two of those languages are dropped."""
+    if languages is not None:
+        languages = {lang.lower().split("-")[0] for lang in languages}
     index = TermbankIndex()
     reports: List[SourceReport] = []
     for priority, path in enumerate(expand_paths(paths)):
-        concepts, report = load_source(path, priority)
+        started = time.time()
+        concepts, report = load_source(path, priority, languages)
         reports.append(report)
         if concepts:
             index.add_concepts(concepts)
+            logger.info(
+                f"Termbank '{report.name}': {report.concepts} concepten geladen in {time.time() - started:.1f}s"
+            )
     return index, reports

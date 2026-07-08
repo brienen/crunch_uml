@@ -357,7 +357,9 @@ class I18nRenderer(JSONRenderer):
         results: Dict[Any, Dict[str, str]] = {}
         if elements:
             logger.info(f"Vertaalpijplijn: {len(elements)} elementen met ontbrekende vertalingen...")
-            pipeline = TranslationPipeline(run_preflight())
+            # Alleen de taal-paren van deze run laden: dat houdt grote
+            # termbanken (volledige IATE-export) geheugen-begrensd.
+            pipeline = TranslationPipeline(run_preflight(languages={from_lang, to_language}))
             results = pipeline.translate_elements(elements, to_language, from_lang)
 
         # Rebuild the output structure, preserving the exact shape and

@@ -192,3 +192,39 @@ def test_empty_term_lookup_returns_nothing():
     index, _ = termbank.load_termbanks([TTL_FIXTURE])
     assert index.lookup("", from_lang="nl", to_lang="en") == []
     assert index.lookup("   ", from_lang="nl", to_lang="en") == []
+
+
+# ---------------------------------------------------------------------------
+# Language filtering (memory bound for huge sources like the full IATE export)
+# ---------------------------------------------------------------------------
+
+
+def test_language_filter_drops_single_language_concepts_ttl():
+    """With a language filter, concepts lacking labels in at least two of
+    the requested languages are dropped: they can never become a candidate.
+    The nl-only 'doorzonwoning', the concept scheme and the domain resources
+    disappear; the three nl+en concepts survive with working lookups."""
+    index, reports = termbank.load_termbanks([TTL_FIXTURE], languages={"nl", "en"})
+
+    assert reports[0].concepts == 3
+    assert index.lookup("vergunning", from_lang="nl", to_lang="en")[0].term == "permit"
+    assert len(index.lookup("partij", from_lang="nl", to_lang="en")) == 2
+
+
+def test_language_filter_drops_unrequested_langsets_tbx():
+    """A TBX loaded for nl→en only: entries keep working, but requesting a
+    language outside the filter yields nothing."""
+    index, reports = termbank.load_termbanks([TBX_FIXTURE], languages={"nl", "en"})
+    assert reports[0].concepts == 2
+    assert index.lookup("bouwwerk", from_lang="nl", to_lang="en")[0].term == "structure"
+
+    index, reports = termbank.load_termbanks([TBX_FIXTURE], languages={"nl", "fr"})
+    # Beide entries hebben alleen nl+en: met filter nl+fr blijft er niets over.
+    assert reports[0].concepts == 0
+    assert index.lookup("bouwwerk", from_lang="nl", to_lang="fr") == []
+
+
+def test_language_filter_normalises_region_subtags():
+    """'en-GB'/'NL' in the filter must match plain 'en'/'nl' labels."""
+    index, _ = termbank.load_termbanks([TTL_FIXTURE], languages={"NL", "en-GB"})
+    assert index.lookup("vergunning", from_lang="nl", to_lang="en")[0].term == "permit"

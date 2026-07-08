@@ -197,6 +197,26 @@ def test_stale_termbank_warns(monkeypatch, caplog):
     assert any("dagen oud" in m and "termbank_fixture" in m for m in caplog.messages)
 
 
+def test_termbank_without_embedded_date_falls_back_to_file_mtime(monkeypatch, caplog, tmp_path):
+    """The IATE dca export carries no date in its header: the age check must
+    fall back to the file's modification time (the download moment)."""
+    import os
+    import shutil
+
+    old_file = tmp_path / "iate_zonder_datum.tbx"
+    shutil.copy("./test/data/termbank_fixture.tbx", old_file)
+    # Strip de datum uit de header zodat alleen de bestandsdatum overblijft.
+    content = old_file.read_text().replace("2019-06-30", "eergisteren")
+    old_file.write_text(content)
+    two_years_ago = 2 * 365 * 24 * 3600
+    os.utime(old_file, (os.path.getmtime(old_file) - two_years_ago,) * 2)
+
+    _mock_ollama(monkeypatch, MODELS)
+    with caplog.at_level("WARNING"):
+        run_preflight(_config(termbank_paths=(str(old_file),), termbank_max_age_days=365))
+    assert any("bestandsdatum" in m and "dagen oud" in m for m in caplog.messages)
+
+
 def test_fresh_enough_termbank_does_not_warn_about_age(monkeypatch, caplog):
     _mock_ollama(monkeypatch, MODELS)
     with caplog.at_level("WARNING"):
