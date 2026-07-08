@@ -186,6 +186,10 @@ def translate_element_once(
         "messages": build_messages(element, to_language, from_language, glossary),
         "stream": False,
         "format": _json_schema_for(field_names),
+        # Houd het model tussen de passes warm (zie config): voorkomt
+        # herladen wanneer een pass van het andere werkpaard langer duurt
+        # dan Ollama's eigen 5-minuten-default.
+        "keep_alive": config.ollama_keep_alive,
         "options": {
             "temperature": 0,
             "seed": config.seed,

@@ -27,6 +27,11 @@ logger = logging.getLogger()
 DEFAULT_WORKHORSES = ("mistral-small3.1:24b",)
 DEFAULT_OLLAMA_URL = "http://localhost:11434"
 DEFAULT_OLLAMA_TIMEOUT = 120
+# Houd modellen ruim tussen de passes in het geheugen: Ollama's eigen
+# default (5m) is korter dan één pass, waardoor het volgende niveau het
+# werkpaard opnieuw zou laden. Ollama's scheduler mag altijd evicten als
+# het geheugen elders nodig is, dus een lange keep-alive is veilig.
+DEFAULT_OLLAMA_KEEP_ALIVE = "60m"
 DEFAULT_WORKERS = 8
 DEFAULT_SEED = 42
 
@@ -37,6 +42,7 @@ ENV_LLM_HEAVY = "CRUNCH_UML_LLM_HEAVY"
 ENV_OLLAMA_URL = "CRUNCH_UML_OLLAMA_URL"
 ENV_OLLAMA_TIMEOUT = "CRUNCH_UML_OLLAMA_TIMEOUT"
 ENV_OLLAMA_MIN_VERSION = "CRUNCH_UML_OLLAMA_MIN_VERSION"
+ENV_OLLAMA_KEEP_ALIVE = "CRUNCH_UML_OLLAMA_KEEP_ALIVE"
 ENV_NMT_MODEL = "CRUNCH_UML_NMT_MODEL"
 ENV_ALLOW_ONLINE = "CRUNCH_UML_TRANSLATE_ALLOW_ONLINE"
 ENV_WORKERS = "CRUNCH_UML_TRANSLATE_WORKERS"
@@ -81,6 +87,7 @@ class TranslationConfig:
     ollama_url: str = DEFAULT_OLLAMA_URL
     ollama_timeout: int = DEFAULT_OLLAMA_TIMEOUT
     ollama_min_version: Optional[str] = None
+    ollama_keep_alive: str = DEFAULT_OLLAMA_KEEP_ALIVE
     nmt_model: Optional[str] = None
     allow_online: bool = False
     workers: int = DEFAULT_WORKERS
@@ -103,6 +110,7 @@ class TranslationConfig:
                 os.environ.get(ENV_OLLAMA_TIMEOUT), DEFAULT_OLLAMA_TIMEOUT, ENV_OLLAMA_TIMEOUT
             ),
             ollama_min_version=os.environ.get(ENV_OLLAMA_MIN_VERSION, "").strip() or None,
+            ollama_keep_alive=os.environ.get(ENV_OLLAMA_KEEP_ALIVE, "").strip() or DEFAULT_OLLAMA_KEEP_ALIVE,
             nmt_model=nmt,
             allow_online=os.environ.get(ENV_ALLOW_ONLINE, "0").strip() == "1",
             workers=max(1, _int_or_default(os.environ.get(ENV_WORKERS), DEFAULT_WORKERS, ENV_WORKERS)),
