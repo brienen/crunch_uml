@@ -68,7 +68,10 @@ def test_lod_renderer():
     assert is_valid_ttl_file(outputfile)
 
     # Test if all classes are there: 6 modelklassen plus de declaratie van
-    # het Domein-type waarmee de pakkethiërarchie wordt gerenderd.
+    # het Domein-type (pakkethiërarchie). De enumeratie TypeMonument is óók
+    # een owl:Class, maar serialiseert als "owl:Class," (dubbel type met
+    # skos:ConceptScheme) en telt in deze woordtelling dus niet mee; de
+    # semantische controle daarvan zit in test_09a.
     assert count_occurences("owl:Class", outputfile) == 7
     # assert count_occurences('RDF:Property', outputfile) == 31
 

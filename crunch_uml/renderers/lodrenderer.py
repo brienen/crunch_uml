@@ -5,7 +5,8 @@ from typing import Optional, Tuple
 from urllib.parse import quote, urljoin, urlunparse
 
 from rdflib import BNode, Graph, Literal, Namespace, URIRef
-from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SH, XSD
+from rdflib.collection import Collection
+from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SH, SKOS, XSD
 
 import crunch_uml.schema as sch
 from crunch_uml import const, util
@@ -131,7 +132,14 @@ class LodRenderer(ModelRenderer):
       waar zijn klassen met ``rdfs:isDefinedBy`` naar verwijzen; de
       bovenliggende (domein)pakketten worden entiteiten van het zelf
       gedeclareerde type ``Domein``, met ``dcterms:isPartOf``-relaties die
-      de pakkethiërarchie van het model volgen tot aan de wortel.
+      de pakkethiërarchie van het model volgen tot aan de wortel;
+    * **enumeraties**: elke enumeratie wordt een ``owl:Class`` én
+      ``skos:ConceptScheme``; de waarden worden ``skos:Concept``-en (met
+      ``skos:inScheme``/``skos:topConceptOf`` en de enumeratie als klasse).
+      Attributen die een enumeratie als type hebben — via de directe
+      koppeling in het model of via de typenaam — worden
+      ``owl:ObjectProperty`` met de enumeratie als range; hun SHACL-shape
+      somt de toegestane concepten op met ``sh:in``.
     """
 
     def writeToFile(self, graph, args):
@@ -180,6 +188,40 @@ class LodRenderer(ModelRenderer):
         for model in models:
             add_package(model)
 
+    @staticmethod
+    def enumConceptUri(enum_uri, literal):
+        return URIRef(f"{enum_uri}/{slugify(literal.name) if literal.name else slugify(literal.id)}")
+
+    def addEnumeration(self, g, enum, enum_uri, model_uri=None):
+        """Render één enumeratie als owl:Class + skos:ConceptScheme met haar
+        waarden als skos:Concept-en. Retourneert de concept-URI's (voor
+        sh:in-constraints)."""
+        g.add((enum_uri, RDF.type, OWL.Class))
+        g.add((enum_uri, RDF.type, SKOS.ConceptScheme))
+        g.add((enum_uri, RDFS.label, Literal(enum.name)))
+        g.add((enum_uri, DCTERMS.identifier, Literal(enum.id)))
+        if enum.definitie:
+            g.add((enum_uri, RDFS.comment, Literal(enum.definitie)))
+        if model_uri is not None:
+            g.add((enum_uri, RDFS.isDefinedBy, model_uri))
+
+        concepts = []
+        for literal in enum.literals:
+            concept_uri = self.enumConceptUri(enum_uri, literal)
+            concepts.append(concept_uri)
+            g.add((concept_uri, RDF.type, SKOS.Concept))
+            # Het concept is óók instantie van de enumeratieklasse, zodat de
+            # rdfs:range van attributen OWL-semantisch klopt.
+            g.add((concept_uri, RDF.type, enum_uri))
+            g.add((concept_uri, SKOS.inScheme, enum_uri))
+            g.add((concept_uri, SKOS.topConceptOf, enum_uri))
+            if literal.name:
+                g.add((concept_uri, SKOS.prefLabel, Literal(literal.name)))
+            g.add((concept_uri, DCTERMS.identifier, Literal(literal.id)))
+            if literal.definitie:
+                g.add((concept_uri, SKOS.definition, Literal(literal.definitie)))
+        return concepts
+
     def render(self, args, zchema: sch.Schema):
         try:
             if args.linked_data_namespace is None:
@@ -218,6 +260,9 @@ class LodRenderer(ModelRenderer):
             model_ns: dict = {}  # package id -> (modelname, Namespace)
             class_dict: dict = {}  # class guid -> uri
             class_by_name: dict = {}  # klassenaam (casefold) -> uri
+            enum_uris: dict = {}  # enum guid -> uri
+            enum_by_name: dict = {}  # enumnaam (casefold) -> enum
+            enum_by_uri: dict = {}  # enum uri -> enum (voor sh:in)
             for model in models:
                 modelname = util.remove_substring(model.name, "model").lower()
                 ns = Namespace(urljoin(str(args.linked_data_namespace), f"/{quote(modelname)}/"))
@@ -228,18 +273,46 @@ class LodRenderer(ModelRenderer):
                     class_uri = ns[slugify(cls.name)]
                     class_dict[cls.id] = class_uri
                     class_by_name.setdefault(cls.name.strip().casefold(), class_uri)
+                for enum in model.enumerations:
+                    if not enum.name:
+                        continue
+                    enum_uris[enum.id] = ns[slugify(enum.name)]
+                    enum_by_uri[enum_uris[enum.id]] = enum
+                    enum_by_name.setdefault(enum.name.strip().casefold(), enum)
+
+            # Enumeraties die buiten de modelpakketten leven maar wel als
+            # attribuuttype voorkomen, krijgen een URI onder /enumeraties/.
+            orphan_enum_ns = Namespace(base + "enumeraties/")
+            orphan_enums: dict = {}  # enum guid -> enum, na afloop renderen
+
+            def enum_uri_for(enum):
+                if enum.id not in enum_uris:
+                    enum_uris[enum.id] = orphan_enum_ns[slugify(enum.name)]
+                    enum_by_uri[enum_uris[enum.id]] = enum
+                    orphan_enums[enum.id] = enum
+                return enum_uris[enum.id]
 
             unmapped_types = set()
 
             def resolve_range(attribute):
-                """Bepaal de range van een attribuut: ('datatype'|'object',
-                range-URI, maximumlengte)."""
+                """Bepaal de range van een attribuut: ('datatype'|'object'|
+                'enum', range-URI, maximumlengte). De directe koppelingen uit
+                het model (enumeration/type_class) zijn leidend; daarna de
+                datatype-mapping op de typenaam en tenslotte naam-matching."""
+                if attribute.enumeration is not None and attribute.enumeration.name:
+                    return "enum", enum_uri_for(attribute.enumeration), None
+                if attribute.type_class is not None and attribute.type_class.id in class_dict:
+                    return "object", class_dict[attribute.type_class.id], None
                 dtype, max_length = map_datatype(attribute.primitive)
                 if dtype is not None:
                     return "datatype", dtype, max_length
-                class_uri = class_by_name.get(attribute.primitive.strip().casefold())
-                if class_uri is not None:
+                if not attribute.primitive:
+                    return "datatype", XSD.string, None
+                norm = attribute.primitive.strip().casefold()
+                if class_uri := class_by_name.get(norm):
                     return "object", class_uri, None
+                if enum := enum_by_name.get(norm):
+                    return "enum", enum_uri_for(enum), None
                 unmapped_types.add(attribute.primitive)
                 return "datatype", XSD.string, None
 
@@ -268,7 +341,11 @@ class LodRenderer(ModelRenderer):
                             g.add((class_uri, RDFS.comment, Literal(cls.definitie)))
 
                         for attribute in cls.attributes:
-                            if attribute.name is not None and attribute.primitive is not None:
+                            if attribute.name is not None and (
+                                attribute.primitive is not None
+                                or attribute.enumeration is not None
+                                or attribute.type_class is not None
+                            ):
                                 attr_uri = (
                                     ns[slugify(cls.name) + "/" + slugify(attribute.name)]
                                     if attribute.name
@@ -290,6 +367,13 @@ class LodRenderer(ModelRenderer):
                                         )
                                     )
 
+                    # Enumeraties van dit model als ConceptScheme + concepten.
+                    for enum in model.enumerations:
+                        if not enum.name:
+                            logger.warning(f"Enumeratie zonder naam overgeslagen: {enum.id}")
+                            continue
+                        self.addEnumeration(g, enum, enum_uris[enum.id], model_uri)
+
                     # Add SHACL NodeShapes for each class
                     for cls in model.classes:
                         if not cls.name:
@@ -303,7 +387,11 @@ class LodRenderer(ModelRenderer):
                         g.add((shape_uri, DCTERMS.identifier, Literal(f"{cls.id}")))
 
                         for attribute in cls.attributes:
-                            if attribute.name is not None and attribute.primitive is not None:
+                            if attribute.name is not None and (
+                                attribute.primitive is not None
+                                or attribute.enumeration is not None
+                                or attribute.type_class is not None
+                            ):
                                 prop_bnode = BNode()
                                 attr_uri = (
                                     ns[slugify(cls.name) + "/" + slugify(attribute.name)]
@@ -320,6 +408,17 @@ class LodRenderer(ModelRenderer):
                                 else:
                                     g.add((prop_bnode, getattr(SH, "class"), range_uri))
                                     g.add((prop_bnode, SH.nodeKind, SH.IRI))
+                                if kind == "enum":
+                                    # Toegestane waarden expliciet opsommen.
+                                    enum = enum_by_uri.get(range_uri)
+                                    if enum is not None and enum.literals:
+                                        list_node = BNode()
+                                        Collection(
+                                            g,
+                                            list_node,
+                                            [self.enumConceptUri(range_uri, lit) for lit in enum.literals],
+                                        )
+                                        g.add((prop_bnode, SH["in"], list_node))
                                 g.add((prop_bnode, SH.minCount, Literal(0)))
                                 g.add((prop_bnode, SH.maxCount, Literal(1)))
                                 g.add((prop_bnode, SH.name, Literal(attribute.name)))
@@ -365,10 +464,16 @@ class LodRenderer(ModelRenderer):
                             if assoc.definitie is not None:
                                 g.add((assoc_uri, RDFS.comment, Literal(assoc.definitie)))
 
+            # Enumeraties die buiten de modelpakketten leven maar wel als
+            # attribuuttype zijn aangetroffen.
+            for enum in orphan_enums.values():
+                self.addEnumeration(g, enum, enum_uris[enum.id])
+
             if unmapped_types:
                 overview = ", ".join(sorted(unmapped_types))
                 logger.warning(
-                    f"Onbekende datatypes teruggevallen op xsd:string (geen mapping, geen modelklasse): {overview}"
+                    f"Onbekende datatypes teruggevallen op xsd:string (geen mapping, geen modelklasse of"
+                    f" -enumeratie): {overview}"
                 )
 
             self.writeToFile(g, args)

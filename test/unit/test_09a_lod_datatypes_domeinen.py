@@ -21,7 +21,7 @@ import os
 
 import pytest
 from rdflib import Graph, Literal, Namespace, URIRef
-from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SH, XSD
+from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SH, SKOS, XSD
 
 from crunch_uml import cli, const
 from crunch_uml.renderers.lodrenderer import GEO, map_datatype
@@ -157,3 +157,53 @@ def test_domain_entities_carry_labels(monumenten_graph):
         assert isinstance(domain, URIRef)
         assert list(monumenten_graph.objects(domain, RDFS.label))
         assert list(monumenten_graph.objects(domain, DCTERMS.identifier))
+
+
+# ---------------------------------------------------------------------------
+# Enumeraties
+# ---------------------------------------------------------------------------
+
+
+def test_enumeration_is_conceptscheme_with_concepts(monumenten_graph):
+    """Het Monumenten-model heeft één enumeratie (TypeMonument, 2 waarden):
+    die moet als owl:Class + skos:ConceptScheme in de graaf staan, met de
+    waarden als skos:Concept-en in het scheme."""
+    schemes = set(monumenten_graph.subjects(RDF.type, SKOS.ConceptScheme))
+    assert len(schemes) == 1
+    scheme = schemes.pop()
+    assert (scheme, RDF.type, OWL.Class) in monumenten_graph
+    assert list(monumenten_graph.objects(scheme, RDFS.label))
+
+    concepts = set(monumenten_graph.subjects(SKOS.inScheme, scheme))
+    assert len(concepts) == 2
+    for concept in concepts:
+        assert (concept, RDF.type, SKOS.Concept) in monumenten_graph
+        # Het concept is ook instantie van de enumeratieklasse (OWL-range).
+        assert (concept, RDF.type, scheme) in monumenten_graph
+        assert (concept, SKOS.topConceptOf, scheme) in monumenten_graph
+        assert list(monumenten_graph.objects(concept, SKOS.prefLabel))
+        assert list(monumenten_graph.objects(concept, DCTERMS.identifier))
+
+
+def test_enum_typed_attribute_is_objectproperty_with_enum_range(monumenten_graph):
+    """Attributen met een enumeratie als type verwijzen als ObjectProperty
+    naar het ConceptScheme in plaats van terug te vallen op xsd:string."""
+    scheme = next(iter(monumenten_graph.subjects(RDF.type, SKOS.ConceptScheme)))
+    enum_props = [s for s, _, o in monumenten_graph.triples((None, RDFS.range, scheme))]
+    assert enum_props, "minstens één attribuut moet de enumeratie als range hebben"
+    for prop in enum_props:
+        assert (prop, RDF.type, OWL.ObjectProperty) in monumenten_graph
+
+
+def test_enum_shacl_shape_lists_allowed_values(monumenten_graph):
+    """De SHACL-shape van een enum-attribuut somt de toegestane concepten op
+    via sh:in (RDF-lijst met beide waarden)."""
+    scheme = next(iter(monumenten_graph.subjects(RDF.type, SKOS.ConceptScheme)))
+    concepts = set(monumenten_graph.subjects(SKOS.inScheme, scheme))
+
+    sh_in_lists = []
+    for prop_bnode, list_node in monumenten_graph.subject_objects(SH["in"]):
+        items = set(monumenten_graph.items(list_node))
+        sh_in_lists.append(items)
+    assert sh_in_lists, "minstens één shape moet sh:in gebruiken"
+    assert concepts in sh_in_lists, "de sh:in-lijst moet precies de enum-concepten bevatten"
