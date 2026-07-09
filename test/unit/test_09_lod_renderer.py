@@ -67,8 +67,9 @@ def test_lod_renderer():
     assert os.path.exists(outputfile)
     assert is_valid_ttl_file(outputfile)
 
-    # Test if all classes are there
-    assert count_occurences("owl:Class", outputfile) == 6  # Only classes in the model
+    # Test if all classes are there: 6 modelklassen plus de declaratie van
+    # het Domein-type waarmee de pakkethiërarchie wordt gerenderd.
+    assert count_occurences("owl:Class", outputfile) == 7
     # assert count_occurences('RDF:Property', outputfile) == 31
 
     # Cleanup
