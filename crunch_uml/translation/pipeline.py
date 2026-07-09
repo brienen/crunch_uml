@@ -38,6 +38,7 @@ same output. There is no agent loop; this is a batch pipeline.
 from __future__ import annotations
 
 import logging
+import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Tuple
 
@@ -70,6 +71,12 @@ DEFINITION_FIELDS = ("definitie", "toelichting", "src_documentation", "dst_docum
 MAX_GLOSSARY_ENTRIES = 30
 
 ResultKey = Tuple[str, str]  # (section, key)
+
+# Transport errors (timeouts, refused connections) get retries with backoff:
+# a busy Ollama server recovers, and a silently failed element would end up
+# with its Dutch source text stamped into the i18n file as "translation".
+LLM_ATTEMPTS = 3
+LLM_RETRY_BACKOFF_SECONDS = 10
 
 
 def _level_of(section: str) -> int:
@@ -155,20 +162,31 @@ class TranslationPipeline:
                 context=element.context,
                 candidates=element.candidates,
             )
-            try:
-                result = translate_element_once(
-                    sub_element,
-                    to_language,
-                    from_language,
-                    model=model_tag,
-                    config=self.config,
-                    glossary=glossaries[key],
-                )
-            except Exception as e:
-                logger.warning(
-                    f"LLM-call ({label}) voor {element.section}/{element.key} mislukt ({e});" " bronwaarden behouden."
-                )
-                result = dict(pending[key])
+            result: Dict[str, str] = dict(pending[key])  # fallback: bronwaarden
+            for attempt in range(1, LLM_ATTEMPTS + 1):
+                try:
+                    result = translate_element_once(
+                        sub_element,
+                        to_language,
+                        from_language,
+                        model=model_tag,
+                        config=self.config,
+                        glossary=glossaries[key],
+                    )
+                    break
+                except Exception as e:
+                    if attempt < LLM_ATTEMPTS:
+                        wait = LLM_RETRY_BACKOFF_SECONDS * attempt
+                        logger.warning(
+                            f"LLM-call ({label}) voor {element.section}/{element.key} mislukt bij poging"
+                            f" {attempt}/{LLM_ATTEMPTS} ({e}); nieuwe poging over {wait}s..."
+                        )
+                        time.sleep(wait)
+                    else:
+                        logger.warning(
+                            f"LLM-call ({label}) voor {element.section}/{element.key} definitief mislukt na"
+                            f" {LLM_ATTEMPTS} pogingen ({e}); bronwaarden behouden."
+                        )
             logger.info(f"[{i + 1}/{total}] ({label}) {element.section}/{element.key} vertaald")
             return result
 

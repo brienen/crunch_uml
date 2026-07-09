@@ -264,6 +264,52 @@ def test_single_workhorse_never_runs_second_pass(monkeypatch):
     assert results[("classes", "E1")]["name"] == "Case"
 
 
+def test_transient_llm_failure_is_retried_with_backoff(monkeypatch):
+    """Regressie uit de GGM-regeneratierun: een drukke Ollama-server geeft
+    read-timeouts; één mislukte call mag niet meteen bronwaarden stempelen.
+    De pass probeert het element opnieuw met backoff."""
+    sleeps = []
+    monkeypatch.setattr(pipeline_mod.time, "sleep", lambda s: sleeps.append(s))
+
+    attempts = {"n": 0}
+
+    def flaky(element, to_language, from_language, model, config, glossary=None):
+        attempts["n"] += 1
+        if attempts["n"] == 1:
+            raise TimeoutError("read timed out")
+        return {"name": "Case"}
+
+    monkeypatch.setattr(pipeline_mod, "translate_element_once", flaky)
+    pipe = TranslationPipeline(_preflight(termbanks=(), voting=False, heavy=False))
+    element = Element(section="classes", key="E1", fields={"name": "Zaak"})
+
+    results = pipe.translate_elements([element], "en", "nl")
+
+    assert results[("classes", "E1")]["name"] == "Case"
+    assert attempts["n"] == 2
+    assert sleeps == [pipeline_mod.LLM_RETRY_BACKOFF_SECONDS]
+
+
+def test_persistent_llm_failure_keeps_source_after_all_attempts(monkeypatch, caplog):
+    monkeypatch.setattr(pipeline_mod.time, "sleep", lambda s: None)
+    calls = {"n": 0}
+
+    def broken(element, to_language, from_language, model, config, glossary=None):
+        calls["n"] += 1
+        raise TimeoutError("read timed out")
+
+    monkeypatch.setattr(pipeline_mod, "translate_element_once", broken)
+    pipe = TranslationPipeline(_preflight(termbanks=(), voting=False, heavy=False))
+    element = Element(section="classes", key="E1", fields={"name": "Zaak"})
+
+    with caplog.at_level("WARNING"):
+        results = pipe.translate_elements([element], "en", "nl")
+
+    assert calls["n"] == pipeline_mod.LLM_ATTEMPTS
+    assert results[("classes", "E1")]["name"] == "Zaak"
+    assert any("definitief mislukt" in m for m in caplog.messages)
+
+
 # ---------------------------------------------------------------------------
 # Degradation below the LLM
 # ---------------------------------------------------------------------------
