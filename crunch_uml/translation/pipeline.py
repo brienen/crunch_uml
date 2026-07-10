@@ -147,10 +147,15 @@ class TranslationPipeline:
         to_language: str,
         from_language: str,
         label: str,
+        max_workers: int = 0,
     ) -> Dict[ResultKey, Dict[str, str]]:
-        """One model over the whole batch (see module docstring on passes)."""
+        """One model over the whole batch (see module docstring on passes).
+
+        ``max_workers`` begrenst de client-parallelliteit voor deze pass;
+        0 betekent de geconfigureerde standaard."""
         total = len(elements)
-        logger.info(f"LLM-pass '{label}' ({model_tag}): {total} elementen...")
+        workers = max_workers or self.config.workers
+        logger.info(f"LLM-pass '{label}' ({model_tag}): {total} elementen ({workers} workers)...")
 
         def _one(indexed: Tuple[int, Element]) -> Dict[str, str]:
             i, element = indexed
@@ -190,7 +195,7 @@ class TranslationPipeline:
             logger.info(f"[{i + 1}/{total}] ({label}) {element.section}/{element.key} vertaald")
             return result
 
-        with ThreadPoolExecutor(max_workers=self.config.workers) as pool:
+        with ThreadPoolExecutor(max_workers=workers) as pool:
             results = list(pool.map(_one, enumerate(elements)))
         return {(e.section, e.key): r for e, r in zip(elements, results)}
 
@@ -254,6 +259,12 @@ class TranslationPipeline:
                     to_language,
                     from_language,
                     label="zwaar-model",
+                    # Het zware model rekent lang per element; volle
+                    # client-parallelliteit maakt de wachtrij zó diep dat de
+                    # traagste elementen door hun read-timeout lopen
+                    # (waargenomen in de GGM-regeneratierun). De server is
+                    # toch de bottleneck: minder workers kost geen doorvoer.
+                    max_workers=max(1, self.config.workers // 2),
                 )
                 results.update(heavy_results)
             else:
