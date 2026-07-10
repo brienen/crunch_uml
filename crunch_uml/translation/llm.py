@@ -193,6 +193,10 @@ def translate_element_once(
         "options": {
             "temperature": 0,
             "seed": config.seed,
+            # Zonder expliciete num_ctx alloceert Ollama de KV-cache op de
+            # volledige modelcontext (128k) — voor een 70B-model tientallen
+            # GB's extra en gemeten geheugendruk-stalls.
+            "num_ctx": config.ollama_num_ctx,
             # Cap the response: translations are a small multiple of the
             # input; without a cap a confused model can run away.
             "num_predict": min(4096, source_chars + 512),

@@ -88,6 +88,9 @@ def test_single_call_with_json_schema_temperature_zero_and_seed(monkeypatch):
     assert sent["options"]["seed"] == 42
     # Modellen blijven tussen passes warm (Ollama's 5m-default is te kort).
     assert sent["keep_alive"] == CONFIG.ollama_keep_alive
+    # Expliciete contextgrens: zonder num_ctx alloceert Ollama de KV-cache
+    # op de volledige modelcontext (86 GB voor llama3.3:70b, gemeten).
+    assert sent["options"]["num_ctx"] == CONFIG.ollama_num_ctx
     assert sent["options"]["num_predict"] <= 4096
     # format = JSON-schema over precies de velden van het element.
     assert sent["format"]["required"] == ["name", "definitie"]

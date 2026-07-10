@@ -32,6 +32,12 @@ DEFAULT_OLLAMA_TIMEOUT = 120
 # werkpaard opnieuw zou laden. Ollama's scheduler mag altijd evicten als
 # het geheugen elders nodig is, dus een lange keep-alive is veilig.
 DEFAULT_OLLAMA_KEEP_ALIVE = "60m"
+# Begrens de contextlengte expliciet: zonder num_ctx kan Ollama de KV-cache
+# op de volledige modelcontext (128k) alloceren — llama3.3:70b werd daardoor
+# 86 GB in plaats van ~46 GB en drukte de machine het geheugen uit
+# (waargenomen in de GGM-regeneratierun: doorvoer 15x ingezakt). Onze
+# element-prompts blijven ruim onder deze grens.
+DEFAULT_OLLAMA_NUM_CTX = 16384
 DEFAULT_WORKERS = 8
 DEFAULT_SEED = 42
 
@@ -43,6 +49,7 @@ ENV_OLLAMA_URL = "CRUNCH_UML_OLLAMA_URL"
 ENV_OLLAMA_TIMEOUT = "CRUNCH_UML_OLLAMA_TIMEOUT"
 ENV_OLLAMA_MIN_VERSION = "CRUNCH_UML_OLLAMA_MIN_VERSION"
 ENV_OLLAMA_KEEP_ALIVE = "CRUNCH_UML_OLLAMA_KEEP_ALIVE"
+ENV_OLLAMA_NUM_CTX = "CRUNCH_UML_OLLAMA_NUM_CTX"
 ENV_NMT_MODEL = "CRUNCH_UML_NMT_MODEL"
 ENV_ALLOW_ONLINE = "CRUNCH_UML_TRANSLATE_ALLOW_ONLINE"
 ENV_WORKERS = "CRUNCH_UML_TRANSLATE_WORKERS"
@@ -88,6 +95,7 @@ class TranslationConfig:
     ollama_timeout: int = DEFAULT_OLLAMA_TIMEOUT
     ollama_min_version: Optional[str] = None
     ollama_keep_alive: str = DEFAULT_OLLAMA_KEEP_ALIVE
+    ollama_num_ctx: int = DEFAULT_OLLAMA_NUM_CTX
     nmt_model: Optional[str] = None
     allow_online: bool = False
     workers: int = DEFAULT_WORKERS
@@ -111,6 +119,9 @@ class TranslationConfig:
             ),
             ollama_min_version=os.environ.get(ENV_OLLAMA_MIN_VERSION, "").strip() or None,
             ollama_keep_alive=os.environ.get(ENV_OLLAMA_KEEP_ALIVE, "").strip() or DEFAULT_OLLAMA_KEEP_ALIVE,
+            ollama_num_ctx=_int_or_default(
+                os.environ.get(ENV_OLLAMA_NUM_CTX), DEFAULT_OLLAMA_NUM_CTX, ENV_OLLAMA_NUM_CTX
+            ),
             nmt_model=nmt,
             allow_online=os.environ.get(ENV_ALLOW_ONLINE, "0").strip() == "1",
             workers=max(1, _int_or_default(os.environ.get(ENV_WORKERS), DEFAULT_WORKERS, ENV_WORKERS)),
