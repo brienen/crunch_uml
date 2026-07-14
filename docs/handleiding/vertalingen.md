@@ -23,12 +23,13 @@ keywords:
 # Vertalingen
 
 Het `i18n`-export-formaat kan modelvelden (namen, definities, toelichtingen,
-GEMMA-tags) automatisch naar een doeltaal vertalen. Er zijn twee backends:
+GEMMA-tags) automatisch naar een doeltaal vertalen. Er zijn drie backends:
 
 | Backend | Wanneer kiezen |
 | --- | --- |
 | `translators` (standaard) | Snelle exports zonder extra setup. Gebruikt Google/Bing endpoints. |
 | `ollama` | Hogere kwaliteit, offline, context-bewust. Draait een lokaal LLM (Mistral) via Ollama. |
+| `pipeline` | Hoogste kwaliteit én reproduceerbaar: gelaagde pijplijn met officiële termbanken (IATE, EuroVoc, eigen LOD) en lokale LLM's met stemmen. Zie [de pijplijn-sectie](#de-deterministische-vertaalpijplijn) hieronder. |
 
 !!! tip "Casing wordt automatisch behouden"
     Een veel-voorkomende valkuil bij automatisch vertalen: `aanvangAanwezigheid`
@@ -220,8 +221,97 @@ Met de externe `translators`-API zijn korte strings doorgaans iets sneller
 (~0.1 s netwerklatentie), maar de kwaliteit op identifiers en domeintermen
 is duidelijk lager.
 
+## De deterministische vertaalpijplijn
+
+De backend `pipeline` is de aanbevolen route voor autoritatieve,
+reproduceerbare vertalingen: officiële terminologie is de basis, de context
+uit het bronmodel bepaalt de betekenis, en dezelfde input plus dezelfde
+bronnen geeft altijd dezelfde output. Het volledige ontwerp staat in
+[het technisch ontwerp](../technisch/vertaalpijplijn.md); dit is de
+gebruikershandleiding.
+
+### Configureren
+
+Alles gaat via omgevingsvariabelen (met CLI-flags als override), zoals
+altijd bij crunch:
+
+```bash
+export CRUNCH_UML_TRANSLATE_BACKEND=pipeline
+
+# Termbanken: kommagescheiden bestanden of directories; volgorde = prioriteit.
+# Formaat wordt automatisch herkend (.ttl/.rdf/.jsonld/... via rdflib, .tbx als IATE).
+export CRUNCH_UML_TERMBANKS="resources/gemma_begrippen.ttl,resources/lod/,resources/IATE_export.tbx"
+
+# LLM-rollen: 1e = primair werkpaard (definities), 2e = tweede stem op namen.
+export CRUNCH_UML_LLM_WORKHORSES="qwen2.5:14b,mistral-small3.1:24b"
+export CRUNCH_UML_LLM_HEAVY="qwen2.5:32b"    # escalatiemodel: het grootste dat je hardware trekt
+
+crunch_uml -sch mijn_model export -t i18n -f mijn_model.i18n.json \
+    --language en --translate True --from_language nl
+```
+
+Modelnamen zijn **prefixen**: `mistral-small` lost op naar de hoogste
+lokaal geïnstalleerde tag, zodat een minor modelupgrade (`ollama pull
+mistral-small3.2`) geen configuratiewijziging vraagt. De opgeloste tag,
+digest en pull-datum staan in het startoverzicht van elke run.
+
+Overige instellingen: `CRUNCH_UML_TERMBANK_MAX_AGE_DAYS` (waarschuw bij
+verouderde bronnen), `CRUNCH_UML_OLLAMA_MIN_VERSION`,
+`CRUNCH_UML_NMT_MODEL` (optioneel NMT-vangnet, bv.
+`Helsinki-NLP/opus-mt-{from}-{to}`; vereist `pip install transformers
+sentencepiece torch`), `CRUNCH_UML_TRANSLATE_ALLOW_ONLINE=1` (sta de
+online Google/Bing-route toe als laatste vangnet — niet reproduceerbaar,
+default uit) en `CRUNCH_UML_TRANSLATE_SEED` (default 42; temperature staat
+vast op 0).
+
+### Hoe de pijplijn vertaalt
+
+1. **Het i18n-bestand is het vertaalgeheugen.** Bestaande vertalingen per
+   (sectie, GUID, veld) worden hergebruikt en nooit opnieuw vertaald —
+   handmatig gereviewde vertalingen winnen dus altijd.
+2. **Termbanken leveren kandidaten** voor namen; een eenduidige treffer
+   (na deterministische disambiguatie op domein en brondefinitie) wordt
+   zonder model genomen, met de concept-URI in het log.
+3. **Per modelelement één LLM-call** met naam, definitie en toelichting
+   samen, plus een compacte contextkop (model, pakket, klasse) en het
+   bindende glossarium. Twee werkpaarden vertalen onafhankelijk; zijn ze
+   het over de naam eens dan is het resultaat geaccepteerd, anders beslist
+   het zware model. Definities worden deterministisch op
+   glossarium-naleving gecontroleerd.
+4. **Hiërarchische volgorde**: eerst pakketten, dan klassen/enumeraties,
+   dan attributen — elke laag legt zijn naamvertalingen vast in het
+   glossarium van de laag eronder, zodat "Bouwactiviteit" overal dezelfde
+   vertaling krijgt.
+
+### Preflight: nette degradatie
+
+Vóór het vertalen controleert de pijplijn wat er beschikbaar is en logt een
+compact overzicht. Ontbreekt er iets, dan volgt een waarschuwing en draait
+de rest gewoon door:
+
+| Situatie | Gedrag |
+| --- | --- |
+| Ollama onbereikbaar / geen modellen | LLM-laag uit; termbanktreffers vertalen nog steeds |
+| Werkpaard niet geïnstalleerd | Waarschuwing met exact `ollama pull`-commando; overige modellen worden gebruikt |
+| Eén werkpaard | Stemlaag uit; escalatie alleen op de glossarium-check |
+| Zwaar model ontbreekt | Moeilijke gevallen houden het antwoord van het primaire werkpaard |
+| Termbank ontbreekt/onleesbaar | Bron overgeslagen, de rest werkt door |
+| Geen enkele termbank | Nadrukkelijke waarschuwing: vertalen zonder autoritatieve grounding |
+| Bron ouder dan drempel | Waarschuwing met gevonden versie/datum uit de data zelf |
+
+### Termbanken verkrijgen
+
+* **IATE** — TBX-export van [iate.europa.eu/download-iate](https://iate.europa.eu/download-iate).
+* **EuroVoc** — SKOS-distributie van [op.europa.eu](https://op.europa.eu/en/web/eu-vocabularies);
+  elke RDF-serialisatie werkt.
+* **Eigen begrippenkaders** — elk SKOS/RDFS/OWL-bestand (bv. het
+  GEMMA-begrippenkader als Turtle) werkt zonder codewijziging; labels,
+  definities en domeinen worden generiek uitgelezen.
+
 ## Verder lezen
 
 * [Export-commando](export.md) — volledige opties van het `export`-subcommando.
+* [Technisch ontwerp vertaalpijplijn](../technisch/vertaalpijplijn.md) — de
+  volledige architectuur van de `pipeline`-backend en de genomen besluiten.
 * [Renderers technisch](../technisch/componenten/renderers.md) — hoe de
   i18n-renderer intern werkt (deduplicatie, parallel pool, fallback).

@@ -682,6 +682,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#model-uitwisseling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model-uitwisseling
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#tabulaire-formaten" class="md-nav__link">
     <span class="md-ellipsis">
       Tabulaire formaten
@@ -749,6 +758,15 @@
   
     <nav class="md-nav" aria-label="Voorbeelden">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ea-xmi-export-round-trip" class="md-nav__link">
+    <span class="md-ellipsis">
+      EA XMI-export (round-trip)
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#excel-export" class="md-nav__link">
@@ -907,6 +925,8 @@
       
         
           
+        
+      
         
       
         
@@ -1287,6 +1307,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../technisch/vertaalpijplijn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertaalpijplijn — technisch ontwerp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../technisch/kwetsbaarheden/" class="md-nav__link">
         
   
@@ -1424,6 +1465,23 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_schema<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>&lt;type&gt;<span class="w"> </span>-f<span class="w"> </span>&lt;bestand&gt;
 </code></pre></div>
 <h2 id="ondersteunde-uitvoerformaten">Ondersteunde uitvoerformaten<a class="headerlink" href="#ondersteunde-uitvoerformaten" title="Permanent link">&para;</a></h2>
+<h3 id="model-uitwisseling">Model-uitwisseling<a class="headerlink" href="#model-uitwisseling" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Optie <code>-t</code></th>
+<th>Beschrijving</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EA XMI</td>
+<td><code>xmi</code></td>
+<td>XMI 2.1 met Enterprise Architect-extensiesectie, inclusief diagrammen met layout. Opnieuw importeerbaar via <code>eaxmi</code> en in Sparx EA</td>
+</tr>
+</tbody>
+</table>
 <h3 id="tabulaire-formaten">Tabulaire formaten<a class="headerlink" href="#tabulaire-formaten" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -1437,7 +1495,7 @@
 <tr>
 <td>JSON</td>
 <td><code>json</code></td>
-<td>JSON document met alle tabellen</td>
+<td>JSON document met alle tabellen (inclusief diagram-koppeltabellen met geometrie)</td>
 </tr>
 <tr>
 <td>CSV</td>
@@ -1591,7 +1649,7 @@
 <tr>
 <td>EA Repository</td>
 <td><code>earepo</code></td>
-<td>Update bestaand Enterprise Architect repository</td>
+<td>Update bestaand Enterprise Architect repository, inclusief diagram-membership en layout (<code>t_diagramobjects</code>/<code>t_diagramlinks</code>)</td>
 </tr>
 <tr>
 <td>EA MIM Repository</td>
@@ -1704,47 +1762,56 @@
 </tbody>
 </table>
 <h2 id="voorbeelden">Voorbeelden<a class="headerlink" href="#voorbeelden" title="Permanent link">&para;</a></h2>
+<h3 id="ea-xmi-export-round-trip">EA XMI-export (round-trip)<a class="headerlink" href="#ea-xmi-export-round-trip" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Compleet model inclusief diagrammen met layout als EA-compatibele XMI</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_model<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>xmi<span class="w"> </span>-f<span class="w"> </span>model.xml
+</code></pre></div>
+<p>Het resultaat is opnieuw importeerbaar met <code>import -t eaxmi</code> (verliesvrij, inclusief geometrie) en importeerbaar in Sparx Enterprise Architect. De EA-specifieke keuzes zijn gedocumenteerd in <code>crunch_uml/renderers/EA_QUIRKS.md</code>.</p>
 <h3 id="excel-export">Excel-export<a class="headerlink" href="#excel-export" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_model<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>xlsx<span class="w"> </span>-f<span class="w"> </span>specificatie.xlsx
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_model<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>xlsx<span class="w"> </span>-f<span class="w"> </span>specificatie.xlsx
 </code></pre></div>
 <h3 id="markdown-documentatie-genereren">Markdown-documentatie genereren<a class="headerlink" href="#markdown-documentatie-genereren" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_model<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>jinja2<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span>--output_jinja2_template<span class="w"> </span>ggm_markdown.j2<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span>-f<span class="w"> </span>docs/definitie.md<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span>--output_jinja2_templatedir<span class="w"> </span>./templates/
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_model<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>jinja2<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span>--output_jinja2_template<span class="w"> </span>ggm_markdown.j2<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span>-f<span class="w"> </span>docs/definitie.md<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span>--output_jinja2_templatedir<span class="w"> </span>./templates/
 </code></pre></div>
 <h3 id="linked-data-turtle-exporteren">Linked Data (Turtle) exporteren<a class="headerlink" href="#linked-data-turtle-exporteren" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_model<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>ttl<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span>-f<span class="w"> </span>ontologie.ttl<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span>--linked_data_namespace<span class="w"> </span>https://example.org/model/
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_model<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>ttl<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span>-f<span class="w"> </span>ontologie.ttl<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span>--linked_data_namespace<span class="w"> </span>https://example.org/model/
 </code></pre></div>
 <h3 id="schema-vergelijking">Schema-vergelijking<a class="headerlink" href="#schema-vergelijking" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>vorige_versie<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>diff_md<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span>-f<span class="w"> </span>wijzigingen.md<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span>--compare_schema_name<span class="w"> </span>huidige_versie<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span>--compare_title<span class="w"> </span><span class="s2">&quot;Wijzigingen v1.0 → v2.0&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>vorige_versie<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>diff_md<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span>-f<span class="w"> </span>wijzigingen.md<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span>--compare_schema_name<span class="w"> </span>huidige_versie<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span>--compare_title<span class="w"> </span><span class="s2">&quot;Wijzigingen v1.0 → v2.0&quot;</span>
 </code></pre></div>
 <h3 id="ea-repository-bijwerken">EA Repository bijwerken<a class="headerlink" href="#ea-repository-bijwerken" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_model<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-f<span class="w"> </span>model.qea<span class="w"> </span>-t<span class="w"> </span>earepo<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span>--tag_strategy<span class="w"> </span>upsert
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_model<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-f<span class="w"> </span>model.qea<span class="w"> </span>-t<span class="w"> </span>earepo<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span>--tag_strategy<span class="w"> </span>upsert
 </code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Let op bij EA Repository updates</p>
 <p>De <code>earepo</code>-renderer werkt direct op een Enterprise Architect repository. Maak altijd een backup voordat je <code>--tag_strategy replace</code> gebruikt, want dit vervangt alle bestaande tags.</p>
 </div>
+<div class="admonition info">
+<p class="admonition-title">Diagramlayout wordt meegeschreven</p>
+<p>De <code>earepo</code>-renderer werkt ook de diagramlayout bij: bestaande rijen in <code>t_diagramobjects</code>/<code>t_diagramlinks</code> krijgen de posities en lijnverlopen uit het model, elementen die nieuw op een diagram staan worden toegevoegd, en membership die uit het model verdween wordt verwijderd. Rijen van elementtypen die crunch_uml niet beheert (zoals Notes) en van elementen die het schema niet kent blijven onaangeroerd.</p>
+</div>
 <h3 id="csv-export-met-kolom-mapping">CSV-export met kolom-mapping<a class="headerlink" href="#csv-export-met-kolom-mapping" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_model<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>csv<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span>-f<span class="w"> </span>export/data<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span>--mapper<span class="w"> </span><span class="s1">&#39;{&quot;name&quot;: &quot;Naam&quot;, &quot;definitie&quot;: &quot;Omschrijving&quot;}&#39;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span>--entity_name<span class="w"> </span>classes
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_model<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>csv<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span>-f<span class="w"> </span>export/data<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span>--mapper<span class="w"> </span><span class="s1">&#39;{&quot;name&quot;: &quot;Naam&quot;, &quot;definitie&quot;: &quot;Omschrijving&quot;}&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span>--entity_name<span class="w"> </span>classes
 </code></pre></div>
 <h3 id="i18n-export-met-lokale-llm-ollama-mistral">i18n-export met lokale LLM (Ollama / Mistral)<a class="headerlink" href="#i18n-export-met-lokale-llm-ollama-mistral" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_model<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>i18n<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span>-f<span class="w"> </span>mijn_model.i18n.json<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span>--language<span class="w"> </span>en<span class="w"> </span>--translate<span class="w"> </span>True<span class="w"> </span>--from_language<span class="w"> </span>nl<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span>--translate_backend<span class="w"> </span>ollama<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span>--ollama_model<span class="w"> </span>mistral-small3.1:24b<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span>--translate_context
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_model<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>i18n<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span>-f<span class="w"> </span>mijn_model.i18n.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span>--language<span class="w"> </span>en<span class="w"> </span>--translate<span class="w"> </span>True<span class="w"> </span>--from_language<span class="w"> </span>nl<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span>--translate_backend<span class="w"> </span>ollama<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span>--ollama_model<span class="w"> </span>mistral-small3.1:24b<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span>--translate_context
 </code></pre></div>
 <p>Voor uitgebreide uitleg (model-keuze, casing-behoud, opake tokens) zie
 de aparte <a href="../vertalingen/">Vertalingen-pagina</a>.</p>

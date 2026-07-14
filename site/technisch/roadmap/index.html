@@ -722,6 +722,8 @@
       
         
       
+        
+      
     
     
       
@@ -1095,6 +1097,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../vertaalpijplijn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertaalpijplijn — technisch ontwerp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../kwetsbaarheden/" class="md-nav__link">
         
   
@@ -1165,6 +1188,15 @@
   <a href="#roadmap-overzicht" class="md-nav__link">
     <span class="md-ellipsis">
       Roadmap Overzicht
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recent-gerealiseerd-v050" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recent gerealiseerd (v0.5.0)
     </span>
   </a>
   
@@ -1437,6 +1469,12 @@
     Performance audit                :f1, 2026-07, 2M
     Beveiligingsaudit                :f2, after f1, 2M
     Documentatie v1.0                :f3, after f2, 2M</code></pre>
+<hr />
+<h2 id="recent-gerealiseerd-v050">Recent gerealiseerd (v0.5.0)<a class="headerlink" href="#recent-gerealiseerd-v050" title="Permanent link">&para;</a></h2>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>Volledige diagram-ondersteuning</strong> — membership én geometrie (posities, afmetingen, z-order, waypoints) end-to-end: <code>eaxmi</code>/<code>qea</code>-parsers lezen layout, de nieuwe <code>xmi</code>-renderer schrijft EA-compatibele XMI met verliesvrije round-trip, <code>earepo</code> werkt de layout in de EA-repository bij, en json/xlsx/csv round-trippen de koppeltabellen. Zie de dekkingsmatrix in het <a href="../datamodel/">datamodel</a>.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>Datamodel-versionering</strong> — versienummer in <code>crunch_uml_meta</code>; compatibele databases worden additief gemigreerd, incompatibele met waarschuwing opnieuw aangemaakt.</li>
+</ul>
 <hr />
 <h2 id="fase-1-metaschema-importexport">Fase 1: Metaschema &amp; Import/Export<a class="headerlink" href="#fase-1-metaschema-importexport" title="Permanent link">&para;</a></h2>
 <h3 id="gecentraliseerde-repository">Gecentraliseerde Repository<a class="headerlink" href="#gecentraliseerde-repository" title="Permanent link">&para;</a></h3>

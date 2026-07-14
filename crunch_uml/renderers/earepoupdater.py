@@ -17,7 +17,9 @@ from sqlalchemy import (
 from sqlalchemy.orm import sessionmaker
 
 import crunch_uml.schema as sch
-from crunch_uml import const, util
+from crunch_uml import const
+from crunch_uml import ea_geometry as geo
+from crunch_uml import util
 from crunch_uml.db import (
     UMLTags,
     UMLTagsAttribute,
@@ -221,6 +223,194 @@ class EARepoUpdater(ModelRenderer):
 
         keys = list(delete_dict.keys())
         session.query(table).filter(table.c[ea_guid_column].in_(keys)).delete(synchronize_session=False)
+
+    # ------------------------------------------------------------------
+    # Diagram layout (t_diagramobjects / t_diagramlinks)
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _normalized_guid(eaid):
+        """Repo GUID for an EAID_/EAPK_ id, normalized for case-insensitive
+        matching (EA GUID columns are COLLATE NOCASE)."""
+        return util.fromEAGuid(eaid).upper()
+
+    def update_diagram_layout(self, schema: sch.Schema, session, metadata):
+        """Write diagram membership and geometry back to t_diagramobjects and
+        t_diagramlinks: update existing rows, insert rows for elements newly
+        on a diagram, delete rows whose membership disappeared. Uses the same
+        coordinate conversions as the qea parser, reversed (RectTop/RectBottom
+        negative, Path with ';' pairs and negative y).
+
+        Only rows for element types managed by crunch_uml are touched
+        (classes/datatypes/enumerations, associations/generalizations/
+        realisations). Rows for Notes, packages and other EA-only elements
+        are left alone. Rows for elements that exist in the repo but are
+        unknown to the crunch schema are also left alone: a partial model
+        export must not strip layout it knows nothing about.
+        """
+        diagrams = schema.get_all_diagrams()
+        obj_table = metadata.tables.get("t_diagramobjects")
+        link_table = metadata.tables.get("t_diagramlinks")
+        dia_table = metadata.tables.get("t_diagram")
+        object_table = metadata.tables.get("t_object")
+        connector_table = metadata.tables.get("t_connector")
+        if obj_table is None or link_table is None or dia_table is None:
+            logger.warning("Diagram layout tables not found in EA repository; skipping diagram layout update.")
+            return
+
+        # Repo lookups, guid -> local id (case-normalized).
+        diagram_ids = {str(row.ea_guid).upper(): row.Diagram_ID for row in session.query(dia_table) if row.ea_guid}
+        object_ids = {}
+        managed_object_ids = set()
+        for row in session.query(object_table):
+            if not row.ea_guid:
+                continue
+            object_ids[str(row.ea_guid).upper()] = row.Object_ID
+            if row.Object_Type in ("Class", "DataType", "Enumeration"):
+                managed_object_ids.add(row.Object_ID)
+        connector_ids = {}
+        managed_connector_ids = set()
+        for row in session.query(connector_table):
+            if not row.ea_guid:
+                continue
+            connector_ids[str(row.ea_guid).upper()] = row.Connector_ID
+            if row.Connector_Type in ("Association", "Generalization", "Realisation"):
+                managed_connector_ids.add(row.Connector_ID)
+
+        # Elements the crunch schema knows about: only their membership may
+        # be deleted when it disappeared from the model.
+        known_node_guids = {
+            self._normalized_guid(element.id)
+            for element in schema.get_all_classes() + schema.get_all_datatypes() + schema.get_all_enumerations()
+        }
+        known_edge_guids = {
+            self._normalized_guid(element.id)
+            for element in schema.get_all_associations() + schema.get_all_generalizations()
+        }
+        known_node_ids = {object_ids[g] for g in known_node_guids if g in object_ids}
+        known_edge_ids = {connector_ids[g] for g in known_edge_guids if g in connector_ids}
+
+        for diagram in diagrams:
+            diagram_id = diagram_ids.get(self._normalized_guid(diagram.id))
+            if diagram_id is None:
+                logger.debug(f"Diagram {diagram.name} ({diagram.id}) not found in EA repository: layout skipped.")
+                continue
+            self._sync_diagram_objects(session, obj_table, diagram, diagram_id, object_ids, known_node_ids)
+            self._sync_diagram_links(session, link_table, diagram, diagram_id, connector_ids, known_edge_ids)
+
+    def _node_values(self, membership):
+        values = {}
+        if None not in (membership.x, membership.y, membership.width, membership.height):
+            rect = geo.format_qea_rect(membership.x, membership.y, membership.width, membership.height)
+            values.update({key: int(round(value)) for key, value in rect.items()})
+        if membership.z_order is not None:
+            values["Sequence"] = membership.z_order
+        if membership.ea_style is not None:
+            values["ObjectStyle"] = membership.ea_style
+        return values
+
+    def _sync_diagram_objects(self, session, obj_table, diagram, diagram_id, object_ids, known_node_ids):
+        desired = {}
+        for membership in list(diagram.diagram_classes) + list(diagram.diagram_enumerations):
+            element_id = getattr(membership, "class_id", None) or getattr(membership, "enumeration_id", None)
+            object_id = object_ids.get(self._normalized_guid(element_id))
+            if object_id is None:
+                logger.debug(f"Element {element_id} on diagram {diagram.name} not found in EA repository: skipped.")
+                continue
+            desired[object_id] = membership
+
+        existing_ids = set()
+        for row in session.query(obj_table).filter(obj_table.c.Diagram_ID == diagram_id):
+            existing_ids.add(row.Object_ID)
+            if row.Object_ID in desired:
+                values = self._node_values(desired[row.Object_ID])
+                if values:
+                    session.execute(
+                        update(obj_table)
+                        .where(
+                            and_(
+                                obj_table.c.Diagram_ID == diagram_id,
+                                obj_table.c.Object_ID == row.Object_ID,
+                            )
+                        )
+                        .values(values)
+                    )
+            elif row.Object_ID in known_node_ids:
+                logger.info(
+                    f"Removing object {row.Object_ID} from diagram {diagram.name}: membership no longer in model."
+                )
+                session.execute(
+                    obj_table.delete().where(
+                        and_(
+                            obj_table.c.Diagram_ID == diagram_id,
+                            obj_table.c.Object_ID == row.Object_ID,
+                        )
+                    )
+                )
+
+        for object_id, membership in desired.items():
+            if object_id in existing_ids:
+                continue
+            values = self._node_values(membership)
+            values.update({"Diagram_ID": diagram_id, "Object_ID": object_id})
+            logger.info(f"Adding object {object_id} to diagram {diagram.name}.")
+            session.execute(insert(obj_table).values(values))
+
+    def _edge_values(self, membership):
+        values = {"Hidden": 1 if membership.hidden else 0}
+        if membership.ea_geometry is not None:
+            values["Geometry"] = membership.ea_geometry
+        if membership.ea_style is not None:
+            values["Style"] = membership.ea_style
+        waypoints = geo.waypoints_from_json(membership.waypoints)
+        values["Path"] = geo.format_path(waypoints, geo.QEA_PATH_SEPARATOR)
+        return values
+
+    def _sync_diagram_links(self, session, link_table, diagram, diagram_id, connector_ids, known_edge_ids):
+        desired = {}
+        for membership in list(diagram.diagram_associations) + list(diagram.diagram_generalizations):
+            element_id = getattr(membership, "association_id", None) or getattr(membership, "generalization_id", None)
+            connector_id = connector_ids.get(self._normalized_guid(element_id))
+            if connector_id is None:
+                logger.debug(f"Connector {element_id} on diagram {diagram.name} not found in EA repository: skipped.")
+                continue
+            desired[connector_id] = membership
+
+        existing_ids = set()
+        for row in session.query(link_table).filter(link_table.c.DiagramID == diagram_id):
+            existing_ids.add(row.ConnectorID)
+            if row.ConnectorID in desired:
+                session.execute(
+                    update(link_table)
+                    .where(
+                        and_(
+                            link_table.c.DiagramID == diagram_id,
+                            link_table.c.ConnectorID == row.ConnectorID,
+                        )
+                    )
+                    .values(self._edge_values(desired[row.ConnectorID]))
+                )
+            elif row.ConnectorID in known_edge_ids:
+                logger.info(
+                    f"Removing connector {row.ConnectorID} from diagram {diagram.name}:"
+                    " membership no longer in model."
+                )
+                session.execute(
+                    link_table.delete().where(
+                        and_(
+                            link_table.c.DiagramID == diagram_id,
+                            link_table.c.ConnectorID == row.ConnectorID,
+                        )
+                    )
+                )
+
+        for connector_id, membership in desired.items():
+            if connector_id in existing_ids:
+                continue
+            values = self._edge_values(membership)
+            values.update({"DiagramID": diagram_id, "ConnectorID": connector_id})
+            logger.info(f"Adding connector {connector_id} to diagram {diagram.name}.")
+            session.execute(insert(link_table).values(values))
 
     def check_and_update_record(
         self,
@@ -1191,6 +1381,11 @@ class EARepoUpdater(ModelRenderer):
                     tag_strategy=tag_strategy,
                     recordtype=const.RECORDTYPE_DIAGRAM,
                 )
+
+                # Write diagram membership and geometry back to
+                # t_diagramobjects / t_diagramlinks.
+                logger.info("Updating diagram layout...")
+                self.update_diagram_layout(schema, target_session, target_metadata)
 
                 # Delete stale records if requested
                 if allow_delete:

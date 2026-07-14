@@ -73,13 +73,14 @@ classDiagram
 - **Registration**: `@ParserRegistry.register("eaxmi")`
 - **File**: `parsers/eaxmiparser.py`
 - **Function**: Enterprise Architect XMI with EA-specific extensions
-- **Features**: Processes diagrams, extended tags, EA metadata. Approximately 600 lines.
+- **Features**: Processes diagrams including geometry (node positions/sizes, z-order, edge waypoints, `Hidden` flag), extended tags and EA metadata. Also reads connector extensions for generalizations (name, documentation, stereotype) and `uml:DataType` extensions. The geometry conversions (y-flip for Path waypoints, splitting `Path=`/`Hidden=` out of the raw strings) live in `crunch_uml/ea_geometry.py`.
 
 ### QEA Parser
 
 - **Registration**: `@ParserRegistry.register("qea")`
 - **File**: `parsers/qeaparser.py`
 - **Function**: QEA database format (EA native)
+- **Features**: Besides packages/objects/attributes/connectors/tagged values, also reads the diagram tables (`t_diagram`, `t_diagramobjects`, `t_diagramlinks`) including geometry. RectTop/RectBottom are negative in the QEA database; the parser normalizes to the canonical coordinate system and normalizes Windows line endings in Notes to LF, so that qea and eaxmi imports yield identical data.
 
 ### JSON Parser
 

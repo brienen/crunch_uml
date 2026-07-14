@@ -4,6 +4,7 @@ import sqlalchemy as sa
 
 import crunch_uml.db as db
 import crunch_uml.schema as sch
+from crunch_uml import ea_geometry as geo
 from crunch_uml.parsers.parser import Parser, ParserRegistry, fixtag
 
 logger = logging.getLogger()
@@ -44,6 +45,15 @@ def synth_attr_eaid(attr_id) -> str:
     return f"EAID_attr_{attr_id}"
 
 
+def normalize_newlines(text):
+    """EA stores Windows line endings in Notes columns. The XMI export of the
+    same model yields plain \\n because the XML spec normalizes CR/LF in
+    attribute values; normalize here so both parsers produce identical data."""
+    if isinstance(text, str):
+        return text.replace("\r\n", "\n").replace("\r", "\n")
+    return text
+
+
 @ParserRegistry.register(
     "qea",
     descr="Parser for Enterprise Architect repository files (.qea/.qeax). These are SQLite databases.",
@@ -61,6 +71,7 @@ class QEAParser(Parser):
             self._phase3_attributes(conn, schema)
             self._phase4_connectors(conn, schema)
             self._phase5_tagged_values(conn, schema)
+            self._phase6_diagrams(conn, schema)
 
         logger.info(
             f"QEA import done: {schema.count_package()} packages, "
@@ -69,7 +80,8 @@ class QEAParser(Parser):
             f"{schema.count_enumeratie()} enumerations, "
             f"{schema.count_enumeratieliteral()} enumeration literals, "
             f"{schema.count_association()} associations, "
-            f"{schema.count_generalizations()} generalizations."
+            f"{schema.count_generalizations()} generalizations, "
+            f"{schema.count_diagrams()} diagrams."
         )
 
     def _phase1_packages(self, conn, schema: sch.Schema):
@@ -100,7 +112,7 @@ class QEAParser(Parser):
                 id=eapk_id,
                 name=name,
                 parent_package_id=parent_eapk,
-                definitie=notes,
+                definitie=normalize_newlines(notes),
                 version=version,
                 created=created,
                 modified=modified,
@@ -156,7 +168,7 @@ class QEAParser(Parser):
                     id=eaid,
                     name=name,
                     package_id=pkg_eapk,
-                    definitie=note,
+                    definitie=normalize_newlines(note),
                     stereotype=stereotype,
                     author=author,
                     version=version,
@@ -173,7 +185,7 @@ class QEAParser(Parser):
                     name=name,
                     package_id=pkg_eapk,
                     is_datatype=(obj_type == "DataType"),
-                    definitie=note,
+                    definitie=normalize_newlines(note),
                     stereotype=stereotype,
                     author=author,
                     version=version,
@@ -238,7 +250,7 @@ class QEAParser(Parser):
                     id=eaid,
                     name=name,
                     enumeratie_id=parent_eaid,
-                    definitie=notes,
+                    definitie=normalize_newlines(notes),
                     stereotype=stereotype,
                 )
                 logger.debug(f"EnumerationLiteral {name} met id {eaid}")
@@ -266,7 +278,7 @@ class QEAParser(Parser):
                     primitive=attr_type if not type_class_id and not enumeration_id else None,
                     type_class_id=type_class_id,
                     enumeration_id=enumeration_id,
-                    definitie=notes,
+                    definitie=normalize_newlines(notes),
                     stereotype=stereotype,
                 )
                 logger.debug(f"Attribute {name} met id {eaid}")
@@ -294,6 +306,12 @@ class QEAParser(Parser):
                 "ORDER BY Connector_ID"
             )
         ).fetchall()
+
+        # Imported connector ids, used by phase 6 to route diagram links to
+        # the right junction table (and skip links to connectors that were
+        # not imported, such as aggregations or connectors to unknown objects).
+        self._assoc_ids = set()
+        self._gen_ids = set()
 
         for row in rows:
             (
@@ -327,11 +345,12 @@ class QEAParser(Parser):
                     name=name or "",
                     superclass_id=dst_eaid,
                     subclass_id=src_eaid,
-                    definitie=notes,
+                    definitie=normalize_newlines(notes),
                     stereotype=stereotype,
                 )
                 logger.debug(f"Generalization {name} met id {eaid}")
                 schema.save(gen)
+                self._gen_ids.add(eaid)
             else:
                 # Association or Realisation
                 src_mult_start, src_mult_end = self._parse_cardinality(src_card)
@@ -346,11 +365,12 @@ class QEAParser(Parser):
                     src_mult_end=src_mult_end,
                     dst_mult_start=dst_mult_start,
                     dst_mult_end=dst_mult_end,
-                    definitie=notes,
+                    definitie=normalize_newlines(notes),
                     stereotype=stereotype,
                 )
                 logger.debug(f"Association {name} met id {eaid}")
                 schema.save(assoc)
+                self._assoc_ids.add(eaid)
 
         logger.info(
             f"Phase 4 done: {schema.count_association()} associations, "
@@ -402,7 +422,7 @@ class QEAParser(Parser):
             field = fixtag(prop)
             obj = classes_by_id.get(eaid) or enums_by_id.get(eaid)
             if obj is not None and hasattr(obj, field):
-                setattr(obj, field, value)
+                setattr(obj, field, normalize_newlines(value))
 
         # Attribute tagged values.
         attr_rows = conn.execute(
@@ -423,7 +443,7 @@ class QEAParser(Parser):
             field = fixtag(prop)
             attr = attrs_by_id.get(eaid)
             if attr is not None and hasattr(attr, field):
-                setattr(attr, field, value)
+                setattr(attr, field, normalize_newlines(value))
 
         # Connector tagged values (associations / realisations).
         conn_rows = conn.execute(
@@ -443,12 +463,155 @@ class QEAParser(Parser):
             field = fixtag(prop)
             assoc = assocs_by_id.get(eaid)
             if assoc is not None and hasattr(assoc, field):
-                setattr(assoc, field, value)
+                setattr(assoc, field, normalize_newlines(value))
 
         # One batched write for all in-memory mutations of this phase.
         schema.database.session.flush()
 
         logger.info("Phase 5 done: tagged values applied")
+
+    def _phase6_diagrams(self, conn, schema: sch.Schema):
+        """Parse t_diagram, t_diagramobjects and t_diagramlinks into Diagram
+        objects with membership and geometry.
+
+        Geometry conversions follow :mod:`crunch_uml.ea_geometry`: RectTop and
+        RectBottom are negative in the QEA database, the Path column uses ';'
+        between x:y pairs with negative y, and Hidden/Path live in separate
+        columns (unlike the XMI export, where they are folded into the style
+        and geometry strings).
+        """
+        logger.info("Phase 6: parsing diagrams")
+
+        rows = conn.execute(
+            sa.text(
+                "SELECT Diagram_ID, ea_guid, Name, Package_ID, Author, Version, "
+                "CreatedDate, ModifiedDate, Notes FROM t_diagram ORDER BY Diagram_ID"
+            )
+        ).fetchall()
+
+        diagrams_by_local_id = {}
+        for row in rows:
+            diagram_id, ea_guid, name, package_id, author, version, created, modified, notes = row
+            eaid = guid_to_eaid(ea_guid)
+            pkg_eapk = self._pkg_id_map.get(package_id)
+            if eaid is None or pkg_eapk is None:
+                logger.debug(f"Diagram {diagram_id} ({name}) has no ea_guid or unknown package: skipped")
+                continue
+            diagram = db.Diagram(
+                id=eaid,
+                name=name,
+                package_id=pkg_eapk,
+                author=author,
+                version=version,
+                created=created,
+                modified=modified,
+                definitie=normalize_newlines(notes),
+            )
+            logger.debug(f"Diagram {name} met id {eaid}")
+            schema.add(diagram)
+            diagrams_by_local_id[diagram_id] = diagram
+
+        # Diagram objects (nodes): route to the class or enumeration junction
+        # table based on the object type; other types (Notes, Packages, ...)
+        # are not part of the model and are skipped.
+        object_rows = conn.execute(
+            sa.text(
+                "SELECT d.Diagram_ID, o.Object_Type, o.ea_guid, d.RectLeft, d.RectTop, "
+                "d.RectRight, d.RectBottom, d.Sequence, d.ObjectStyle "
+                "FROM t_diagramobjects d "
+                "JOIN t_object o ON o.Object_ID = d.Object_ID "
+                "ORDER BY d.Diagram_ID, d.Sequence"
+            )
+        ).fetchall()
+
+        seen_nodes = set()
+        for row in object_rows:
+            diagram_id, obj_type, ea_guid, rect_left, rect_top, rect_right, rect_bottom, sequence, style = row
+            node_diagram = diagrams_by_local_id.get(diagram_id)
+            element_id = guid_to_eaid(ea_guid)
+            if node_diagram is None or element_id is None:
+                continue
+            if obj_type not in ("Class", "DataType", "Enumeration"):
+                logger.debug(f"Diagram object of type {obj_type} on diagram {node_diagram.name}: skipped")
+                continue
+            if (diagram_id, element_id) in seen_nodes:
+                # Same element twice on one diagram: composite PK cannot hold
+                # both. Known limitation: the first instance wins.
+                logger.warning(
+                    f"Element {element_id} appears more than once on diagram {node_diagram.name}: keeping the"
+                    " first occurrence only."
+                )
+                continue
+            seen_nodes.add((diagram_id, element_id))
+
+            node_geometry = geo.parse_qea_rect(rect_left, rect_top, rect_right, rect_bottom) or {}
+            membership_kwargs = dict(
+                diagram_id=node_diagram.id,
+                schema_id=schema.schema_id,
+                z_order=sequence,
+                ea_style=style,
+                **node_geometry,
+            )
+            if obj_type == "Enumeration":
+                node_diagram.diagram_enumerations.append(
+                    db.DiagramEnumeration(enumeration_id=element_id, **membership_kwargs)
+                )
+            else:
+                node_diagram.diagram_classes.append(db.DiagramClass(class_id=element_id, **membership_kwargs))
+
+        # Diagram links (edges): only connectors that were imported in phase 4
+        # get membership; others (NoteLinks, aggregations, connectors with
+        # unknown endpoints) are skipped.
+        link_rows = conn.execute(
+            sa.text(
+                "SELECT l.DiagramID, c.ea_guid, l.Geometry, l.Style, l.Hidden, l.Path "
+                "FROM t_diagramlinks l "
+                "JOIN t_connector c ON c.Connector_ID = l.ConnectorID "
+                "ORDER BY l.DiagramID, l.Instance_ID"
+            )
+        ).fetchall()
+
+        seen_edges = set()
+        for row in link_rows:
+            diagram_id, ea_guid, geometry, style, hidden, path = row
+            edge_diagram = diagrams_by_local_id.get(diagram_id)
+            element_id = guid_to_eaid(ea_guid)
+            if edge_diagram is None or element_id is None:
+                continue
+            edge_is_assoc = element_id in self._assoc_ids
+            if not edge_is_assoc and element_id not in self._gen_ids:
+                logger.debug(
+                    f"Diagram link to connector {element_id} on diagram {edge_diagram.name}: not in model, skipped"
+                )
+                continue
+            if (diagram_id, element_id) in seen_edges:
+                logger.warning(
+                    f"Connector {element_id} appears more than once on diagram {edge_diagram.name}: keeping the"
+                    " first occurrence only."
+                )
+                continue
+            seen_edges.add((diagram_id, element_id))
+
+            waypoints = geo.parse_path(path, geo.QEA_PATH_SEPARATOR)
+            membership_kwargs = dict(
+                diagram_id=edge_diagram.id,
+                schema_id=schema.schema_id,
+                waypoints=geo.waypoints_to_json(waypoints),
+                hidden=bool(hidden),
+                ea_geometry=geometry,
+                ea_style=style,
+            )
+            if edge_is_assoc:
+                edge_diagram.diagram_associations.append(
+                    db.DiagramAssociation(association_id=element_id, **membership_kwargs)
+                )
+            else:
+                edge_diagram.diagram_generalizations.append(
+                    db.DiagramGeneralization(generalization_id=element_id, **membership_kwargs)
+                )
+
+        schema.database.session.flush()
+        logger.info(f"Phase 6 done: {schema.count_diagrams()} diagrams")
 
     @staticmethod
     def _parse_cardinality(card: str):

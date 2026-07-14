@@ -116,6 +116,28 @@ erDiagram
         string name
         string package_id FK
     }
+
+    DiagramClass {
+        string diagram_id PK
+        string schema_id PK
+        string class_id PK
+        float x
+        float y
+        float width
+        float height
+        int z_order
+        text ea_style
+    }
+
+    DiagramAssociation {
+        string diagram_id PK
+        string schema_id PK
+        string association_id PK
+        text waypoints
+        boolean hidden
+        text ea_geometry
+        text ea_style
+    }
 ```
 
 ## Modeldetail
@@ -176,6 +198,63 @@ Enumeratietype met benoemde waarden. EnumerationLiteral bevat de individuele waa
 ### Diagram
 
 Visueel diagram dat via junction tables verwijst naar classes, enumeraties, associaties en generalisaties.
+
+#### Diagram-geometrie
+
+De vier junction tables bevatten naast de membership ook de layout van elementen op het diagram. Alle geometriekolommen zijn **nullable**: membership zonder bekende layout blijft geldig, en bestanden of databases van vóór deze kolommen blijven importeerbaar.
+
+**Node-achtig** (`DiagramClass`, `DiagramEnumeration`):
+
+| Kolom | Type | Betekenis |
+|---|---|---|
+| `x` | Float | linkerkant, canonieke coördinaten |
+| `y` | Float | bovenkant, canonieke coördinaten |
+| `width` | Float | breedte |
+| `height` | Float | hoogte |
+| `z_order` | Integer | stapelvolgorde (EA `seqno`/`Sequence`) |
+| `ea_style` | Text | ruwe EA style-string, lossless bewaard voor round-trip |
+
+**Edge-achtig** (`DiagramAssociation`, `DiagramGeneralization`):
+
+| Kolom | Type | Betekenis |
+|---|---|---|
+| `waypoints` | Text (JSON) | `[{"x": .., "y": ..}, ...]` in canonieke coördinaten; lege lijst of NULL = geen tussenpunten |
+| `hidden` | Boolean | EA `Hidden`-vlag |
+| `ea_geometry` | Text | ruwe EA geometry-string (SX/SY/EX/EY/EDGE/labelposities/Path) — lossless |
+| `ea_style` | Text | ruwe EA style-string — lossless |
+
+**Canoniek coördinatenstelsel**: oorsprong linksboven, x naar rechts, y naar beneden, alle waarden positief. Alle conversies van en naar EA-conventies gebeuren in de parsers en renderers; de database bevat uitsluitend canonieke waarden. De EA-conventies (geverifieerd tegen echte bestanden):
+
+- XMI-extension node-geometrie (`Left=..;Top=..;Right=..;Bottom=..;`) heeft **positieve** Top/Bottom: `x=Left`, `y=Top`, `width=Right-Left`, `height=Bottom-Top`.
+- `t_diagramobjects` in een `.qea`-repository heeft **negatieve** RectTop/RectBottom: `x=RectLeft`, `y=-RectTop`, `width=RectRight-RectLeft`, `height=RectTop-RectBottom`.
+- `Path=`-waypoints hebben in **beide** bronnen negatieve y; canonieke waypoints flippen het teken. XMI scheidt x:y-paren met `$`, de qea-kolom `Path` met `;`.
+
+#### Datamodelversie en migratie
+
+Elke crunch_uml-database bevat een versienummer van het datamodel in de tabel `crunch_uml_meta` (sleutel `datamodel_version`). Bij het verbinden gebeurt het volgende:
+
+- **Zelfde versie** (of een database van vóór dit mechanisme): ontbrekende tabellen en nullable kolommen worden **additief** toegevoegd; bestaande data blijft staan.
+- **Andere versie**: de database is niet compatibel en wordt **opnieuw aangemaakt**. Alle data wordt weggegooid (met een duidelijke waarschuwing in de log); importeer de modellen opnieuw.
+
+Het versienummer (`DATAMODEL_VERSION` in `crunch_uml/db.py`) wordt alléén opgehoogd bij schemawijzigingen die de additieve migratie niet aankan (hernoemde of hertypeerde kolommen, gewijzigde primary keys of semantiek). De tabel `crunch_uml_meta` staat bewust buiten het ORM-model en verschijnt dus niet in json/xlsx/csv-exports.
+
+#### Dekkingsmatrix diagrammen
+
+Welke parsers en renderers diagram-membership en geometrie lezen of schrijven:
+
+| Component | Diagram-membership | Geometrie |
+|---|---|---|
+| `eaxmi` parser | leest | leest |
+| `qea` parser | leest | leest |
+| `xmi` parser (strict) | n.v.t. — strict XMI 2.1 bevat geen diagrammen | n.v.t. |
+| `xmi` renderer | schrijft | schrijft |
+| `json` parser/renderer | leest/schrijft | leest/schrijft |
+| `csv` parser/renderer | leest/schrijft (bestand per koppeltabel) | leest/schrijft |
+| `xlsx` parser/renderer | leest/schrijft (tabblad per koppeltabel) | leest/schrijft |
+| `i18n` parser/renderer | n.v.t. — koppeltabellen hebben geen `id`-kolom en bevatten niets vertaalbaars | n.v.t. |
+| `earepo`/`eamimrepo` renderer | schrijft (`t_diagramobjects`/`t_diagramlinks`: update, insert, delete) | schrijft |
+| `sqla` renderer | n.v.t. — genereert code voor het gemodelleerde domein, niet voor diagrammen | n.v.t. |
+| Semantische renderers (`jinja2`, `ggm_md`, `json_schema`, `plain_html`, `model_overview_md`, `er_diagram`, `openapi`, `ttl`, `rdf`, `json-ld`, `shex`, `profile`, `uml_mmd`, `model_stats_md`, `diff_md`) | n.v.t. — geometrie heeft geen betekenis in deze uitvoerformaten | n.v.t. |
 
 ## Mixin-structuur
 

@@ -153,8 +153,30 @@ class I18nRenderer(JSONRenderer):
     def get_record_type(self):
         return const.RECORD_TYPE_INDEXED
 
-    def translate_data(self, data, to_language, from_language="auto", update_i18n=True, original_i18n={}):
+    @staticmethod
+    def _index_existing_i18n(original_i18n, to_language) -> Dict[str, Dict[str, Dict[str, Any]]]:
+        """Index existing translations once: section -> key -> {field: value}.
+        This is the translation memory of the pipeline: whatever is already
+        in the i18n file is reused and never re-translated."""
+        existing_index: Dict[str, Dict[str, Dict[str, Any]]] = {}
+        for section, entries in original_i18n.get(to_language, {}).items():
+            sec_idx: Dict[str, Dict[str, Any]] = {}
+            for entry in entries:
+                if not isinstance(entry, dict):
+                    continue
+                for key, fields in entry.items():
+                    if isinstance(fields, dict):
+                        sec_idx[key] = fields
+            existing_index[section] = sec_idx
+        return existing_index
+
+    def translate_data(self, data, to_language, from_language="auto", update_i18n=True, original_i18n={}, schema=None):
         """Translate every string field of ``data`` into ``to_language``.
+
+        Backend selection via ``CRUNCH_UML_TRANSLATE_BACKEND``: the value
+        ``pipeline`` routes to the element-based translation pipeline (see
+        :mod:`crunch_uml.translation`); any other value keeps the original
+        string-based flow below.
 
         Two optimisations over the original per-string loop:
 
@@ -177,17 +199,11 @@ class I18nRenderer(JSONRenderer):
             f" {util.count_dict_elements(data)} entries..."
         )
 
-        # Index existing translations once: section -> key -> {field: value}.
-        existing_index: Dict[str, Dict[str, Dict[str, Any]]] = {}
-        for section, entries in original_i18n.get(to_language, {}).items():
-            sec_idx: Dict[str, Dict[str, Any]] = {}
-            for entry in entries:
-                if not isinstance(entry, dict):
-                    continue
-                for key, fields in entry.items():
-                    if isinstance(fields, dict):
-                        sec_idx[key] = fields
-            existing_index[section] = sec_idx
+        backend = os.environ.get("CRUNCH_UML_TRANSLATE_BACKEND", "translators").lower()
+        if backend == "pipeline":
+            return self._translate_data_pipeline(data, to_language, from_language, update_i18n, original_i18n, schema)
+
+        existing_index = self._index_existing_i18n(original_i18n, to_language)
 
         def _existing(section: str, key: str, field: str):
             if not update_i18n:
@@ -292,6 +308,85 @@ class I18nRenderer(JSONRenderer):
         logger.info(f"Finished translating data to language '{to_language}'.")
         return translated_data
 
+    def _translate_data_pipeline(self, data, to_language, from_language, update_i18n, original_i18n, schema):
+        """Element-based translation via the layered pipeline (backend
+        ``pipeline``, see :mod:`crunch_uml.translation`).
+
+        The i18n file is the translation memory: fields with an existing
+        translation per (section, GUID, field) are excluded up front, so an
+        element only reaches the pipeline with its actually missing fields.
+        Elements are enriched with model/package/class context from the
+        schema before translation.
+        """
+        from crunch_uml.translation.context import build_context_map
+        from crunch_uml.translation.llm import Element
+        from crunch_uml.translation.pipeline import TranslationPipeline
+        from crunch_uml.translation.preflight import run_preflight
+
+        # The pipeline needs a concrete source language (termbank lookup and
+        # prompts): 'auto' falls back to the model's default language.
+        from_lang = from_language if from_language and from_language != "auto" else const.DEFAULT_LANGUAGE
+        if from_lang != from_language:
+            logger.info(f"Brontaal 'auto' wordt door de pijplijn niet ondersteund; brontaal '{from_lang}' aangenomen.")
+
+        existing_index = self._index_existing_i18n(original_i18n, to_language) if update_i18n else {}
+
+        def _existing(section: str, key: str, field: str):
+            return existing_index.get(section, {}).get(key, {}).get(field)
+
+        context_map = build_context_map(schema) if schema is not None else {}
+
+        elements = []
+        for section, entries in data.items():
+            for entry in entries:
+                for key, record in entry.items():
+                    pending = {
+                        field: value
+                        for field, value in record.items()
+                        if isinstance(value, str)
+                        and not util.is_empty_or_none(value)
+                        and _existing(section, key, field) is None
+                    }
+                    if pending:
+                        elements.append(
+                            Element(
+                                section=section, key=key, fields=pending, context=context_map.get((section, key), {})
+                            )
+                        )
+
+        results: Dict[Any, Dict[str, str]] = {}
+        if elements:
+            logger.info(f"Vertaalpijplijn: {len(elements)} elementen met ontbrekende vertalingen...")
+            # Alleen de taal-paren van deze run laden: dat houdt grote
+            # termbanken (volledige IATE-export) geheugen-begrensd.
+            pipeline = TranslationPipeline(run_preflight(languages={from_lang, to_language}))
+            results = pipeline.translate_elements(elements, to_language, from_lang)
+
+        # Rebuild the output structure, preserving the exact shape and
+        # ordering of the string-based flow.
+        translated_data: Dict[str, List[Dict[str, Any]]] = {}
+        for section, entries in data.items():
+            out_entries: List[Dict[str, Any]] = []
+            for entry in entries:
+                translated_record: Dict[str, Any] = {}
+                last_key = None
+                for key, record in entry.items():
+                    last_key = key
+                    for field, value in record.items():
+                        if not isinstance(value, str) or util.is_empty_or_none(value):
+                            continue
+                        pre = _existing(section, key, field)
+                        if pre is not None:
+                            translated_record[field] = pre
+                        else:
+                            translated_record[field] = results.get((section, key), {}).get(field, value)
+                if last_key is not None:
+                    out_entries.append({last_key: translated_record})
+            translated_data[section] = out_entries
+
+        logger.info(f"Finished translating data to language '{to_language}'.")
+        return translated_data
+
     def render(self, args, schema: sch.Schema):
 
         logger.info(f"Starting rendering i18n file {args.outputfile}...")
@@ -313,7 +408,12 @@ class I18nRenderer(JSONRenderer):
         all_data = self.get_all_data(args, schema, empty_values=False)
         if args.translate:
             all_data = self.translate_data(
-                all_data, args.language, from_language=args.from_language, update_i18n=True, original_i18n=i18n_data
+                all_data,
+                args.language,
+                from_language=args.from_language,
+                update_i18n=getattr(args, "update_i18n", True),
+                original_i18n=i18n_data,
+                schema=schema,
             )
 
         # Update the i18n data with the new language entry

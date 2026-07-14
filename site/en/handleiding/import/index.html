@@ -859,6 +859,8 @@
       
         
       
+        
+      
     
     
       
@@ -1225,6 +1227,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../technisch/vertaalpijplijn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertaalpijplijn — technisch ontwerp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../technisch/kwetsbaarheden/" class="md-nav__link">
         
   
@@ -1324,17 +1347,17 @@
 <tr>
 <td>XMI</td>
 <td><code>xmi</code></td>
-<td>Standard XMI 2.1 — without tool-specific extensions</td>
+<td>Standard XMI 2.1 — without tool-specific extensions and without diagrams</td>
 </tr>
 <tr>
 <td>Enterprise Architect XMI</td>
 <td><code>eaxmi</code></td>
-<td>XMI with EA-specific extensions (diagrams, tags, metadata)</td>
+<td>XMI with EA-specific extensions (diagrams including layout, tags, metadata)</td>
 </tr>
 <tr>
 <td>QEA</td>
 <td><code>qea</code></td>
-<td>Enterprise Architect native repository file (.qea/.qeax)</td>
+<td>Enterprise Architect native repository file (.qea/.qeax), including diagrams with layout</td>
 </tr>
 <tr>
 <td>JSON</td>
@@ -1361,6 +1384,10 @@
 <div class="admonition tip">
 <p class="admonition-title">Which type to choose?</p>
 <p>Working with Enterprise Architect? Use <code>eaxmi</code> — this also processes diagrams and EA-specific metadata. Use <code>xmi</code> only for XMI files from other tools.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Diagrams with geometry</p>
+<p>The <code>eaxmi</code> and <code>qea</code> parsers read diagrams in full: which elements appear on a diagram <strong>and</strong> their layout (positions, sizes, stacking order and the routing of relationship lines). The geometry is stored in a canonical coordinate system; see the <a href="../../technisch/datamodel/">data model</a> for the details and the coverage matrix.</p>
 </div>
 <h2 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h2>
 <table>
@@ -1419,7 +1446,7 @@
 <h3 id="import-excel">Import Excel<a class="headerlink" href="#import-excel" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>crunch_uml<span class="w"> </span>import<span class="w"> </span>-f<span class="w"> </span>specification.xlsx<span class="w"> </span>-t<span class="w"> </span>xlsx<span class="w"> </span>-db_create
 </code></pre></div>
-<p>The Excel file must contain worksheets with names that match the tables in the data model: <code>packages</code>, <code>classes</code>, <code>attributes</code>, <code>enumerations</code>, <code>enumerationliterals</code>, <code>associations</code>, <code>generalizations</code>.</p>
+<p>The Excel file must contain worksheets with names that match the tables in the data model: <code>packages</code>, <code>classes</code>, <code>attributes</code>, <code>enumerations</code>, <code>enumerationliterals</code>, <code>associations</code>, <code>generalizations</code>, <code>diagrams</code> and the diagram junction tables (<code>diagram_class</code>, <code>diagram_enumeration</code>, <code>diagram_association</code>, <code>diagram_generalization</code>) with membership and layout.</p>
 <h3 id="import-into-a-specific-schema">Import into a specific schema<a class="headerlink" href="#import-into-a-specific-schema" title="Permanent link">&para;</a></h3>
 <p>By default all data is loaded into the <code>default</code> schema. With <code>-sch</code> you can choose a different schema:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Import version 1.0 into schema &quot;v1&quot;</span>

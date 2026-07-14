@@ -839,6 +839,8 @@
       
         
       
+        
+      
     
     
       
@@ -1205,6 +1207,27 @@
   
   
     <li class="md-nav__item">
+      <a href="technisch/vertaalpijplijn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertaalpijplijn — technisch ontwerp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="technisch/kwetsbaarheden/" class="md-nav__link">
         
   
@@ -1358,6 +1381,7 @@
     CU["crunch_uml&lt;br/&gt;━━━━━━━━━━━━&lt;br/&gt;Normaliseer&lt;br/&gt;Transformeer&lt;br/&gt;Valideer"]
 
     subgraph Uitvoer
+        EAXMI2["EA XMI"]
         JSON2["JSON"]
         MD["Markdown"]
         RDF["RDF / TTL / JSON-LD"]
@@ -1369,14 +1393,15 @@
     end
 
     XMI &amp; EAXMI &amp; QEA &amp; JSON &amp; XLSX &amp; CSV --&gt; CU
-    CU --&gt; JSON2 &amp; MD &amp; RDF &amp; JSCHEMA &amp; XLS2 &amp; SQLA &amp; EA &amp; DIFF
+    CU --&gt; EAXMI2 &amp; JSON2 &amp; MD &amp; RDF &amp; JSCHEMA &amp; XLS2 &amp; SQLA &amp; EA &amp; DIFF
     CU --- DB[("crunch_uml.db&lt;br/&gt;SQLite / PostgreSQL")]
 
     style CU fill:#1a5276,color:#fff,stroke:#1a5276
     style DB fill:#e74c3c,color:#fff,stroke:#c0392b</code></pre>
-<p>De kern van crunch_uml is een <strong>gestandaardiseerd metaschema</strong>: ongeacht het invoerformaat worden alle UML-entiteiten (packages, classes, attributen, associaties, generalisaties, enumeraties) opgeslagen in dezelfde database. Vanuit die database kun je vervolgens exporteren naar elk gewenst formaat.</p>
+<p>De kern van crunch_uml is een <strong>gestandaardiseerd metaschema</strong>: ongeacht het invoerformaat worden alle UML-entiteiten (packages, classes, attributen, associaties, generalisaties, enumeraties én diagrammen) opgeslagen in dezelfde database. Vanuit die database kun je vervolgens exporteren naar elk gewenst formaat.</p>
 <h2 id="wat-maakt-crunch_uml-bijzonder">Wat maakt crunch_uml bijzonder?<a class="headerlink" href="#wat-maakt-crunch_uml-bijzonder" title="Permanent link">&para;</a></h2>
 <p><strong>Multi-schema ondersteuning</strong> — Je kunt hetzelfde model meerdere keren inlezen in verschillende schema's binnen dezelfde database. Hierdoor kun je bijvoorbeeld versie 1.0 en versie 2.0 van een model naast elkaar zetten en automatisch een diff-rapport genereren. Of je kunt een vertaald model naast het origineel bewaren.</p>
+<p><strong>Diagrammen met layout</strong> — Diagrammen worden volledig meegenomen: niet alleen wélke elementen op een diagram staan, maar ook hun posities, afmetingen en het verloop van relatielijnen. De <code>xmi</code>-export levert EA-compatibele XMI op waarin de diagrammen er in Sparx EA weer exact zo uitzien, en de <code>earepo</code>-export werkt de layout direct in een EA-repository bij.</p>
 <p><strong>Plugin-architectuur</strong> — Nieuwe invoerformaten, uitvoerformaten en transformaties kunnen worden toegevoegd zonder de kerncode aan te passen, via een registry-based plugin systeem.</p>
 <p><strong>Pipeline-aanpak</strong> — Import, transformatie en export zijn onafhankelijke stappen die je naar wens kunt combineren tot geautomatiseerde workflows.</p>
 <h2 id="snel-starten">Snel starten<a class="headerlink" href="#snel-starten" title="Permanent link">&para;</a></h2>

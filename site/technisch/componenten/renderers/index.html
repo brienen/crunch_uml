@@ -722,6 +722,8 @@
       
         
       
+        
+      
     
     
       
@@ -1088,6 +1090,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#xmi-renderer" class="md-nav__link">
+    <span class="md-ellipsis">
+      XMI Renderer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#tabulaire-renderers" class="md-nav__link">
     <span class="md-ellipsis">
       Tabulaire Renderers
@@ -1276,6 +1287,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../vertaalpijplijn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertaalpijplijn — technisch ontwerp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../kwetsbaarheden/" class="md-nav__link">
         
   
@@ -1415,6 +1447,12 @@
 </thead>
 <tbody>
 <tr>
+<td>XMIRenderer</td>
+<td><code>xmi</code></td>
+<td><code>xmirenderer.py</code></td>
+<td>XMI 2.1 + EA-extensie, incl. diagrammen met geometrie</td>
+</tr>
+<tr>
 <td>JSONRenderer</td>
 <td><code>json</code></td>
 <td><code>pandasrenderer.py</code></td>
@@ -1494,6 +1532,14 @@
 </tr>
 </tbody>
 </table>
+<hr />
+<h2 id="xmi-renderer">XMI Renderer<a class="headerlink" href="#xmi-renderer" title="Permanent link">&para;</a></h2>
+<p>De <code>xmi</code>-renderer (<code>renderers/xmirenderer.py</code>) schrijft het complete schema als <strong>XMI 2.1 met Enterprise Architect-extensiesectie</strong> — het spiegelbeeld van wat de <code>eaxmi</code>-parser leest:</p>
+<ul>
+<li><strong>Strikte deel</strong>: <code>uml:Model</code> met packages, classes (incl. attributen), enumeraties (incl. literals), associaties (incl. ends/kardinaliteiten/rollen) en generalisaties, met de bestaande ids als <code>xmi:id</code>.</li>
+<li><strong>Extensiedeel</strong>: documentatie, projectmetadata, tagged values, connector-rollen en per diagram een <code>&lt;diagram&gt;</code>-element met de geometrie in EA-formaat (de exacte omkering van de parserconversies, inclusief de y-flip voor edge-waypoints).</li>
+</ul>
+<p>De uitvoer is opnieuw importeerbaar via de eigen <code>eaxmi</code>-parser (verliesvrije round-trip, afgedekt door acceptatietests op vier fixtures) en importeerbaar in Sparx EA. Waar de XMI-spec en EA botsen wint EA; elke afwijking is gedocumenteerd in <a href="https://github.com/brienen/crunch_uml/blob/main/crunch_uml/renderers/EA_QUIRKS.md"><code>crunch_uml/renderers/EA_QUIRKS.md</code></a>.</p>
 <hr />
 <h2 id="tabulaire-renderers">Tabulaire Renderers<a class="headerlink" href="#tabulaire-renderers" title="Permanent link">&para;</a></h2>
 <p><strong>JSON, CSV, XLSX</strong> — Pandas-gebaseerde export met ondersteuning voor:</p>
@@ -1641,6 +1687,7 @@ externe API vangt elke fout op.</p>
 </ul>
 <p>Tag-strategieën: <code>update</code> | <code>upsert</code> | <code>replace</code></p>
 </div>
+<p>Naast de modelelementen wordt ook de <strong>diagramlayout</strong> teruggeschreven naar <code>t_diagramobjects</code> en <code>t_diagramlinks</code>: bestaande rijen worden bijgewerkt, nieuwe membership ingevoegd en vervallen membership verwijderd, met dezelfde coördinaatconversies als de qea-parser (omgekeerd). Rijen van elementtypen die crunch_uml niet beheert (Notes, packages) en van elementen die het schema niet kent blijven onaangeroerd — een partiële export sloopt geen layout waar hij niets van weet.</p>
 <hr />
 <h2 id="schema-diff-renderer">Schema Diff Renderer<a class="headerlink" href="#schema-diff-renderer" title="Permanent link">&para;</a></h2>
 <p>Vergelijkt twee schema's via <code>--compare_schema_name</code> en genereert een markdown diff-rapport.</p>

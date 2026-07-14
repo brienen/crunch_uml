@@ -795,6 +795,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#watching-progress-in-the-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      Watching progress in the log
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#performance-what-to-expect" class="md-nav__link">
     <span class="md-ellipsis">
       Performance — what to expect
@@ -880,6 +889,8 @@
       
         
           
+        
+      
         
       
         
@@ -1244,6 +1255,27 @@
   
   <span class="md-ellipsis">
     Data Model
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../technisch/vertaalpijplijn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertaalpijplijn — technisch ontwerp
   </span>
   
 
@@ -1626,6 +1658,20 @@ on both backends.</p>
 <a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="c1"># changed fields.</span>
 <a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>crunch_uml<span class="w"> </span>…<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>i18n<span class="w"> </span>-f<span class="w"> </span>mine.i18n.json<span class="w"> </span>--language<span class="w"> </span>en<span class="w"> </span>--translate<span class="w"> </span>True<span class="w"> </span>--update_i18n<span class="w"> </span>True
 </code></pre></div>
+<h2 id="watching-progress-in-the-log">Watching progress in the log<a class="headerlink" href="#watching-progress-in-the-log" title="Permanent link">&para;</a></h2>
+<p>While translating, the renderer logs <strong>every completed translation</strong> at
+<code>INFO</code> level so a long batch (especially on the Ollama backend) is
+observable in real time:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>[ 1/58] bouwjaarTot → buildYearTo
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>[ 2/58] Bouwstijl → BuildingStyle
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>[ 3/58] Het bouwen van een bouwwerk. → The construction of a building.
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>[ 4/58] OorspronkelijkeFunctie → OriginalFunction
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>...
+</code></pre></div>
+<p>The order is completion order, not start order — with parallel workers
+the lines arrive interleaved. The <code>[n/total]</code> counter always reflects the
+number of <em>completed</em> translations. Run with <code>-v</code> or have logging at
+<code>INFO</code> (default in <code>crunch_uml</code>) to see this.</p>
 <h2 id="performance-what-to-expect">Performance — what to expect<a class="headerlink" href="#performance-what-to-expect" title="Permanent link">&para;</a></h2>
 <p>On a Mac M4 with <code>mistral-small3.1:24b</code>:</p>
 <ul>

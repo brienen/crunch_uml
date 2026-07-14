@@ -76,12 +76,23 @@ Alle modellen erven van `UML_Generic` en optioneel `UMLBase` en `UMLTags*` mixin
 
 ### Junction Tables
 
-| Tabel | Koppelt |
-|---|---|
-| `diagram_classes` | Diagram ↔ Class |
-| `diagram_enumerations` | Diagram ↔ Enumeratie |
-| `diagram_associations` | Diagram ↔ Association |
-| `diagram_generalizations` | Diagram ↔ Generalization |
+De diagram-koppeltabellen dragen naast de membership ook de **layout** van elementen op een diagram (nullable geometriekolommen, canoniek coördinatenstelsel — zie [Datamodel](../datamodel.md)):
+
+| Tabel | Koppelt | Geometrie |
+|---|---|---|
+| `diagram_class` | Diagram ↔ Class | x, y, width, height, z_order, ea_style |
+| `diagram_enumeration` | Diagram ↔ Enumeratie | x, y, width, height, z_order, ea_style |
+| `diagram_association` | Diagram ↔ Association | waypoints (JSON), hidden, ea_geometry, ea_style |
+| `diagram_generalization` | Diagram ↔ Generalization | waypoints (JSON), hidden, ea_geometry, ea_style |
+
+## Datamodelversie en migratie
+
+Elke database bevat een versiemarkering in de tabel `crunch_uml_meta` (bewust buiten `Base.metadata`, zodat hij nooit in exports opduikt). Bij het verbinden:
+
+- **Zelfde versie** of een database van vóór dit mechanisme: ontbrekende tabellen en nullable kolommen worden **additief** toegevoegd (`Database._add_missing_tables_and_columns`); data blijft staan.
+- **Andere versie**: de database is incompatibel en wordt met een duidelijke waarschuwing **opnieuw aangemaakt**; modellen moeten opnieuw geïmporteerd worden.
+
+`DATAMODEL_VERSION` (in `db.py`) wordt alléén opgehoogd bij wijzigingen die de additieve migratie niet aankan (hernoemde/hertypeerde kolommen, gewijzigde primary keys of semantiek).
 
 ## Mixins
 

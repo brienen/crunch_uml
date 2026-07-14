@@ -859,6 +859,8 @@
       
         
       
+        
+      
     
     
       
@@ -1225,6 +1227,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../technisch/vertaalpijplijn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertaalpijplijn — technisch ontwerp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../technisch/kwetsbaarheden/" class="md-nav__link">
         
   
@@ -1324,17 +1347,17 @@
 <tr>
 <td>XMI</td>
 <td><code>xmi</code></td>
-<td>Standaard XMI 2.1 — zonder tool-specifieke extensies</td>
+<td>Standaard XMI 2.1 — zonder tool-specifieke extensies en zonder diagrammen</td>
 </tr>
 <tr>
 <td>Enterprise Architect XMI</td>
 <td><code>eaxmi</code></td>
-<td>XMI met EA-specifieke extensies (diagrammen, tags, metadata)</td>
+<td>XMI met EA-specifieke extensies (diagrammen inclusief layout, tags, metadata)</td>
 </tr>
 <tr>
 <td>QEA</td>
 <td><code>qea</code></td>
-<td>Enterprise Architect native repository-bestand (.qea/.qeax)</td>
+<td>Enterprise Architect native repository-bestand (.qea/.qeax), inclusief diagrammen met layout</td>
 </tr>
 <tr>
 <td>JSON</td>
@@ -1361,6 +1384,10 @@
 <div class="admonition tip">
 <p class="admonition-title">Welk type kiezen?</p>
 <p>Werk je met Enterprise Architect? Gebruik dan <code>eaxmi</code> — dit verwerkt ook diagrammen en EA-specifieke metadata. Gebruik <code>xmi</code> alleen voor XMI-bestanden uit andere tools.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Diagrammen met geometrie</p>
+<p>De <code>eaxmi</code>- en <code>qea</code>-parsers lezen diagrammen volledig in: welke elementen op een diagram staan <strong>én</strong> hun layout (posities, afmetingen, stapelvolgorde en het verloop van relatielijnen). De geometrie wordt opgeslagen in een canoniek coördinatenstelsel; zie het <a href="../../technisch/datamodel/">datamodel</a> voor de details en de dekkingsmatrix.</p>
 </div>
 <h2 id="opties">Opties<a class="headerlink" href="#opties" title="Permanent link">&para;</a></h2>
 <table>
@@ -1419,7 +1446,7 @@
 <h3 id="excel-importeren">Excel importeren<a class="headerlink" href="#excel-importeren" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>crunch_uml<span class="w"> </span>import<span class="w"> </span>-f<span class="w"> </span>specificatie.xlsx<span class="w"> </span>-t<span class="w"> </span>xlsx<span class="w"> </span>-db_create
 </code></pre></div>
-<p>Het Excel-bestand moet worksheets bevatten met namen die overeenkomen met de tabellen in het datamodel: <code>packages</code>, <code>classes</code>, <code>attributes</code>, <code>enumerations</code>, <code>enumerationliterals</code>, <code>associations</code>, <code>generalizations</code>.</p>
+<p>Het Excel-bestand moet worksheets bevatten met namen die overeenkomen met de tabellen in het datamodel: <code>packages</code>, <code>classes</code>, <code>attributes</code>, <code>enumerations</code>, <code>enumerationliterals</code>, <code>associations</code>, <code>generalizations</code>, <code>diagrams</code> en de diagram-koppeltabellen (<code>diagram_class</code>, <code>diagram_enumeration</code>, <code>diagram_association</code>, <code>diagram_generalization</code>) met membership en layout.</p>
 <h3 id="import-in-een-specifiek-schema">Import in een specifiek schema<a class="headerlink" href="#import-in-een-specifiek-schema" title="Permanent link">&para;</a></h3>
 <p>Standaard worden alle data in het <code>default</code>-schema geladen. Met <code>-sch</code> kun je een ander schema kiezen:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Versie 1.0 importeren in schema &quot;v1&quot;</span>

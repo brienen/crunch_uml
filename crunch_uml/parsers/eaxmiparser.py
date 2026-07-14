@@ -2,6 +2,7 @@ import logging
 
 import crunch_uml.db as db
 import crunch_uml.schema as sch
+from crunch_uml import ea_geometry as geo
 from crunch_uml.parsers.parser import ParserRegistry, copy_values, fixtag
 from crunch_uml.parsers.xmiparser import XMIParser
 
@@ -50,7 +51,7 @@ class EAXMIParser(XMIParser):
         # flush) with O(1) dict lookups + one terminal flush.
         packages_by_id = {p.id: p for p in schema.get_all_packages()}
         classes_by_id = {c.id: c for c in schema.get_all_classes()}
-        # datatypes_by_id = {c.id: c for c in schema.get_all_datatypes()}
+        datatypes_by_id = {c.id: c for c in schema.get_all_datatypes()}
         enums_by_id = {e.id: e for e in schema.get_all_enumerations()}
         literals_by_id = {lit.id: lit for lit in schema.get_all_literals()}
         attrs_by_id = {a.id: a for a in schema.get_all_attributes()}
@@ -119,10 +120,13 @@ class EAXMIParser(XMIParser):
         """
 
         logger.info("Processing references to classes")
-        clazzrefs = extension.xpath(".//element[@xmi:type='uml:Class' and @xmi:idref]", namespaces=ns)  # type: ignore
+        clazzrefs = extension.xpath(
+            ".//element[(@xmi:type='uml:Class' or @xmi:type='uml:DataType') and @xmi:idref]",
+            namespaces=ns,
+        )  # type: ignore
         for clazzref in clazzrefs:
             idref = clazzref.get("{" + ns["xmi"] + "}idref")
-            clazz = classes_by_id.get(idref)
+            clazz = classes_by_id.get(idref) or datatypes_by_id.get(idref)
             if clazz is None:
                 continue
 
@@ -230,6 +234,28 @@ class EAXMIParser(XMIParser):
                 if hasattr(association, fixtag(tag.get("name"))):
                     setattr(association, fixtag(tag.get("name")), tag.get("value"))
 
+        logger.info("Processing references to generalizations")
+        genrefs = extension.xpath(".//connector[@xmi:idref and properties/@ea_type='Generalization']", namespaces=ns)  # type: ignore
+        for genref in genrefs:
+            idref = genref.get("{" + ns["xmi"] + "}idref")
+            generalization = gens_by_id.get(idref)
+            if generalization is None:
+                continue
+
+            # EA carries the connector name in the middle-top label.
+            labels = genref.xpath("./labels")
+            if labels and labels[0].get("mt"):
+                generalization.name = labels[0].get("mt")
+
+            documentation = genref.xpath("./documentation")
+            if len(documentation) == 1 and documentation[0].get("value") is not None:
+                generalization.definitie = documentation[0].get("value")
+
+            tags = get_sorted_tags(genref.xpath("./tags/tag"))
+            for tag in tags:
+                if hasattr(generalization, fixtag(tag.get("name"))):
+                    setattr(generalization, fixtag(tag.get("name")), tag.get("value"))
+
         """
         Voorbeeld van Diagram
 
@@ -257,7 +283,7 @@ class EAXMIParser(XMIParser):
                     </diagram>
         """
 
-        logger.info("Processing references to attributes")
+        logger.info("Processing references to diagrams")
         diagramrefs = extension.xpath(".//diagram[@xmi:id]", namespaces=ns)  # type: ignore
         for diagramref in diagramrefs:
             idref = diagramref.get("{" + ns["xmi"] + "}id")
@@ -280,25 +306,64 @@ class EAXMIParser(XMIParser):
             )
             schema.add(diagram)
 
+            seen_element_ids = set()
             for element in diagramref.xpath("./elements/element"):
                 element_id = element.get("subject")
                 logger.debug(f'Found element with id {element_id} in diagram {name}')
-                cls = classes_by_id.get(element_id)
-                if cls is not None:
-                    diagram.classes.append(cls)
+                if element_id in seen_element_ids:
+                    # EA (rarely) allows the same element twice on one
+                    # diagram; the composite primary key cannot. Known
+                    # limitation: the first instance wins.
+                    logger.warning(
+                        f"Element {element_id} appears more than once on diagram {name}: keeping the"
+                        " first occurrence only."
+                    )
                     continue
-                assoc = assocs_by_id.get(element_id)
-                if assoc is not None:
-                    diagram.associations.append(assoc)
+
+                node = classes_by_id.get(element_id) or datatypes_by_id.get(element_id) or enums_by_id.get(element_id)
+                if node is not None:
+                    seen_element_ids.add(element_id)
+                    node_geometry = geo.parse_xmi_node_geometry(element.get("geometry")) or {}
+                    seqno = element.get("seqno")
+                    membership_kwargs = dict(
+                        diagram_id=diagram.id,
+                        schema_id=schema.schema_id,
+                        z_order=int(seqno) if seqno is not None else None,
+                        ea_style=element.get("style"),
+                        **node_geometry,
+                    )
+                    if element_id in enums_by_id:
+                        diagram.diagram_enumerations.append(
+                            db.DiagramEnumeration(enumeration_id=element_id, **membership_kwargs)
+                        )
+                    else:
+                        diagram.diagram_classes.append(db.DiagramClass(class_id=element_id, **membership_kwargs))
                     continue
-                enum = enums_by_id.get(element_id)
-                if enum is not None:
-                    diagram.enumerations.append(enum)
+
+                edge_is_assoc = element_id in assocs_by_id
+                if edge_is_assoc or element_id in gens_by_id:
+                    seen_element_ids.add(element_id)
+                    base_geometry, path = geo.split_path_from_xmi_geometry(element.get("geometry"))
+                    waypoints = geo.parse_path(path, geo.XMI_PATH_SEPARATOR)
+                    base_style, hidden = geo.split_hidden_from_style(element.get("style"))
+                    membership_kwargs = dict(
+                        diagram_id=diagram.id,
+                        schema_id=schema.schema_id,
+                        waypoints=geo.waypoints_to_json(waypoints),
+                        hidden=hidden,
+                        ea_geometry=base_geometry,
+                        ea_style=base_style,
+                    )
+                    if edge_is_assoc:
+                        diagram.diagram_associations.append(
+                            db.DiagramAssociation(association_id=element_id, **membership_kwargs)
+                        )
+                    else:
+                        diagram.diagram_generalizations.append(
+                            db.DiagramGeneralization(generalization_id=element_id, **membership_kwargs)
+                        )
                     continue
-                gen = gens_by_id.get(element_id)
-                if gen is not None:
-                    diagram.generalizations.append(gen)
-                    continue
+
                 logger.debug(
                     f'Element {element_id} in diagram {name} is niet gevonden in de database. Kan een'
                     ' niet geimplemneteerde type zijn zoals: Note of Constraint, of kan een relatie zij naar een'

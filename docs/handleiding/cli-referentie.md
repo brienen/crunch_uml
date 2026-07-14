@@ -89,7 +89,9 @@ crunch_uml export [-h] -f FILE -t TYPE [-pi IDS] [-xpi IDS]
 
 De volgende tabellen worden herkend bij import en export:
 
-`packages`, `classes`, `attributes`, `enumerations`, `enumerationliterals`, `associations`, `generalizations`
+`packages`, `classes`, `attributes`, `enumerations`, `enumerationliterals`, `associations`, `generalizations`, `diagrams`, `diagram_class`, `diagram_enumeration`, `diagram_association`, `diagram_generalization`
+
+De vier `diagram_*`-koppeltabellen bevatten de diagram-membership én de layout (posities, afmetingen, waypoints); zie het [datamodel](../technisch/datamodel.md).
 
 ## Database backends
 

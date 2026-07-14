@@ -46,6 +46,13 @@ gantt
 
 ---
 
+## Recently Delivered (v0.5.0)
+
+- [x] **Full diagram support** — membership *and* geometry (positions, sizes, z-order, waypoints) end-to-end: the `eaxmi`/`qea` parsers read layout, the new `xmi` renderer writes EA-compatible XMI with a lossless round-trip, `earepo` updates the layout in the EA repository, and json/xlsx/csv round-trip the junction tables. See the coverage matrix in the [data model](datamodel.md).
+- [x] **Data model versioning** — version number in `crunch_uml_meta`; compatible databases are migrated additively, incompatible ones are recreated with a warning.
+
+---
+
 ## Phase 1: Metaschema & Import/Export
 
 ### Centralized Repository

@@ -116,6 +116,28 @@ erDiagram
         string name
         string package_id FK
     }
+
+    DiagramClass {
+        string diagram_id PK
+        string schema_id PK
+        string class_id PK
+        float x
+        float y
+        float width
+        float height
+        int z_order
+        text ea_style
+    }
+
+    DiagramAssociation {
+        string diagram_id PK
+        string schema_id PK
+        string association_id PK
+        text waypoints
+        boolean hidden
+        text ea_geometry
+        text ea_style
+    }
 ```
 
 ## Model Details
@@ -176,6 +198,63 @@ Enumeration type with named values. EnumerationLiteral contains the individual v
 ### Diagram
 
 Visual diagram that references classes, enumerations, associations and generalizations via junction tables.
+
+#### Diagram geometry
+
+Besides membership, the four junction tables also carry the layout of elements on the diagram. All geometry columns are **nullable**: membership without a known layout stays valid, and files or databases written before these columns existed remain importable.
+
+**Node-like** (`DiagramClass`, `DiagramEnumeration`):
+
+| Column | Type | Meaning |
+|---|---|---|
+| `x` | Float | left edge, canonical coordinates |
+| `y` | Float | top edge, canonical coordinates |
+| `width` | Float | width |
+| `height` | Float | height |
+| `z_order` | Integer | stacking order (EA `seqno`/`Sequence`) |
+| `ea_style` | Text | raw EA style string, kept losslessly for round-trips |
+
+**Edge-like** (`DiagramAssociation`, `DiagramGeneralization`):
+
+| Column | Type | Meaning |
+|---|---|---|
+| `waypoints` | Text (JSON) | `[{"x": .., "y": ..}, ...]` in canonical coordinates; empty list or NULL = no intermediate points |
+| `hidden` | Boolean | EA `Hidden` flag |
+| `ea_geometry` | Text | raw EA geometry string (SX/SY/EX/EY/EDGE/label positions/Path) — lossless |
+| `ea_style` | Text | raw EA style string — lossless |
+
+**Canonical coordinate system**: origin in the top-left corner, x grows to the right, y grows downwards, all values positive. All conversions to and from EA conventions happen in the parsers and renderers; the database only ever contains canonical values. The EA conventions (verified against real files):
+
+- XMI extension node geometry (`Left=..;Top=..;Right=..;Bottom=..;`) uses **positive** Top/Bottom: `x=Left`, `y=Top`, `width=Right-Left`, `height=Bottom-Top`.
+- `t_diagramobjects` in a `.qea` repository stores **negative** RectTop/RectBottom: `x=RectLeft`, `y=-RectTop`, `width=RectRight-RectLeft`, `height=RectTop-RectBottom`.
+- `Path=` waypoints have negative y in **both** sources; canonical waypoints flip the sign. XMI separates x:y pairs with `$`, the qea `Path` column with `;`.
+
+#### Datamodel version and migration
+
+Every crunch_uml database carries a datamodel version number in the `crunch_uml_meta` table (key `datamodel_version`). On connect:
+
+- **Same version** (or a database predating this mechanism): missing tables and nullable columns are added **additively**; existing data is kept.
+- **Different version**: the database is incompatible and is **recreated**. All data is discarded (with a clear warning in the log); re-import your models.
+
+The version number (`DATAMODEL_VERSION` in `crunch_uml/db.py`) is only bumped for schema changes the additive migration cannot handle (renamed or retyped columns, changed primary keys or semantics). The `crunch_uml_meta` table deliberately lives outside the ORM model, so it never shows up in json/xlsx/csv exports.
+
+#### Diagram coverage matrix
+
+Which parsers and renderers read or write diagram membership and geometry:
+
+| Component | Diagram membership | Geometry |
+|---|---|---|
+| `eaxmi` parser | reads | reads |
+| `qea` parser | reads | reads |
+| `xmi` parser (strict) | n/a — strict XMI 2.1 carries no diagrams | n/a |
+| `xmi` renderer | writes | writes |
+| `json` parser/renderer | reads/writes | reads/writes |
+| `csv` parser/renderer | reads/writes (one file per junction table) | reads/writes |
+| `xlsx` parser/renderer | reads/writes (one sheet per junction table) | reads/writes |
+| `i18n` parser/renderer | n/a — junction tables have no `id` column and contain nothing translatable | n/a |
+| `earepo`/`eamimrepo` renderer | writes (`t_diagramobjects`/`t_diagramlinks`: update, insert, delete) | writes |
+| `sqla` renderer | n/a — generates code for the modelled domain, not for diagrams | n/a |
+| Semantic renderers (`jinja2`, `ggm_md`, `json_schema`, `plain_html`, `model_overview_md`, `er_diagram`, `openapi`, `ttl`, `rdf`, `json-ld`, `shex`, `profile`, `uml_mmd`, `model_stats_md`, `diff_md`) | n/a — geometry has no meaning in these output formats | n/a |
 
 ## Mixin Structure
 

@@ -39,11 +39,17 @@ crunch_uml -sch mijn_schema export -t <type> -f <bestand>
 
 ## Ondersteunde uitvoerformaten
 
+### Model-uitwisseling
+
+| Type | Optie `-t` | Beschrijving |
+|---|---|---|
+| EA XMI | `xmi` | XMI 2.1 met Enterprise Architect-extensiesectie, inclusief diagrammen met layout. Opnieuw importeerbaar via `eaxmi` en in Sparx EA |
+
 ### Tabulaire formaten
 
 | Type | Optie `-t` | Beschrijving |
 |---|---|---|
-| JSON | `json` | JSON document met alle tabellen |
+| JSON | `json` | JSON document met alle tabellen (inclusief diagram-koppeltabellen met geometrie) |
 | CSV | `csv` | Meerdere CSV-bestanden, één per tabel |
 | Excel | `xlsx` | Excel-bestand met tabs per tabel |
 | i18n | `i18n` | Vertaalbestand met vertaalbare velden |
@@ -83,7 +89,7 @@ crunch_uml -sch mijn_schema export -t <type> -f <bestand>
 
 | Type | Optie `-t` | Beschrijving |
 |---|---|---|
-| EA Repository | `earepo` | Update bestaand Enterprise Architect repository |
+| EA Repository | `earepo` | Update bestaand Enterprise Architect repository, inclusief diagram-membership en layout (`t_diagramobjects`/`t_diagramlinks`) |
 | EA MIM Repository | `eamimrepo` | Update EA repository met MIM-tags |
 
 ## Opties
@@ -115,6 +121,15 @@ crunch_uml -sch mijn_schema export -t <type> -f <bestand>
 | `--translate_context` | Stuur section/field-hints in de prompt voor consistentere domeintermen |
 
 ## Voorbeelden
+
+### EA XMI-export (round-trip)
+
+```bash
+# Compleet model inclusief diagrammen met layout als EA-compatibele XMI
+crunch_uml -sch mijn_model export -t xmi -f model.xml
+```
+
+Het resultaat is opnieuw importeerbaar met `import -t eaxmi` (verliesvrij, inclusief geometrie) en importeerbaar in Sparx Enterprise Architect. De EA-specifieke keuzes zijn gedocumenteerd in `crunch_uml/renderers/EA_QUIRKS.md`.
 
 ### Excel-export
 
@@ -157,6 +172,9 @@ crunch_uml -sch mijn_model export -f model.qea -t earepo \
 
 !!! warning "Let op bij EA Repository updates"
     De `earepo`-renderer werkt direct op een Enterprise Architect repository. Maak altijd een backup voordat je `--tag_strategy replace` gebruikt, want dit vervangt alle bestaande tags.
+
+!!! info "Diagramlayout wordt meegeschreven"
+    De `earepo`-renderer werkt ook de diagramlayout bij: bestaande rijen in `t_diagramobjects`/`t_diagramlinks` krijgen de posities en lijnverlopen uit het model, elementen die nieuw op een diagram staan worden toegevoegd, en membership die uit het model verdween wordt verwijderd. Rijen van elementtypen die crunch_uml niet beheert (zoals Notes) en van elementen die het schema niet kent blijven onaangeroerd.
 
 ### CSV-export met kolom-mapping
 

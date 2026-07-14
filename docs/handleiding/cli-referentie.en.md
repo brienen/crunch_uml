@@ -89,7 +89,9 @@ crunch_uml export [-h] -f FILE -t TYPE [-pi IDS] [-xpi IDS]
 
 The following tables are recognized on import and export:
 
-`packages`, `classes`, `attributes`, `enumerations`, `enumerationliterals`, `associations`, `generalizations`
+`packages`, `classes`, `attributes`, `enumerations`, `enumerationliterals`, `associations`, `generalizations`, `diagrams`, `diagram_class`, `diagram_enumeration`, `diagram_association`, `diagram_generalization`
+
+The four `diagram_*` junction tables carry the diagram membership as well as the layout (positions, sizes, waypoints); see the [data model](../technisch/datamodel.md).
 
 ## Database Backends
 

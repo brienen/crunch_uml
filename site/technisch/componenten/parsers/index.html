@@ -722,6 +722,8 @@
       
         
       
+        
+      
     
     
       
@@ -1249,6 +1251,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../vertaalpijplijn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertaalpijplijn — technisch ontwerp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../kwetsbaarheden/" class="md-nav__link">
         
   
@@ -1398,13 +1421,14 @@
 <li><strong>Registratie</strong>: <code>@ParserRegistry.register("eaxmi")</code></li>
 <li><strong>Bestand</strong>: <code>parsers/eaxmiparser.py</code></li>
 <li><strong>Functie</strong>: Enterprise Architect XMI met EA-specifieke extensies</li>
-<li><strong>Bijzonderheden</strong>: Verwerkt diagrammen, extended tags, EA-metadata. Circa 600 regels.</li>
+<li><strong>Bijzonderheden</strong>: Verwerkt diagrammen inclusief geometrie (nodeposities/-afmetingen, z-order, edge-waypoints, <code>Hidden</code>-vlag), extended tags en EA-metadata. Ook connector-extensies voor generalisaties (naam, documentatie, stereotype) en <code>uml:DataType</code>-extensies worden gelezen. De geometrieconversies (y-flip voor Path-waypoints, splitsen van <code>Path=</code>/<code>Hidden=</code> uit de ruwe strings) staan in <code>crunch_uml/ea_geometry.py</code>.</li>
 </ul>
 <h3 id="qea-parser">QEA Parser<a class="headerlink" href="#qea-parser" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Registratie</strong>: <code>@ParserRegistry.register("qea")</code></li>
 <li><strong>Bestand</strong>: <code>parsers/qeaparser.py</code></li>
 <li><strong>Functie</strong>: QEA database-formaat (EA native)</li>
+<li><strong>Bijzonderheden</strong>: Leest naast packages/objecten/attributen/connectors/tagged values ook de diagramtabellen (<code>t_diagram</code>, <code>t_diagramobjects</code>, <code>t_diagramlinks</code>) inclusief geometrie. RectTop/RectBottom zijn negatief in de QEA-database; de parser normaliseert naar het canonieke coördinatenstelsel en normaliseert Windows-regeleindes in Notes naar LF, zodat qea- en eaxmi-import identieke data opleveren.</li>
 </ul>
 <h3 id="json-parser">JSON Parser<a class="headerlink" href="#json-parser" title="Permanent link">&para;</a></h3>
 <ul>

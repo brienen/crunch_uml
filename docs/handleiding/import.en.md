@@ -12,9 +12,9 @@ crunch_uml import -f <file> -t <type> [options]
 
 | Type | Option `-t` | Description |
 |---|---|---|
-| XMI | `xmi` | Standard XMI 2.1 — without tool-specific extensions |
-| Enterprise Architect XMI | `eaxmi` | XMI with EA-specific extensions (diagrams, tags, metadata) |
-| QEA | `qea` | Enterprise Architect native repository file (.qea/.qeax) |
+| XMI | `xmi` | Standard XMI 2.1 — without tool-specific extensions and without diagrams |
+| Enterprise Architect XMI | `eaxmi` | XMI with EA-specific extensions (diagrams including layout, tags, metadata) |
+| QEA | `qea` | Enterprise Architect native repository file (.qea/.qeax), including diagrams with layout |
 | JSON | `json` | JSON with table names as keys and arrays of records |
 | Excel | `xlsx` | Excel file with one worksheet per table |
 | CSV | `csv` | Single CSV file, mapped to one table |
@@ -22,6 +22,9 @@ crunch_uml import -f <file> -t <type> [options]
 
 !!! tip "Which type to choose?"
     Working with Enterprise Architect? Use `eaxmi` — this also processes diagrams and EA-specific metadata. Use `xmi` only for XMI files from other tools.
+
+!!! info "Diagrams with geometry"
+    The `eaxmi` and `qea` parsers read diagrams in full: which elements appear on a diagram **and** their layout (positions, sizes, stacking order and the routing of relationship lines). The geometry is stored in a canonical coordinate system; see the [data model](../technisch/datamodel.md) for the details and the coverage matrix.
 
 ## Options
 
@@ -63,7 +66,7 @@ crunch_uml import -f data.json -t json --mapper '{"old_name": "name", "old_def":
 crunch_uml import -f specification.xlsx -t xlsx -db_create
 ```
 
-The Excel file must contain worksheets with names that match the tables in the data model: `packages`, `classes`, `attributes`, `enumerations`, `enumerationliterals`, `associations`, `generalizations`.
+The Excel file must contain worksheets with names that match the tables in the data model: `packages`, `classes`, `attributes`, `enumerations`, `enumerationliterals`, `associations`, `generalizations`, `diagrams` and the diagram junction tables (`diagram_class`, `diagram_enumeration`, `diagram_association`, `diagram_generalization`) with membership and layout.
 
 ### Import into a specific schema
 

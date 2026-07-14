@@ -722,6 +722,8 @@
       
         
       
+        
+      
     
     
       
@@ -1249,6 +1251,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../vertaalpijplijn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertaalpijplijn — technisch ontwerp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../kwetsbaarheden/" class="md-nav__link">
         
   
@@ -1398,13 +1421,14 @@
 <li><strong>Registration</strong>: <code>@ParserRegistry.register("eaxmi")</code></li>
 <li><strong>File</strong>: <code>parsers/eaxmiparser.py</code></li>
 <li><strong>Function</strong>: Enterprise Architect XMI with EA-specific extensions</li>
-<li><strong>Features</strong>: Processes diagrams, extended tags, EA metadata. Approximately 600 lines.</li>
+<li><strong>Features</strong>: Processes diagrams including geometry (node positions/sizes, z-order, edge waypoints, <code>Hidden</code> flag), extended tags and EA metadata. Also reads connector extensions for generalizations (name, documentation, stereotype) and <code>uml:DataType</code> extensions. The geometry conversions (y-flip for Path waypoints, splitting <code>Path=</code>/<code>Hidden=</code> out of the raw strings) live in <code>crunch_uml/ea_geometry.py</code>.</li>
 </ul>
 <h3 id="qea-parser">QEA Parser<a class="headerlink" href="#qea-parser" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Registration</strong>: <code>@ParserRegistry.register("qea")</code></li>
 <li><strong>File</strong>: <code>parsers/qeaparser.py</code></li>
 <li><strong>Function</strong>: QEA database format (EA native)</li>
+<li><strong>Features</strong>: Besides packages/objects/attributes/connectors/tagged values, also reads the diagram tables (<code>t_diagram</code>, <code>t_diagramobjects</code>, <code>t_diagramlinks</code>) including geometry. RectTop/RectBottom are negative in the QEA database; the parser normalizes to the canonical coordinate system and normalizes Windows line endings in Notes to LF, so that qea and eaxmi imports yield identical data.</li>
 </ul>
 <h3 id="json-parser">JSON Parser<a class="headerlink" href="#json-parser" title="Permanent link">&para;</a></h3>
 <ul>

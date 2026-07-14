@@ -16,6 +16,18 @@ class RendererRegistry(Registry):
     _descr_registry = {}  # type: ignore
 
 
+def str2bool(value):
+    """Argparse-type for real booleans. ``type=bool`` is a classic trap:
+    bool("False") is True, so '--update_i18n False' silently meant True."""
+    if isinstance(value, bool):
+        return value
+    if value.strip().lower() in ("true", "yes", "1"):
+        return True
+    if value.strip().lower() in ("false", "no", "0"):
+        return False
+    raise ValueError(f"verwacht True of False, kreeg '{value}'")
+
+
 def add_args(argumentparser, subparser_dict):
     output_subparser = subparser_dict.get(const.CMD_EXPORT)
 
@@ -138,21 +150,21 @@ def add_args(argumentparser, subparser_dict):
     output_subparser.add_argument(
         "-trans",
         "--translate",
-        type=bool,
+        type=str2bool,
         default=False,
         help=(
             "Used only for i18n renderer. When set to true the input values will be translated using automatic"
-            " translating."
-        )
-        + f" Default is {const.DEFAULT_LANGUAGE}.",
+            " translating. Default is False."
+        ),
     )
     output_subparser.add_argument(
         "--update_i18n",
-        type=bool,
+        type=str2bool,
         default=True,
         help=(
-            "Used only for i18n renderer in conjunction with '--translate' option. When set to true only missing value"
-            " sin i18n file will be translated. Default is True."
+            "Used only for i18n renderer in conjunction with '--translate' option. True (default): only missing"
+            " values in the i18n file are translated. False: the language is fully re-translated (existing"
+            " translations for that language are replaced; other languages stay untouched)."
         ),
     )
     output_subparser.add_argument(
@@ -201,12 +213,61 @@ def add_args(argumentparser, subparser_dict):
     output_subparser.add_argument(
         "--translate_backend",
         type=str,
-        choices=["translators", "ollama"],
+        choices=["translators", "ollama", "pipeline"],
         default=None,
         help=(
             "i18n renderer: which translation backend to use. 'translators' (default) calls "
-            "Google/Bing via the translators library; 'ollama' calls a local LLM. Overrides "
+            "Google/Bing via the translators library; 'ollama' calls a local LLM; 'pipeline' runs "
+            "the layered deterministic pipeline (termbanks + local LLMs, see docs). Overrides "
             "CRUNCH_UML_TRANSLATE_BACKEND."
+        ),
+    )
+    output_subparser.add_argument(
+        "--termbanks",
+        type=str,
+        default=None,
+        help=(
+            "i18n renderer (pipeline backend): comma-separated paths (files or directories) to "
+            "termbank sources (SKOS/RDF/TTL/JSON-LD or IATE TBX); order = priority. Overrides "
+            "CRUNCH_UML_TERMBANKS."
+        ),
+    )
+    output_subparser.add_argument(
+        "--llm_workhorses",
+        type=str,
+        default=None,
+        help=(
+            "i18n renderer (pipeline backend): comma-separated Ollama model prefixes; the first is "
+            "the primary workhorse, the second the independent vote on names. Overrides "
+            "CRUNCH_UML_LLM_WORKHORSES."
+        ),
+    )
+    output_subparser.add_argument(
+        "--llm_heavy",
+        type=str,
+        default=None,
+        help=(
+            "i18n renderer (pipeline backend): Ollama model prefix for the heavy escalation model. "
+            "Overrides CRUNCH_UML_LLM_HEAVY."
+        ),
+    )
+    output_subparser.add_argument(
+        "--nmt_model",
+        type=str,
+        default=None,
+        help=(
+            "i18n renderer (pipeline backend): Hugging Face model name for the optional NMT safety "
+            "net; {from}/{to} placeholders allowed. Overrides CRUNCH_UML_NMT_MODEL."
+        ),
+    )
+    output_subparser.add_argument(
+        "--translate_allow_online",
+        action="store_true",
+        default=False,
+        help=(
+            "i18n renderer (pipeline backend): allow the online translators route (Google/Bing) as "
+            "last-resort fallback. Not reproducible, therefore off by default. Equivalent to "
+            "CRUNCH_UML_TRANSLATE_ALLOW_ONLINE=1."
         ),
     )
     output_subparser.add_argument(

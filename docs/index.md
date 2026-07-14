@@ -54,6 +54,7 @@ graph LR
     CU["crunch_uml<br/>━━━━━━━━━━━━<br/>Normaliseer<br/>Transformeer<br/>Valideer"]
 
     subgraph Uitvoer
+        EAXMI2["EA XMI"]
         JSON2["JSON"]
         MD["Markdown"]
         RDF["RDF / TTL / JSON-LD"]
@@ -65,18 +66,20 @@ graph LR
     end
 
     XMI & EAXMI & QEA & JSON & XLSX & CSV --> CU
-    CU --> JSON2 & MD & RDF & JSCHEMA & XLS2 & SQLA & EA & DIFF
+    CU --> EAXMI2 & JSON2 & MD & RDF & JSCHEMA & XLS2 & SQLA & EA & DIFF
     CU --- DB[("crunch_uml.db<br/>SQLite / PostgreSQL")]
 
     style CU fill:#1a5276,color:#fff,stroke:#1a5276
     style DB fill:#e74c3c,color:#fff,stroke:#c0392b
 ```
 
-De kern van crunch_uml is een **gestandaardiseerd metaschema**: ongeacht het invoerformaat worden alle UML-entiteiten (packages, classes, attributen, associaties, generalisaties, enumeraties) opgeslagen in dezelfde database. Vanuit die database kun je vervolgens exporteren naar elk gewenst formaat.
+De kern van crunch_uml is een **gestandaardiseerd metaschema**: ongeacht het invoerformaat worden alle UML-entiteiten (packages, classes, attributen, associaties, generalisaties, enumeraties én diagrammen) opgeslagen in dezelfde database. Vanuit die database kun je vervolgens exporteren naar elk gewenst formaat.
 
 ## Wat maakt crunch_uml bijzonder?
 
 **Multi-schema ondersteuning** — Je kunt hetzelfde model meerdere keren inlezen in verschillende schema's binnen dezelfde database. Hierdoor kun je bijvoorbeeld versie 1.0 en versie 2.0 van een model naast elkaar zetten en automatisch een diff-rapport genereren. Of je kunt een vertaald model naast het origineel bewaren.
+
+**Diagrammen met layout** — Diagrammen worden volledig meegenomen: niet alleen wélke elementen op een diagram staan, maar ook hun posities, afmetingen en het verloop van relatielijnen. De `xmi`-export levert EA-compatibele XMI op waarin de diagrammen er in Sparx EA weer exact zo uitzien, en de `earepo`-export werkt de layout direct in een EA-repository bij.
 
 **Plugin-architectuur** — Nieuwe invoerformaten, uitvoerformaten en transformaties kunnen worden toegevoegd zonder de kerncode aan te passen, via een registry-based plugin systeem.
 

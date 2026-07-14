@@ -73,13 +73,14 @@ classDiagram
 - **Registratie**: `@ParserRegistry.register("eaxmi")`
 - **Bestand**: `parsers/eaxmiparser.py`
 - **Functie**: Enterprise Architect XMI met EA-specifieke extensies
-- **Bijzonderheden**: Verwerkt diagrammen, extended tags, EA-metadata. Circa 600 regels.
+- **Bijzonderheden**: Verwerkt diagrammen inclusief geometrie (nodeposities/-afmetingen, z-order, edge-waypoints, `Hidden`-vlag), extended tags en EA-metadata. Ook connector-extensies voor generalisaties (naam, documentatie, stereotype) en `uml:DataType`-extensies worden gelezen. De geometrieconversies (y-flip voor Path-waypoints, splitsen van `Path=`/`Hidden=` uit de ruwe strings) staan in `crunch_uml/ea_geometry.py`.
 
 ### QEA Parser
 
 - **Registratie**: `@ParserRegistry.register("qea")`
 - **Bestand**: `parsers/qeaparser.py`
 - **Functie**: QEA database-formaat (EA native)
+- **Bijzonderheden**: Leest naast packages/objecten/attributen/connectors/tagged values ook de diagramtabellen (`t_diagram`, `t_diagramobjects`, `t_diagramlinks`) inclusief geometrie. RectTop/RectBottom zijn negatief in de QEA-database; de parser normaliseert naar het canonieke coördinatenstelsel en normaliseert Windows-regeleindes in Notes naar LF, zodat qea- en eaxmi-import identieke data opleveren.
 
 ### JSON Parser
 

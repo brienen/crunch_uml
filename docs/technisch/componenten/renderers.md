@@ -54,6 +54,7 @@ classDiagram
 
 | Renderer | Type | Bestand | Outputformaat |
 |---|---|---|---|
+| XMIRenderer | `xmi` | `xmirenderer.py` | XMI 2.1 + EA-extensie, incl. diagrammen met geometrie |
 | JSONRenderer | `json` | `pandasrenderer.py` | JSON (array of records / indexed) |
 | CSVRenderer | `csv` | `pandasrenderer.py` | CSV per tabel |
 | I18nRenderer | `i18n` | `pandasrenderer.py` | Vertaal-JSON |
@@ -67,6 +68,17 @@ classDiagram
 | SQLARenderer | `sqla` | `sqlarenderer.py` | Python SQLAlchemy code |
 | EARepoUpdater | `ea_repo` | `earepoupdater.py` | Direct EA database update |
 | SchemaDiffMD | `schema_diff_md` | `jinja2renderer.py` | Schema-vergelijking markdown |
+
+---
+
+## XMI Renderer
+
+De `xmi`-renderer (`renderers/xmirenderer.py`) schrijft het complete schema als **XMI 2.1 met Enterprise Architect-extensiesectie** — het spiegelbeeld van wat de `eaxmi`-parser leest:
+
+- **Strikte deel**: `uml:Model` met packages, classes (incl. attributen), enumeraties (incl. literals), associaties (incl. ends/kardinaliteiten/rollen) en generalisaties, met de bestaande ids als `xmi:id`.
+- **Extensiedeel**: documentatie, projectmetadata, tagged values, connector-rollen en per diagram een `<diagram>`-element met de geometrie in EA-formaat (de exacte omkering van de parserconversies, inclusief de y-flip voor edge-waypoints).
+
+De uitvoer is opnieuw importeerbaar via de eigen `eaxmi`-parser (verliesvrije round-trip, afgedekt door acceptatietests op vier fixtures) en importeerbaar in Sparx EA. Waar de XMI-spec en EA botsen wint EA; elke afwijking is gedocumenteerd in [`crunch_uml/renderers/EA_QUIRKS.md`](https://github.com/brienen/crunch_uml/blob/main/crunch_uml/renderers/EA_QUIRKS.md).
 
 ---
 
@@ -186,6 +198,8 @@ HTML-to-Markdown conversie via BeautifulSoup + markdownify.
     - `--ea_allow_delete` — Toestaan van verwijderingen
 
     Tag-strategieën: `update` | `upsert` | `replace`
+
+Naast de modelelementen wordt ook de **diagramlayout** teruggeschreven naar `t_diagramobjects` en `t_diagramlinks`: bestaande rijen worden bijgewerkt, nieuwe membership ingevoegd en vervallen membership verwijderd, met dezelfde coördinaatconversies als de qea-parser (omgekeerd). Rijen van elementtypen die crunch_uml niet beheert (Notes, packages) en van elementen die het schema niet kent blijven onaangeroerd — een partiële export sloopt geen layout waar hij niets van weet.
 
 ---
 

@@ -40,11 +40,17 @@ crunch_uml -sch my_schema export -t <type> -f <file>
 
 ## Supported Output Formats
 
+### Model exchange
+
+| Type | Option `-t` | Description |
+|---|---|---|
+| EA XMI | `xmi` | XMI 2.1 with Enterprise Architect extension section, including diagrams with layout. Re-importable via `eaxmi` and into Sparx EA |
+
 ### Tabular formats
 
 | Type | Option `-t` | Description |
 |---|---|---|
-| JSON | `json` | JSON document with all tables |
+| JSON | `json` | JSON document with all tables (including diagram junction tables with geometry) |
 | CSV | `csv` | Multiple CSV files, one per table |
 | Excel | `xlsx` | Excel file with tabs per table |
 | i18n | `i18n` | Translation file with translatable fields |
@@ -84,7 +90,7 @@ crunch_uml -sch my_schema export -t <type> -f <file>
 
 | Type | Option `-t` | Description |
 |---|---|---|
-| EA Repository | `earepo` | Update existing Enterprise Architect repository |
+| EA Repository | `earepo` | Update existing Enterprise Architect repository, including diagram membership and layout (`t_diagramobjects`/`t_diagramlinks`) |
 | EA MIM Repository | `eamimrepo` | Update EA repository with MIM tags |
 
 ## Options
@@ -116,6 +122,15 @@ crunch_uml -sch my_schema export -t <type> -f <file>
 | `--translate_context` | Send section/field hints in the prompt for more consistent domain terms |
 
 ## Examples
+
+### EA XMI export (round-trip)
+
+```bash
+# Complete model including diagrams with layout as EA-compatible XMI
+crunch_uml -sch my_model export -t xmi -f model.xml
+```
+
+The result can be re-imported with `import -t eaxmi` (lossless, including geometry) and imported into Sparx Enterprise Architect. The EA-specific choices are documented in `crunch_uml/renderers/EA_QUIRKS.md`.
 
 ### Excel export
 
@@ -158,6 +173,9 @@ crunch_uml -sch my_model export -f model.qea -t earepo \
 
 !!! warning "Be careful with EA Repository updates"
     The `earepo` renderer works directly on an Enterprise Architect repository. Always make a backup before using `--tag_strategy replace`, as this replaces all existing tags.
+
+!!! info "Diagram layout is written back"
+    The `earepo` renderer also updates the diagram layout: existing rows in `t_diagramobjects`/`t_diagramlinks` receive the positions and line routings from the model, elements that are newly placed on a diagram are added, and membership that disappeared from the model is removed. Rows of element types that crunch_uml does not manage (such as Notes) and of elements unknown to the schema are left untouched.
 
 ### CSV export with column mapping
 

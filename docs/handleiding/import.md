@@ -12,9 +12,9 @@ crunch_uml import -f <bestand> -t <type> [opties]
 
 | Type | Optie `-t` | Beschrijving |
 |---|---|---|
-| XMI | `xmi` | Standaard XMI 2.1 — zonder tool-specifieke extensies |
-| Enterprise Architect XMI | `eaxmi` | XMI met EA-specifieke extensies (diagrammen, tags, metadata) |
-| QEA | `qea` | Enterprise Architect native repository-bestand (.qea/.qeax) |
+| XMI | `xmi` | Standaard XMI 2.1 — zonder tool-specifieke extensies en zonder diagrammen |
+| Enterprise Architect XMI | `eaxmi` | XMI met EA-specifieke extensies (diagrammen inclusief layout, tags, metadata) |
+| QEA | `qea` | Enterprise Architect native repository-bestand (.qea/.qeax), inclusief diagrammen met layout |
 | JSON | `json` | JSON met tabelnamen als keys en arrays van records |
 | Excel | `xlsx` | Excel-bestand met één worksheet per tabel |
 | CSV | `csv` | Enkel CSV-bestand, gekoppeld aan één tabel |
@@ -22,6 +22,9 @@ crunch_uml import -f <bestand> -t <type> [opties]
 
 !!! tip "Welk type kiezen?"
     Werk je met Enterprise Architect? Gebruik dan `eaxmi` — dit verwerkt ook diagrammen en EA-specifieke metadata. Gebruik `xmi` alleen voor XMI-bestanden uit andere tools.
+
+!!! info "Diagrammen met geometrie"
+    De `eaxmi`- en `qea`-parsers lezen diagrammen volledig in: welke elementen op een diagram staan **én** hun layout (posities, afmetingen, stapelvolgorde en het verloop van relatielijnen). De geometrie wordt opgeslagen in een canoniek coördinatenstelsel; zie het [datamodel](../technisch/datamodel.md) voor de details en de dekkingsmatrix.
 
 ## Opties
 
@@ -63,7 +66,7 @@ crunch_uml import -f data.json -t json --mapper '{"old_name": "name", "old_def":
 crunch_uml import -f specificatie.xlsx -t xlsx -db_create
 ```
 
-Het Excel-bestand moet worksheets bevatten met namen die overeenkomen met de tabellen in het datamodel: `packages`, `classes`, `attributes`, `enumerations`, `enumerationliterals`, `associations`, `generalizations`.
+Het Excel-bestand moet worksheets bevatten met namen die overeenkomen met de tabellen in het datamodel: `packages`, `classes`, `attributes`, `enumerations`, `enumerationliterals`, `associations`, `generalizations`, `diagrams` en de diagram-koppeltabellen (`diagram_class`, `diagram_enumeration`, `diagram_association`, `diagram_generalization`) met membership en layout.
 
 ### Import in een specifiek schema
 

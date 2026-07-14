@@ -722,6 +722,8 @@
       
         
       
+        
+      
     
     
       
@@ -1095,6 +1097,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../vertaalpijplijn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertaalpijplijn — technisch ontwerp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../kwetsbaarheden/" class="md-nav__link">
         
   
@@ -1165,6 +1188,15 @@
   <a href="#roadmap-overview" class="md-nav__link">
     <span class="md-ellipsis">
       Roadmap Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recently-delivered-v050" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recently Delivered (v0.5.0)
     </span>
   </a>
   
@@ -1437,6 +1469,12 @@
     Performance audit               :f1, 2026-07, 2M
     Security audit                  :f2, after f1, 2M
     Documentation v1.0              :f3, after f2, 2M</code></pre>
+<hr />
+<h2 id="recently-delivered-v050">Recently Delivered (v0.5.0)<a class="headerlink" href="#recently-delivered-v050" title="Permanent link">&para;</a></h2>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>Full diagram support</strong> — membership <em>and</em> geometry (positions, sizes, z-order, waypoints) end-to-end: the <code>eaxmi</code>/<code>qea</code> parsers read layout, the new <code>xmi</code> renderer writes EA-compatible XMI with a lossless round-trip, <code>earepo</code> updates the layout in the EA repository, and json/xlsx/csv round-trip the junction tables. See the coverage matrix in the <a href="../datamodel/">data model</a>.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>Data model versioning</strong> — version number in <code>crunch_uml_meta</code>; compatible databases are migrated additively, incompatible ones are recreated with a warning.</li>
+</ul>
 <hr />
 <h2 id="phase-1-metaschema-importexport">Phase 1: Metaschema &amp; Import/Export<a class="headerlink" href="#phase-1-metaschema-importexport" title="Permanent link">&para;</a></h2>
 <h3 id="centralized-repository">Centralized Repository<a class="headerlink" href="#centralized-repository" title="Permanent link">&para;</a></h3>
