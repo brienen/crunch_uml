@@ -229,6 +229,24 @@ De vier junction tables bevatten naast de membership ook de layout van elementen
 - `t_diagramobjects` in een `.qea`-repository heeft **negatieve** RectTop/RectBottom: `x=RectLeft`, `y=-RectTop`, `width=RectRight-RectLeft`, `height=RectTop-RectBottom`.
 - `Path=`-waypoints hebben in **beide** bronnen negatieve y; canonieke waypoints flippen het teken. XMI scheidt x:y-paren met `$`, de qea-kolom `Path` met `;`.
 
+#### Dekkingsmatrix diagrammen
+
+Welke parsers en renderers diagram-membership en geometrie lezen of schrijven:
+
+| Component | Diagram-membership | Geometrie |
+|---|---|---|
+| `eaxmi` parser | leest | leest |
+| `qea` parser | leest | leest |
+| `xmi` parser (strict) | n.v.t. — strict XMI 2.1 bevat geen diagrammen | n.v.t. |
+| `xmi` renderer | schrijft | schrijft |
+| `json` parser/renderer | leest/schrijft | leest/schrijft |
+| `csv` parser/renderer | leest/schrijft (bestand per koppeltabel) | leest/schrijft |
+| `xlsx` parser/renderer | leest/schrijft (tabblad per koppeltabel) | leest/schrijft |
+| `i18n` parser/renderer | n.v.t. — koppeltabellen hebben geen `id`-kolom en bevatten niets vertaalbaars | n.v.t. |
+| `earepo`/`eamimrepo` renderer | schrijft (`t_diagramobjects`/`t_diagramlinks`: update, insert, delete) | schrijft |
+| `sqla` renderer | n.v.t. — genereert code voor het gemodelleerde domein, niet voor diagrammen | n.v.t. |
+| Semantische renderers (`jinja2`, `ggm_md`, `json_schema`, `plain_html`, `model_overview_md`, `er_diagram`, `openapi`, `ttl`, `rdf`, `json-ld`, `shex`, `profile`, `uml_mmd`, `model_stats_md`, `diff_md`) | n.v.t. — geometrie heeft geen betekenis in deze uitvoerformaten | n.v.t. |
+
 ## Mixin-structuur
 
 Alle entiteiten delen velden via mixins:

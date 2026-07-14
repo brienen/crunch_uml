@@ -229,6 +229,24 @@ Besides membership, the four junction tables also carry the layout of elements o
 - `t_diagramobjects` in a `.qea` repository stores **negative** RectTop/RectBottom: `x=RectLeft`, `y=-RectTop`, `width=RectRight-RectLeft`, `height=RectTop-RectBottom`.
 - `Path=` waypoints have negative y in **both** sources; canonical waypoints flip the sign. XMI separates x:y pairs with `$`, the qea `Path` column with `;`.
 
+#### Diagram coverage matrix
+
+Which parsers and renderers read or write diagram membership and geometry:
+
+| Component | Diagram membership | Geometry |
+|---|---|---|
+| `eaxmi` parser | reads | reads |
+| `qea` parser | reads | reads |
+| `xmi` parser (strict) | n/a — strict XMI 2.1 carries no diagrams | n/a |
+| `xmi` renderer | writes | writes |
+| `json` parser/renderer | reads/writes | reads/writes |
+| `csv` parser/renderer | reads/writes (one file per junction table) | reads/writes |
+| `xlsx` parser/renderer | reads/writes (one sheet per junction table) | reads/writes |
+| `i18n` parser/renderer | n/a — junction tables have no `id` column and contain nothing translatable | n/a |
+| `earepo`/`eamimrepo` renderer | writes (`t_diagramobjects`/`t_diagramlinks`: update, insert, delete) | writes |
+| `sqla` renderer | n/a — generates code for the modelled domain, not for diagrams | n/a |
+| Semantic renderers (`jinja2`, `ggm_md`, `json_schema`, `plain_html`, `model_overview_md`, `er_diagram`, `openapi`, `ttl`, `rdf`, `json-ld`, `shex`, `profile`, `uml_mmd`, `model_stats_md`, `diff_md`) | n/a — geometry has no meaning in these output formats | n/a |
+
 ## Mixin Structure
 
 All entities share fields via mixins:
