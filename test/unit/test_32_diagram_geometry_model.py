@@ -270,6 +270,69 @@ def test_copy_skips_relations_that_are_not_copied():
     database.close()
 
 
+def test_copy_skips_relation_owned_by_class_from_other_root():
+    """A diagram may show a class from another root package. A relation owned
+    by such a class is only copied when its far endpoint is in scope of the
+    *owning class's* root — mirroring Class.get_copy. Here the far endpoint
+    lives in the diagram's root, not the owner's, so no membership row may be
+    created (the relation itself never reaches the copy)."""
+    database = db.Database(const.DATABASE_URL, db_create=True)
+    schema = sch.Schema(database, SCHEMA)
+
+    root1 = db.Package(id="EAPK_ROOT_1", name="Model Een")
+    root2 = db.Package(id="EAPK_ROOT_2", name="Model Twee")
+    schema.save(root1)
+    schema.save(root2)
+    klasse_a = db.Class(id="EAID_CLASS_A", name="KlasseA", package_id=root1.id)
+    klasse_b = db.Class(id="EAID_CLASS_B", name="KlasseB", package_id=root2.id)
+    schema.save(klasse_a)
+    schema.save(klasse_b)
+    assoc = db.Association(id="EAID_ASSOC_BA", name="b naar a", src_class_id=klasse_b.id, dst_class_id=klasse_a.id)
+    schema.save(assoc)
+
+    diagram = db.Diagram(id="EAID_DIAGRAM_X", name="Cross root", package_id=root1.id)
+    for class_id in (klasse_a.id, klasse_b.id):
+        diagram.diagram_classes.append(
+            db.DiagramClass(diagram_id=diagram.id, schema_id=schema.schema_id, class_id=class_id)
+        )
+    diagram.diagram_associations.append(
+        db.DiagramAssociation(diagram_id=diagram.id, schema_id=schema.schema_id, association_id=assoc.id)
+    )
+    schema.add(diagram)
+    database.commit()
+
+    root = schema.get_package("EAPK_ROOT_1")
+    kopie_schema = sch.Schema(database, "diagram_geometry_kopie3")
+    kopie = root.get_copy(None)
+    kopie_schema.add(kopie, recursive=True)
+    database.commit()
+
+    session = kopie_schema.get_session()
+    # No dangling membership: every membership row points to an existing association.
+    assoc_ids = {a.id for a in session.query(db.Association).filter_by(schema_id="diagram_geometry_kopie3")}
+    for row in get_junction_rows(session, db.DiagramAssociation, "diagram_geometry_kopie3"):
+        assert row.association_id in assoc_ids
+
+    database.close()
+
+
+def test_diagram_get_instances_supports_all_types():
+    """Diagram.get_instances references get_associations_inscope and
+    get_generalizations_inscope on Package; those helpers did not exist
+    before phase 1."""
+    database = db.Database(const.DATABASE_URL, db_create=True)
+    schema = sch.Schema(database, SCHEMA)
+    diagram = build_model(schema)
+    database.commit()
+
+    associations = diagram.get_instances(db.Association, "EAPK_TEST_ROOT")
+    assert {assoc.id for assoc in associations} == {"EAID_ASSOC_1"}
+    generalizations = diagram.get_instances(db.Generalization, "EAPK_TEST_ROOT")
+    assert {gener.id for gener in generalizations} == {"EAID_GEN_1"}
+
+    database.close()
+
+
 def test_old_database_file_gets_missing_columns_added():
     """A database file written before the geometry columns existed must stay
     usable: missing nullable columns are added on connect."""

@@ -1247,16 +1247,24 @@ class Diagram(Base, UMLBase):  # type: ignore
         # itself ends up in the copy. Class.get_copy is what copies
         # relations: an association is copied along with its (copied) source
         # class when that class has a package and the far endpoint is a
-        # non-orphan class in scope of the original root; a generalization
-        # is copied along with its superclass under the same conditions.
-        # Mirror those conditions here — anything else would create dangling
-        # membership rows.
+        # non-orphan class in scope of the *owning class's own* root
+        # package; a generalization is copied along with its superclass
+        # under the same conditions. Mirror those conditions here —
+        # anything else would create dangling membership rows.
         copied_class_ids = (
             set(clazzIDs_in_scope)
             | set(clazzIDs_already_copied)
             | {clazz.id for clazz in self.classes if clazz.name != const.ORPHAN_CLASS}
         )
-        original_root_class_ids = {clazz.id for clazz in self.package.get_root_package().get_classes_inscope()}
+        # Scope is determined per owning class: a diagram may show classes
+        # from another root package, whose scope differs from the diagram's.
+        owner_root_scope_cache: dict = {}
+
+        def owner_scope_ids(owning_class):
+            root = owning_class.package.get_root_package()
+            if root.id not in owner_root_scope_cache:
+                owner_root_scope_cache[root.id] = {clazz.id for clazz in root.get_classes_inscope()}
+            return owner_root_scope_cache[root.id]
 
         def relation_is_copied(owning_class, far_class):
             # Same conditions as Class.get_copy uses when copying relations.
@@ -1267,7 +1275,7 @@ class Diagram(Base, UMLBase):  # type: ignore
                 and owning_class.package is not None
                 and far_class is not None
                 and far_class.name != const.ORPHAN_CLASS
-                and far_class.id in original_root_class_ids
+                and far_class.id in owner_scope_ids(owning_class)
             )
 
         original_diagram_assocs = {da.association_id: da for da in self.diagram_associations}
