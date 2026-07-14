@@ -7,7 +7,6 @@ additive migration of pre-existing database files.
 """
 
 import json
-import os
 import sqlite3
 
 import crunch_uml.schema as sch
@@ -333,12 +332,10 @@ def test_diagram_get_instances_supports_all_types():
     database.close()
 
 
-def test_old_database_file_gets_missing_columns_added():
+def test_old_database_file_gets_missing_columns_added(tmp_path):
     """A database file written before the geometry columns existed must stay
     usable: missing nullable columns are added on connect."""
-    path = "./test/output/old_style.db"
-    if os.path.exists(path):
-        os.remove(path)
+    path = tmp_path / "old_style.db"
     raw = sqlite3.connect(path)
     # Old-style minimal schema: presence of 'packages' suppresses create_all.
     raw.execute("CREATE TABLE packages (id VARCHAR NOT NULL, schema_id VARCHAR NOT NULL, PRIMARY KEY (id, schema_id))")
@@ -369,7 +366,6 @@ def test_old_database_file_gets_missing_columns_added():
         database.close()
     finally:
         db.Database._instance = saved_instance
-        os.remove(path)
 
 
 def test_datamodel_version_is_stamped_and_kept_out_of_exports():
@@ -382,12 +378,10 @@ def test_datamodel_version_is_stamped_and_kept_out_of_exports():
     database.close()
 
 
-def test_incompatible_datamodel_version_recreates_database():
+def test_incompatible_datamodel_version_recreates_database(tmp_path):
     """A database with a different datamodel version is incompatible: it is
     recreated from scratch on connect (data discarded) and restamped."""
-    path = "./test/output/incompatible_version.db"
-    if os.path.exists(path):
-        os.remove(path)
+    path = tmp_path / "incompatible_version.db"
     raw = sqlite3.connect(path)
     raw.execute("CREATE TABLE packages (id VARCHAR NOT NULL, schema_id VARCHAR NOT NULL, PRIMARY KEY (id, schema_id))")
     raw.execute("INSERT INTO packages VALUES ('EAPK_OUD', 'default')")
@@ -409,14 +403,11 @@ def test_incompatible_datamodel_version_recreates_database():
         database.close()
     finally:
         db.Database._instance = saved_instance
-        os.remove(path)
 
 
-def test_compatible_database_keeps_data_between_connects():
+def test_compatible_database_keeps_data_between_connects(tmp_path):
     """Same datamodel version: reconnecting must not touch existing data."""
-    path = "./test/output/compatible_version.db"
-    if os.path.exists(path):
-        os.remove(path)
+    path = tmp_path / "compatible_version.db"
 
     saved_instance = db.Database._instance
     db.Database._instance = None
@@ -434,7 +425,6 @@ def test_compatible_database_keeps_data_between_connects():
         database.close()
     finally:
         db.Database._instance = saved_instance
-        os.remove(path)
 
 
 def test_cascade_delete_diagram_removes_geometry_rows():
