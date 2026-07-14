@@ -45,6 +45,15 @@ def synth_attr_eaid(attr_id) -> str:
     return f"EAID_attr_{attr_id}"
 
 
+def normalize_newlines(text):
+    """EA stores Windows line endings in Notes columns. The XMI export of the
+    same model yields plain \\n because the XML spec normalizes CR/LF in
+    attribute values; normalize here so both parsers produce identical data."""
+    if isinstance(text, str):
+        return text.replace("\r\n", "\n").replace("\r", "\n")
+    return text
+
+
 @ParserRegistry.register(
     "qea",
     descr="Parser for Enterprise Architect repository files (.qea/.qeax). These are SQLite databases.",
@@ -103,7 +112,7 @@ class QEAParser(Parser):
                 id=eapk_id,
                 name=name,
                 parent_package_id=parent_eapk,
-                definitie=notes,
+                definitie=normalize_newlines(notes),
                 version=version,
                 created=created,
                 modified=modified,
@@ -159,7 +168,7 @@ class QEAParser(Parser):
                     id=eaid,
                     name=name,
                     package_id=pkg_eapk,
-                    definitie=note,
+                    definitie=normalize_newlines(note),
                     stereotype=stereotype,
                     author=author,
                     version=version,
@@ -176,7 +185,7 @@ class QEAParser(Parser):
                     name=name,
                     package_id=pkg_eapk,
                     is_datatype=(obj_type == "DataType"),
-                    definitie=note,
+                    definitie=normalize_newlines(note),
                     stereotype=stereotype,
                     author=author,
                     version=version,
@@ -241,7 +250,7 @@ class QEAParser(Parser):
                     id=eaid,
                     name=name,
                     enumeratie_id=parent_eaid,
-                    definitie=notes,
+                    definitie=normalize_newlines(notes),
                     stereotype=stereotype,
                 )
                 logger.debug(f"EnumerationLiteral {name} met id {eaid}")
@@ -269,7 +278,7 @@ class QEAParser(Parser):
                     primitive=attr_type if not type_class_id and not enumeration_id else None,
                     type_class_id=type_class_id,
                     enumeration_id=enumeration_id,
-                    definitie=notes,
+                    definitie=normalize_newlines(notes),
                     stereotype=stereotype,
                 )
                 logger.debug(f"Attribute {name} met id {eaid}")
@@ -336,7 +345,7 @@ class QEAParser(Parser):
                     name=name or "",
                     superclass_id=dst_eaid,
                     subclass_id=src_eaid,
-                    definitie=notes,
+                    definitie=normalize_newlines(notes),
                     stereotype=stereotype,
                 )
                 logger.debug(f"Generalization {name} met id {eaid}")
@@ -356,7 +365,7 @@ class QEAParser(Parser):
                     src_mult_end=src_mult_end,
                     dst_mult_start=dst_mult_start,
                     dst_mult_end=dst_mult_end,
-                    definitie=notes,
+                    definitie=normalize_newlines(notes),
                     stereotype=stereotype,
                 )
                 logger.debug(f"Association {name} met id {eaid}")
@@ -413,7 +422,7 @@ class QEAParser(Parser):
             field = fixtag(prop)
             obj = classes_by_id.get(eaid) or enums_by_id.get(eaid)
             if obj is not None and hasattr(obj, field):
-                setattr(obj, field, value)
+                setattr(obj, field, normalize_newlines(value))
 
         # Attribute tagged values.
         attr_rows = conn.execute(
@@ -434,7 +443,7 @@ class QEAParser(Parser):
             field = fixtag(prop)
             attr = attrs_by_id.get(eaid)
             if attr is not None and hasattr(attr, field):
-                setattr(attr, field, value)
+                setattr(attr, field, normalize_newlines(value))
 
         # Connector tagged values (associations / realisations).
         conn_rows = conn.execute(
@@ -454,7 +463,7 @@ class QEAParser(Parser):
             field = fixtag(prop)
             assoc = assocs_by_id.get(eaid)
             if assoc is not None and hasattr(assoc, field):
-                setattr(assoc, field, value)
+                setattr(assoc, field, normalize_newlines(value))
 
         # One batched write for all in-memory mutations of this phase.
         schema.database.session.flush()
@@ -496,7 +505,7 @@ class QEAParser(Parser):
                 version=version,
                 created=created,
                 modified=modified,
-                definitie=notes,
+                definitie=normalize_newlines(notes),
             )
             logger.debug(f"Diagram {name} met id {eaid}")
             schema.add(diagram)

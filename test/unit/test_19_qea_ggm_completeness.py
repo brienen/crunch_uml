@@ -22,7 +22,7 @@ import pytest
 import crunch_uml.db as db
 import crunch_uml.schema as sch
 from crunch_uml import cli, const
-from crunch_uml.parsers.qeaparser import guid_to_eaid
+from crunch_uml.parsers.qeaparser import guid_to_eaid, normalize_newlines
 
 GGM_QEA = "./test/data/Gemeentelijk Gegevensmodel 2.4.0.qea"
 SCHEMA = "ggm24_completeness"
@@ -151,6 +151,9 @@ def test_class_definitie_from_t_object_note(imported_schema, src_cursor):
     mismatches = []
     for ea_guid, expected in sample:
         eaid = guid_to_eaid(ea_guid)
+        # The parser normalizes Windows line endings in Notes; normalize the
+        # raw fixture value the same way before comparing.
+        expected = normalize_newlines(expected)
         clazz = imported_schema.get_class(eaid) or imported_schema.get_datatype(eaid)
         if clazz is None or (clazz.definitie or "") != (expected or ""):
             mismatches.append((eaid, expected[:40] if expected else None, clazz.definitie if clazz else None))
@@ -176,6 +179,7 @@ def test_attribute_definitie_from_t_attribute_notes(imported_schema, src_cursor)
     mismatches = []
     for ea_guid, expected in sample:
         eaid = guid_to_eaid(ea_guid)
+        expected = normalize_newlines(expected)
         attr = imported_schema.get_attribute(eaid)
         if attr is None or (attr.definitie or "") != (expected or ""):
             mismatches.append((eaid, expected[:40] if expected else None, attr.definitie if attr else None))
@@ -220,7 +224,7 @@ def test_object_tagged_values_are_applied(imported_schema, src_cursor):
             mismatches.append((eaid, prop, expected, "<object not found>"))
             continue
         actual = getattr(obj, field_map[prop], None)
-        if (actual or "") != (expected or ""):
+        if (actual or "") != (normalize_newlines(expected) or ""):
             mismatches.append((eaid, prop, expected, actual))
     assert not mismatches, (
         f"Tagged-value mismatch on {len(mismatches)}/{len(sample)} rows; " f"first mismatches: {mismatches[:3]}"

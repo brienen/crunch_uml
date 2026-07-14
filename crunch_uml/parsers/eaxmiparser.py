@@ -120,10 +120,13 @@ class EAXMIParser(XMIParser):
         """
 
         logger.info("Processing references to classes")
-        clazzrefs = extension.xpath(".//element[@xmi:type='uml:Class' and @xmi:idref]", namespaces=ns)  # type: ignore
+        clazzrefs = extension.xpath(
+            ".//element[(@xmi:type='uml:Class' or @xmi:type='uml:DataType') and @xmi:idref]",
+            namespaces=ns,
+        )  # type: ignore
         for clazzref in clazzrefs:
             idref = clazzref.get("{" + ns["xmi"] + "}idref")
-            clazz = classes_by_id.get(idref)
+            clazz = classes_by_id.get(idref) or datatypes_by_id.get(idref)
             if clazz is None:
                 continue
 
@@ -230,6 +233,28 @@ class EAXMIParser(XMIParser):
             for tag in tags:
                 if hasattr(association, fixtag(tag.get("name"))):
                     setattr(association, fixtag(tag.get("name")), tag.get("value"))
+
+        logger.info("Processing references to generalizations")
+        genrefs = extension.xpath(".//connector[@xmi:idref and properties/@ea_type='Generalization']", namespaces=ns)  # type: ignore
+        for genref in genrefs:
+            idref = genref.get("{" + ns["xmi"] + "}idref")
+            generalization = gens_by_id.get(idref)
+            if generalization is None:
+                continue
+
+            # EA carries the connector name in the middle-top label.
+            labels = genref.xpath("./labels")
+            if labels and labels[0].get("mt"):
+                generalization.name = labels[0].get("mt")
+
+            documentation = genref.xpath("./documentation")
+            if len(documentation) == 1 and documentation[0].get("value") is not None:
+                generalization.definitie = documentation[0].get("value")
+
+            tags = get_sorted_tags(genref.xpath("./tags/tag"))
+            for tag in tags:
+                if hasattr(generalization, fixtag(tag.get("name"))):
+                    setattr(generalization, fixtag(tag.get("name")), tag.get("value"))
 
         """
         Voorbeeld van Diagram
