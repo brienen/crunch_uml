@@ -9,8 +9,11 @@ additive migration of pre-existing database files.
 import json
 import sqlite3
 
+import pytest
+
 import crunch_uml.schema as sch
 from crunch_uml import const, db
+from crunch_uml.exceptions import CrunchException
 
 SCHEMA = "diagram_geometry_test"
 WAYPOINTS = json.dumps([{"x": 226.0, "y": 205.0}, {"x": 256.0, "y": 205.0}])
@@ -379,8 +382,9 @@ def test_datamodel_version_is_stamped_and_kept_out_of_exports():
 
 
 def test_incompatible_datamodel_version_recreates_database(tmp_path):
-    """A database with a different datamodel version is incompatible: it is
-    recreated from scratch on connect (data discarded) and restamped."""
+    """A database with a different datamodel version is incompatible. Since
+    v0.5.1 the default policy ('auto') REFUSES to touch an explicitly
+    addressed database; recreation must be requested explicitly."""
     path = tmp_path / "incompatible_version.db"
     raw = sqlite3.connect(path)
     raw.execute("CREATE TABLE packages (id VARCHAR NOT NULL, schema_id VARCHAR NOT NULL, PRIMARY KEY (id, schema_id))")
@@ -393,9 +397,18 @@ def test_incompatible_datamodel_version_recreates_database(tmp_path):
     saved_instance = db.Database._instance
     db.Database._instance = None
     try:
-        database = db.Database(f"sqlite:///{path}")
-        # Recreated: the old package row is gone, the version is restamped
-        # and the full current table set exists.
+        # Default 'auto' policy on an explicit db_url: fail fast, touch nothing.
+        with pytest.raises(CrunchException):
+            db.Database(f"sqlite:///{path}")
+        if db.Database._instance is not None:
+            db.Database._instance.close()
+        raw = sqlite3.connect(path)
+        assert raw.execute("SELECT COUNT(*) FROM packages").fetchone()[0] == 1
+        assert raw.execute("SELECT value FROM crunch_uml_meta WHERE key='datamodel_version'").fetchone()[0] == "9999"
+        raw.close()
+
+        # Explicit recreate: old data gone, version restamped, full table set.
+        database = db.Database(f"sqlite:///{path}", on_version_mismatch=const.VERSION_MISMATCH_RECREATE)
         assert database.session.query(db.Package).count() == 0
         assert database._read_datamodel_version() == db.DATAMODEL_VERSION
         rows = database.session.query(db.DiagramClass).all()

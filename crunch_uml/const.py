@@ -17,6 +17,13 @@ ENCODING = "utf-8"
 CMD_IMPORT = "import"
 CMD_EXPORT = "export"
 CMD_TRANSFORM = "transform"
+
+# Policy when the database's stored datamodel version does not match this
+# build's DATAMODEL_VERSION. 'auto' resolves to 'recreate' for the local
+# default database and to 'fail' for any explicitly provided db_url.
+VERSION_MISMATCH_AUTO = "auto"
+VERSION_MISMATCH_FAIL = "fail"
+VERSION_MISMATCH_RECREATE = "recreate"
 # CMD_CHECK = 'check'
 # CMD_FIX = 'fix'
 

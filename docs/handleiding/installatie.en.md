@@ -6,6 +6,12 @@
 pip install crunch-uml
 ```
 
+To write to a PostgreSQL database (for instance a shared import staging, see the import manual), install the postgres extra as well:
+
+```bash
+pip install 'crunch_uml[postgres]'
+```
+
 After installation, the `crunch_uml` command is available:
 
 ```bash
