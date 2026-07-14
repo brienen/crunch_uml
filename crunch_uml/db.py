@@ -9,14 +9,17 @@ from sqlalchemy import (
     Float,
     ForeignKeyConstraint,
     Integer,
+    MetaData,
     PrimaryKeyConstraint,
     String,
+    Table,
     Text,
     create_engine,
 )
 from sqlalchemy import exc as sa_exc
-from sqlalchemy import inspect
+from sqlalchemy import insert, inspect, select
 from sqlalchemy import text as sqlalchemy_text
+from sqlalchemy import update
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
@@ -28,6 +31,29 @@ from crunch_uml.exceptions import CrunchException
 
 logger = logging.getLogger()
 suppress_warnings = True
+
+# Version of the crunch_uml datamodel, stored inside every database in the
+# crunch_uml_meta table. Bump this ONLY when the schema changes in a way the
+# additive migration (Database._add_missing_tables_and_columns) cannot
+# handle: renamed or retyped columns, changed primary keys, changed
+# semantics. On connect the stored version is compared with this value; a
+# mismatch means the database is incompatible and it is recreated from
+# scratch (all data discarded — models must be re-imported). Databases
+# without a version marker predate this mechanism and are treated as
+# additively migratable.
+DATAMODEL_VERSION = 1
+DATAMODEL_VERSION_KEY = "datamodel_version"
+
+# The meta table deliberately lives in its own MetaData, NOT in Base.metadata:
+# the generic renderers/parsers iterate Base.metadata.tables and must never
+# see it (it has no schema_id and carries no model data).
+_meta_metadata = MetaData()
+crunch_meta_table = Table(
+    "crunch_uml_meta",
+    _meta_metadata,
+    Column("key", String, primary_key=True),
+    Column("value", String),
+)
 
 
 def add_args(argumentparser, subparser_dict):
@@ -1331,6 +1357,7 @@ class Database:
     def _reset_database(self):
         Base.metadata.drop_all(bind=self.engine)  # Drop all tables
         Base.metadata.create_all(bind=self.engine)  # Create all tables
+        self._write_datamodel_version()
 
     def _check_and_create_database(self):
         try:
@@ -1339,10 +1366,56 @@ class Database:
                 # If the 'packages' table does not exist, create all tables
                 Base.metadata.create_all(bind=self.engine)
             else:
-                self._add_missing_tables_and_columns(inspector)
+                stored_version = self._read_datamodel_version()
+                if stored_version is not None and stored_version != DATAMODEL_VERSION:
+                    # Incompatible datamodel: recreate the database. A None
+                    # version means the database predates the version marker
+                    # and is still additively migratable.
+                    logger.warning(
+                        f"Database has datamodel version {stored_version}, this version of crunch_uml"
+                        f" requires {DATAMODEL_VERSION}: recreating the database. All data is discarded;"
+                        " re-import your models."
+                    )
+                    self._reset_database()
+                else:
+                    self._add_missing_tables_and_columns(inspector)
         except OperationalError:
             # If the database does not exist or is not reachable, create it
             Base.metadata.create_all(bind=self.engine)
+        self._write_datamodel_version()
+
+    def _read_datamodel_version(self):
+        """Version marker stored in the database, or None when the database
+        predates the marker (or the value is unreadable)."""
+        try:
+            inspector = inspect(self.engine)
+            if crunch_meta_table.name not in inspector.get_table_names():
+                return None
+            with self.engine.connect() as connection:
+                row = connection.execute(
+                    select(crunch_meta_table.c.value).where(crunch_meta_table.c.key == DATAMODEL_VERSION_KEY)
+                ).first()
+            if row is None or row[0] is None:
+                return None
+            return int(row[0])
+        except (OperationalError, ValueError):
+            return None
+
+    def _write_datamodel_version(self):
+        try:
+            _meta_metadata.create_all(bind=self.engine, checkfirst=True)
+            with self.engine.begin() as connection:
+                updated = connection.execute(
+                    update(crunch_meta_table)
+                    .where(crunch_meta_table.c.key == DATAMODEL_VERSION_KEY)
+                    .values(value=str(DATAMODEL_VERSION))
+                ).rowcount
+                if not updated:
+                    connection.execute(
+                        insert(crunch_meta_table).values(key=DATAMODEL_VERSION_KEY, value=str(DATAMODEL_VERSION))
+                    )
+        except OperationalError as e:
+            logger.warning(f"Could not write datamodel version to database: {e}")
 
     def _add_missing_tables_and_columns(self, inspector):
         """Lightweight additive migration for existing database files.

@@ -229,6 +229,15 @@ Besides membership, the four junction tables also carry the layout of elements o
 - `t_diagramobjects` in a `.qea` repository stores **negative** RectTop/RectBottom: `x=RectLeft`, `y=-RectTop`, `width=RectRight-RectLeft`, `height=RectTop-RectBottom`.
 - `Path=` waypoints have negative y in **both** sources; canonical waypoints flip the sign. XMI separates x:y pairs with `$`, the qea `Path` column with `;`.
 
+#### Datamodel version and migration
+
+Every crunch_uml database carries a datamodel version number in the `crunch_uml_meta` table (key `datamodel_version`). On connect:
+
+- **Same version** (or a database predating this mechanism): missing tables and nullable columns are added **additively**; existing data is kept.
+- **Different version**: the database is incompatible and is **recreated**. All data is discarded (with a clear warning in the log); re-import your models.
+
+The version number (`DATAMODEL_VERSION` in `crunch_uml/db.py`) is only bumped for schema changes the additive migration cannot handle (renamed or retyped columns, changed primary keys or semantics). The `crunch_uml_meta` table deliberately lives outside the ORM model, so it never shows up in json/xlsx/csv exports.
+
 #### Diagram coverage matrix
 
 Which parsers and renderers read or write diagram membership and geometry:

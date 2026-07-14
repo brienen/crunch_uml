@@ -229,6 +229,15 @@ De vier junction tables bevatten naast de membership ook de layout van elementen
 - `t_diagramobjects` in een `.qea`-repository heeft **negatieve** RectTop/RectBottom: `x=RectLeft`, `y=-RectTop`, `width=RectRight-RectLeft`, `height=RectTop-RectBottom`.
 - `Path=`-waypoints hebben in **beide** bronnen negatieve y; canonieke waypoints flippen het teken. XMI scheidt x:y-paren met `$`, de qea-kolom `Path` met `;`.
 
+#### Datamodelversie en migratie
+
+Elke crunch_uml-database bevat een versienummer van het datamodel in de tabel `crunch_uml_meta` (sleutel `datamodel_version`). Bij het verbinden gebeurt het volgende:
+
+- **Zelfde versie** (of een database van vóór dit mechanisme): ontbrekende tabellen en nullable kolommen worden **additief** toegevoegd; bestaande data blijft staan.
+- **Andere versie**: de database is niet compatibel en wordt **opnieuw aangemaakt**. Alle data wordt weggegooid (met een duidelijke waarschuwing in de log); importeer de modellen opnieuw.
+
+Het versienummer (`DATAMODEL_VERSION` in `crunch_uml/db.py`) wordt alléén opgehoogd bij schemawijzigingen die de additieve migratie niet aankan (hernoemde of hertypeerde kolommen, gewijzigde primary keys of semantiek). De tabel `crunch_uml_meta` staat bewust buiten het ORM-model en verschijnt dus niet in json/xlsx/csv-exports.
+
 #### Dekkingsmatrix diagrammen
 
 Welke parsers en renderers diagram-membership en geometrie lezen of schrijven:

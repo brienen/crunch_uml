@@ -363,6 +363,74 @@ def test_old_database_file_gets_missing_columns_added():
         assert rows[0].ea_style is None
         # Missing tables were created as well.
         assert database.session.query(db.Diagram).count() == 0
+        # The database predates the version marker: it gets stamped with the
+        # current datamodel version on connect.
+        assert database._read_datamodel_version() == db.DATAMODEL_VERSION
+        database.close()
+    finally:
+        db.Database._instance = saved_instance
+        os.remove(path)
+
+
+def test_datamodel_version_is_stamped_and_kept_out_of_exports():
+    """Every database carries the datamodel version in crunch_uml_meta; the
+    meta table must not leak into the generic renderers (it is not part of
+    Base.metadata)."""
+    database = db.Database(const.DATABASE_URL, db_create=True)
+    assert database._read_datamodel_version() == db.DATAMODEL_VERSION
+    assert "crunch_uml_meta" not in db.getTables()
+    database.close()
+
+
+def test_incompatible_datamodel_version_recreates_database():
+    """A database with a different datamodel version is incompatible: it is
+    recreated from scratch on connect (data discarded) and restamped."""
+    path = "./test/output/incompatible_version.db"
+    if os.path.exists(path):
+        os.remove(path)
+    raw = sqlite3.connect(path)
+    raw.execute("CREATE TABLE packages (id VARCHAR NOT NULL, schema_id VARCHAR NOT NULL, PRIMARY KEY (id, schema_id))")
+    raw.execute("INSERT INTO packages VALUES ('EAPK_OUD', 'default')")
+    raw.execute("CREATE TABLE crunch_uml_meta (key VARCHAR NOT NULL PRIMARY KEY, value VARCHAR)")
+    raw.execute("INSERT INTO crunch_uml_meta VALUES ('datamodel_version', '9999')")
+    raw.commit()
+    raw.close()
+
+    saved_instance = db.Database._instance
+    db.Database._instance = None
+    try:
+        database = db.Database(f"sqlite:///{path}")
+        # Recreated: the old package row is gone, the version is restamped
+        # and the full current table set exists.
+        assert database.session.query(db.Package).count() == 0
+        assert database._read_datamodel_version() == db.DATAMODEL_VERSION
+        rows = database.session.query(db.DiagramClass).all()
+        assert rows == []
+        database.close()
+    finally:
+        db.Database._instance = saved_instance
+        os.remove(path)
+
+
+def test_compatible_database_keeps_data_between_connects():
+    """Same datamodel version: reconnecting must not touch existing data."""
+    path = "./test/output/compatible_version.db"
+    if os.path.exists(path):
+        os.remove(path)
+
+    saved_instance = db.Database._instance
+    db.Database._instance = None
+    try:
+        database = db.Database(f"sqlite:///{path}")
+        schema = sch.Schema(database, "blijft")
+        schema.save(db.Package(id="EAPK_BLIJFT", name="Blijft"))
+        database.commit()
+        database.close()
+
+        db.Database._instance = None
+        database = db.Database(f"sqlite:///{path}")
+        assert database.session.query(db.Package).filter_by(schema_id="blijft").count() == 1
+        assert database._read_datamodel_version() == db.DATAMODEL_VERSION
         database.close()
     finally:
         db.Database._instance = saved_instance
