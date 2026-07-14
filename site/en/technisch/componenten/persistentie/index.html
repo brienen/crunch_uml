@@ -722,6 +722,8 @@
       
         
       
+        
+      
     
     
       
@@ -1151,6 +1153,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#data-model-version-and-migration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Model Version and Migration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#mixins" class="md-nav__link">
     <span class="md-ellipsis">
       Mixins
@@ -1197,6 +1208,27 @@
   
   <span class="md-ellipsis">
     Data Model
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vertaalpijplijn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertaalpijplijn — technisch ontwerp
   </span>
   
 
@@ -1393,32 +1425,45 @@
 </tbody>
 </table>
 <h3 id="junction-tables">Junction Tables<a class="headerlink" href="#junction-tables" title="Permanent link">&para;</a></h3>
+<p>In addition to the membership, the diagram junction tables also carry the <strong>layout</strong> of elements on a diagram (nullable geometry columns, canonical coordinate system — see <a href="../../datamodel/">Data Model</a>):</p>
 <table>
 <thead>
 <tr>
 <th>Table</th>
 <th>Connects</th>
+<th>Geometry</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>diagram_classes</code></td>
+<td><code>diagram_class</code></td>
 <td>Diagram ↔ Class</td>
+<td>x, y, width, height, z_order, ea_style</td>
 </tr>
 <tr>
-<td><code>diagram_enumerations</code></td>
+<td><code>diagram_enumeration</code></td>
 <td>Diagram ↔ Enumeration</td>
+<td>x, y, width, height, z_order, ea_style</td>
 </tr>
 <tr>
-<td><code>diagram_associations</code></td>
+<td><code>diagram_association</code></td>
 <td>Diagram ↔ Association</td>
+<td>waypoints (JSON), hidden, ea_geometry, ea_style</td>
 </tr>
 <tr>
-<td><code>diagram_generalizations</code></td>
+<td><code>diagram_generalization</code></td>
 <td>Diagram ↔ Generalization</td>
+<td>waypoints (JSON), hidden, ea_geometry, ea_style</td>
 </tr>
 </tbody>
 </table>
+<h2 id="data-model-version-and-migration">Data Model Version and Migration<a class="headerlink" href="#data-model-version-and-migration" title="Permanent link">&para;</a></h2>
+<p>Every database contains a version marker in the <code>crunch_uml_meta</code> table (deliberately kept outside <code>Base.metadata</code>, so it never shows up in exports). On connecting:</p>
+<ul>
+<li><strong>Same version</strong> or a database predating this mechanism: missing tables and nullable columns are added <strong>additively</strong> (<code>Database._add_missing_tables_and_columns</code>); data is preserved.</li>
+<li><strong>Different version</strong>: the database is incompatible and is <strong>recreated</strong> with a clear warning; models must be re-imported.</li>
+</ul>
+<p><code>DATAMODEL_VERSION</code> (in <code>db.py</code>) is only bumped for changes the additive migration cannot handle (renamed/retyped columns, changed primary keys or semantics).</p>
 <h2 id="mixins">Mixins<a class="headerlink" href="#mixins" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>graph TB
     UG["UML_Generic&lt;br/&gt;id, schema_id, name, definitie,&lt;br/&gt;bron, toelichting, created, modified, stereotype"]

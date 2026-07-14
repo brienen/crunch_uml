@@ -12,9 +12,9 @@ crunch_uml is built as a **plugin-based, registry-driven architecture** with six
 
 1. **Presentation Layer** — CLI interface, logging, constants
 2. **Orchestration Layer** — Registry pattern and plugin framework
-3. **Import Layer** — 8 parsers for various input formats
+3. **Import Layer** — 7 parsers for various input formats
 4. **Transformation Layer** — Copy transformer and plugin framework
-5. **Export Layer** — 22 renderers for various output formats
+5. **Export Layer** — 23 renderers for various output formats (including the XMI renderer with diagram geometry)
 6. **Persistence Layer** — SQLAlchemy ORM with multi-schema support
 
 ## Sections

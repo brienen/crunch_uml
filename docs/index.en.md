@@ -54,6 +54,7 @@ graph LR
     CU["crunch_uml<br/>━━━━━━━━━━━━<br/>Normalize<br/>Transform<br/>Validate"]
 
     subgraph Output
+        EAXMI2["EA XMI"]
         JSON2["JSON"]
         MD["Markdown"]
         RDF["RDF / TTL / JSON-LD"]
@@ -65,18 +66,20 @@ graph LR
     end
 
     XMI & EAXMI & QEA & JSON & XLSX & CSV --> CU
-    CU --> JSON2 & MD & RDF & JSCHEMA & XLS2 & SQLA & EA & DIFF
+    CU --> EAXMI2 & JSON2 & MD & RDF & JSCHEMA & XLS2 & SQLA & EA & DIFF
     CU --- DB[("crunch_uml.db<br/>SQLite / PostgreSQL")]
 
     style CU fill:#1a5276,color:#fff,stroke:#1a5276
     style DB fill:#e74c3c,color:#fff,stroke:#c0392b
 ```
 
-The core of crunch_uml is a **standardized meta-schema**: regardless of the input format, all UML entities (packages, classes, attributes, associations, generalizations, enumerations) are stored in the same database. From that database you can then export to any desired format.
+The core of crunch_uml is a **standardized meta-schema**: regardless of the input format, all UML entities (packages, classes, attributes, associations, generalizations, enumerations and diagrams) are stored in the same database. From that database you can then export to any desired format.
 
 ## What Makes crunch_uml Special?
 
 **Multi-schema support** — You can read the same model multiple times into different schemas within the same database. This allows you to, for example, place version 1.0 and version 2.0 of a model side by side and automatically generate a diff report. Or you can keep a translated model alongside the original.
+
+**Diagrams with layout** — Diagrams are fully included: not just *which* elements appear on a diagram, but also their positions, sizes and the routing of relationship lines. The `xmi` export produces EA-compatible XMI in which the diagrams look exactly the same again in Sparx EA, and the `earepo` export updates the layout directly in an EA repository.
 
 **Plugin architecture** — New input formats, output formats and transformations can be added without modifying the core code, via a registry-based plugin system.
 

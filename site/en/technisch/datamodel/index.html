@@ -19,7 +19,7 @@
         <link rel="prev" href="../componenten/persistentie/">
       
       
-        <link rel="next" href="../kwetsbaarheden/">
+        <link rel="next" href="../vertaalpijplijn/">
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
@@ -722,6 +722,8 @@
       
         
       
+        
+      
     
     
       
@@ -1199,6 +1201,39 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Diagram">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#diagram-geometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      Diagram geometry
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datamodel-version-and-migration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Datamodel version and migration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#diagram-coverage-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      Diagram coverage matrix
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -1261,6 +1296,27 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vertaalpijplijn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertaalpijplijn — technisch ontwerp
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -1468,6 +1524,28 @@
         string schema_id
         string name
         string package_id FK
+    }
+
+    DiagramClass {
+        string diagram_id PK
+        string schema_id PK
+        string class_id PK
+        float x
+        float y
+        float width
+        float height
+        int z_order
+        text ea_style
+    }
+
+    DiagramAssociation {
+        string diagram_id PK
+        string schema_id PK
+        string association_id PK
+        text waypoints
+        boolean hidden
+        text ea_geometry
+        text ea_style
     }</code></pre>
 <h2 id="model-details">Model Details<a class="headerlink" href="#model-details" title="Permanent link">&para;</a></h2>
 <h3 id="package">Package<a class="headerlink" href="#package" title="Permanent link">&para;</a></h3>
@@ -1510,6 +1588,163 @@
 <p>Enumeration type with named values. EnumerationLiteral contains the individual values.</p>
 <h3 id="diagram">Diagram<a class="headerlink" href="#diagram" title="Permanent link">&para;</a></h3>
 <p>Visual diagram that references classes, enumerations, associations and generalizations via junction tables.</p>
+<h4 id="diagram-geometry">Diagram geometry<a class="headerlink" href="#diagram-geometry" title="Permanent link">&para;</a></h4>
+<p>Besides membership, the four junction tables also carry the layout of elements on the diagram. All geometry columns are <strong>nullable</strong>: membership without a known layout stays valid, and files or databases written before these columns existed remain importable.</p>
+<p><strong>Node-like</strong> (<code>DiagramClass</code>, <code>DiagramEnumeration</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x</code></td>
+<td>Float</td>
+<td>left edge, canonical coordinates</td>
+</tr>
+<tr>
+<td><code>y</code></td>
+<td>Float</td>
+<td>top edge, canonical coordinates</td>
+</tr>
+<tr>
+<td><code>width</code></td>
+<td>Float</td>
+<td>width</td>
+</tr>
+<tr>
+<td><code>height</code></td>
+<td>Float</td>
+<td>height</td>
+</tr>
+<tr>
+<td><code>z_order</code></td>
+<td>Integer</td>
+<td>stacking order (EA <code>seqno</code>/<code>Sequence</code>)</td>
+</tr>
+<tr>
+<td><code>ea_style</code></td>
+<td>Text</td>
+<td>raw EA style string, kept losslessly for round-trips</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Edge-like</strong> (<code>DiagramAssociation</code>, <code>DiagramGeneralization</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>waypoints</code></td>
+<td>Text (JSON)</td>
+<td><code>[{"x": .., "y": ..}, ...]</code> in canonical coordinates; empty list or NULL = no intermediate points</td>
+</tr>
+<tr>
+<td><code>hidden</code></td>
+<td>Boolean</td>
+<td>EA <code>Hidden</code> flag</td>
+</tr>
+<tr>
+<td><code>ea_geometry</code></td>
+<td>Text</td>
+<td>raw EA geometry string (SX/SY/EX/EY/EDGE/label positions/Path) — lossless</td>
+</tr>
+<tr>
+<td><code>ea_style</code></td>
+<td>Text</td>
+<td>raw EA style string — lossless</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Canonical coordinate system</strong>: origin in the top-left corner, x grows to the right, y grows downwards, all values positive. All conversions to and from EA conventions happen in the parsers and renderers; the database only ever contains canonical values. The EA conventions (verified against real files):</p>
+<ul>
+<li>XMI extension node geometry (<code>Left=..;Top=..;Right=..;Bottom=..;</code>) uses <strong>positive</strong> Top/Bottom: <code>x=Left</code>, <code>y=Top</code>, <code>width=Right-Left</code>, <code>height=Bottom-Top</code>.</li>
+<li><code>t_diagramobjects</code> in a <code>.qea</code> repository stores <strong>negative</strong> RectTop/RectBottom: <code>x=RectLeft</code>, <code>y=-RectTop</code>, <code>width=RectRight-RectLeft</code>, <code>height=RectTop-RectBottom</code>.</li>
+<li><code>Path=</code> waypoints have negative y in <strong>both</strong> sources; canonical waypoints flip the sign. XMI separates x:y pairs with <code>$</code>, the qea <code>Path</code> column with <code>;</code>.</li>
+</ul>
+<h4 id="datamodel-version-and-migration">Datamodel version and migration<a class="headerlink" href="#datamodel-version-and-migration" title="Permanent link">&para;</a></h4>
+<p>Every crunch_uml database carries a datamodel version number in the <code>crunch_uml_meta</code> table (key <code>datamodel_version</code>). On connect:</p>
+<ul>
+<li><strong>Same version</strong> (or a database predating this mechanism): missing tables and nullable columns are added <strong>additively</strong>; existing data is kept.</li>
+<li><strong>Different version</strong>: the database is incompatible and is <strong>recreated</strong>. All data is discarded (with a clear warning in the log); re-import your models.</li>
+</ul>
+<p>The version number (<code>DATAMODEL_VERSION</code> in <code>crunch_uml/db.py</code>) is only bumped for schema changes the additive migration cannot handle (renamed or retyped columns, changed primary keys or semantics). The <code>crunch_uml_meta</code> table deliberately lives outside the ORM model, so it never shows up in json/xlsx/csv exports.</p>
+<h4 id="diagram-coverage-matrix">Diagram coverage matrix<a class="headerlink" href="#diagram-coverage-matrix" title="Permanent link">&para;</a></h4>
+<p>Which parsers and renderers read or write diagram membership and geometry:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Diagram membership</th>
+<th>Geometry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>eaxmi</code> parser</td>
+<td>reads</td>
+<td>reads</td>
+</tr>
+<tr>
+<td><code>qea</code> parser</td>
+<td>reads</td>
+<td>reads</td>
+</tr>
+<tr>
+<td><code>xmi</code> parser (strict)</td>
+<td>n/a — strict XMI 2.1 carries no diagrams</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td><code>xmi</code> renderer</td>
+<td>writes</td>
+<td>writes</td>
+</tr>
+<tr>
+<td><code>json</code> parser/renderer</td>
+<td>reads/writes</td>
+<td>reads/writes</td>
+</tr>
+<tr>
+<td><code>csv</code> parser/renderer</td>
+<td>reads/writes (one file per junction table)</td>
+<td>reads/writes</td>
+</tr>
+<tr>
+<td><code>xlsx</code> parser/renderer</td>
+<td>reads/writes (one sheet per junction table)</td>
+<td>reads/writes</td>
+</tr>
+<tr>
+<td><code>i18n</code> parser/renderer</td>
+<td>n/a — junction tables have no <code>id</code> column and contain nothing translatable</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td><code>earepo</code>/<code>eamimrepo</code> renderer</td>
+<td>writes (<code>t_diagramobjects</code>/<code>t_diagramlinks</code>: update, insert, delete)</td>
+<td>writes</td>
+</tr>
+<tr>
+<td><code>sqla</code> renderer</td>
+<td>n/a — generates code for the modelled domain, not for diagrams</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td>Semantic renderers (<code>jinja2</code>, <code>ggm_md</code>, <code>json_schema</code>, <code>plain_html</code>, <code>model_overview_md</code>, <code>er_diagram</code>, <code>openapi</code>, <code>ttl</code>, <code>rdf</code>, <code>json-ld</code>, <code>shex</code>, <code>profile</code>, <code>uml_mmd</code>, <code>model_stats_md</code>, <code>diff_md</code>)</td>
+<td>n/a — geometry has no meaning in these output formats</td>
+<td>n/a</td>
+</tr>
+</tbody>
+</table>
 <h2 id="mixin-structure">Mixin Structure<a class="headerlink" href="#mixin-structure" title="Permanent link">&para;</a></h2>
 <p>All entities share fields via mixins:</p>
 <table>

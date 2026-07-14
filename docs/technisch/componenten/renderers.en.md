@@ -54,6 +54,7 @@ classDiagram
 
 | Renderer | Type | File | Output Format |
 |---|---|---|---|
+| XMIRenderer | `xmi` | `xmirenderer.py` | XMI 2.1 + EA extension, incl. diagrams with geometry |
 | JSONRenderer | `json` | `pandasrenderer.py` | JSON (array of records / indexed) |
 | CSVRenderer | `csv` | `pandasrenderer.py` | CSV per table |
 | I18nRenderer | `i18n` | `pandasrenderer.py` | Translation JSON |
@@ -67,6 +68,17 @@ classDiagram
 | SQLARenderer | `sqla` | `sqlarenderer.py` | Python SQLAlchemy code |
 | EARepoUpdater | `ea_repo` | `earepoupdater.py` | Direct EA database update |
 | SchemaDiffMD | `schema_diff_md` | `jinja2renderer.py` | Schema comparison markdown |
+
+---
+
+## XMI Renderer
+
+The `xmi` renderer (`renderers/xmirenderer.py`) writes the complete schema as **XMI 2.1 with an Enterprise Architect extension section** — the mirror image of what the `eaxmi` parser reads:
+
+- **Strict part**: `uml:Model` with packages, classes (incl. attributes), enumerations (incl. literals), associations (incl. ends/cardinalities/roles) and generalizations, with the existing ids as `xmi:id`.
+- **Extension part**: documentation, project metadata, tagged values, connector roles and, per diagram, a `<diagram>` element with the geometry in EA format (the exact inverse of the parser conversions, including the y-flip for edge waypoints).
+
+The output can be re-imported via crunch_uml's own `eaxmi` parser (lossless round-trip, covered by acceptance tests on four fixtures) and imported into Sparx EA. Where the XMI spec and EA collide, EA wins; every deviation is documented in [`crunch_uml/renderers/EA_QUIRKS.md`](https://github.com/brienen/crunch_uml/blob/main/crunch_uml/renderers/EA_QUIRKS.md).
 
 ---
 
@@ -186,6 +198,8 @@ HTML-to-Markdown conversion via BeautifulSoup + markdownify.
     - `--ea_allow_delete` — Allow deletions
 
     Tag strategies: `update` | `upsert` | `replace`
+
+Besides the model elements, the **diagram layout** is also written back to `t_diagramobjects` and `t_diagramlinks`: existing rows are updated, new membership is inserted and lapsed membership is removed, with the same coordinate conversions as the qea parser (inverted). Rows of element types that crunch_uml does not manage (Notes, packages) and of elements unknown to the schema are left untouched — a partial export does not wreck layout it knows nothing about.
 
 ---
 

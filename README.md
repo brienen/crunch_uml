@@ -17,18 +17,18 @@ Crunch_UML is a tool for parsing, transforming and exporting UML information mod
   ┌─────────────────┐                                        ┌──────────────────┐
   │     Input       │                                        │     Output       │
   │                 │                                        │                  │
-  │  XMI 2.1        │         ┌──────────────────┐           │  JSON            │
-  │  EA XMI         │────────▶│   crunch_uml     │──────────▶│  Markdown        │
-  │  QEA (EA native)│         │                  │           │  Excel           │
-  │  JSON           │         │  Normaliseer     │           │  RDF / TTL       │
-  │  Excel          │         │  Transformeer    │           │  JSON-LD         │
-  │  CSV            │         │  Valideer        │           │  JSON Schema     │
-  │  i18n           │         └────────┬─────────┘           │  OpenAPI         │
-  │                 │                  │                     │  SQLAlchemy code │
-  └─────────────────┘                  │                     │  EA Repository   │
-                              ┌────────┴─────────┐           │  Schema Diff     │
-                              │  crunch_uml.db   │           │  CSV             │
-                              │  SQLite / PG     │           │  i18n            │
+  │  XMI 2.1        │         ┌──────────────────┐           │  EA XMI          │
+  │  EA XMI         │────────▶│   crunch_uml     │──────────▶│  JSON            │
+  │  QEA (EA native)│         │                  │           │  Markdown        │
+  │  JSON           │         │  Normaliseer     │           │  Excel           │
+  │  Excel          │         │  Transformeer    │           │  RDF / TTL       │
+  │  CSV            │         │  Valideer        │           │  JSON-LD         │
+  │  i18n           │         └────────┬─────────┘           │  JSON Schema     │
+  │                 │                  │                     │  OpenAPI         │
+  └─────────────────┘                  │                     │  SQLAlchemy code │
+                              ┌────────┴─────────┐           │  EA Repository   │
+                              │  crunch_uml.db   │           │  Schema Diff     │
+                              │  SQLite / PG     │           │  CSV / i18n      │
                               └──────────────────┘           └──────────────────┘
 ```
 
@@ -36,11 +36,13 @@ Crunch_UML is a tool for parsing, transforming and exporting UML information mod
 
 - **Multi-format import** — Reads XMI 2.1, Enterprise Architect XMI, QEA, JSON, Excel, CSV and i18n files
 - **Normalised storage** — Stores all UML entities (Package, Class, Attribute, Association, Generalization, Enumeration, Diagram) in a SQLAlchemy database
+- **Diagrams with layout** — Diagram membership *and* geometry (positions, sizes, z-order, edge waypoints) are read from EA XMI and QEA files, stored in a canonical coordinate system, and written back out — including a full XMI round-trip and EA repository layout updates
 - **Multi-schema support** — Load different versions or translations of the same model into separate schemas within one database, then compare or merge them
-- **22 export formats** — JSON, CSV, Excel, Markdown, Jinja2 templates, RDF/TTL/JSON-LD, JSON Schema, OpenAPI, SQLAlchemy code, EA Repository update, schema diff, and more
+- **23 export formats** — EA XMI, JSON, CSV, Excel, Markdown, Jinja2 templates, RDF/TTL/JSON-LD, JSON Schema, OpenAPI, SQLAlchemy code, EA Repository update, schema diff, and more
 - **Plugin architecture** — Add custom parsers, renderers or transformers without changing core code
 - **Pipeline approach** — Import, transform and export are independent steps that can be combined into automated workflows
 - **Upsert support** — Import different datasets or incremental changes into the same database
+- **Safe database evolution** — Every database carries a datamodel version; compatible upgrades are migrated in place (additive), incompatible ones recreate the database with a clear warning
 
 ## Documentation
 
@@ -115,15 +117,15 @@ crunch_uml import -f <file> -t <type> [options]
 
 | Type | Description |
 |---|---|
-| `xmi` | Standard XMI 2.1 parser (no tool-specific extensions) |
-| `eaxmi` | Enterprise Architect XMI parser with EA-specific extensions |
-| `qea` | Enterprise Architect native repository file (.qea/.qeax) |
+| `xmi` | Standard XMI 2.1 parser (no tool-specific extensions, no diagrams) |
+| `eaxmi` | Enterprise Architect XMI parser with EA-specific extensions, including diagrams with geometry |
+| `qea` | Enterprise Architect native repository file (.qea/.qeax), including diagrams with geometry |
 | `json` | JSON with table names as keys and arrays of records |
 | `xlsx` | Excel with worksheets corresponding to table names |
 | `csv` | Single CSV file mapped to one table |
 | `i18n` | Translation file for multilingual models |
 
-Supported tables: `packages`, `classes`, `attributes`, `enumerations`, `enumerationliterals`, `associations`, `generalizations`.
+Supported tables: `packages`, `classes`, `attributes`, `enumerations`, `enumerationliterals`, `associations`, `generalizations`, `diagrams` and the diagram junction tables (`diagram_class`, `diagram_enumeration`, `diagram_association`, `diagram_generalization`) that carry membership and layout.
 
 ### transform
 
@@ -176,6 +178,7 @@ crunch_uml [-sch SCHEMA] export -t <type> -f <file> [options]
 
 | Type | Description |
 |---|---|
+| `xmi` | XMI 2.1 with Enterprise Architect extension section, including diagrams with geometry. Re-importable via `eaxmi` and into Sparx EA |
 | `json` | JSON document with all tables |
 | `csv` | Multiple CSV files, one per table |
 | `xlsx` | Excel with tabs per table |
@@ -196,7 +199,7 @@ crunch_uml [-sch SCHEMA] export -t <type> -f <file> [options]
 | `json_schema` | JSON Schema for data validation. Requires `-js_url` |
 | `openapi` | OpenAPI / Swagger specification |
 | `sqla` | Python SQLAlchemy model code |
-| `earepo` | Update existing EA v16 repository |
+| `earepo` | Update existing EA v16 repository, including diagram membership and layout |
 | `eamimrepo` | Update EA repository with MIM tags |
 
 ## Multi-Schema: Version Comparison & Translations

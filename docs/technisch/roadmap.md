@@ -46,6 +46,13 @@ gantt
 
 ---
 
+## Recent gerealiseerd (v0.5.0)
+
+- [x] **Volledige diagram-ondersteuning** — membership én geometrie (posities, afmetingen, z-order, waypoints) end-to-end: `eaxmi`/`qea`-parsers lezen layout, de nieuwe `xmi`-renderer schrijft EA-compatibele XMI met verliesvrije round-trip, `earepo` werkt de layout in de EA-repository bij, en json/xlsx/csv round-trippen de koppeltabellen. Zie de dekkingsmatrix in het [datamodel](datamodel.md).
+- [x] **Datamodel-versionering** — versienummer in `crunch_uml_meta`; compatibele databases worden additief gemigreerd, incompatibele met waarschuwing opnieuw aangemaakt.
+
+---
+
 ## Fase 1: Metaschema & Import/Export
 
 ### Gecentraliseerde Repository

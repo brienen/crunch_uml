@@ -12,9 +12,9 @@ crunch_uml is opgebouwd als een **plugin-gebaseerde, registry-driven architectuu
 
 1. **Presentatielaag** — CLI interface, logging, constanten
 2. **Orchestratielaag** — Registry pattern en plugin framework
-3. **Importlaag** — 8 parsers voor diverse invoerformaten
+3. **Importlaag** — 7 parsers voor diverse invoerformaten
 4. **Transformatielaag** — Copy transformer en plugin framework
-5. **Exportlaag** — 22 renderers voor diverse uitvoerformaten
+5. **Exportlaag** — 23 renderers voor diverse uitvoerformaten (waaronder de XMI-renderer met diagram-geometrie)
 6. **Persistentielaag** — SQLAlchemy ORM met multi-schema ondersteuning
 
 ## Secties

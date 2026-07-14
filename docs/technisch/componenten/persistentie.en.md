@@ -76,12 +76,23 @@ All models inherit from `UML_Generic` and optionally `UMLBase` and `UMLTags*` mi
 
 ### Junction Tables
 
-| Table | Connects |
-|---|---|
-| `diagram_classes` | Diagram ↔ Class |
-| `diagram_enumerations` | Diagram ↔ Enumeration |
-| `diagram_associations` | Diagram ↔ Association |
-| `diagram_generalizations` | Diagram ↔ Generalization |
+In addition to the membership, the diagram junction tables also carry the **layout** of elements on a diagram (nullable geometry columns, canonical coordinate system — see [Data Model](../datamodel.md)):
+
+| Table | Connects | Geometry |
+|---|---|---|
+| `diagram_class` | Diagram ↔ Class | x, y, width, height, z_order, ea_style |
+| `diagram_enumeration` | Diagram ↔ Enumeration | x, y, width, height, z_order, ea_style |
+| `diagram_association` | Diagram ↔ Association | waypoints (JSON), hidden, ea_geometry, ea_style |
+| `diagram_generalization` | Diagram ↔ Generalization | waypoints (JSON), hidden, ea_geometry, ea_style |
+
+## Data Model Version and Migration
+
+Every database contains a version marker in the `crunch_uml_meta` table (deliberately kept outside `Base.metadata`, so it never shows up in exports). On connecting:
+
+- **Same version** or a database predating this mechanism: missing tables and nullable columns are added **additively** (`Database._add_missing_tables_and_columns`); data is preserved.
+- **Different version**: the database is incompatible and is **recreated** with a clear warning; models must be re-imported.
+
+`DATAMODEL_VERSION` (in `db.py`) is only bumped for changes the additive migration cannot handle (renamed/retyped columns, changed primary keys or semantics).
 
 ## Mixins
 

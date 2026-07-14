@@ -818,6 +818,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#example-9a-export-model-including-diagrams-as-ea-xmi" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example 9a: Export model including diagrams as EA XMI
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#example-10-complete-deployment-pipeline" class="md-nav__link">
     <span class="md-ellipsis">
       Example 10: Complete deployment pipeline
@@ -854,6 +863,8 @@
       
         
           
+        
+      
         
       
         
@@ -1234,6 +1245,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../technisch/vertaalpijplijn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertaalpijplijn — technisch ontwerp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../technisch/kwetsbaarheden/" class="md-nav__link">
         
   
@@ -1482,12 +1514,20 @@
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span>-f<span class="w"> </span>./model.qea<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span>--tag_strategy<span class="w"> </span>upsert
 </code></pre></div>
-<p>The <code>upsert</code> strategy adds new tags and updates existing ones, without deleting unmentioned tags.</p>
+<p>The <code>upsert</code> strategy adds new tags and updates existing ones, without deleting unmentioned tags. The diagram layout (positions, line routing) is also updated to match the state of the model.</p>
+<hr />
+<h2 id="example-9a-export-model-including-diagrams-as-ea-xmi">Example 9a: Export model including diagrams as EA XMI<a class="headerlink" href="#example-9a-export-model-including-diagrams-as-ea-xmi" title="Permanent link">&para;</a></h2>
+<p>Export the complete model — including diagrams with layout — as EA-compatible XMI, for example to load it into another EA installation or into the Semantic Toolkit:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>GGM_ROOT_SCHEMA<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span>-t<span class="w"> </span>xmi<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span>-f<span class="w"> </span>./export/model.xml
+</code></pre></div>
+<p>The result can be re-imported losslessly (<code>import -t eaxmi</code>): same elements, same diagram membership and exactly the same geometry.</p>
 <hr />
 <h2 id="example-10-complete-deployment-pipeline">Example 10: Complete deployment pipeline<a class="headerlink" href="#example-10-complete-deployment-pipeline" title="Permanent link">&para;</a></h2>
 <p>Combine all steps in an automated pipeline (with <a href="https://taskfile.dev/">Task</a>):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Complete deployment in one command</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>task<span class="w"> </span>full-deploy
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Complete deployment in one command</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>task<span class="w"> </span>full-deploy
 </code></pre></div>
 <p>This executes in sequence:</p>
 <ol>

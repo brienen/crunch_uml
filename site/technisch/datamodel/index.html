@@ -19,7 +19,7 @@
         <link rel="prev" href="../componenten/persistentie/">
       
       
-        <link rel="next" href="../kwetsbaarheden/">
+        <link rel="next" href="../vertaalpijplijn/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -722,6 +722,8 @@
       
         
       
+        
+      
     
     
       
@@ -1199,6 +1201,39 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Diagram">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#diagram-geometrie" class="md-nav__link">
+    <span class="md-ellipsis">
+      Diagram-geometrie
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datamodelversie-en-migratie" class="md-nav__link">
+    <span class="md-ellipsis">
+      Datamodelversie en migratie
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dekkingsmatrix-diagrammen" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dekkingsmatrix diagrammen
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -1261,6 +1296,27 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vertaalpijplijn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertaalpijplijn — technisch ontwerp
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -1468,6 +1524,28 @@
         string schema_id
         string name
         string package_id FK
+    }
+
+    DiagramClass {
+        string diagram_id PK
+        string schema_id PK
+        string class_id PK
+        float x
+        float y
+        float width
+        float height
+        int z_order
+        text ea_style
+    }
+
+    DiagramAssociation {
+        string diagram_id PK
+        string schema_id PK
+        string association_id PK
+        text waypoints
+        boolean hidden
+        text ea_geometry
+        text ea_style
     }</code></pre>
 <h2 id="modeldetail">Modeldetail<a class="headerlink" href="#modeldetail" title="Permanent link">&para;</a></h2>
 <h3 id="package">Package<a class="headerlink" href="#package" title="Permanent link">&para;</a></h3>
@@ -1510,6 +1588,163 @@
 <p>Enumeratietype met benoemde waarden. EnumerationLiteral bevat de individuele waarden.</p>
 <h3 id="diagram">Diagram<a class="headerlink" href="#diagram" title="Permanent link">&para;</a></h3>
 <p>Visueel diagram dat via junction tables verwijst naar classes, enumeraties, associaties en generalisaties.</p>
+<h4 id="diagram-geometrie">Diagram-geometrie<a class="headerlink" href="#diagram-geometrie" title="Permanent link">&para;</a></h4>
+<p>De vier junction tables bevatten naast de membership ook de layout van elementen op het diagram. Alle geometriekolommen zijn <strong>nullable</strong>: membership zonder bekende layout blijft geldig, en bestanden of databases van vóór deze kolommen blijven importeerbaar.</p>
+<p><strong>Node-achtig</strong> (<code>DiagramClass</code>, <code>DiagramEnumeration</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Type</th>
+<th>Betekenis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x</code></td>
+<td>Float</td>
+<td>linkerkant, canonieke coördinaten</td>
+</tr>
+<tr>
+<td><code>y</code></td>
+<td>Float</td>
+<td>bovenkant, canonieke coördinaten</td>
+</tr>
+<tr>
+<td><code>width</code></td>
+<td>Float</td>
+<td>breedte</td>
+</tr>
+<tr>
+<td><code>height</code></td>
+<td>Float</td>
+<td>hoogte</td>
+</tr>
+<tr>
+<td><code>z_order</code></td>
+<td>Integer</td>
+<td>stapelvolgorde (EA <code>seqno</code>/<code>Sequence</code>)</td>
+</tr>
+<tr>
+<td><code>ea_style</code></td>
+<td>Text</td>
+<td>ruwe EA style-string, lossless bewaard voor round-trip</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Edge-achtig</strong> (<code>DiagramAssociation</code>, <code>DiagramGeneralization</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Type</th>
+<th>Betekenis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>waypoints</code></td>
+<td>Text (JSON)</td>
+<td><code>[{"x": .., "y": ..}, ...]</code> in canonieke coördinaten; lege lijst of NULL = geen tussenpunten</td>
+</tr>
+<tr>
+<td><code>hidden</code></td>
+<td>Boolean</td>
+<td>EA <code>Hidden</code>-vlag</td>
+</tr>
+<tr>
+<td><code>ea_geometry</code></td>
+<td>Text</td>
+<td>ruwe EA geometry-string (SX/SY/EX/EY/EDGE/labelposities/Path) — lossless</td>
+</tr>
+<tr>
+<td><code>ea_style</code></td>
+<td>Text</td>
+<td>ruwe EA style-string — lossless</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Canoniek coördinatenstelsel</strong>: oorsprong linksboven, x naar rechts, y naar beneden, alle waarden positief. Alle conversies van en naar EA-conventies gebeuren in de parsers en renderers; de database bevat uitsluitend canonieke waarden. De EA-conventies (geverifieerd tegen echte bestanden):</p>
+<ul>
+<li>XMI-extension node-geometrie (<code>Left=..;Top=..;Right=..;Bottom=..;</code>) heeft <strong>positieve</strong> Top/Bottom: <code>x=Left</code>, <code>y=Top</code>, <code>width=Right-Left</code>, <code>height=Bottom-Top</code>.</li>
+<li><code>t_diagramobjects</code> in een <code>.qea</code>-repository heeft <strong>negatieve</strong> RectTop/RectBottom: <code>x=RectLeft</code>, <code>y=-RectTop</code>, <code>width=RectRight-RectLeft</code>, <code>height=RectTop-RectBottom</code>.</li>
+<li><code>Path=</code>-waypoints hebben in <strong>beide</strong> bronnen negatieve y; canonieke waypoints flippen het teken. XMI scheidt x:y-paren met <code>$</code>, de qea-kolom <code>Path</code> met <code>;</code>.</li>
+</ul>
+<h4 id="datamodelversie-en-migratie">Datamodelversie en migratie<a class="headerlink" href="#datamodelversie-en-migratie" title="Permanent link">&para;</a></h4>
+<p>Elke crunch_uml-database bevat een versienummer van het datamodel in de tabel <code>crunch_uml_meta</code> (sleutel <code>datamodel_version</code>). Bij het verbinden gebeurt het volgende:</p>
+<ul>
+<li><strong>Zelfde versie</strong> (of een database van vóór dit mechanisme): ontbrekende tabellen en nullable kolommen worden <strong>additief</strong> toegevoegd; bestaande data blijft staan.</li>
+<li><strong>Andere versie</strong>: de database is niet compatibel en wordt <strong>opnieuw aangemaakt</strong>. Alle data wordt weggegooid (met een duidelijke waarschuwing in de log); importeer de modellen opnieuw.</li>
+</ul>
+<p>Het versienummer (<code>DATAMODEL_VERSION</code> in <code>crunch_uml/db.py</code>) wordt alléén opgehoogd bij schemawijzigingen die de additieve migratie niet aankan (hernoemde of hertypeerde kolommen, gewijzigde primary keys of semantiek). De tabel <code>crunch_uml_meta</code> staat bewust buiten het ORM-model en verschijnt dus niet in json/xlsx/csv-exports.</p>
+<h4 id="dekkingsmatrix-diagrammen">Dekkingsmatrix diagrammen<a class="headerlink" href="#dekkingsmatrix-diagrammen" title="Permanent link">&para;</a></h4>
+<p>Welke parsers en renderers diagram-membership en geometrie lezen of schrijven:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Diagram-membership</th>
+<th>Geometrie</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>eaxmi</code> parser</td>
+<td>leest</td>
+<td>leest</td>
+</tr>
+<tr>
+<td><code>qea</code> parser</td>
+<td>leest</td>
+<td>leest</td>
+</tr>
+<tr>
+<td><code>xmi</code> parser (strict)</td>
+<td>n.v.t. — strict XMI 2.1 bevat geen diagrammen</td>
+<td>n.v.t.</td>
+</tr>
+<tr>
+<td><code>xmi</code> renderer</td>
+<td>schrijft</td>
+<td>schrijft</td>
+</tr>
+<tr>
+<td><code>json</code> parser/renderer</td>
+<td>leest/schrijft</td>
+<td>leest/schrijft</td>
+</tr>
+<tr>
+<td><code>csv</code> parser/renderer</td>
+<td>leest/schrijft (bestand per koppeltabel)</td>
+<td>leest/schrijft</td>
+</tr>
+<tr>
+<td><code>xlsx</code> parser/renderer</td>
+<td>leest/schrijft (tabblad per koppeltabel)</td>
+<td>leest/schrijft</td>
+</tr>
+<tr>
+<td><code>i18n</code> parser/renderer</td>
+<td>n.v.t. — koppeltabellen hebben geen <code>id</code>-kolom en bevatten niets vertaalbaars</td>
+<td>n.v.t.</td>
+</tr>
+<tr>
+<td><code>earepo</code>/<code>eamimrepo</code> renderer</td>
+<td>schrijft (<code>t_diagramobjects</code>/<code>t_diagramlinks</code>: update, insert, delete)</td>
+<td>schrijft</td>
+</tr>
+<tr>
+<td><code>sqla</code> renderer</td>
+<td>n.v.t. — genereert code voor het gemodelleerde domein, niet voor diagrammen</td>
+<td>n.v.t.</td>
+</tr>
+<tr>
+<td>Semantische renderers (<code>jinja2</code>, <code>ggm_md</code>, <code>json_schema</code>, <code>plain_html</code>, <code>model_overview_md</code>, <code>er_diagram</code>, <code>openapi</code>, <code>ttl</code>, <code>rdf</code>, <code>json-ld</code>, <code>shex</code>, <code>profile</code>, <code>uml_mmd</code>, <code>model_stats_md</code>, <code>diff_md</code>)</td>
+<td>n.v.t. — geometrie heeft geen betekenis in deze uitvoerformaten</td>
+<td>n.v.t.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="mixin-structuur">Mixin-structuur<a class="headerlink" href="#mixin-structuur" title="Permanent link">&para;</a></h2>
 <p>Alle entiteiten delen velden via mixins:</p>
 <table>

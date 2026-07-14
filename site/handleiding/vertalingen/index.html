@@ -795,11 +795,71 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#voortgang-volgen-in-de-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      Voortgang volgen in de log
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#prestaties-wat-te-verwachten" class="md-nav__link">
     <span class="md-ellipsis">
       Prestaties — wat te verwachten
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#de-deterministische-vertaalpijplijn" class="md-nav__link">
+    <span class="md-ellipsis">
+      De deterministische vertaalpijplijn
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="De deterministische vertaalpijplijn">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configureren" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configureren
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hoe-de-pijplijn-vertaalt" class="md-nav__link">
+    <span class="md-ellipsis">
+      Hoe de pijplijn vertaalt
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#preflight-nette-degradatie" class="md-nav__link">
+    <span class="md-ellipsis">
+      Preflight: nette degradatie
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#termbanken-verkrijgen" class="md-nav__link">
+    <span class="md-ellipsis">
+      Termbanken verkrijgen
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -880,6 +940,8 @@
       
         
           
+        
+      
         
       
         
@@ -1260,6 +1322,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../technisch/vertaalpijplijn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertaalpijplijn — technisch ontwerp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../technisch/kwetsbaarheden/" class="md-nav__link">
         
   
@@ -1384,7 +1467,7 @@
 
 <h1 id="vertalingen">Vertalingen<a class="headerlink" href="#vertalingen" title="Permanent link">&para;</a></h1>
 <p>Het <code>i18n</code>-export-formaat kan modelvelden (namen, definities, toelichtingen,
-GEMMA-tags) automatisch naar een doeltaal vertalen. Er zijn twee backends:</p>
+GEMMA-tags) automatisch naar een doeltaal vertalen. Er zijn drie backends:</p>
 <table>
 <thead>
 <tr>
@@ -1400,6 +1483,10 @@ GEMMA-tags) automatisch naar een doeltaal vertalen. Er zijn twee backends:</p>
 <tr>
 <td><code>ollama</code></td>
 <td>Hogere kwaliteit, offline, context-bewust. Draait een lokaal LLM (Mistral) via Ollama.</td>
+</tr>
+<tr>
+<td><code>pipeline</code></td>
+<td>Hoogste kwaliteit én reproduceerbaar: gelaagde pijplijn met officiële termbanken (IATE, EuroVoc, eigen LOD) en lokale LLM's met stemmen. Zie <a href="#de-deterministische-vertaalpijplijn">de pijplijn-sectie</a> hieronder.</td>
 </tr>
 </tbody>
 </table>
@@ -1624,6 +1711,20 @@ worden opnieuw vertaald. Dit werkt voor beide backends.</p>
 <a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="c1"># of gewijzigde velden.</span>
 <a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>crunch_uml<span class="w"> </span>…<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>i18n<span class="w"> </span>-f<span class="w"> </span>mijn.i18n.json<span class="w"> </span>--language<span class="w"> </span>en<span class="w"> </span>--translate<span class="w"> </span>True<span class="w"> </span>--update_i18n<span class="w"> </span>True
 </code></pre></div>
+<h2 id="voortgang-volgen-in-de-log">Voortgang volgen in de log<a class="headerlink" href="#voortgang-volgen-in-de-log" title="Permanent link">&para;</a></h2>
+<p>Tijdens het vertalen logt de renderer <strong>elke voltooide vertaling</strong> op
+<code>INFO</code>-niveau, zodat een lange batch (zeker met de Ollama-backend) live te
+volgen is:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>[ 1/58] bouwjaarTot → buildYearTo
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>[ 2/58] Bouwstijl → BuildingStyle
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>[ 3/58] Het bouwen van een bouwwerk. → The construction of a building.
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>[ 4/58] OorspronkelijkeFunctie → OriginalFunction
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>...
+</code></pre></div>
+<p>De volgorde is die van voltooiing, niet van starten — bij parallel
+draaiende workers verschijnen de regels door elkaar. De teller <code>[n/total]</code>
+geeft altijd het aantal <em>afgeronde</em> vertalingen weer. Run met <code>-v</code> of zet
+het logniveau op <code>INFO</code> (default in <code>crunch_uml</code>) om dit te zien.</p>
 <h2 id="prestaties-wat-te-verwachten">Prestaties — wat te verwachten<a class="headerlink" href="#prestaties-wat-te-verwachten" title="Permanent link">&para;</a></h2>
 <p>Op een Mac M4 met <code>mistral-small3.1:24b</code>:</p>
 <ul>
@@ -1636,9 +1737,116 @@ worden opnieuw vertaald. Dit werkt voor beide backends.</p>
 <p>Met de externe <code>translators</code>-API zijn korte strings doorgaans iets sneller
 (~0.1 s netwerklatentie), maar de kwaliteit op identifiers en domeintermen
 is duidelijk lager.</p>
+<h2 id="de-deterministische-vertaalpijplijn">De deterministische vertaalpijplijn<a class="headerlink" href="#de-deterministische-vertaalpijplijn" title="Permanent link">&para;</a></h2>
+<p>De backend <code>pipeline</code> is de aanbevolen route voor autoritatieve,
+reproduceerbare vertalingen: officiële terminologie is de basis, de context
+uit het bronmodel bepaalt de betekenis, en dezelfde input plus dezelfde
+bronnen geeft altijd dezelfde output. Het volledige ontwerp staat in
+<a href="../../technisch/vertaalpijplijn/">het technisch ontwerp</a>; dit is de
+gebruikershandleiding.</p>
+<h3 id="configureren">Configureren<a class="headerlink" href="#configureren" title="Permanent link">&para;</a></h3>
+<p>Alles gaat via omgevingsvariabelen (met CLI-flags als override), zoals
+altijd bij crunch:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">CRUNCH_UML_TRANSLATE_BACKEND</span><span class="o">=</span>pipeline
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="c1"># Termbanken: kommagescheiden bestanden of directories; volgorde = prioriteit.</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Formaat wordt automatisch herkend (.ttl/.rdf/.jsonld/... via rdflib, .tbx als IATE).</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="nb">export</span><span class="w"> </span><span class="nv">CRUNCH_UML_TERMBANKS</span><span class="o">=</span><span class="s2">&quot;resources/gemma_begrippen.ttl,resources/lod/,resources/IATE_export.tbx&quot;</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1"># LLM-rollen: 1e = primair werkpaard (definities), 2e = tweede stem op namen.</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="nb">export</span><span class="w"> </span><span class="nv">CRUNCH_UML_LLM_WORKHORSES</span><span class="o">=</span><span class="s2">&quot;qwen2.5:14b,mistral-small3.1:24b&quot;</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="nb">export</span><span class="w"> </span><span class="nv">CRUNCH_UML_LLM_HEAVY</span><span class="o">=</span><span class="s2">&quot;qwen2.5:32b&quot;</span><span class="w">    </span><span class="c1"># escalatiemodel: het grootste dat je hardware trekt</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>crunch_uml<span class="w"> </span>-sch<span class="w"> </span>mijn_model<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-t<span class="w"> </span>i18n<span class="w"> </span>-f<span class="w"> </span>mijn_model.i18n.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">    </span>--language<span class="w"> </span>en<span class="w"> </span>--translate<span class="w"> </span>True<span class="w"> </span>--from_language<span class="w"> </span>nl
+</code></pre></div>
+<p>Modelnamen zijn <strong>prefixen</strong>: <code>mistral-small</code> lost op naar de hoogste
+lokaal geïnstalleerde tag, zodat een minor modelupgrade (<code>ollama pull
+mistral-small3.2</code>) geen configuratiewijziging vraagt. De opgeloste tag,
+digest en pull-datum staan in het startoverzicht van elke run.</p>
+<p>Overige instellingen: <code>CRUNCH_UML_TERMBANK_MAX_AGE_DAYS</code> (waarschuw bij
+verouderde bronnen), <code>CRUNCH_UML_OLLAMA_MIN_VERSION</code>,
+<code>CRUNCH_UML_NMT_MODEL</code> (optioneel NMT-vangnet, bv.
+<code>Helsinki-NLP/opus-mt-{from}-{to}</code>; vereist <code>pip install transformers
+sentencepiece torch</code>), <code>CRUNCH_UML_TRANSLATE_ALLOW_ONLINE=1</code> (sta de
+online Google/Bing-route toe als laatste vangnet — niet reproduceerbaar,
+default uit) en <code>CRUNCH_UML_TRANSLATE_SEED</code> (default 42; temperature staat
+vast op 0).</p>
+<h3 id="hoe-de-pijplijn-vertaalt">Hoe de pijplijn vertaalt<a class="headerlink" href="#hoe-de-pijplijn-vertaalt" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Het i18n-bestand is het vertaalgeheugen.</strong> Bestaande vertalingen per
+   (sectie, GUID, veld) worden hergebruikt en nooit opnieuw vertaald —
+   handmatig gereviewde vertalingen winnen dus altijd.</li>
+<li><strong>Termbanken leveren kandidaten</strong> voor namen; een eenduidige treffer
+   (na deterministische disambiguatie op domein en brondefinitie) wordt
+   zonder model genomen, met de concept-URI in het log.</li>
+<li><strong>Per modelelement één LLM-call</strong> met naam, definitie en toelichting
+   samen, plus een compacte contextkop (model, pakket, klasse) en het
+   bindende glossarium. Twee werkpaarden vertalen onafhankelijk; zijn ze
+   het over de naam eens dan is het resultaat geaccepteerd, anders beslist
+   het zware model. Definities worden deterministisch op
+   glossarium-naleving gecontroleerd.</li>
+<li><strong>Hiërarchische volgorde</strong>: eerst pakketten, dan klassen/enumeraties,
+   dan attributen — elke laag legt zijn naamvertalingen vast in het
+   glossarium van de laag eronder, zodat "Bouwactiviteit" overal dezelfde
+   vertaling krijgt.</li>
+</ol>
+<h3 id="preflight-nette-degradatie">Preflight: nette degradatie<a class="headerlink" href="#preflight-nette-degradatie" title="Permanent link">&para;</a></h3>
+<p>Vóór het vertalen controleert de pijplijn wat er beschikbaar is en logt een
+compact overzicht. Ontbreekt er iets, dan volgt een waarschuwing en draait
+de rest gewoon door:</p>
+<table>
+<thead>
+<tr>
+<th>Situatie</th>
+<th>Gedrag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ollama onbereikbaar / geen modellen</td>
+<td>LLM-laag uit; termbanktreffers vertalen nog steeds</td>
+</tr>
+<tr>
+<td>Werkpaard niet geïnstalleerd</td>
+<td>Waarschuwing met exact <code>ollama pull</code>-commando; overige modellen worden gebruikt</td>
+</tr>
+<tr>
+<td>Eén werkpaard</td>
+<td>Stemlaag uit; escalatie alleen op de glossarium-check</td>
+</tr>
+<tr>
+<td>Zwaar model ontbreekt</td>
+<td>Moeilijke gevallen houden het antwoord van het primaire werkpaard</td>
+</tr>
+<tr>
+<td>Termbank ontbreekt/onleesbaar</td>
+<td>Bron overgeslagen, de rest werkt door</td>
+</tr>
+<tr>
+<td>Geen enkele termbank</td>
+<td>Nadrukkelijke waarschuwing: vertalen zonder autoritatieve grounding</td>
+</tr>
+<tr>
+<td>Bron ouder dan drempel</td>
+<td>Waarschuwing met gevonden versie/datum uit de data zelf</td>
+</tr>
+</tbody>
+</table>
+<h3 id="termbanken-verkrijgen">Termbanken verkrijgen<a class="headerlink" href="#termbanken-verkrijgen" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>IATE</strong> — TBX-export van <a href="https://iate.europa.eu/download-iate">iate.europa.eu/download-iate</a>.</li>
+<li><strong>EuroVoc</strong> — SKOS-distributie van <a href="https://op.europa.eu/en/web/eu-vocabularies">op.europa.eu</a>;
+  elke RDF-serialisatie werkt.</li>
+<li><strong>Eigen begrippenkaders</strong> — elk SKOS/RDFS/OWL-bestand (bv. het
+  GEMMA-begrippenkader als Turtle) werkt zonder codewijziging; labels,
+  definities en domeinen worden generiek uitgelezen.</li>
+</ul>
 <h2 id="verder-lezen">Verder lezen<a class="headerlink" href="#verder-lezen" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../export/">Export-commando</a> — volledige opties van het <code>export</code>-subcommando.</li>
+<li><a href="../../technisch/vertaalpijplijn/">Technisch ontwerp vertaalpijplijn</a> — de
+  volledige architectuur van de <code>pipeline</code>-backend en de genomen besluiten.</li>
 <li><a href="../../technisch/componenten/renderers/">Renderers technisch</a> — hoe de
   i18n-renderer intern werkt (deduplicatie, parallel pool, fallback).</li>
 </ul>

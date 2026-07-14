@@ -13,28 +13,28 @@
         <meta name="author" content="Arjen Brienen">
       
       
-        <link rel="canonical" href="https://brienen.github.io/crunch_uml/en/technisch/componenten/transformers/">
+        <link rel="canonical" href="https://brienen.github.io/crunch_uml/en/technisch/vertaalpijplijn/">
       
       
-        <link rel="prev" href="../parsers/">
+        <link rel="prev" href="../datamodel/">
       
       
-        <link rel="next" href="../renderers/">
+        <link rel="next" href="../kwetsbaarheden/">
       
       
-      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <link rel="icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.26">
     
     
       
-        <title>Transformers - crunch_uml</title>
+        <title>Vertaalpijplijn — technisch ontwerp - crunch_uml</title>
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.6543a935.min.css">
       
         
-        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -53,9 +53,9 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/extra.css">
+      <link rel="stylesheet" href="../../../assets/extra.css">
     
-    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -77,15 +77,15 @@
 
     
     
-      <link rel="canonical" href="https://brienen.github.io/crunch_uml/en/technisch/componenten/transformers/">
+      <link rel="canonical" href="https://brienen.github.io/crunch_uml/en/technisch/vertaalpijplijn/">
     
 
     
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Transformers">
+    <meta property="og:title" content="Vertaalpijplijn — technisch ontwerp">
     <meta property="og:description" content="Documentation for crunch_uml — UML model transformation and export">
     
-      <meta property="og:url" content="https://brienen.github.io/crunch_uml/en/technisch/componenten/transformers/">
+      <meta property="og:url" content="https://brienen.github.io/crunch_uml/en/technisch/vertaalpijplijn/">
     
     <meta property="og:site_name" content="crunch_uml">
     
@@ -94,7 +94,7 @@
 
     
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Transformers">
+    <meta name="twitter:title" content="Vertaalpijplijn — technisch ontwerp">
     <meta name="twitter:description" content="Documentation for crunch_uml — UML model transformation and export">
 
     
@@ -111,7 +111,7 @@
     {
       "@context": "https://schema.org",
       "@type": "TechArticle",
-      "headline": "Transformers",
+      "headline": "Vertaalpijplijn \u2014 technisch ontwerp",
       "description": "Documentation for crunch_uml \u2014 UML model transformation and export",
       "author": {
         "@type": "Person",
@@ -122,7 +122,7 @@
         "name": "crunch_uml",
         "url": "https://brienen.github.io/crunch_uml/"
       },
-      "url": "https://brienen.github.io/crunch_uml/en/technisch/componenten/transformers/",
+      "url": "https://brienen.github.io/crunch_uml/en/technisch/vertaalpijplijn/",
       "inLanguage": "en",
       "isPartOf": {
         "@type": "WebSite",
@@ -137,7 +137,7 @@
 
   
 
-   <link href="../../../../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+   <link href="../../../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
     html.glightbox-open { overflow: initial; height: 100%; }
     .gslide-title { margin-top: 0px; user-select: text; }
     .gslide-desc { color: #666; user-select: text; }
@@ -146,7 +146,7 @@
     .gdesc-inner { font-size: 0.75rem; }
     body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
     body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
-    body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}</style> <script src="../../../../assets/javascripts/glightbox.min.js"></script></head>
+    body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}</style> <script src="../../../assets/javascripts/glightbox.min.js"></script></head>
   
   
     
@@ -165,7 +165,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#transformers" class="md-skip">
+        <a href="#vertaalpijplijn-technisch-ontwerp" class="md-skip">
           Skip to content
         </a>
       
@@ -179,7 +179,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../" title="crunch_uml" class="md-header__button md-logo" aria-label="crunch_uml" data-md-component="logo">
+    <a href="../../" title="crunch_uml" class="md-header__button md-logo" aria-label="crunch_uml" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -199,7 +199,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Transformers
+              Vertaalpijplijn — technisch ontwerp
             
           </span>
         </div>
@@ -246,7 +246,7 @@
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="../../../../technisch/componenten/transformers/" hreflang="nl" class="md-select__link">
+            <a href="../../../technisch/vertaalpijplijn/" hreflang="nl" class="md-select__link">
               Nederlands
             </a>
           </li>
@@ -334,7 +334,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../" class="md-tabs__link">
+      <a href="../../" class="md-tabs__link">
         
   
     
@@ -353,7 +353,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../handleiding/" class="md-tabs__link">
+        <a href="../../handleiding/" class="md-tabs__link">
           
   
     
@@ -371,7 +371,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../voorbeelden/" class="md-tabs__link">
+      <a href="../../voorbeelden/" class="md-tabs__link">
         
   
     
@@ -392,7 +392,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../" class="md-tabs__link">
+        <a href="../" class="md-tabs__link">
           
   
     
@@ -429,7 +429,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../" title="crunch_uml" class="md-nav__button md-logo" aria-label="crunch_uml" data-md-component="logo">
+    <a href="../../" title="crunch_uml" class="md-nav__button md-logo" aria-label="crunch_uml" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -459,7 +459,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../" class="md-nav__link">
+      <a href="../../" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -516,7 +516,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../handleiding/" class="md-nav__link ">
+            <a href="../../handleiding/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -549,7 +549,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../handleiding/installatie/" class="md-nav__link">
+      <a href="../../handleiding/installatie/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -570,7 +570,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../handleiding/import/" class="md-nav__link">
+      <a href="../../handleiding/import/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -591,7 +591,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../handleiding/transform/" class="md-nav__link">
+      <a href="../../handleiding/transform/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -612,7 +612,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../handleiding/export/" class="md-nav__link">
+      <a href="../../handleiding/export/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -633,7 +633,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../handleiding/vertalingen/" class="md-nav__link">
+      <a href="../../handleiding/vertalingen/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -654,7 +654,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../handleiding/cli-referentie/" class="md-nav__link">
+      <a href="../../handleiding/cli-referentie/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -682,7 +682,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../voorbeelden/" class="md-nav__link">
+      <a href="../../voorbeelden/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -744,7 +744,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../" class="md-nav__link ">
+            <a href="../" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -811,7 +811,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../architectuur/" class="md-nav__link ">
+            <a href="../architectuur/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -844,7 +844,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architectuur/lagen/" class="md-nav__link">
+      <a href="../architectuur/lagen/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -865,7 +865,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architectuur/dataflows/" class="md-nav__link">
+      <a href="../architectuur/dataflows/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -886,7 +886,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architectuur/design-patterns/" class="md-nav__link">
+      <a href="../architectuur/design-patterns/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -912,8 +912,6 @@
                 
   
   
-    
-  
   
   
     
@@ -942,16 +940,18 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_3" >
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../" class="md-nav__link ">
+            <a href="../componenten/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -968,7 +968,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_3">
             <span class="md-nav__icon md-icon"></span>
             Components
@@ -984,11 +984,103 @@
   
   
     <li class="md-nav__item">
-      <a href="../parsers/" class="md-nav__link">
+      <a href="../componenten/parsers/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     Parsers (Import Layer)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../componenten/transformers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Transformers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../componenten/renderers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Renderers (Export Layer)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../componenten/persistentie/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Persistence Layer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datamodel/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Data Model
   </span>
   
 
@@ -1018,7 +1110,7 @@
           
   
   <span class="md-ellipsis">
-    Transformers
+    Vertaalpijplijn — technisch ontwerp
   </span>
   
 
@@ -1029,7 +1121,7 @@
         
   
   <span class="md-ellipsis">
-    Transformers
+    Vertaalpijplijn — technisch ontwerp
   </span>
   
 
@@ -1051,69 +1143,81 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#class-hierarchy" class="md-nav__link">
+  <a href="#uitgangspunten-en-genomen-besluiten" class="md-nav__link">
     <span class="md-ellipsis">
-      Class Hierarchy
+      Uitgangspunten en genomen besluiten
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#copytransformer" class="md-nav__link">
+  <a href="#cascade" class="md-nav__link">
     <span class="md-ellipsis">
-      CopyTransformer
+      Cascade
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#plugintransformer" class="md-nav__link">
+  <a href="#preflight" class="md-nav__link">
     <span class="md-ellipsis">
-      PluginTransformer
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="PluginTransformer">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#plugin-base-class" class="md-nav__link">
-    <span class="md-ellipsis">
-      Plugin Base Class
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cli-arguments-transform" class="md-nav__link">
-    <span class="md-ellipsis">
-      CLI Arguments (Transform)
+      Preflight
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#planned-extensions" class="md-nav__link">
+  <a href="#termbanken-automatische-lod-detectie" class="md-nav__link">
     <span class="md-ellipsis">
-      Planned Extensions
+      Termbanken: automatische LOD-detectie
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#adding-a-new-transformer" class="md-nav__link">
+  <a href="#disambiguatie-deterministisch-zonder-model" class="md-nav__link">
     <span class="md-ellipsis">
-      Adding a New Transformer
+      Disambiguatie (deterministisch, zonder model)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#llm-laag" class="md-nav__link">
+    <span class="md-ellipsis">
+      LLM-laag
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuratie-alle-instellingen" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuratie (alle instellingen)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modulestructuur" class="md-nav__link">
+    <span class="md-ellipsis">
+      Modulestructuur
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wat-bewust-geen-onderdeel-is" class="md-nav__link">
+    <span class="md-ellipsis">
+      Wat bewust géén onderdeel is
     </span>
   </a>
   
@@ -1135,99 +1239,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../renderers/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Renderers (Export Layer)
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../persistentie/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Persistence Layer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../datamodel/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Data Model
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../vertaalpijplijn/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Vertaalpijplijn — technisch ontwerp
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../kwetsbaarheden/" class="md-nav__link">
+      <a href="../kwetsbaarheden/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1248,7 +1260,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../roadmap/" class="md-nav__link">
+      <a href="../roadmap/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1269,7 +1281,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../stack/" class="md-nav__link">
+      <a href="../stack/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1308,148 +1320,244 @@
   
 
 
-<h1 id="transformers">Transformers<a class="headerlink" href="#transformers" title="Permanent link">&para;</a></h1>
-<p>Transformers process data between schemas within the same database. They register themselves via <code>@TransformerRegistry.register()</code>.</p>
-<h2 id="class-hierarchy">Class Hierarchy<a class="headerlink" href="#class-hierarchy" title="Permanent link">&para;</a></h2>
-<pre class="mermaid"><code>classDiagram
-    class Transformer {
-        &lt;&lt;abstract&gt;&gt;
-        +transform(args, database)*
-        +transformLogic(args, root_package, schema_from, schema_to)*
-    }
-
-    class CopyTransformer {
-        Deep copy of package hierarchies
-        +materialize_generalizations option
-    }
-
-    class PluginTransformer {
-        Dynamic plugin loading
-        +plugin_file_name
-        +plugin_class_name
-    }
-
-    class Plugin {
-        &lt;&lt;abstract&gt;&gt;
-        +transform(args, schema_from, schema_to)*
-    }
-
-    Transformer &lt;|-- CopyTransformer
-    Transformer &lt;|-- PluginTransformer
-    PluginTransformer --&gt; Plugin : loads dynamically</code></pre>
-<h2 id="copytransformer">CopyTransformer<a class="headerlink" href="#copytransformer" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Registration</strong>: <code>@TransformerRegistry.register("copy")</code></li>
-<li><strong>File</strong>: <code>transformers/copytransformer.py</code></li>
-<li><strong>Function</strong>: Deep copy of a complete package hierarchy from schema A to schema B</li>
-<li><strong>Options</strong>:<ul>
-<li><code>--materialize_generalizations</code> — Copies attributes from superclasses to subclasses (flattens inheritance hierarchy)</li>
-<li><code>--root_package</code> — Starting point of the copy</li>
-</ul>
-</li>
-</ul>
-<pre class="mermaid"><code>graph LR
-    A["Schema A&lt;br/&gt;(source)"] --&gt; B["get_copy()"]
-    B --&gt; C{"Materialization?"}
-    C --&gt;|yes| D["Copy parent attrs&lt;br/&gt;to children"]
-    C --&gt;|no| E["Direct copy"]
-    D --&gt; F["Schema B&lt;br/&gt;(target)"]
-    E --&gt; F</code></pre>
-<h2 id="plugintransformer">PluginTransformer<a class="headerlink" href="#plugintransformer" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Registration</strong>: <code>@TransformerRegistry.register("plugin")</code></li>
-<li><strong>File</strong>: <code>transformers/plugintransformer.py</code></li>
-<li><strong>Function</strong>: Dynamically loads a custom plugin class</li>
-<li><strong>Arguments</strong>: <code>--plugin_file_name</code>, <code>--plugin_class_name</code></li>
-</ul>
-<h3 id="plugin-base-class">Plugin Base Class<a class="headerlink" href="#plugin-base-class" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">class</span> <span class="nc">Plugin</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nd">@abstractmethod</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">schema_from</span><span class="p">,</span> <span class="n">schema_to</span><span class="p">):</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Implement custom transformation logic.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="k">pass</span>
+<h1 id="vertaalpijplijn-technisch-ontwerp">Vertaalpijplijn — technisch ontwerp<a class="headerlink" href="#vertaalpijplijn-technisch-ontwerp" title="Permanent link">&para;</a></h1>
+<p>Dit document is de definitieve specificatie van de gelaagde, deterministische
+vertaalpijplijn (backend <code>pipeline</code>) die losse termen én korte definities uit
+UML-informatiemodellen vertaalt. Officiële terminologie (IATE, EuroVoc, eigen
+begrippenkaders als LOD) is de basis; de context uit het bronmodel bepaalt de
+betekenis. Reproduceerbaarheid is een harde eis: dezelfde input plus dezelfde
+bronnen plus hetzelfde (gelogde) model geeft altijd dezelfde output.</p>
+<h2 id="uitgangspunten-en-genomen-besluiten">Uitgangspunten en genomen besluiten<a class="headerlink" href="#uitgangspunten-en-genomen-besluiten" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Geen aparte cache (geen SQLite).</strong> Het i18n-uitvoerbestand ís het
+   vertaalgeheugen: bestaande vertalingen per <code>(sectie, GUID, veld)</code> worden
+   hergebruikt en nooit opnieuw vertaald (<code>update_i18n=True</code>). Die sleutel is
+   sterker dan een stringsleutel — de GUID identificeert het exacte
+   modelelement, dus homoniemen kunnen elkaar niet besmetten. Het bestand is
+   bovendien reviewbaar en versioneerbaar in git. Een tweede opslagplaats zou
+   een tweede bron van waarheid zijn die kan verouderen en stilletjes
+   verkeerde vertalingen serveert.</li>
+<li><strong>Configuratie uitsluitend via omgevingsvariabelen</strong> (patroon
+   <code>CRUNCH_UML_*</code>, met CLI-args als override). Geen configbestanden: crunch
+   wordt vanuit scripts aangeroepen.</li>
+<li><strong>Vertalen per modelelement, niet per string.</strong> Alle vertaalbare velden
+   van één element (<code>name</code>, <code>alias</code>, <code>definitie</code>, <code>toelichting</code>, …) gaan in
+   één gestructureerde JSON-call. De definitie disambigueert de term en de
+   gekozen term wordt gegarandeerd consistent gebruikt in de vertaalde
+   definitie.</li>
+<li><strong>Hiërarchische volgorde met glossarium-doorgifte.</strong> Eerst pakketten, dan
+   klassen/enumeraties, dan attributen/enumeratiewaarden. Elke laag legt zijn
+   naamvertalingen vast in het bindende glossarium van de laag eronder, zodat
+   een attribuutdefinitie die "de bouwactiviteit" noemt dezelfde vertaling
+   gebruikt als de klasse <code>Bouwactiviteit</code>.</li>
+<li><strong>Twee werkpaarden en een zwaar model.</strong> De werkpaarden vertalen
+   onafhankelijk (zelfde glossarium); komen de namen na normalisatie overeen
+   dan is het resultaat geaccepteerd. Onenigheid ís de definitie van een
+   moeilijk geval en gaat naar het zware model, met beide kandidaten in de
+   prompt. Voor definities werkt stemmen niet (twee LLM's formuleren nooit
+   letterlijk gelijk); daar geldt het primaire werkpaard plus een
+   <em>deterministische</em> glossarium-nalevingscheck, met escalatie bij schending.
+   Met één geconfigureerd werkpaard gaat de stemlaag uit (waarschuwing) en
+   escaleren alleen de deterministische checks.</li>
+<li><strong>Passes, geen interleaving.</strong> Ollama wisselt modellen in en uit het
+   VRAM; om en om bevragen betekent swappen. Daarom per niveau: werkpaard A
+   over de hele batch, dan werkpaard B, dan vergelijken, dan het zware model
+   alleen over de meningsverschillen.</li>
+<li><strong>Online diensten (Google/Bing via <code>translators</code>) zijn opt-in</strong> en nooit
+   default: ze zijn niet reproduceerbaar.</li>
+</ol>
+<h2 id="cascade">Cascade<a class="headerlink" href="#cascade" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>                    ┌──────────────────────────────────────────────┐
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                    │ 0. Preflight (capability discovery)          │
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                    └──────────────────┬───────────────────────────┘
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                                       ▼
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a> i18n-bestand ──▶ 1. Hergebruik per (sectie, GUID, veld)   [bestaand gedrag]
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                                       ▼ (alleen ontbrekende velden)
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a> termbanken  ──▶ 2. Kandidaten (exact, dan fuzzy) per naam
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                                       ▼
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>                 3. Deterministische disambiguatie op brondefinitie + domein
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>                      │ eenduidig → naamvertaling ligt vast (met concept-URI)
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>                      ▼ meervoudig/geen
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>                 4. LLM per element (JSON, temp 0, glossarium bindend)
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>                      werkpaard A ─ werkpaard B ─ [onenigheid] → zwaar model
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>                                       ▼ (LLM niet beschikbaar)
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>                 5. NMT-vangnet (optionele dependency, bv. Opus-MT)
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>                                       ▼ (NMT niet beschikbaar)
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>                 6. Online (translators) — alleen als expliciet toegestaan
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>                                       ▼ (niets beschikbaar)
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>                    origineel behouden + waarschuwing
 </code></pre></div>
-<h2 id="cli-arguments-transform">CLI Arguments (Transform)<a class="headerlink" href="#cli-arguments-transform" title="Permanent link">&para;</a></h2>
+<p>NMT is bewust het vangnet <em>onder</em> de LLM en geen escalatiepad erboven:
+dedicated vertaalmodellen kunnen geen glossarium volgen of disambigueren.</p>
+<h2 id="preflight">Preflight<a class="headerlink" href="#preflight" title="Permanent link">&para;</a></h2>
+<p>Elke laag controleert zijn eigen randvoorwaarden en degradeert netjes: een
+ontbrekende of onleesbare resource geeft een <code>logging.warning</code> en het
+overslaan van die laag — nooit stille verkeerde output of een crash. Bij de
+start wordt een compact overzicht gelogd: actieve lagen, geladen bronnen met
+versie, uitgeschakelde lagen met reden.</p>
+<p><strong>Ollama</strong></p>
+<ul>
+<li>Bereikbaarheid via <code>GET /api/tags</code>; onbereikbaar → LLM-laag uit, waarschuwing.</li>
+<li>Serverversie via <code>GET /api/version</code>, vergeleken met
+  <code>CRUNCH_UML_OLLAMA_MIN_VERSION</code> (waarschuwing indien lager).</li>
+<li>Modelresolutie per rol: een geconfigureerde waarde is een <strong>prefix</strong>.
+  Exacte tag wint; anders de hoogste lokaal geïnstalleerde tag die met de
+  prefix begint (natuurlijke versiesortering). De opgeloste tag, digest en
+  lokale pull-datum worden gelogd, zodat elke run traceerbaar is. Ontbreekt
+  een model → waarschuwing met de exacte instructie (<code>ollama pull &lt;model&gt;</code>).
+  Eerlijkheid in de melding: Ollama kan niet bepalen of een tag upstream
+  verouderd is; de check beperkt zich tot lokale aanwezigheid.</li>
+<li>Eén opgelost werkpaard → stemlaag uit (waarschuwing); nul → LLM-laag uit.</li>
+</ul>
+<p><strong>Termbanken</strong></p>
+<ul>
+<li>Elk pad uit <code>CRUNCH_UML_TERMBANKS</code> wordt gecontroleerd (bestaat, leesbaar,
+  parseerbaar); een directory wordt gescand op ondersteunde bestanden.</li>
+<li>Versie/datum wordt uit de data zelf gelezen (<code>owl:versionInfo</code>,
+  <code>dcterms:modified</code>/<code>issued</code>, TBX-headerdatum) en gerapporteerd; ouder dan
+  <code>CRUNCH_UML_TERMBANK_MAX_AGE_DAYS</code> → waarschuwing.</li>
+<li>Geen enkele termbank beschikbaar → nadrukkelijke waarschuwing dat termen
+  zonder autoritatieve grounding vertaald worden.</li>
+</ul>
+<h2 id="termbanken-automatische-lod-detectie">Termbanken: automatische LOD-detectie<a class="headerlink" href="#termbanken-automatische-lod-detectie" title="Permanent link">&para;</a></h2>
+<p>Eén lijstvariabele, volgorde = prioriteit (eerste wint bij conflicten):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">CRUNCH_UML_TERMBANKS</span><span class="o">=</span><span class="s2">&quot;resources/gemma_begrippen.ttl,resources/lod/,resources/IATE_export.tbx&quot;</span>
+</code></pre></div>
+<ul>
+<li>Formaat wordt automatisch bepaald: rdflib leest alle gangbare
+  LOD-serialisaties (Turtle, RDF/XML, N-Triples, JSON-LD, TriG, N-Quads) op
+  extensie met inhouds-sniffing als vangnet; TBX (XML, herkenbaar aan het
+  rootelement) heeft een eigen lader.</li>
+<li>De vocabulaire wordt generiek bevraagd, niet per bron gecodeerd:
+  taalgelabelde labels via <code>skos:prefLabel</code> &gt; <code>skos:altLabel</code> &gt; <code>rdfs:label</code><blockquote>
+<p><code>dct:title</code>; definities uit <code>skos:definition</code>/<code>skos:scopeNote</code>; domein
+  uit <code>skos:inScheme</code>/<code>dct:subject</code>; IATE-betrouwbaarheidscodes uit TBX.
+  Daarmee werkt elke SKOS/RDFS/OWL-gebaseerde bron zonder nieuwe code.</p>
+</blockquote>
+</li>
+<li>Lookup: eerst exact (genormaliseerd), dan fuzzy (deterministisch,
+  <code>difflib</code>); kandidaten dragen doelterm, definitie, domein, bron,
+  betrouwbaarheid en concept-URI.</li>
+</ul>
+<h2 id="disambiguatie-deterministisch-zonder-model">Disambiguatie (deterministisch, zonder model)<a class="headerlink" href="#disambiguatie-deterministisch-zonder-model" title="Permanent link">&para;</a></h2>
+<p>Uit de kandidaten wordt gekozen op basis van context die crunch al heeft:
+het pakket/domein waarin de term staat en vooral de brondefinitie
+(tokenoverlap tussen kandidaat-definitie en brondefinitie). Past precies één
+kandidaat (unieke winnaar met marge) → die wordt deterministisch genomen,
+zonder model. Meervoudig of geen → naar de LLM-laag, mét de kandidaten als
+glossarium en de instructie de juiste betekenis te kiezen.</p>
+<h2 id="llm-laag">LLM-laag<a class="headerlink" href="#llm-laag" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Eén <code>POST /api/chat</code> per element met <code>format</code> = JSON-schema (alle velden
+  van het element), <code>temperature: 0</code>, configureerbare seed (default 42).</li>
+<li>Compacte contextkop — bewust géén hele modellen in de prompt: modelnaam +
+  modeldefinitie (1–2 zinnen), pakketpad, bij attributen de eigen klasse met
+  definitie, sibling-namen als één regel, en het bindende glossarium.</li>
+<li>Identifier-casing wordt na afloop deterministisch hersteld
+  (<code>reconcile_case</code>, bestaand).</li>
+<li>Overeenstemming is bewijs van vertrouwen, geen bewijs van juistheid: de
+  uiteindelijke waarheidscheck blijft menselijke review van het i18n-bestand.</li>
+</ul>
+<h2 id="configuratie-alle-instellingen">Configuratie (alle instellingen)<a class="headerlink" href="#configuratie-alle-instellingen" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Argument</th>
-<th>Description</th>
+<th>Variabele</th>
+<th>Betekenis</th>
+<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>-sch_from</code></td>
-<td>Source schema (default: current schema)</td>
+<td><code>CRUNCH_UML_TRANSLATE_BACKEND</code></td>
+<td><code>translators</code> | <code>ollama</code> | <code>pipeline</code></td>
+<td><code>translators</code></td>
 </tr>
 <tr>
-<td><code>-sch_to</code></td>
-<td>Target schema</td>
+<td><code>CRUNCH_UML_TERMBANKS</code></td>
+<td>kommagescheiden paden (bestanden of directories) naar LOD/TBX-bronnen; volgorde = prioriteit</td>
+<td>leeg</td>
 </tr>
 <tr>
-<td><code>-ttp / --transformationtype</code></td>
-<td>Transformer type (copy, plugin)</td>
+<td><code>CRUNCH_UML_TERMBANK_MAX_AGE_DAYS</code></td>
+<td>waarschuw als een bron ouder is</td>
+<td>uit</td>
 </tr>
 <tr>
-<td><code>-rt_pkg / --root_package</code></td>
-<td>Root package ID for starting point</td>
+<td><code>CRUNCH_UML_LLM_WORKHORSES</code></td>
+<td>kommagescheiden modelprefixen; 1e = primair (definities), 2e = tweede stem</td>
+<td><code>mistral-small3.1:24b</code></td>
 </tr>
 <tr>
-<td><code>-m_gen / --materialize_generalizations</code></td>
-<td>Flatten inheritance</td>
+<td><code>CRUNCH_UML_LLM_HEAVY</code></td>
+<td>modelprefix voor escalatie (het grootste dat de hardware trekt)</td>
+<td>uit</td>
 </tr>
 <tr>
-<td><code>--plugin_file_name</code></td>
-<td>Path to plugin file</td>
+<td><code>CRUNCH_UML_OLLAMA_URL</code></td>
+<td>Ollama-server</td>
+<td><code>http://localhost:11434</code></td>
 </tr>
 <tr>
-<td><code>--plugin_class_name</code></td>
-<td>Class name of the plugin</td>
+<td><code>CRUNCH_UML_OLLAMA_TIMEOUT</code></td>
+<td>seconden per call</td>
+<td><code>120</code></td>
+</tr>
+<tr>
+<td><code>CRUNCH_UML_OLLAMA_MIN_VERSION</code></td>
+<td>minimale serverversie (waarschuwing)</td>
+<td>uit</td>
+</tr>
+<tr>
+<td><code>CRUNCH_UML_NMT_MODEL</code></td>
+<td>HF-modelnaam voor het NMT-vangnet, <code>{from}</code>/<code>{to}</code>-placeholders toegestaan (bv. <code>Helsinki-NLP/opus-mt-{from}-{to}</code>)</td>
+<td>uit</td>
+</tr>
+<tr>
+<td><code>CRUNCH_UML_TRANSLATE_ALLOW_ONLINE</code></td>
+<td><code>1</code> = translators-route als laatste vangnet toestaan</td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>CRUNCH_UML_TRANSLATE_WORKERS</code></td>
+<td>parallelle calls binnen één pass</td>
+<td><code>8</code></td>
+</tr>
+<tr>
+<td><code>CRUNCH_UML_TRANSLATE_SEED</code></td>
+<td>seed voor LLM-calls</td>
+<td><code>42</code></td>
 </tr>
 </tbody>
 </table>
-<h2 id="planned-extensions">Planned Extensions<a class="headerlink" href="#planned-extensions" title="Permanent link">&para;</a></h2>
-<div class="admonition note">
-<p class="admonition-title">Universal Mapping Layer</p>
-<p>Metadata-driven, database-agnostic mapping intermediate layer. Standardizes translation to physical database models.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Schema Diff &amp; Merge Engine</p>
-<p>Automatic comparison and merging of two schema versions.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Generalization Materializer v2</p>
-<p>Support for complex inheritance strategies (multi-level, diamond inheritance).</p>
-</div>
-<h2 id="adding-a-new-transformer">Adding a New Transformer<a class="headerlink" href="#adding-a-new-transformer" title="Permanent link">&para;</a></h2>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Via Registry</label><label for="__tabbed_1_2">Via Plugin</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span> <span class="nn">crunch_uml.transformers.transformer</span> <span class="kn">import</span> <span class="n">Transformer</span><span class="p">,</span> <span class="n">TransformerRegistry</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nd">@TransformerRegistry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;my_transform&quot;</span><span class="p">)</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">class</span> <span class="nc">MyTransformer</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">database</span><span class="p">):</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>        <span class="o">...</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="k">def</span> <span class="nf">transformLogic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">root_package</span><span class="p">,</span> <span class="n">schema_from</span><span class="p">,</span> <span class="n">schema_to</span><span class="p">):</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>        <span class="o">...</span>
+<p>De bestaande variabelen (<code>CRUNCH_UML_OLLAMA_MODEL</code>, <code>_URL</code>, <code>_TIMEOUT</code>,
+<code>CRUNCH_UML_TRANSLATE_CONTEXT</code>) blijven werken voor de backends
+<code>translators</code> en <code>ollama</code>; het gedrag daarvan is ongewijzigd.</p>
+<h2 id="modulestructuur">Modulestructuur<a class="headerlink" href="#modulestructuur" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>crunch_uml/translation/
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>├── __init__.py
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>├── config.py        # TranslationConfig.from_env()
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>├── termbank.py      # LOD/TBX-laders, directory-scan, lookup, versie-extractie
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>├── disambiguate.py  # deterministische keuze uit kandidaten
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>├── preflight.py     # capability discovery + startoverzicht
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>├── llm.py           # element-vertaling via Ollama, stemmen, glossarium-check
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>├── nmt.py           # optioneel NMT-vangnet (transformers, optionele dependency)
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>└── pipeline.py      # cascade-orkestratie: niveaus, passes, glossarium-doorgifte
 </code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span> <span class="nn">crunch_uml.transformers.plugin</span> <span class="kn">import</span> <span class="n">Plugin</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">class</span> <span class="nc">MyPlugin</span><span class="p">(</span><span class="n">Plugin</span><span class="p">):</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">schema_from</span><span class="p">,</span> <span class="n">schema_to</span><span class="p">):</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="c1"># Custom logic</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        <span class="o">...</span>
-</code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>crunch_uml<span class="w"> </span>transform<span class="w"> </span>-ttp<span class="w"> </span>plugin<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span>--plugin_file_name<span class="w"> </span>/path/to/my_plugin.py<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span>--plugin_class_name<span class="w"> </span>MyPlugin
-</code></pre></div>
-</div>
-</div>
-</div>
+<p>Integratie: <code>I18nRenderer.translate_data</code> bouwt bij backend <code>pipeline</code>
+elementen uit de i18n-data (alleen velden zonder bestaande vertaling),
+verrijkt ze met context uit het schema (pakket-/klassenamen en -definities)
+en schrijft de resultaten terug in de bestaande i18n-structuur. De
+string-gebaseerde route voor <code>translators</code>/<code>ollama</code> blijft onaangeroerd.</p>
+<h2 id="wat-bewust-geen-onderdeel-is">Wat bewust géén onderdeel is<a class="headerlink" href="#wat-bewust-geen-onderdeel-is" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Geen agent- of toolloop</strong> — dit is een deterministische batchpijplijn.</li>
+<li><strong>Geen SQLite-vertaalgeheugen</strong> — zie besluit 1.</li>
+<li><strong>Geen terugschrijven van concept-URI's naar het model</strong> — het datamodel
+  heeft daar nu geen veld voor; kan later als aparte feature.</li>
+<li><strong>Geen cloud-LLM-escalatie</strong> — kan later als expliciete opt-in laag boven
+  het zware model, met een deterministisch aan-criterium.</li>
+</ul>
 
 
 
@@ -1534,10 +1642,10 @@
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "navigation.indexes", "toc.integrate", "search.suggest", "search.highlight", "content.tabs.link", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "navigation.indexes", "toc.integrate", "search.suggest", "search.highlight", "content.tabs.link", "content.code.copy", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
     
   <script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});

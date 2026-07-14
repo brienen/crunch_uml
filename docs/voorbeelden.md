@@ -225,7 +225,21 @@ crunch_uml -sch GGM_ROOT_SCHEMA export \
     --tag_strategy upsert
 ```
 
-De `upsert`-strategie voegt nieuwe tags toe en werkt bestaande bij, zonder niet-genoemde tags te verwijderen.
+De `upsert`-strategie voegt nieuwe tags toe en werkt bestaande bij, zonder niet-genoemde tags te verwijderen. Ook de diagramlayout (posities, lijnverlopen) wordt bijgewerkt naar de stand van het model.
+
+---
+
+## Voorbeeld 9a: Model inclusief diagrammen exporteren als EA XMI
+
+Exporteer het complete model — inclusief diagrammen met layout — als EA-compatibele XMI, bijvoorbeeld om het in een andere EA-installatie of in de Semantic Toolkit in te lezen:
+
+```bash
+crunch_uml -sch GGM_ROOT_SCHEMA export \
+    -t xmi \
+    -f ./export/model.xml
+```
+
+Het resultaat is verliesvrij opnieuw importeerbaar (`import -t eaxmi`): zelfde elementen, zelfde diagram-membership en exact dezelfde geometrie.
 
 ---
 

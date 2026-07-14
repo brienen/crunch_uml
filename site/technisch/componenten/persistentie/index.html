@@ -722,6 +722,8 @@
       
         
       
+        
+      
     
     
       
@@ -1151,6 +1153,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#datamodelversie-en-migratie" class="md-nav__link">
+    <span class="md-ellipsis">
+      Datamodelversie en migratie
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#mixins" class="md-nav__link">
     <span class="md-ellipsis">
       Mixins
@@ -1197,6 +1208,27 @@
   
   <span class="md-ellipsis">
     Datamodel
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vertaalpijplijn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertaalpijplijn — technisch ontwerp
   </span>
   
 
@@ -1393,32 +1425,45 @@
 </tbody>
 </table>
 <h3 id="junction-tables">Junction Tables<a class="headerlink" href="#junction-tables" title="Permanent link">&para;</a></h3>
+<p>De diagram-koppeltabellen dragen naast de membership ook de <strong>layout</strong> van elementen op een diagram (nullable geometriekolommen, canoniek coördinatenstelsel — zie <a href="../../datamodel/">Datamodel</a>):</p>
 <table>
 <thead>
 <tr>
 <th>Tabel</th>
 <th>Koppelt</th>
+<th>Geometrie</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>diagram_classes</code></td>
+<td><code>diagram_class</code></td>
 <td>Diagram ↔ Class</td>
+<td>x, y, width, height, z_order, ea_style</td>
 </tr>
 <tr>
-<td><code>diagram_enumerations</code></td>
+<td><code>diagram_enumeration</code></td>
 <td>Diagram ↔ Enumeratie</td>
+<td>x, y, width, height, z_order, ea_style</td>
 </tr>
 <tr>
-<td><code>diagram_associations</code></td>
+<td><code>diagram_association</code></td>
 <td>Diagram ↔ Association</td>
+<td>waypoints (JSON), hidden, ea_geometry, ea_style</td>
 </tr>
 <tr>
-<td><code>diagram_generalizations</code></td>
+<td><code>diagram_generalization</code></td>
 <td>Diagram ↔ Generalization</td>
+<td>waypoints (JSON), hidden, ea_geometry, ea_style</td>
 </tr>
 </tbody>
 </table>
+<h2 id="datamodelversie-en-migratie">Datamodelversie en migratie<a class="headerlink" href="#datamodelversie-en-migratie" title="Permanent link">&para;</a></h2>
+<p>Elke database bevat een versiemarkering in de tabel <code>crunch_uml_meta</code> (bewust buiten <code>Base.metadata</code>, zodat hij nooit in exports opduikt). Bij het verbinden:</p>
+<ul>
+<li><strong>Zelfde versie</strong> of een database van vóór dit mechanisme: ontbrekende tabellen en nullable kolommen worden <strong>additief</strong> toegevoegd (<code>Database._add_missing_tables_and_columns</code>); data blijft staan.</li>
+<li><strong>Andere versie</strong>: de database is incompatibel en wordt met een duidelijke waarschuwing <strong>opnieuw aangemaakt</strong>; modellen moeten opnieuw geïmporteerd worden.</li>
+</ul>
+<p><code>DATAMODEL_VERSION</code> (in <code>db.py</code>) wordt alléén opgehoogd bij wijzigingen die de additieve migratie niet aankan (hernoemde/hertypeerde kolommen, gewijzigde primary keys of semantiek).</p>
 <h2 id="mixins">Mixins<a class="headerlink" href="#mixins" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>graph TB
     UG["UML_Generic&lt;br/&gt;id, schema_id, name, definitie,&lt;br/&gt;bron, toelichting, created, modified, stereotype"]

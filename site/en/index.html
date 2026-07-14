@@ -814,6 +814,8 @@
       
         
       
+        
+      
     
     
       
@@ -1180,6 +1182,27 @@
   
   
     <li class="md-nav__item">
+      <a href="technisch/vertaalpijplijn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vertaalpijplijn — technisch ontwerp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="technisch/kwetsbaarheden/" class="md-nav__link">
         
   
@@ -1333,6 +1356,7 @@
     CU["crunch_uml&lt;br/&gt;━━━━━━━━━━━━&lt;br/&gt;Normalize&lt;br/&gt;Transform&lt;br/&gt;Validate"]
 
     subgraph Output
+        EAXMI2["EA XMI"]
         JSON2["JSON"]
         MD["Markdown"]
         RDF["RDF / TTL / JSON-LD"]
@@ -1344,14 +1368,15 @@
     end
 
     XMI &amp; EAXMI &amp; QEA &amp; JSON &amp; XLSX &amp; CSV --&gt; CU
-    CU --&gt; JSON2 &amp; MD &amp; RDF &amp; JSCHEMA &amp; XLS2 &amp; SQLA &amp; EA &amp; DIFF
+    CU --&gt; EAXMI2 &amp; JSON2 &amp; MD &amp; RDF &amp; JSCHEMA &amp; XLS2 &amp; SQLA &amp; EA &amp; DIFF
     CU --- DB[("crunch_uml.db&lt;br/&gt;SQLite / PostgreSQL")]
 
     style CU fill:#1a5276,color:#fff,stroke:#1a5276
     style DB fill:#e74c3c,color:#fff,stroke:#c0392b</code></pre>
-<p>The core of crunch_uml is a <strong>standardized meta-schema</strong>: regardless of the input format, all UML entities (packages, classes, attributes, associations, generalizations, enumerations) are stored in the same database. From that database you can then export to any desired format.</p>
+<p>The core of crunch_uml is a <strong>standardized meta-schema</strong>: regardless of the input format, all UML entities (packages, classes, attributes, associations, generalizations, enumerations and diagrams) are stored in the same database. From that database you can then export to any desired format.</p>
 <h2 id="what-makes-crunch_uml-special">What Makes crunch_uml Special?<a class="headerlink" href="#what-makes-crunch_uml-special" title="Permanent link">&para;</a></h2>
 <p><strong>Multi-schema support</strong> — You can read the same model multiple times into different schemas within the same database. This allows you to, for example, place version 1.0 and version 2.0 of a model side by side and automatically generate a diff report. Or you can keep a translated model alongside the original.</p>
+<p><strong>Diagrams with layout</strong> — Diagrams are fully included: not just <em>which</em> elements appear on a diagram, but also their positions, sizes and the routing of relationship lines. The <code>xmi</code> export produces EA-compatible XMI in which the diagrams look exactly the same again in Sparx EA, and the <code>earepo</code> export updates the layout directly in an EA repository.</p>
 <p><strong>Plugin architecture</strong> — New input formats, output formats and transformations can be added without modifying the core code, via a registry-based plugin system.</p>
 <p><strong>Pipeline approach</strong> — Import, transformation and export are independent steps that you can combine as needed into automated workflows.</p>
 <h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
