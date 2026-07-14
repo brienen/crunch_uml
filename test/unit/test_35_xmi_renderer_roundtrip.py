@@ -23,6 +23,8 @@ Documented normalizations (see also renderers/EA_QUIRKS.md):
   differently (class name vs None), so it is ignored in that case.
 """
 
+import json
+
 import crunch_uml.schema as sch
 from crunch_uml import cli, const, db
 
@@ -44,6 +46,19 @@ ENTITY_MODELS = (
     db.Generalization,
     db.Diagram,
 )
+
+
+# Fields where '' / the literal string 'None' / NULL are interchangeable
+# parser artifacts (see module docstring). All other fields are compared
+# exactly, so real data loss cannot hide behind the normalization.
+NORMALIZED_FIELDS = {
+    "src_mult_start",
+    "src_mult_end",
+    "dst_mult_start",
+    "dst_mult_end",
+    "primitive",
+    "name",
+}
 
 
 def normalize(value):
@@ -95,8 +110,11 @@ def assert_semantically_equal(schema_a, schema_b):
                     and (dict_a.get("type_class_id") or dict_a.get("enumeration_id"))
                 ):
                     continue
-                assert normalize(value_a) == normalize(dict_b.get(field)), (
-                    f"{model.__tablename__} {key} differs on {field}:" f" {value_a!r} vs {dict_b.get(field)!r}"
+                value_b = dict_b.get(field)
+                if field in NORMALIZED_FIELDS:
+                    value_a, value_b = normalize(value_a), normalize(value_b)
+                assert value_a == value_b, (
+                    f"{model.__tablename__} {key} differs on {field}:" f" {value_a!r} vs {value_b!r}"
                 )
 
     for model, key_field, fields in JUNCTION_MODELS:
@@ -109,9 +127,7 @@ def assert_semantically_equal(schema_a, schema_b):
         for key in rows_a:
             for field in fields:
                 value_a, value_b = getattr(rows_a[key], field), getattr(rows_b[key], field)
-                assert normalize(value_a) == normalize(
-                    value_b
-                ), f"{model.__tablename__} {key} differs on {field}: {value_a!r} vs {value_b!r}"
+                assert value_a == value_b, f"{model.__tablename__} {key} differs on {field}: {value_a!r} vs {value_b!r}"
 
 
 def test_roundtrip_monumenten_eaxmi():
@@ -210,8 +226,9 @@ def test_roundtrip_inkomen_qea():
 
 def test_render_survives_control_characters_and_unplaced_class():
     """Control characters (ingestible via json/xlsx imports) may not crash
-    the renderer, and a class without a (known) package is placed in the
-    first root package instead of being dropped."""
+    the renderer, a class without a (known) package is placed in the first
+    root package instead of being dropped, and a hidden diagram edge stays
+    hidden through the round-trip (no fixture carries hidden=True)."""
     database = db.Database(const.DATABASE_URL, db_create=True)
     schema = sch.Schema(database, "xmirt_edge_a")
     package = db.Package(id="EAPK_EDGE_ROOT", name="Model Edge")
@@ -225,6 +242,31 @@ def test_render_survives_control_characters_and_unplaced_class():
     schema.save(clazz)
     zwevend = db.Class(id="EAID_EDGE_ZWEVEND", name="Zwevend", package_id="EAPK_BESTAAT_NIET")
     schema.save(zwevend)
+    assoc = db.Association(id="EAID_EDGE_ASSOC", name="verstopt", src_class_id=clazz.id, dst_class_id=clazz.id)
+    schema.save(assoc)
+
+    diagram = db.Diagram(id="EAID_EDGE_DIAGRAM", name="Diagram Edge", package_id=package.id)
+    diagram.diagram_classes.append(
+        db.DiagramClass(
+            diagram_id=diagram.id,
+            schema_id=schema.schema_id,
+            class_id=clazz.id,
+            x=10.0,
+            y=20.0,
+            width=100.0,
+            height=50.0,
+        )
+    )
+    diagram.diagram_associations.append(
+        db.DiagramAssociation(
+            diagram_id=diagram.id,
+            schema_id=schema.schema_id,
+            association_id=assoc.id,
+            hidden=True,
+            waypoints='[{"x": 30.0, "y": 40.0}]',
+        )
+    )
+    schema.add(diagram)
     database.commit()
 
     cli.main(["-sch", "xmirt_edge_a", "export", "-f", "./test/output/xmirt_edge.xml", "-t", "xmi"])
@@ -238,6 +280,13 @@ def test_render_survives_control_characters_and_unplaced_class():
     zwevend_b = schema_b.get_class("EAID_EDGE_ZWEVEND")
     assert zwevend_b is not None
     assert zwevend_b.package_id == "EAPK_EDGE_ROOT"  # relocated, not dropped
+
+    session = database.session
+    edge = (
+        session.query(db.DiagramAssociation).filter_by(schema_id="xmirt_edge_b", association_id="EAID_EDGE_ASSOC").one()
+    )
+    assert edge.hidden is True
+    assert json.loads(edge.waypoints) == [{"x": 30.0, "y": 40.0}]
 
 
 def test_rendered_file_contains_ea_extension():
