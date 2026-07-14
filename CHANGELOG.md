@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.5.0 (unreleased)
+
+- **Diagram geometry in the data model (phase 1).** The four diagram junction tables now carry layout information alongside membership: node-like members (`diagram_class`, `diagram_enumeration`) get nullable `x`, `y`, `width`, `height`, `z_order` and `ea_style` columns; edge-like members (`diagram_association`, `diagram_generalization`) get nullable `waypoints` (JSON), `hidden`, `ea_geometry` and `ea_style` columns. Coordinates are stored in a canonical system (origin top-left, y downwards, all positive); parsers/renderers convert at the edge. `Diagram.get_copy()` now copies the geometry along and also copies association/generalization membership, which was previously omitted (the required `get_associations_inscope`/`get_generalizations_inscope` helpers on `Package` did not exist yet); membership is only copied for relations that actually end up in the copy, so no dangling rows are created. Existing database files from older versions are migrated on connect with a lightweight additive step (missing tables and nullable columns are added, nothing is dropped), and the pandas-based parsers now normalize NaN from empty spreadsheet cells to NULL so typed columns accept them.
+
 ## v1.9.1 (2023-05-08)
 
 - Fixes a replacement typo in setup.py for `package_data`

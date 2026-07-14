@@ -6,6 +6,7 @@ import inflection
 from sqlalchemy import (
     Boolean,
     Column,
+    Float,
     ForeignKeyConstraint,
     Integer,
     PrimaryKeyConstraint,
@@ -15,6 +16,7 @@ from sqlalchemy import (
 )
 from sqlalchemy import exc as sa_exc
 from sqlalchemy import inspect
+from sqlalchemy import text as sqlalchemy_text
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
@@ -101,7 +103,51 @@ def getColumnNames(tablename):
 
 
 # Koppeltabellen
-class DiagramClass(Base):  # type: ignore
+#
+# Canonical diagram geometry
+# --------------------------
+# The diagram junction tables carry the layout of elements on a diagram in a
+# *canonical* coordinate system: origin in the top-left corner of the diagram,
+# x grows to the right, y grows downwards, and all stored values are positive.
+# Parsers and renderers convert between this canonical system and the various
+# Enterprise Architect conventions at the edge; the database itself only ever
+# contains canonical values. The EA conventions (verified against real files):
+#
+# * XMI extension node geometry ("Left=..;Top=..;Right=..;Bottom=..;") uses
+#   positive Top/Bottom values: x=Left, y=Top, width=Right-Left,
+#   height=Bottom-Top.
+# * QEA t_diagramobjects stores *negative* RectTop/RectBottom: x=RectLeft,
+#   y=-RectTop, width=RectRight-RectLeft, height=RectTop-RectBottom.
+# * Edge waypoints ("Path=") have negative y in both sources; canonical
+#   waypoints flip the sign. XMI separates x:y pairs with '$', QEA with ';'.
+#
+# All geometry columns are nullable: membership without a known layout stays
+# valid, and files/databases written before these columns existed remain
+# importable. The raw EA style/geometry strings are kept losslessly in
+# ea_style/ea_geometry so a round-trip can reproduce them exactly.
+
+
+class DiagramNodeGeometry:
+    """Canonical geometry for node-like diagram members (classes, enums)."""
+
+    x = Column(Float, nullable=True)  # left edge, canonical coordinates
+    y = Column(Float, nullable=True)  # top edge, canonical coordinates
+    width = Column(Float, nullable=True)
+    height = Column(Float, nullable=True)
+    z_order = Column(Integer, nullable=True)  # stacking order (EA seqno/Sequence)
+    ea_style = Column(Text, nullable=True)  # raw EA style string, lossless
+
+
+class DiagramEdgeGeometry:
+    """Canonical geometry for edge-like diagram members (associations, generalizations)."""
+
+    waypoints = Column(Text, nullable=True)  # JSON list of {"x": .., "y": ..}, canonical
+    hidden = Column(Boolean, nullable=True)  # EA Hidden flag
+    ea_geometry = Column(Text, nullable=True)  # raw EA geometry string, lossless
+    ea_style = Column(Text, nullable=True)  # raw EA style string, lossless
+
+
+class DiagramClass(Base, DiagramNodeGeometry):  # type: ignore
     __tablename__ = "diagram_class"
     diagram_id = Column(String, nullable=False)
     schema_id = Column(String, nullable=False)
@@ -114,7 +160,7 @@ class DiagramClass(Base):  # type: ignore
     __mapper_args__ = {"confirm_deleted_rows": False}
 
 
-class DiagramEnumeration(Base):  # type: ignore
+class DiagramEnumeration(Base, DiagramNodeGeometry):  # type: ignore
     __tablename__ = "diagram_enumeration"
     diagram_id = Column(String, nullable=False)
     schema_id = Column(String, nullable=False)
@@ -130,7 +176,7 @@ class DiagramEnumeration(Base):  # type: ignore
     __mapper_args__ = {"confirm_deleted_rows": False}
 
 
-class DiagramAssociation(Base):  # type: ignore
+class DiagramAssociation(Base, DiagramEdgeGeometry):  # type: ignore
     __tablename__ = "diagram_association"
     diagram_id = Column(String, nullable=False)
     schema_id = Column(String, nullable=False)
@@ -146,7 +192,7 @@ class DiagramAssociation(Base):  # type: ignore
     __mapper_args__ = {"confirm_deleted_rows": False}
 
 
-class DiagramGeneralization(Base):  # type: ignore
+class DiagramGeneralization(Base, DiagramEdgeGeometry):  # type: ignore
     __tablename__ = "diagram_generalization"
     diagram_id = Column(String, nullable=False)
     schema_id = Column(String, nullable=False)
@@ -485,6 +531,20 @@ class Package(Base, UMLBase, UMLTagsDomain):  # type: ignore
             for subpackage in self.subpackages:
                 enums = enums.union(subpackage.get_enumerations_inscope())
             return enums
+
+    def get_associations_inscope(self):
+        """Associations whose both endpoint classes are in scope of this package."""
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore" if suppress_warnings else "default", category=sa_exc.SAWarning)
+            clazzes = self.get_classes_inscope()
+            return {assoc for clazz in clazzes for assoc in clazz.uitgaande_associaties if assoc.dst_class in clazzes}
+
+    def get_generalizations_inscope(self):
+        """Generalizations whose both endpoint classes are in scope of this package."""
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore" if suppress_warnings else "default", category=sa_exc.SAWarning)
+            clazzes = self.get_classes_inscope()
+            return {gener for clazz in clazzes for gener in clazz.superclasses if gener.superclass in clazzes}
 
     def get_copy(self, parent, materialize_generalizations=False):
         if parent and not isinstance(parent, Package):
@@ -1118,7 +1178,16 @@ class Diagram(Base, UMLBase):  # type: ignore
         copy_instance = super().get_copy(parent)
         copy_instance.package = parent
 
+        node_geometry_fields = ("x", "y", "width", "height", "z_order", "ea_style")
+        edge_geometry_fields = ("waypoints", "hidden", "ea_geometry", "ea_style")
+
+        def copy_geometry(source_row, target_row, fields):
+            if source_row is not None:
+                for field in fields:
+                    setattr(target_row, field, getattr(source_row, field))
+
         # Append classes
+        original_diagram_classes = {dc.class_id: dc for dc in self.diagram_classes}
         clazzIDs_in_scope = [clazz.id for clazz in self.get_instances(Class, parent.get_root_package().id)]
         clazzIDs_already_copied = [clazz.id for clazz in copy_instance.package.get_root_package().get_classes_inscope()]
         for clazz in self.classes:
@@ -1141,9 +1210,11 @@ class Diagram(Base, UMLBase):  # type: ignore
                         schema_id=copy_instance.schema_id,
                         class_id=clazz.id,
                     )
+                copy_geometry(original_diagram_classes.get(clazz.id), diagram_class, node_geometry_fields)
                 copy_instance.diagram_classes.append(diagram_class)
 
         # Append enumerations
+        original_diagram_enums = {de.enumeration_id: de for de in self.diagram_enumerations}
         enumerationIDs_in_scope = [
             enum.id for enum in self.get_instances(Enumeratie, parent.get_root_package().id)
         ]  # parent.get_enumerations_inscope()
@@ -1168,7 +1239,67 @@ class Diagram(Base, UMLBase):  # type: ignore
                     schema_id=copy_instance.schema_id,
                     enumeration_id=enum.id,
                 )
+            copy_geometry(original_diagram_enums.get(enum.id), diagram_enum, node_geometry_fields)
             copy_instance.diagram_enumerations.append(diagram_enum)
+
+        # Append associations and generalizations. Copies keep the original
+        # ids, so a membership row stays valid exactly when the relation
+        # itself ends up in the copy. Class.get_copy is what copies
+        # relations: an association is copied along with its (copied) source
+        # class when that class has a package and the far endpoint is a
+        # non-orphan class in scope of the original root; a generalization
+        # is copied along with its superclass under the same conditions.
+        # Mirror those conditions here — anything else would create dangling
+        # membership rows.
+        copied_class_ids = (
+            set(clazzIDs_in_scope)
+            | set(clazzIDs_already_copied)
+            | {clazz.id for clazz in self.classes if clazz.name != const.ORPHAN_CLASS}
+        )
+        original_root_class_ids = {clazz.id for clazz in self.package.get_root_package().get_classes_inscope()}
+
+        def relation_is_copied(owning_class, far_class):
+            # Same conditions as Class.get_copy uses when copying relations.
+            return (
+                owning_class is not None
+                and owning_class.id in copied_class_ids
+                and owning_class.name != const.ORPHAN_CLASS
+                and owning_class.package is not None
+                and far_class is not None
+                and far_class.name != const.ORPHAN_CLASS
+                and far_class.id in original_root_class_ids
+            )
+
+        original_diagram_assocs = {da.association_id: da for da in self.diagram_associations}
+        for assoc in self.associations:
+            if relation_is_copied(assoc.src_class, assoc.dst_class):
+                diagram_assoc = DiagramAssociation(
+                    diagram_id=copy_instance.id,
+                    schema_id=copy_instance.schema_id,
+                    association_id=assoc.id,
+                )
+                copy_geometry(original_diagram_assocs.get(assoc.id), diagram_assoc, edge_geometry_fields)
+                copy_instance.diagram_associations.append(diagram_assoc)
+            else:
+                logger.debug(
+                    f"Association {assoc.name} on diagram {self.name} is not part of the copy:"
+                    " membership not copied."
+                )
+
+        original_diagram_geners = {dg.generalization_id: dg for dg in self.diagram_generalizations}
+        for gener in self.generalizations:
+            if relation_is_copied(gener.superclass, gener.subclass):
+                diagram_gener = DiagramGeneralization(
+                    diagram_id=copy_instance.id,
+                    schema_id=copy_instance.schema_id,
+                    generalization_id=gener.id,
+                )
+                copy_geometry(original_diagram_geners.get(gener.id), diagram_gener, edge_geometry_fields)
+                copy_instance.diagram_generalizations.append(diagram_gener)
+            else:
+                logger.debug(
+                    f"Generalization on diagram {self.name} is not part of the copy:" " membership not copied."
+                )
 
         return copy_instance
 
@@ -1199,9 +1330,49 @@ class Database:
             if Package.__tablename__ not in inspector.get_table_names():
                 # If the 'packages' table does not exist, create all tables
                 Base.metadata.create_all(bind=self.engine)
+            else:
+                self._add_missing_tables_and_columns(inspector)
         except OperationalError:
             # If the database does not exist or is not reachable, create it
             Base.metadata.create_all(bind=self.engine)
+
+    def _add_missing_tables_and_columns(self, inspector):
+        """Lightweight additive migration for existing database files.
+
+        Database files written by an older version of crunch_uml miss columns
+        that were added to the model later (e.g. the diagram geometry
+        columns); ``create_all`` never alters existing tables, so querying
+        such a file would fail with "no such column". Only additions are
+        performed: missing tables are created and missing *nullable* columns
+        are added — nothing is ever dropped or changed.
+        """
+        existing_tables = set(inspector.get_table_names())
+        missing_tables = [table for table in Base.metadata.tables.values() if table.name not in existing_tables]
+        if missing_tables:
+            Base.metadata.create_all(bind=self.engine, tables=missing_tables)
+
+        preparer = self.engine.dialect.identifier_preparer
+        with self.engine.begin() as connection:
+            for table in Base.metadata.tables.values():
+                if table.name not in existing_tables:
+                    continue
+                existing_columns = {col["name"] for col in inspector.get_columns(table.name)}
+                for column in table.columns:
+                    if column.name in existing_columns:
+                        continue
+                    if not column.nullable and column.default is None and column.server_default is None:
+                        logger.warning(
+                            f"Table '{table.name}' in existing database misses non-nullable column"
+                            f" '{column.name}'; cannot add it automatically. Recreate the database"
+                            " with --database_create_new."
+                        )
+                        continue
+                    ddl = (
+                        f"ALTER TABLE {preparer.quote(table.name)} ADD COLUMN"
+                        f" {preparer.quote(column.name)} {column.type.compile(self.engine.dialect)}"
+                    )
+                    logger.info(f"Adding missing column '{column.name}' to table '{table.name}'")
+                    connection.execute(sqlalchemy_text(ddl))
 
     def save(self, obj):
         # NB: no per-call flush. autoflush=True ensures any subsequent ORM

@@ -1,5 +1,6 @@
 import json
 import logging
+import math
 import os
 
 import pandas as pd
@@ -11,6 +12,14 @@ from crunch_uml.exceptions import CrunchException
 from crunch_uml.parsers.parser import Parser, ParserRegistry
 
 logger = logging.getLogger()
+
+
+def clean_value(value):
+    """Pandas represents empty spreadsheet cells as NaN; the database expects
+    NULL. Typed columns (e.g. Boolean) reject NaN outright, so normalize it."""
+    if isinstance(value, float) and math.isnan(value):
+        return None
+    return value
 
 
 class TransformableParser(Parser):
@@ -30,6 +39,7 @@ class TransformableParser(Parser):
             logger.warning(f"Entity not found with tablename: {entity_name}.")
             return
         columns = db.getColumnNames(entity_name)
+        data = {k: clean_value(v) for k, v in data.items()}
 
         # Als er een ID in de data aanwezig is, zoek dan naar een bestaand record
         if "id" in data:

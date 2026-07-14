@@ -116,6 +116,28 @@ erDiagram
         string name
         string package_id FK
     }
+
+    DiagramClass {
+        string diagram_id PK
+        string schema_id PK
+        string class_id PK
+        float x
+        float y
+        float width
+        float height
+        int z_order
+        text ea_style
+    }
+
+    DiagramAssociation {
+        string diagram_id PK
+        string schema_id PK
+        string association_id PK
+        text waypoints
+        boolean hidden
+        text ea_geometry
+        text ea_style
+    }
 ```
 
 ## Model Details
@@ -176,6 +198,36 @@ Enumeration type with named values. EnumerationLiteral contains the individual v
 ### Diagram
 
 Visual diagram that references classes, enumerations, associations and generalizations via junction tables.
+
+#### Diagram geometry
+
+Besides membership, the four junction tables also carry the layout of elements on the diagram. All geometry columns are **nullable**: membership without a known layout stays valid, and files or databases written before these columns existed remain importable.
+
+**Node-like** (`DiagramClass`, `DiagramEnumeration`):
+
+| Column | Type | Meaning |
+|---|---|---|
+| `x` | Float | left edge, canonical coordinates |
+| `y` | Float | top edge, canonical coordinates |
+| `width` | Float | width |
+| `height` | Float | height |
+| `z_order` | Integer | stacking order (EA `seqno`/`Sequence`) |
+| `ea_style` | Text | raw EA style string, kept losslessly for round-trips |
+
+**Edge-like** (`DiagramAssociation`, `DiagramGeneralization`):
+
+| Column | Type | Meaning |
+|---|---|---|
+| `waypoints` | Text (JSON) | `[{"x": .., "y": ..}, ...]` in canonical coordinates; empty list or NULL = no intermediate points |
+| `hidden` | Boolean | EA `Hidden` flag |
+| `ea_geometry` | Text | raw EA geometry string (SX/SY/EX/EY/EDGE/label positions/Path) — lossless |
+| `ea_style` | Text | raw EA style string — lossless |
+
+**Canonical coordinate system**: origin in the top-left corner, x grows to the right, y grows downwards, all values positive. All conversions to and from EA conventions happen in the parsers and renderers; the database only ever contains canonical values. The EA conventions (verified against real files):
+
+- XMI extension node geometry (`Left=..;Top=..;Right=..;Bottom=..;`) uses **positive** Top/Bottom: `x=Left`, `y=Top`, `width=Right-Left`, `height=Bottom-Top`.
+- `t_diagramobjects` in a `.qea` repository stores **negative** RectTop/RectBottom: `x=RectLeft`, `y=-RectTop`, `width=RectRight-RectLeft`, `height=RectTop-RectBottom`.
+- `Path=` waypoints have negative y in **both** sources; canonical waypoints flip the sign. XMI separates x:y pairs with `$`, the qea `Path` column with `;`.
 
 ## Mixin Structure
 
