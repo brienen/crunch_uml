@@ -87,3 +87,21 @@ Now both versions are side by side in the same database and you can compare them
 ```bash
 crunch_uml -sch translation_en import -f translations.json -t i18n --language en
 ```
+
+### Shared database as import staging (run markers and version policy)
+
+When crunch_uml writes to a shared database (say, a PostgreSQL staging database another application reads from), v0.5.1 adds two safeguards:
+
+**Run markers.** Every `import` invocation writes a row to the `crunch_uml_runs` table (outside the data model, so it never leaks into exports): at the start with an empty `completed_at`, and only after the successful commit is `completed_at` stamped as the very last step. External readers should only consume schemas whose latest run has a `completed_at` — a row without one means "in progress or aborted" (crunch_uml writes table-by-table, non-transactionally, so reading halfway yields a torn model).
+
+**Version policy.** When a database carries a different datamodel version, `-on_version_mismatch` decides what happens: `recreate` (historical behaviour: discard everything and rebuild), `fail` (stop without touching anything), or the default `auto` — which only recreates the local default database and fails on any explicitly provided `-db_url`. A mismatched crunch_uml version can therefore no longer accidentally wipe a shared staging database:
+
+```bash
+# Staging workflow: GGM into a PostgreSQL staging database, one schema per release
+pip install 'crunch_uml[postgres]'
+crunch_uml -db_url postgresql://crunch_writer:***@staging-host/crunch_staging \
+  -sch ggm_2_5_1 import -f "Gemeentelijk Gegevensmodel XMI2.1.xml" -t eaxmi
+
+# Deliberately recreate after a crunch_uml upgrade with a datamodel change:
+crunch_uml -db_url postgresql://... -on_version_mismatch recreate -sch ggm_2_5_1 import -f model.xml -t eaxmi
+```

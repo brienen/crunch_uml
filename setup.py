@@ -11,7 +11,7 @@ def parse_requirements(filename):
 
 setuptools.setup(
     name='crunch_uml',
-    version='0.5.0',
+    version='0.5.1',
     description="Crunch_uml reads UML Class model from multiple formats (including XMI, Enterprise Architect XMI, Excel, Json, and others), can perform transformations and renders them to other formats (including Markdown, json, json schema and many others).",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -39,6 +39,9 @@ setuptools.setup(
     ],
     install_requires=parse_requirements('requirements.txt'),
     extras_require={
+        'postgres': [
+            'psycopg2-binary >= 2.9, < 3',
+        ],
         'dev':[
             'bandit == 1.7.*',
             'black >= 26.3.1, < 27',

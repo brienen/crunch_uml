@@ -140,19 +140,28 @@ def main(args=None):
                 return
 
             # Get daatbase and optionaly create new one
-            database = Database(args.database_url, db_create=args.database_create_new)
+            database = Database(
+                args.database_url,
+                db_create=args.database_create_new,
+                on_version_mismatch=args.on_version_mismatch,
+            )
             schema = sch.Schema(database, schema_name=args.schema_name)
+            # Run marker: row with completed_at NULL means "in progress or
+            # aborted"; completed_at is stamped as the FINAL step after the
+            # commit, so external readers only consume consistent schemas.
+            run_id = database.start_import_run(args.schema_name)
             try:
                 # First open database, select parser and parse into database
                 logger.info(f"Starting parsing with inputtype {args.inputtype}")
                 parser = parsers.ParserRegistry.getinstance(args.inputtype)
                 parser.parse(args, schema)
                 database.commit()
+                database.complete_import_run(run_id)
                 logger.info("Succes! parsed all data and saved it in database")
             except Exception as ex:
                 logger.error(
                     f"Error while parsing file, writing data to database with message: {ex}. Exiting and"
-                    " descarding all changes to database."
+                    " descarding all changes to database. The import run marker stays incomplete."
                 )
                 database.rollback()
                 raise
@@ -161,7 +170,7 @@ def main(args=None):
 
         # Do transformation
         elif args.command == const.CMD_TRANSFORM:
-            database = Database(args.database_url, db_create=False)
+            database = Database(args.database_url, db_create=False, on_version_mismatch=args.on_version_mismatch)
             logger.info("Starting transformation ")
             try:
                 transformer = transformers.TransformerRegistry.getinstance(args.transformationtype)
@@ -183,7 +192,7 @@ def main(args=None):
 
         # Render Output
         elif args.command == const.CMD_EXPORT:
-            database = Database(args.database_url, db_create=False)
+            database = Database(args.database_url, db_create=False, on_version_mismatch=args.on_version_mismatch)
             schema = sch.Schema(database, schema_name=args.schema_name)
             logger.info(f"Starting rendering with outputtype {args.outputtype}")
             renderer = renderers.RendererRegistry.getinstance(args.outputtype)

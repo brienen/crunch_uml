@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.5.1 (unreleased)
+
+- **Import-run markers for shared databases.** Every `import` invocation records a row in a new `crunch_uml_runs` table (outside the ORM model, like `crunch_uml_meta`, so it never leaks into exports): `run_id`, `schema_id`, `started_at`, `crunch_version`, `datamodel_version`, and a `completed_at` that is stamped as the FINAL step after the import committed. A row with `completed_at` NULL marks an in-progress or aborted (torn) run — external readers of a shared crunch database (e.g. an import API) should only consume schemas whose latest run is completed. The markers use their own connection, so they survive a session rollback as evidence, and a database recreate clears them (the data they vouched for is gone).
+- **Safe datamodel-version handling for shared databases.** New global flag `-on_version_mismatch {auto,fail,recreate}` controls what happens when a database was written with an incompatible datamodel version. `recreate` keeps the historical behaviour (drop and rebuild, all data discarded); `fail` stops with a clear error without touching the database; the default `auto` recreates only the local default database and fails on any explicitly provided `-db_url` — a mismatched crunch_uml version can no longer accidentally wipe a shared (staging) database.
+- **PostgreSQL extra.** `pip install 'crunch_uml[postgres]'` installs the psycopg2 driver for `-db_url postgresql://...` staging workflows; documented in the import manual (NL/EN) together with the run-marker/version-policy contract.
+
 ## v0.5.0 (unreleased)
 
 - **Datamodel version marker in the database.** Every crunch_uml database now stores a datamodel version in a `crunch_uml_meta` table (kept outside the ORM model so it never leaks into exports). On connect, a database with the same version — or one predating the marker — is migrated additively (missing tables/nullable columns are added, data kept); a database with a different version is incompatible and is recreated from scratch with a clear warning, after which models must be re-imported. The version is only bumped for schema changes the additive migration cannot handle.

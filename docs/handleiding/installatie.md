@@ -6,6 +6,12 @@
 pip install crunch-uml
 ```
 
+Wil je naar een PostgreSQL-database schrijven (bijvoorbeeld een gedeelde import-staging, zie de importhandleiding), installeer dan de postgres-extra mee:
+
+```bash
+pip install 'crunch_uml[postgres]'
+```
+
 Na installatie is het commando `crunch_uml` beschikbaar:
 
 ```bash

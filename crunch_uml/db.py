@@ -1,6 +1,9 @@
+import importlib.metadata
 import logging
 import re
+import uuid
 import warnings
+from datetime import datetime, timezone
 
 import inflection
 from sqlalchemy import (
@@ -55,6 +58,30 @@ crunch_meta_table = Table(
     Column("value", String),
 )
 
+# Import-run bookkeeping, also outside Base.metadata for the same reason.
+# One row per `import` invocation. `completed_at` is written as the FINAL
+# step after the import committed; a row with completed_at IS NULL therefore
+# marks an in-progress or aborted (torn) run. External readers of a shared
+# crunch database (e.g. the Semantic Toolkit's import API) must only consume
+# schemas whose latest run is completed.
+crunch_runs_table = Table(
+    "crunch_uml_runs",
+    _meta_metadata,
+    Column("run_id", String, primary_key=True),
+    Column("schema_id", String, nullable=False),
+    Column("started_at", String, nullable=False),  # ISO-8601 UTC
+    Column("completed_at", String, nullable=True),  # ISO-8601 UTC, NULL = torn
+    Column("crunch_version", String, nullable=True),
+    Column("datamodel_version", String, nullable=True),
+)
+
+
+def _crunch_version():
+    try:
+        return importlib.metadata.version("crunch_uml")
+    except importlib.metadata.PackageNotFoundError:
+        return "unknown"
+
 
 def add_args(argumentparser, subparser_dict):
     global suppress_warnings
@@ -81,6 +108,19 @@ def add_args(argumentparser, subparser_dict):
             f" supported database. Default is {const.DATABASE_URL}"
         ),
         default=const.DATABASE_URL,
+    )
+    argumentparser.add_argument(
+        "-on_version_mismatch",
+        "--on_version_mismatch",
+        type=str,
+        choices=[const.VERSION_MISMATCH_AUTO, const.VERSION_MISMATCH_FAIL, const.VERSION_MISMATCH_RECREATE],
+        help=(
+            "What to do when the database was written with an incompatible datamodel version:"
+            " 'recreate' drops and rebuilds it (ALL data discarded), 'fail' stops without touching it."
+            " Default 'auto': recreate only the local default database, fail on any explicitly"
+            " provided -db_url (assumed shared/precious, e.g. a staging Postgres)."
+        ),
+        default=const.VERSION_MISMATCH_AUTO,
     )
 
 
@@ -1341,13 +1381,16 @@ class Diagram(Base, UMLBase):  # type: ignore
 class Database:
     _instance = None
 
-    def __new__(cls, db_url=const.DATABASE_URL, db_create=False):
+    def __new__(cls, db_url=const.DATABASE_URL, db_create=False, on_version_mismatch=const.VERSION_MISMATCH_AUTO):
         if cls._instance is None:
             cls._instance = super(Database, cls).__new__(cls)
             # Setting up the database
             cls._instance.engine = create_engine(db_url)
             Session = sessionmaker(bind=cls._instance.engine)
             cls._instance.session = Session()
+            cls._instance._db_url = db_url
+        # Policy may differ per invocation (CLI flag), so set it on every call.
+        cls._instance._on_version_mismatch = on_version_mismatch
         if db_create:
             cls._instance._reset_database()
 
@@ -1358,6 +1401,17 @@ class Database:
         Base.metadata.drop_all(bind=self.engine)  # Drop all tables
         Base.metadata.create_all(bind=self.engine)  # Create all tables
         self._write_datamodel_version()
+        # The model data the run markers vouched for is gone — stale
+        # "completed" rows would falsely promise consistent schemas.
+        self._clear_import_runs()
+
+    def _clear_import_runs(self):
+        try:
+            _meta_metadata.create_all(bind=self.engine, checkfirst=True)
+            with self.engine.begin() as connection:
+                connection.execute(crunch_runs_table.delete())
+        except OperationalError as e:
+            logger.warning(f"Could not clear import run markers: {e}")
 
     def _check_and_create_database(self):
         try:
@@ -1368,21 +1422,88 @@ class Database:
             else:
                 stored_version = self._read_datamodel_version()
                 if stored_version is not None and stored_version != DATAMODEL_VERSION:
-                    # Incompatible datamodel: recreate the database. A None
-                    # version means the database predates the version marker
-                    # and is still additively migratable.
-                    logger.warning(
-                        f"Database has datamodel version {stored_version}, this version of crunch_uml"
-                        f" requires {DATAMODEL_VERSION}: recreating the database. All data is discarded;"
-                        " re-import your models."
-                    )
-                    self._reset_database()
+                    # Incompatible datamodel. A None version means the database
+                    # predates the version marker and is still additively
+                    # migratable. What happens next depends on the mismatch
+                    # policy: the historical behaviour (recreate, all data
+                    # discarded) is only safe for the local throwaway default
+                    # database — on any explicitly provided db_url (a shared
+                    # Postgres staging database, say) we fail fast instead.
+                    if self._resolve_version_mismatch_policy() == const.VERSION_MISMATCH_RECREATE:
+                        logger.warning(
+                            f"Database has datamodel version {stored_version}, this version of crunch_uml"
+                            f" requires {DATAMODEL_VERSION}: recreating the database. All data is discarded;"
+                            " re-import your models."
+                        )
+                        self._reset_database()
+                    else:
+                        raise CrunchException(
+                            f"Database has datamodel version {stored_version}, but this version of"
+                            f" crunch_uml requires {DATAMODEL_VERSION}. Refusing to touch it: recreating"
+                            " would discard ALL data in this database. Re-run with"
+                            " '-on_version_mismatch recreate' (or -db_create) to rebuild it, or use a"
+                            " matching crunch_uml version."
+                        )
                 else:
                     self._add_missing_tables_and_columns(inspector)
         except OperationalError:
             # If the database does not exist or is not reachable, create it
             Base.metadata.create_all(bind=self.engine)
         self._write_datamodel_version()
+
+    def _resolve_version_mismatch_policy(self):
+        """Effective mismatch policy: an explicit CLI choice wins; 'auto'
+        recreates only the local default database and fails on anything else
+        (an explicitly provided db_url is assumed to be shared/precious)."""
+        policy = getattr(self, "_on_version_mismatch", const.VERSION_MISMATCH_AUTO)
+        if policy != const.VERSION_MISMATCH_AUTO:
+            return policy
+        if getattr(self, "_db_url", const.DATABASE_URL) == const.DATABASE_URL:
+            return const.VERSION_MISMATCH_RECREATE
+        return const.VERSION_MISMATCH_FAIL
+
+    def start_import_run(self, schema_id):
+        """Insert an import-run row (completed_at NULL) and return its run_id.
+
+        Uses its own connection, independent of the ORM session: the row must
+        be visible to concurrent readers *while* the import is still running,
+        and must survive a session rollback as evidence of a torn run.
+        Best-effort: bookkeeping failure never blocks an import.
+        """
+        run_id = str(uuid.uuid4())
+        try:
+            _meta_metadata.create_all(bind=self.engine, checkfirst=True)
+            with self.engine.begin() as connection:
+                connection.execute(
+                    insert(crunch_runs_table).values(
+                        run_id=run_id,
+                        schema_id=schema_id,
+                        started_at=datetime.now(timezone.utc).isoformat(),
+                        completed_at=None,
+                        crunch_version=_crunch_version(),
+                        datamodel_version=str(DATAMODEL_VERSION),
+                    )
+                )
+            return run_id
+        except OperationalError as e:
+            logger.warning(f"Could not record import run start: {e}")
+            return None
+
+    def complete_import_run(self, run_id):
+        """Stamp completed_at on the run row. Call as the FINAL step, after
+        the import transaction committed — the marker is the contract that
+        tells external readers the schema is consistent."""
+        if run_id is None:
+            return
+        try:
+            with self.engine.begin() as connection:
+                connection.execute(
+                    update(crunch_runs_table)
+                    .where(crunch_runs_table.c.run_id == run_id)
+                    .values(completed_at=datetime.now(timezone.utc).isoformat())
+                )
+        except OperationalError as e:
+            logger.warning(f"Could not record import run completion: {e}")
 
     def _read_datamodel_version(self):
         """Version marker stored in the database, or None when the database
