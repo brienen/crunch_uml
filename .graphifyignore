@@ -1,0 +1,16 @@
+# Uitsluitingen voor de graphify-kennisgraaf (gitignore-syntax).
+# Bedoeld om gegenereerde output en datafixtures buiten de graaf te houden,
+# zodat god nodes en communities de code beschrijven en niet de ruis.
+
+# Gegenereerde mkdocs-site: dupliceert docs/ volledig, plus ~38 geminificeerde
+# JS-bestanden waarvan de mangled functienamen (m(), r(), d()) als god nodes
+# boven de echte abstracties uitkwamen.
+site/
+
+# JSON-schemafixtures voor de tests: leveren samen ~380 nodes op die vrijwel
+# allemaal generieke sleutels zijn (type, description, $ref, properties).
+# Die vormen losse enum-communities en veroorzaken het merendeel van de
+# dangling/collapsed edges in de health check.
+json_schema_Schuldhulptraject.json
+test/schema_Uitwisselmodel.json
+test/data/meta-schema.json
