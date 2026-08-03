@@ -508,7 +508,8 @@ class QEAParser(Parser):
                 definitie=normalize_newlines(notes),
             )
             logger.debug(f"Diagram {name} met id {eaid}")
-            schema.add(diagram)
+            # Nog niet opslaan: de leden worden hieronder aan dit object
+            # gehangen en het geheel gaat daarna in een keer naar de database.
             diagrams_by_local_id[diagram_id] = diagram
 
         # Diagram objects (nodes): route to the class or enumeration junction
@@ -609,6 +610,13 @@ class QEAParser(Parser):
                 edge_diagram.diagram_generalizations.append(
                     db.DiagramGeneralization(generalization_id=element_id, **membership_kwargs)
                 )
+
+        # Pas nu opslaan, mét leden: schema.save() is een insert-or-update, dus
+        # een diagram dat al in de database staat wordt bijgewerkt in plaats
+        # van opnieuw ingevoegd. Dat maakt een herimport in een gevulde
+        # database mogelijk.
+        for diagram in diagrams_by_local_id.values():
+            schema.save(diagram)
 
         schema.database.session.flush()
         logger.info(f"Phase 6 done: {schema.count_diagrams()} diagrams")
