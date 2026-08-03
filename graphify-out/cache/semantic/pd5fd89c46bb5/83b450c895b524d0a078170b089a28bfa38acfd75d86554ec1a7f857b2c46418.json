@@ -1,0 +1,1 @@
+{"nodes": [{"id": "dev_requirements_dev_toolchain", "label": "Development toolchain (black, flake8, isort, mypy, pytest, bandit, build, twine)", "file_type": "document", "source_file": "dev_requirements.txt", "source_location": null, "source_url": null, "captured_at": null, "author": null, "contributor": null}], "edges": [], "hyperedges": []}
