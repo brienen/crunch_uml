@@ -29,7 +29,12 @@ def load_xmi(source):
             raw = f.read()
 
     declared_encoding = extract_declared_encoding(raw)
-    detected_encoding = chardet.detect(raw)["encoding"]
+    # chardet.detect() leest het volledige bestand en schaalt lineair met de
+    # omvang: op een XMI van tientallen MB's kost dat het leeuwendeel van de
+    # importtijd. Zodra de XML-declaratie een encoding geeft wint die toch,
+    # dus alleen detecteren als de declaratie ontbreekt (of verderop, als de
+    # foutmelding de gedetecteerde waarde nodig heeft).
+    detected_encoding = None if declared_encoding else chardet.detect(raw)["encoding"]
     used_encoding = declared_encoding or detected_encoding or const.ENCODING
 
     try:
@@ -40,6 +45,10 @@ def load_xmi(source):
         parser = etree.XMLParser(recover=True, encoding=const.ENCODING)
         return etree.fromstring(utf8_bytes, parser)
     except Exception as e:
+        if detected_encoding is None:
+            # Uitzonderingspad: hier is de detectie de moeite waard, want ze
+            # vertelt waarom de gedeclareerde encoding niet werkte.
+            detected_encoding = chardet.detect(raw)["encoding"]
         raise RuntimeError(
             f"Probleem met XMI inlezen (declared: {declared_encoding}, detected: {detected_encoding}): {e}"
         )
