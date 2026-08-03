@@ -304,7 +304,11 @@ class EAXMIParser(XMIParser):
                 modified=modified,
                 definitie=documentation,
             )
-            schema.add(diagram)
+            # Bewust nog niet opslaan: het diagram gaat pas na het verzamelen
+            # van zijn leden naar de database, via schema.save() onderaan deze
+            # lus. Dat is een insert-or-update; een harde insert hier laat een
+            # herimport in een database die het diagram al kent stuklopen op
+            # de primaire sleutel (diagrams.id, diagrams.schema_id).
 
             seen_element_ids = set()
             for element in diagramref.xpath("./elements/element"):
