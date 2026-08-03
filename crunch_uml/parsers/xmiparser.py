@@ -1,5 +1,6 @@
 import logging
 import re
+from collections import defaultdict
 
 import chardet
 import requests
@@ -29,7 +30,12 @@ def load_xmi(source):
             raw = f.read()
 
     declared_encoding = extract_declared_encoding(raw)
-    detected_encoding = chardet.detect(raw)["encoding"]
+    # chardet.detect() leest het volledige bestand en schaalt lineair met de
+    # omvang: op een XMI van tientallen MB's kost dat het leeuwendeel van de
+    # importtijd. Zodra de XML-declaratie een encoding geeft wint die toch,
+    # dus alleen detecteren als de declaratie ontbreekt (of verderop, als de
+    # foutmelding de gedetecteerde waarde nodig heeft).
+    detected_encoding = None if declared_encoding else chardet.detect(raw)["encoding"]
     used_encoding = declared_encoding or detected_encoding or const.ENCODING
 
     try:
@@ -40,9 +46,23 @@ def load_xmi(source):
         parser = etree.XMLParser(recover=True, encoding=const.ENCODING)
         return etree.fromstring(utf8_bytes, parser)
     except Exception as e:
+        if detected_encoding is None:
+            # Uitzonderingspad: hier is de detectie de moeite waard, want ze
+            # vertelt waarom de gedeclareerde encoding niet werkte.
+            detected_encoding = chardet.detect(raw)["encoding"]
         raise RuntimeError(
             f"Probleem met XMI inlezen (declared: {declared_encoding}, detected: {detected_encoding}): {e}"
         )
+
+
+def get_end_value(endpoint, tag):
+    """Waarde van het eerste kindelement ``tag`` van een association-end.
+
+    Eén XPath-evaluatie per aanroep: de vorige inline-variant evalueerde
+    dezelfde expressie tweemaal (eenmaal om te tellen, eenmaal om te lezen).
+    """
+    nodes = endpoint.xpath(f"./{tag}")
+    return nodes[0].get("value") if nodes else None
 
 
 def remove_EADatatype(input_string):
@@ -213,9 +233,6 @@ class XMIParser(Parser):
                             )
 
                         endpoint = endpoints[0]
-                        getval = lambda x, endpoint: (  # noqa
-                            endpoint.xpath(f"./{x}")[0].get("value") if len(endpoint.xpath(f"./{x}")) else None  # noqa
-                        )  # noqa
                         typenode = endpoint.xpath("./type")
                         if len(typenode) == 0:
                             clsid = util.getEAGuid()
@@ -231,19 +248,19 @@ class XMIParser(Parser):
                             else:
                                 association.dst_class_id = clsid  # type: ignore
                         else:
-                            clsid = endpoint.xpath("./type")[0].get("{" + ns["xmi"] + "}idref")
+                            clsid = typenode[0].get("{" + ns["xmi"] + "}idref")
                             cls = schema.get_class(clsid)
                             if cls is None:
                                 clazz = db.Class(id=clsid, name=const.ORPHAN_CLASS)
                                 schema.save(clazz)
                             if "src" in id:
                                 association.src_class_id = clsid  # type: ignore
-                                association.src_mult_start = str(getval("lowerValue", endpoint))  # type: ignore
-                                association.src_mult_end = str(getval("upperValue", endpoint))  # type: ignore
+                                association.src_mult_start = str(get_end_value(endpoint, "lowerValue"))  # type: ignore
+                                association.src_mult_end = str(get_end_value(endpoint, "upperValue"))  # type: ignore
                             else:
                                 association.dst_class_id = clsid  # type: ignore
-                                association.dst_mult_start = str(getval("lowerValue", endpoint))  # type: ignore
-                                association.dst_mult_end = str(getval("upperValue", endpoint))  # type: ignore
+                                association.dst_mult_start = str(get_end_value(endpoint, "lowerValue"))  # type: ignore
+                                association.dst_mult_end = str(get_end_value(endpoint, "upperValue"))  # type: ignore
                     else:
                         err = f"Association {association.name} with {association.id} has more than two endpoints. panic"
                         logger.error(err)
@@ -294,10 +311,20 @@ class XMIParser(Parser):
                 attribute.type_class_id = cls.id
             schema.save(attribute)
 
+        # Alle type-verwijzingen in één doorloop indexeren op idref. De drie
+        # lussen hierna (enumeraties, klassen, datatypes) deden elk per element
+        # een eigen XPath-descent over de volledige boom: op een groot model
+        # ruim duizend scans van hetzelfde document. Nu is het één scan plus
+        # een dict-lookup per element.
+        ns_xmi_idref = "{" + ns["xmi"] + "}idref"
+        type_refs_by_idref = defaultdict(list)
+        for type_node in node.xpath(".//type[@xmi:idref]", namespaces=ns):  # type: ignore
+            type_refs_by_idref[type_node.get(ns_xmi_idref)].append(type_node)
+
         # Last of all set enumerations
         enums = schema.get_all_enumerations()
         for enum in enums:
-            enumverws = node.xpath(".//type[@xmi:idref='" + enum.id + "']", namespaces=ns)
+            enumverws = type_refs_by_idref.get(enum.id, ())
             for enumverw in enumverws:
                 property = enumverw.getparent()
                 if property.tag == "ownedAttribute" and property.get("{" + ns["xmi"] + "}type") == "uml:Property":
@@ -311,7 +338,7 @@ class XMIParser(Parser):
         # Last of all set object references
         classes = schema.get_all_classes()
         for clazz in classes:
-            classverws = node.xpath(".//type[@xmi:idref='" + clazz.id + "']", namespaces=ns)
+            classverws = type_refs_by_idref.get(clazz.id, ())
             for classverw in classverws:
                 property = classverw.getparent()
                 if property.tag == "ownedAttribute" and property.get("{" + ns["xmi"] + "}type") == "uml:Property":
@@ -325,7 +352,7 @@ class XMIParser(Parser):
         # Last of all set object references
         datatypes = schema.get_all_datatypes()
         for dt in datatypes:
-            dtverws = node.xpath(".//type[@xmi:idref='" + dt.id + "']", namespaces=ns)
+            dtverws = type_refs_by_idref.get(dt.id, ())
             for dtverw in dtverws:
                 property = dtverw.getparent()
                 if property.tag == "ownedAttribute" and property.get("{" + ns["xmi"] + "}type") == "uml:Property":

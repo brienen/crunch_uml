@@ -1389,6 +1389,9 @@ class Database:
             Session = sessionmaker(bind=cls._instance.engine)
             cls._instance.session = Session()
             cls._instance._db_url = db_url
+            # Boekhouding voor het schrijfpad, zie _can_insert_without_lookup.
+            cls._instance._table_empty_at_start = {}
+            cls._instance._inserted_keys = {}
         # Policy may differ per invocation (CLI flag), so set it on every call.
         cls._instance._on_version_mismatch = on_version_mismatch
         if db_create:
@@ -1400,6 +1403,9 @@ class Database:
     def _reset_database(self):
         Base.metadata.drop_all(bind=self.engine)  # Drop all tables
         Base.metadata.create_all(bind=self.engine)  # Create all tables
+        # De tabellen zijn nieuw: eerdere aannames over hun inhoud vervallen.
+        self._table_empty_at_start = {}
+        self._inserted_keys = {}
         self._write_datamodel_version()
         # The model data the run markers vouched for is gone — stale
         # "completed" rows would falsely promise consistent schemas.
@@ -1576,15 +1582,79 @@ class Database:
                     logger.info(f"Adding missing column '{column.name}' to table '{table.name}'")
                     connection.execute(sqlalchemy_text(ddl))
 
+    def _table_started_empty(self, mapper):
+        """Was de tabel achter ``mapper`` leeg toen deze sessie hem voor het
+        eerst aanraakte?
+
+        Alleen dan staat vast dat een primaire sleutel die wij zelf nog niet
+        hebben ingevoegd, ook echt nog niet bestaat. Het antwoord wordt per
+        tabel één keer bepaald (één ``SELECT ... LIMIT 1``) en daarna
+        hergebruikt.
+        """
+        table = mapper.local_table
+        if table is None:
+            return False
+        known = self._table_empty_at_start.get(table)
+        if known is None:
+            try:
+                known = self.session.execute(select(table).limit(1)).first() is None
+            except sa_exc.SQLAlchemyError as e:
+                logger.debug(f"Could not determine whether table '{table.name}' was empty: {e}")
+                known = False
+            self._table_empty_at_start[table] = known
+        return known
+
+    def _can_insert_without_lookup(self, obj):
+        """Mag ``obj`` rechtstreeks worden toegevoegd, zonder merge?
+
+        ``session.merge()`` doet per object een SELECT op de primaire sleutel om
+        te bepalen of het een INSERT of een UPDATE wordt. Bij een import in een
+        verse database is dat antwoord altijd 'bestaat nog niet': duizenden
+        SELECTs die niets opleveren. Deze check zegt alleen 'ja' als de tabel
+        leeg was bij aanvang én wij deze sleutel nog niet zelf hebben ingevoegd;
+        in alle andere gevallen blijft merge() het werk doen, zodat bestaande
+        rijen gewoon worden bijgewerkt.
+        """
+        mapper = inspect(obj).mapper
+        if not self._table_started_empty(mapper):
+            return False
+
+        identity = mapper.primary_key_from_instance(obj)
+        if any(value is None for value in identity):
+            return False  # onvolledige sleutel: laat merge het uitzoeken
+
+        seen = self._inserted_keys.setdefault(mapper, set())
+        key = tuple(identity)
+        if key in seen:
+            return False  # tweede keer dezelfde rij: merge werkt hem bij
+        seen.add(key)
+        return True
+
+    def _remember_inserted(self, obj):
+        """Leg vast dat ``obj`` via deze sessie in de tabel terechtkomt, zodat
+        een latere save() op dezelfde sleutel bijwerkt in plaats van invoegt."""
+        try:
+            mapper = inspect(obj).mapper
+            identity = mapper.primary_key_from_instance(obj)
+        except Exception as e:  # geen mapped object of onvolledige sleutel
+            logger.debug(f"Could not register primary key for {obj}: {e}")
+            return
+        if not any(value is None for value in identity):
+            self._inserted_keys.setdefault(mapper, set()).add(tuple(identity))
+
     def save(self, obj):
         # NB: no per-call flush. autoflush=True ensures any subsequent ORM
         # query in the same unit-of-work sees pending changes; parsers that
         # touch many rows in a tight loop call session.flush() explicitly at
         # phase boundaries instead. Flushing per save() turns each row into a
         # SQL round-trip — that was the dominant cost on large imports.
+        if self._can_insert_without_lookup(obj):
+            self.session.add(obj)
+            return obj
         return self.session.merge(obj)
 
     def add(self, obj):
+        self._remember_inserted(obj)
         return self.session.add(obj)
 
     def count_package(self):
