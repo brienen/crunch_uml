@@ -1,12 +1,55 @@
 # CHANGELOG
 
-## v0.5.1 (unreleased)
+## v0.7.0 (unreleased)
+
+Both EA parsers now yield the same rows for the same model, the engine is safe on untrusted input, and two new commands turn a model file into a row artifact. Driven by the Semantic Toolkit's self-service import (M4.1, import study 2026-09-17).
+
+**Parsers stop losing content silently**
+
+- **qea: package stereotypes, metadata and tags.** Stereotype, author, status, alias and phase of a package live on its companion `t_object` row (same `ea_guid`), which phase 1 never read; package tagged values were filtered out too. A GGM read via `.qea` had 0 «Domein» packages (via EA-XMI: 60).
+- **qea: aggregations.** `Connector_Type = 'Aggregation'` is imported as an association, including its tagged values (GGM 2.4.0: 1,019 -> 1,106 associations; InkomenMIM: 10 -> 70). The completeness test `test_19` no longer encodes the loss as expected. Also read: `Phase` of classes and enumerations, and DataType classifiers of attributes (`type_class_id`).
+- **eaxmi: members without an id.** EA exports attributes and enumeration values whose `ea_guid` is NULL with `xmi:id=""`; they were stored under the empty primary key and collapsed into one row without a warning (InkomenMIM: 85 instead of 444 attributes). Both parsers now mint the same deterministic id, `EAID_syn_` + `sha1(owner id|name|duplicate index)`, and log a WARNING per element. This replaces the qea-only `EAID_attr_<row id>` (the QEA row number differs from the XMI `ea_localid`, so it never matched across formats).
+- **eaxmi: enumeration values without `IsLiteral=1`** are exported as `ownedAttribute` of type `uml:Property`; they are now enumeration literals (InkomenMIM: 0 -> 458).
+- **Doubled-brace GUIDs.** An element whose GUID is `{{...}}` got `EAID_X` via qea and `EAID_{X}` via eaxmi (115 enumerations in the GGM). Every braced id and reference is normalized to `EAID_X`.
+- **Deterministic placeholders.** `<Orphan Class>` placeholders get a hash of their association and member end instead of a uuid4: two parses of one file give identical rows, and re-importing into the same schema no longer adds placeholders.
+- **eaxmi** also reads roles, documentation and tags of aggregation connectors from the EA extension.
+
+**Diagram settings.** `diagrams` gains five nullable columns: `diagram_type`, `hide_attributes`, `hide_operations` (canonical, from `HideAtts`/`HideOps`) and the raw settings strings `ea_style` (QEA `PDATA` / XMI `style1`) and `ea_style_ex` (`StyleEx` / `style2`). Both parsers fill them and the xmi renderer writes them back. They ride on the additive migration; `DATAMODEL_VERSION` stays 1. Per-element overrides (`AttPub=0;...`) stay where they were, in the junction-table `ea_style`.
+
+**Hardening for untrusted input**
+
+- `translators` is imported lazily: its import contacts the network, so `crunch_uml -h` (and every command) failed offline without `translators_default_region`.
+- One hardened lxml configuration (`crunch_uml.xmlsafe`): no entity expansion, no network, no DTD loading, bounded trees. EA-XMI with a DOCTYPE is refused. **Behaviour change:** malformed XML now fails instead of being silently recovered (all fixtures parse cleanly without recovery). Termbank TBX reading uses the same options.
+- chardet reads at most 64 KiB (a declaration without `encoding` made one GGM parse 5.5x slower).
+- `.qea` files are opened read-only and immutable (no journal/WAL/SHM side files, no locks).
+- The "table started empty" insert fast path is decided per schema instead of per table, so a second schema in a shared database is as fast as the first (0.6.0: merge path, 1.5-2.2x slower).
+
+**New commands**
+
+- `crunch_uml detect -f <file>` classifies a file by content (at most 64 KiB from the head, plus 64 KiB from the tail of an XML file) and prints one JSON line: `verdict`, `format` (`eaxmi`, `qea`, `artifact`, `unknown`), `accepted`, `code`. Accepted: EA-XMI 2.1 from Enterprise Architect with an extension block; a QEA with the ten `t_*` tables, rollback journal, no views or triggers; a row artifact. Refusal codes: `file_type_unknown`, `xmi_not_ea`, `xml_malformed`, `xml_forbidden`, `qea_unreadable`. Standard library only.
+- `crunch_uml pack -f <file> [-t eaxmi|qea] -o <out.cua.gz>` runs detect, parses into a fresh temporary SQLite and writes a row artifact with a standard-library-only streaming writer: gzip JSON with a header (`format` `semtk-crunch-artifact`, `format_version` 1, `datamodel_version`, `producer`, `source` without the file name, `capabilities`, `run`) and every model table with rows sorted by primary key. One JSON line on stdout; exit 0, or 2 with a code (also `model_empty` for a model without classes), or 1 with `parse_failed`.
+
+**Version metadata.** `crunch_uml/_version.py` is the single source (`crunch_uml.__version__`); `setup.py` reads it and the import-run marker reports it (it used `importlib.metadata`, which in an editable install kept saying 0.4.11).
+
+**Tests and fixtures.** Cross-format parity on MonumentenMIM (`test_18`: package stereotypes, diagram settings), InkomenMIM (444 attributes, 458 values, identical synthetic ids, 70 associations) and GGM 2.4.0 (slow: 60 «Domein» in both formats, 1,106 associations via qea, identical enumeration ids, identical diagram settings); these fail on 0.6.0. New `MiniM4.qea`/`MiniM4.xml` fixture pair (< 30 KB each, generated by `tools/make_mini_m4_fixture.py`) with every quirk above. `detect` is tested against the 51-fixture golden list of the import study, `pack` row for row against a normal import.
+
+**Measured** (GGM 2.5.1, Apple M4 Max, fresh SQLite, minimum of 3 runs interleaved with 0.6.0): EA-XMI 6.25 s with 946-972 MiB peak RSS (0.6.0: 6.20 s, 962-974 MiB); a second schema in the same SQLite 6.26 s (0.6.0: 9.27 s); QEA 2.62 s with 257-262 MiB (0.6.0: 2.57 s, 270-279 MiB). `pack`: XMI 6.7 s, artifact 1.2 MB (6.4 MB unpacked); QEA 3.0 s, 1.1 MB (5.7 MB).
+
+**Known, not in this release:** datamodel v2 (generic tags table, attribute upper bound, aggregation kind), `uml:AssociationClass`, `#NOTES#` in XMI tagged values, role names from QEA, filtering EA Boundary/ProxyConnector/Text elements that the eaxmi parser still reads as classes, association-end pseudo-attributes (`EAID_src*`/`EAID_dst*`) from eaxmi, enriching GUID-less members from the XMI extension (it has no `xmi:idref` for them).
+
+## v0.6.0 (2026-08-03)
+
+- **Faster EA-XMI import** (GGM 2.4.0 XMI: ~48 s -> ~6 s). The encoding is only detected with chardet when the XML declaration names none; attribute type references are indexed once instead of searched per element; `save()` skips the primary-key lookup of `merge()` for rows in a table that started empty.
+- **Re-importing a model with diagrams** into a database that already holds it no longer fails on the diagrams primary key: diagrams are saved as insert-or-update, together with their members.
+- **CSV:** empty tables stay readable on export and import.
+
+## v0.5.1 (2026-07-15)
 
 - **Import-run markers for shared databases.** Every `import` invocation records a row in a new `crunch_uml_runs` table (outside the ORM model, like `crunch_uml_meta`, so it never leaks into exports): `run_id`, `schema_id`, `started_at`, `crunch_version`, `datamodel_version`, and a `completed_at` that is stamped as the FINAL step after the import committed. A row with `completed_at` NULL marks an in-progress or aborted (torn) run — external readers of a shared crunch database (e.g. an import API) should only consume schemas whose latest run is completed. The markers use their own connection, so they survive a session rollback as evidence, and a database recreate clears them (the data they vouched for is gone).
 - **Safe datamodel-version handling for shared databases.** New global flag `-on_version_mismatch {auto,fail,recreate}` controls what happens when a database was written with an incompatible datamodel version. `recreate` keeps the historical behaviour (drop and rebuild, all data discarded); `fail` stops with a clear error without touching the database; the default `auto` recreates only the local default database and fails on any explicitly provided `-db_url` — a mismatched crunch_uml version can no longer accidentally wipe a shared (staging) database.
 - **PostgreSQL extra.** `pip install 'crunch_uml[postgres]'` installs the psycopg2 driver for `-db_url postgresql://...` staging workflows; documented in the import manual (NL/EN) together with the run-marker/version-policy contract.
 
-## v0.5.0 (unreleased)
+## v0.5.0 (2026-07-14)
 
 - **Datamodel version marker in the database.** Every crunch_uml database now stores a datamodel version in a `crunch_uml_meta` table (kept outside the ORM model so it never leaks into exports). On connect, a database with the same version — or one predating the marker — is migrated additively (missing tables/nullable columns are added, data kept); a database with a different version is incompatible and is recreated from scratch with a clear warning, after which models must be re-imported. The version is only bumped for schema changes the additive migration cannot handle.
 - **All formats carry diagram geometry (phase 4).** The generic formats round-trip the four diagram junction tables including the geometry columns: `json`, `xlsx` and `csv` (one file/sheet per junction table); files written before these columns existed keep importing. The `i18n` format deliberately skips the junction tables (no `id` column, nothing translatable). The `earepo`/`eamimrepo` updaters now write diagram layout back to `t_diagramobjects` and `t_diagramlinks` — existing rows are updated, elements newly on a diagram are inserted, and membership that disappeared from the model is deleted, with the same coordinate conversions as the qea parser reversed; rows for element types crunch_uml does not manage (Notes, packages) and for elements unknown to the schema are left alone. A coverage matrix (parser/renderer × membership × geometry) was added to `docs/technisch/datamodel.md`. Version bumped to 0.5.0.

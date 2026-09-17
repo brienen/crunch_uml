@@ -115,6 +115,11 @@ erDiagram
         string schema_id
         string name
         string package_id FK
+        string diagram_type
+        bool hide_attributes
+        bool hide_operations
+        text ea_style
+        text ea_style_ex
     }
 
     DiagramClass {
@@ -198,6 +203,20 @@ Enumeratietype met benoemde waarden. EnumerationLiteral bevat de individuele waa
 ### Diagram
 
 Visueel diagram dat via junction tables verwijst naar classes, enumeraties, associaties en generalisaties.
+
+#### Diagraminstellingen
+
+Sinds 0.7.0 bewaart `diagrams` ook de weergave-instellingen van Enterprise Architect, in vijf **nullable** kolommen (NULL = onbekend, niet "uit"). Ze komen er bij een bestaande database via de additieve migratie bij; `DATAMODEL_VERSION` blijft 1.
+
+| Kolom | Type | Bron (QEA / EA-XMI) |
+|---|---|---|
+| `diagram_type` | String | `t_diagram.Diagram_Type` / `properties@type`, bijv. `Logical` |
+| `hide_attributes` | Boolean | `HideAtts` in PDATA / `style1` |
+| `hide_operations` | Boolean | `HideOps` in PDATA / `style1` |
+| `ea_style` | Text | ruwe `t_diagram.PDATA` / `style1` — lossless, dialect van de bron |
+| `ea_style_ex` | Text | ruwe `t_diagram.StyleEx` / `style2` — lossless |
+
+Deze instellingen staan bewust niet in de `ea_style` van de koppeltabellen: die bevat de ObjectStyle van één element op het diagram (bijv. `AttPub=0;…` om de attributen van die ene node te verbergen) en wordt letterlijk teruggeschreven.
 
 #### Diagram-geometrie
 

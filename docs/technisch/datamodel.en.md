@@ -115,6 +115,11 @@ erDiagram
         string schema_id
         string name
         string package_id FK
+        string diagram_type
+        bool hide_attributes
+        bool hide_operations
+        text ea_style
+        text ea_style_ex
     }
 
     DiagramClass {
@@ -198,6 +203,20 @@ Enumeration type with named values. EnumerationLiteral contains the individual v
 ### Diagram
 
 Visual diagram that references classes, enumerations, associations and generalizations via junction tables.
+
+#### Diagram settings
+
+Since 0.7.0 `diagrams` also stores Enterprise Architect's display settings, in five **nullable** columns (NULL = unknown, not "off"). The additive migration adds them to an existing database; `DATAMODEL_VERSION` stays 1.
+
+| Column | Type | Source (QEA / EA-XMI) |
+|---|---|---|
+| `diagram_type` | String | `t_diagram.Diagram_Type` / `properties@type`, e.g. `Logical` |
+| `hide_attributes` | Boolean | `HideAtts` in PDATA / `style1` |
+| `hide_operations` | Boolean | `HideOps` in PDATA / `style1` |
+| `ea_style` | Text | raw `t_diagram.PDATA` / `style1` — lossless, in the source's dialect |
+| `ea_style_ex` | Text | raw `t_diagram.StyleEx` / `style2` — lossless |
+
+These settings are deliberately not stored in the junction tables' `ea_style`: that holds the ObjectStyle of one element on the diagram (e.g. `AttPub=0;…` to hide the attributes of that one node) and is written back verbatim.
 
 #### Diagram geometry
 
