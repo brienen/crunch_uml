@@ -1593,26 +1593,34 @@ class Database:
                     logger.info(f"Adding missing column '{column.name}' to table '{table.name}'")
                     connection.execute(sqlalchemy_text(ddl))
 
-    def _table_started_empty(self, mapper):
-        """Was de tabel achter ``mapper`` leeg toen deze sessie hem voor het
-        eerst aanraakte?
+    def _table_started_empty(self, mapper, schema_id=None):
+        """Had the table behind ``mapper`` no rows *of this schema* when this
+        session first touched it?
 
-        Alleen dan staat vast dat een primaire sleutel die wij zelf nog niet
-        hebben ingevoegd, ook echt nog niet bestaat. Het antwoord wordt per
-        tabel één keer bepaald (één ``SELECT ... LIMIT 1``) en daarna
-        hergebruikt.
+        Only then is it certain that a primary key we have not inserted
+        ourselves does not exist yet: every primary key includes schema_id, so
+        rows of other schemas can never collide. Checking per (table, schema)
+        instead of per table keeps the fast insert path for the second and
+        later schemas in a shared database (the per-table check sent a GGM
+        parse into a shared database down the merge path: 1.5-2x slower and
+        3-10x more statements). One ``SELECT ... LIMIT 1`` per (table, schema),
+        cached for the session.
         """
         table = mapper.local_table
         if table is None:
             return False
-        known = self._table_empty_at_start.get(table)
+        key = (table, schema_id)
+        known = self._table_empty_at_start.get(key)
         if known is None:
+            query = select(table)
+            if schema_id is not None and "schema_id" in table.c:
+                query = query.where(table.c.schema_id == schema_id)
             try:
-                known = self.session.execute(select(table).limit(1)).first() is None
+                known = self.session.execute(query.limit(1)).first() is None
             except sa_exc.SQLAlchemyError as e:
                 logger.debug(f"Could not determine whether table '{table.name}' was empty: {e}")
                 known = False
-            self._table_empty_at_start[table] = known
+            self._table_empty_at_start[key] = known
         return known
 
     def _can_insert_without_lookup(self, obj):
@@ -1620,14 +1628,15 @@ class Database:
 
         ``session.merge()`` doet per object een SELECT op de primaire sleutel om
         te bepalen of het een INSERT of een UPDATE wordt. Bij een import in een
-        verse database is dat antwoord altijd 'bestaat nog niet': duizenden
-        SELECTs die niets opleveren. Deze check zegt alleen 'ja' als de tabel
-        leeg was bij aanvang én wij deze sleutel nog niet zelf hebben ingevoegd;
-        in alle andere gevallen blijft merge() het werk doen, zodat bestaande
-        rijen gewoon worden bijgewerkt.
+        verse database - of een schema dat nog niet in de database staat - is
+        dat antwoord altijd 'bestaat nog niet': duizenden SELECTs die niets
+        opleveren. Deze check zegt alleen 'ja' als het schema van ``obj`` in de
+        tabel leeg was bij aanvang én wij deze sleutel nog niet zelf hebben
+        ingevoegd; in alle andere gevallen blijft merge() het werk doen, zodat
+        bestaande rijen gewoon worden bijgewerkt.
         """
         mapper = inspect(obj).mapper
-        if not self._table_started_empty(mapper):
+        if not self._table_started_empty(mapper, getattr(obj, "schema_id", None)):
             return False
 
         identity = mapper.primary_key_from_instance(obj)
