@@ -81,6 +81,8 @@ def test_import_qea_with_null_ea_guid_attributes():
     assert enum is not None
     assert len(enum.literals) == 65
 
-    # All synthetic ids follow the EAID_attr_<n> pattern.
-    synth = [lit for lit in enum.literals if lit.id.startswith("EAID_attr_")]
+    # All synthetic ids follow the EAID_syn_<sha1> pattern (crunch_uml.ea_ids),
+    # the same ids the eaxmi parser mints for these members.
+    synth = [lit for lit in enum.literals if lit.id.startswith("EAID_syn_")]
     assert len(synth) == 65
+    assert len({lit.id for lit in synth}) == 65

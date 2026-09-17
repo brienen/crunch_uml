@@ -1181,6 +1181,17 @@ class Diagram(Base, UMLBase):  # type: ignore
     __tablename__ = "diagrams"
 
     package_id = Column(String, index=True, nullable=False)
+    # Diagram-level display settings. All nullable: NULL means "unknown" (a
+    # database written before these columns existed, or a source without the
+    # setting), never "false". ea_style/ea_style_ex keep the raw EA settings
+    # strings losslessly: QEA t_diagram.PDATA/StyleEx, XMI <style1>/<style2>.
+    # They are deliberately not stored in the junction-table ea_style, which
+    # holds the per-element ObjectStyle and is written back verbatim.
+    diagram_type = Column(String, nullable=True)  # EA Diagram_Type / properties@type, e.g. 'Logical'
+    hide_attributes = Column(Boolean, nullable=True)  # EA HideAtts
+    hide_operations = Column(Boolean, nullable=True)  # EA HideOps
+    ea_style = Column(Text, nullable=True)
+    ea_style_ex = Column(Text, nullable=True)
     package = relationship("Package", back_populates="diagrams")
     classes = relationship("Class", secondary="diagram_class", back_populates="diagrams")
     diagram_classes = relationship("DiagramClass", cascade="all, delete-orphan", overlaps="classes,diagrams")

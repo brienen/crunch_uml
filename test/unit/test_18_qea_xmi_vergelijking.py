@@ -175,3 +175,43 @@ def test_tagged_values_gelijk():
     assert cq.definitie == cx.definitie
     assert cq.gemma_type == cx.gemma_type
     assert cq.gemma_url == cx.gemma_url
+
+
+def test_package_stereotypes_gelijk():
+    """Package-stereotypen (zoals «Domein») zijn in beide formaten gelijk.
+
+    De QEA bewaart het stereotype van een package op de bijbehorende
+    t_object-rij, niet in t_package. Tot en met 0.6.0 las de qea-parser dat
+    niet, waardoor een GGM via .qea in één domein belandde in plaats van ~61.
+    """
+    database, _, _ = get_schemas()
+
+    with Session(database.engine) as session:
+
+        def stereotypes(schema_id):
+            return {p.id: p.stereotype for p in session.query(db.Package).filter(db.Package.schema_id == schema_id)}
+
+        qea = stereotypes(SCHEMA_QEA)
+        xmi = stereotypes(SCHEMA_XMI)
+
+    assert qea == xmi
+    assert sorted(s for s in qea.values() if s) == ["Basismodel", "Domein", "Extern", "Extern", "Extern"]
+
+
+def test_diagraminstellingen_gelijk():
+    """Diagramtype en HideAtts/HideOps zijn per diagram gelijk in beide formaten."""
+    database, _, _ = get_schemas()
+
+    with Session(database.engine) as session:
+
+        def settings(schema_id):
+            return {
+                d.id: (d.diagram_type, d.hide_attributes, d.hide_operations)
+                for d in session.query(db.Diagram).filter(db.Diagram.schema_id == schema_id)
+            }
+
+        qea = settings(SCHEMA_QEA)
+        xmi = settings(SCHEMA_XMI)
+
+    assert qea == xmi
+    assert all(value[0] == "Logical" and value[1] is not None for value in qea.values())

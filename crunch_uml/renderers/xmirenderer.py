@@ -466,7 +466,12 @@ class XMIRenderer(Renderer):
         model_el = etree.SubElement(diagram_el, "model")
         _set_attrs(model_el, package=diagram.package_id, localID=local_id, owner=diagram.package_id)
         properties = etree.SubElement(diagram_el, "properties")
-        _set_attrs(properties, name=diagram.name, type="Logical", documentation=diagram.definitie)
+        _set_attrs(
+            properties,
+            name=diagram.name,
+            type=diagram.diagram_type or "Logical",
+            documentation=diagram.definitie,
+        )
         project = etree.SubElement(diagram_el, "project")
         _set_attrs(
             project,
@@ -475,6 +480,20 @@ class XMIRenderer(Renderer):
             created=diagram.created,
             modified=diagram.modified,
         )
+        # Diagram settings (HideAtts, HideOps, ...): the raw strings round-trip
+        # losslessly; a diagram without them gets a minimal style1 carrying the
+        # canonical flags, so the eaxmi parser reads the same flags back.
+        style1 = diagram.ea_style
+        if style1 is None and (diagram.hide_attributes is not None or diagram.hide_operations is not None):
+            style1 = "".join(
+                f"{key}={1 if flag else 0};"
+                for key, flag in (("HideAtts", diagram.hide_attributes), ("HideOps", diagram.hide_operations))
+                if flag is not None
+            )
+        if style1 is not None:
+            _set_attrs(etree.SubElement(diagram_el, "style1"), value=style1)
+        if diagram.ea_style_ex is not None:
+            _set_attrs(etree.SubElement(diagram_el, "style2"), value=diagram.ea_style_ex)
 
         elements = etree.SubElement(diagram_el, "elements")
         nodes = [(dc.class_id, dc) for dc in diagram.diagram_classes]

@@ -1,0 +1,372 @@
+<?xml version='1.0' encoding='windows-1252' ?>
+<xmi:XMI xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmi:version="2.1" xmlns:uml="http://schema.omg.org/spec/UML/2.1">
+	<xmi:Documentation exporter="Enterprise Architect" exporterVersion="6.5" exporterID="1628"/>
+	<uml:Model xmi:type="uml:Model" name="EA_Model" visibility="public">
+		<packagedElement xmi:type="uml:Package" xmi:id="EAPK_4D4E0001_0000_4000_8000_000000000001" name="MiniM4" visibility="public">
+			<packagedElement xmi:type="uml:Package" xmi:id="EAPK_4D4E0002_0000_4000_8000_000000000002" name="Kern" visibility="public">
+				<packagedElement xmi:type="uml:Class" xmi:id="EAID_4D4E000A_0000_4000_8000_00000000000A" name="Persoon" visibility="public">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_4D4E0014_0000_4000_8000_000000000014" name="naam" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI4D4E0014_0000_4000_8000_000000000014_l" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI4D4E0014_0000_4000_8000_000000000014_u" value="1"/>
+						<type xmi:idref="EAJava_CharacterString"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="" name="geboortedatum" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="" value="1"/>
+						<type xmi:idref="EAJava_Date"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="" name="opmerking" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="" value="1"/>
+						<type xmi:idref="EAJava_CharacterString"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="" name="opmerking" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="" value="1"/>
+						<type xmi:idref="EAJava_CharacterString"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_4D4E0015_0000_4000_8000_000000000015" name="geslacht" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI4D4E0015_0000_4000_8000_000000000015_l" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI4D4E0015_0000_4000_8000_000000000015_u" value="1"/>
+						<type xmi:idref="EAID_{4D4E0010_0000_4000_8000_000000000010}"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Class" xmi:id="EAID_4D4E000B_0000_4000_8000_00000000000B" name="Adres" visibility="public">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_4D4E0016_0000_4000_8000_000000000016" name="postcode" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI4D4E0016_0000_4000_8000_000000000016_l" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI4D4E0016_0000_4000_8000_000000000016_u" value="1"/>
+						<type xmi:idref="EAID_4D4E000F_0000_4000_8000_00000000000F"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Class" xmi:id="EAID_4D4E000C_0000_4000_8000_00000000000C" name="Huishouden" visibility="public"/>
+				<packagedElement xmi:type="uml:Class" xmi:id="EAID_4D4E000D_0000_4000_8000_00000000000D" name="Ingezetene" visibility="public">
+					<generalization xmi:type="uml:Generalization" xmi:id="EAID_4D4E0020_0000_4000_8000_000000000020" general="EAID_4D4E000A_0000_4000_8000_00000000000A"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Class" xmi:id="EAID_4D4E000E_0000_4000_8000_00000000000E" name="Grens" visibility="public"/>
+				<packagedElement xmi:type="uml:Enumeration" xmi:id="EAID_{4D4E0010_0000_4000_8000_000000000010}" name="Geslacht" visibility="public">
+					<ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="EAID_4D4E0017_0000_4000_8000_000000000017" name="man" visibility="public"/>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="" name="vrouw" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="" value="1"/>
+					</ownedAttribute>
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_4D4E0018_0000_4000_8000_000000000018" name="onbekend" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI4D4E0018_0000_4000_8000_000000000018_l" value="1"/>
+						<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI4D4E0018_0000_4000_8000_000000000018_u" value="1"/>
+					</ownedAttribute>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Association" xmi:id="EAID_4D4E001E_0000_4000_8000_00000000001E" name="woont op" visibility="public">
+					<memberEnd xmi:idref="EAID_dst4E001E_0000_4000_8000_00000000001E"/>
+					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dst4E001E_0000_4000_8000_00000000001E" visibility="public" association="EAID_4D4E001E_0000_4000_8000_00000000001E" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_4D4E000B_0000_4000_8000_00000000000B"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LIdst" value="1"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LUdst" value="1"/>
+					</ownedEnd>
+					<memberEnd xmi:idref="EAID_src4E001E_0000_4000_8000_00000000001E"/>
+					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src4E001E_0000_4000_8000_00000000001E" visibility="public" association="EAID_4D4E001E_0000_4000_8000_00000000001E" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_4D4E000A_0000_4000_8000_00000000000A"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LIsrc" value="1"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LUsrc" value="1"/>
+					</ownedEnd>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Association" xmi:id="EAID_4D4E001F_0000_4000_8000_00000000001F" name="bestaat uit" visibility="public">
+					<memberEnd xmi:idref="EAID_dst4E001F_0000_4000_8000_00000000001F"/>
+					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dst4E001F_0000_4000_8000_00000000001F" visibility="public" association="EAID_4D4E001F_0000_4000_8000_00000000001F" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="shared">
+						<type xmi:idref="EAID_4D4E000C_0000_4000_8000_00000000000C"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LIdst" value="1"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LUdst" value="1"/>
+					</ownedEnd>
+					<memberEnd xmi:idref="EAID_src4E001F_0000_4000_8000_00000000001F"/>
+					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src4E001F_0000_4000_8000_00000000001F" visibility="public" association="EAID_4D4E001F_0000_4000_8000_00000000001F" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_4D4E000A_0000_4000_8000_00000000000A"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LIsrc" value="1"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LUsrc" value="1"/>
+					</ownedEnd>
+				</packagedElement>
+			</packagedElement>
+			<packagedElement xmi:type="uml:Package" xmi:id="EAPK_4D4E0003_0000_4000_8000_000000000003" name="Overig" visibility="public">
+				<packagedElement xmi:type="uml:DataType" xmi:id="EAID_4D4E000F_0000_4000_8000_00000000000F" name="Postcode" visibility="public"/>
+			</packagedElement>
+		</packagedElement>
+	</uml:Model>
+	<xmi:Extension extender="Enterprise Architect" extenderID="6.5">
+		<elements>
+			<element xmi:idref="EAPK_4D4E0001_0000_4000_8000_000000000001" xmi:type="uml:Package" name="MiniM4" scope="public">
+				<model package2="EAID_4D4E0001_0000_4000_8000_000000000001" package="EAPK_25B4ECD1_9E00_4c73_A3E9_4B2D0A1B4B6F" tpos="0" ea_localid="1" ea_eleType="package"/>
+				<properties documentation="Testmodel voor crunch_uml 0.7.0." isSpecification="false" sType="Package" nType="0" scope="public"/>
+				<project author="crunch_uml tests" version="1.0" created="2026-09-17 12:00:00" modified="2026-09-17 12:30:00"/>
+				<tags/>
+			</element>
+			<element xmi:idref="EAPK_4D4E0002_0000_4000_8000_000000000002" xmi:type="uml:Package" name="Kern" scope="public">
+				<model package2="EAID_4D4E0002_0000_4000_8000_000000000002" package="EAPK_4D4E0001_0000_4000_8000_000000000001" tpos="0" ea_localid="1" ea_eleType="package"/>
+				<properties isSpecification="false" sType="Package" nType="0" scope="public" stereotype="Domein" alias="kern"/>
+				<project author="crunch_uml tests" version="1.0" phase="1.0" created="2026-09-17 12:00:00" modified="2026-09-17 12:30:00" complexity="1" status="Proposed"/>
+				<tags>
+					<tag xmi:id="EAID_4D4E003C_0000_4000_8000_00000000003C" name="afkorting" value="KRN" modelElement="EAID_4D4E0002_0000_4000_8000_000000000002"/>
+				</tags>
+			</element>
+			<element xmi:idref="EAPK_4D4E0003_0000_4000_8000_000000000003" xmi:type="uml:Package" name="Overig" scope="public">
+				<model package2="EAID_4D4E0003_0000_4000_8000_000000000003" package="EAPK_4D4E0001_0000_4000_8000_000000000001" tpos="0" ea_localid="2" ea_eleType="package"/>
+				<properties isSpecification="false" sType="Package" nType="0" scope="public"/>
+				<project author="crunch_uml tests" version="1.0" phase="1.0" created="2026-09-17 12:00:00" modified="2026-09-17 12:30:00" complexity="1" status="Proposed"/>
+				<tags/>
+			</element>
+			<element xmi:idref="EAID_4D4E000A_0000_4000_8000_00000000000A" xmi:type="uml:Class" name="Persoon" scope="public">
+				<model package="EAPK_4D4E0002_0000_4000_8000_000000000002" tpos="0" ea_localid="3" ea_eleType="element"/>
+				<properties documentation="Een mens." isSpecification="false" sType="Class" nType="0" scope="public"/>
+				<project author="crunch_uml tests" version="1.0" phase="1.0" created="2026-09-17 12:00:00" modified="2026-09-17 12:30:00" complexity="1" status="Proposed"/>
+				<tags>
+					<tag xmi:id="EAID_4D4E003D_0000_4000_8000_00000000003D" name="herkomst" value="MiniM4" modelElement="EAID_4D4E000A_0000_4000_8000_00000000000A"/>
+				</tags>
+				<attributes>
+					<attribute xmi:idref="EAID_4D4E0014_0000_4000_8000_000000000014" name="naam" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="100" ea_guid="{4D4E0014-0000-4000-8000-000000000014}"/>
+						<properties type="CharacterString" collection="false" static="0" duplicates="0" changeability="changeable"/>
+						<containment containment="Not Specified" position="0"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<styleex value="volatile=0;"/>
+						<tags>
+							<tag xmi:id="EAID_4D4E003E_0000_4000_8000_00000000003E" name="lengte" value="200" modelElement="EAID_4D4E0014_0000_4000_8000_000000000014"/>
+						</tags>
+					</attribute>
+					<attribute name="geboortedatum" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="101"/>
+						<properties type="Date" collection="false" static="0" duplicates="0" changeability="changeable"/>
+						<containment containment="Not Specified" position="1"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+					</attribute>
+					<attribute name="opmerking" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="102"/>
+						<properties type="CharacterString" collection="false" static="0" duplicates="0" changeability="changeable"/>
+						<containment containment="Not Specified" position="2"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+					</attribute>
+					<attribute name="opmerking" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="103"/>
+						<properties type="CharacterString" collection="false" static="0" duplicates="0" changeability="changeable"/>
+						<containment containment="Not Specified" position="3"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+					</attribute>
+					<attribute xmi:idref="EAID_4D4E0015_0000_4000_8000_000000000015" name="geslacht" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="104" ea_guid="{4D4E0015-0000-4000-8000-000000000015}"/>
+						<properties type="Geslacht" collection="false" static="0" duplicates="0" changeability="changeable"/>
+						<containment containment="Not Specified" position="4"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+					</attribute>
+				</attributes>
+			</element>
+			<element xmi:idref="EAID_4D4E000B_0000_4000_8000_00000000000B" xmi:type="uml:Class" name="Adres" scope="public">
+				<model package="EAPK_4D4E0002_0000_4000_8000_000000000002" tpos="0" ea_localid="4" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Class" nType="0" scope="public"/>
+				<project author="crunch_uml tests" version="1.0" phase="1.0" created="2026-09-17 12:00:00" modified="2026-09-17 12:30:00" complexity="1" status="Proposed"/>
+				<tags/>
+				<attributes>
+					<attribute xmi:idref="EAID_4D4E0016_0000_4000_8000_000000000016" name="postcode" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="105" ea_guid="{4D4E0016-0000-4000-8000-000000000016}"/>
+						<properties type="Postcode" collection="false" static="0" duplicates="0" changeability="changeable"/>
+						<containment containment="Not Specified" position="0"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+					</attribute>
+				</attributes>
+			</element>
+			<element xmi:idref="EAID_4D4E000C_0000_4000_8000_00000000000C" xmi:type="uml:Class" name="Huishouden" scope="public">
+				<model package="EAPK_4D4E0002_0000_4000_8000_000000000002" tpos="0" ea_localid="5" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Class" nType="0" scope="public"/>
+				<project author="crunch_uml tests" version="1.0" phase="1.0" created="2026-09-17 12:00:00" modified="2026-09-17 12:30:00" complexity="1" status="Proposed"/>
+				<tags/>
+			</element>
+			<element xmi:idref="EAID_4D4E000D_0000_4000_8000_00000000000D" xmi:type="uml:Class" name="Ingezetene" scope="public">
+				<model package="EAPK_4D4E0002_0000_4000_8000_000000000002" tpos="0" ea_localid="6" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Class" nType="0" scope="public"/>
+				<project author="crunch_uml tests" version="1.0" phase="1.0" created="2026-09-17 12:00:00" modified="2026-09-17 12:30:00" complexity="1" status="Proposed"/>
+				<tags/>
+			</element>
+			<element xmi:idref="EAID_4D4E000E_0000_4000_8000_00000000000E" xmi:type="uml:Boundary" name="Grens" scope="public">
+				<model package="EAPK_4D4E0002_0000_4000_8000_000000000002" tpos="0" ea_localid="7" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Boundary" nType="0" scope="public"/>
+				<project author="crunch_uml tests" version="1.0" phase="1.0" created="2026-09-17 12:00:00" modified="2026-09-17 12:30:00" complexity="1" status="Proposed"/>
+				<tags/>
+			</element>
+			<element xmi:idref="EAID_4D4E000F_0000_4000_8000_00000000000F" xmi:type="uml:DataType" name="Postcode" scope="public">
+				<model package="EAPK_4D4E0003_0000_4000_8000_000000000003" tpos="0" ea_localid="8" ea_eleType="element"/>
+				<properties isSpecification="false" sType="DataType" nType="0" scope="public"/>
+				<project author="crunch_uml tests" version="1.0" phase="1.0" created="2026-09-17 12:00:00" modified="2026-09-17 12:30:00" complexity="1" status="Proposed"/>
+				<tags/>
+			</element>
+			<element xmi:idref="EAID_{4D4E0010_0000_4000_8000_000000000010}" xmi:type="uml:Enumeration" name="Geslacht" scope="public">
+				<model package="EAPK_4D4E0002_0000_4000_8000_000000000002" tpos="0" ea_localid="9" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Enumeration" nType="0" scope="public"/>
+				<project author="crunch_uml tests" version="1.0" phase="1.0" created="2026-09-17 12:00:00" modified="2026-09-17 12:30:00" complexity="1" status="Proposed"/>
+				<tags/>
+				<attributes>
+					<attribute xmi:idref="EAID_4D4E0017_0000_4000_8000_000000000017" name="man" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="106" ea_guid="{4D4E0017-0000-4000-8000-000000000017}"/>
+						<properties collection="false" static="0" duplicates="0" changeability="changeable"/>
+						<containment containment="Not Specified" position="0"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<styleex value="IsLiteral=1;volatile=0;"/>
+						<tags/>
+					</attribute>
+					<attribute name="vrouw" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="107"/>
+						<properties collection="false" static="0" duplicates="0" changeability="changeable"/>
+						<containment containment="Not Specified" position="1"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<styleex value="IsLiteral=0;volatile=0;"/>
+						<tags/>
+					</attribute>
+					<attribute xmi:idref="EAID_4D4E0018_0000_4000_8000_000000000018" name="onbekend" scope="Public">
+						<initial/>
+						<documentation/>
+						<model ea_localid="108" ea_guid="{4D4E0018-0000-4000-8000-000000000018}"/>
+						<properties collection="false" static="0" duplicates="0" changeability="changeable"/>
+						<containment containment="Not Specified" position="2"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<styleex value="IsLiteral=0;volatile=0;"/>
+						<tags/>
+					</attribute>
+				</attributes>
+			</element>
+		</elements>
+		<connectors>
+			<connector xmi:idref="EAID_4D4E001E_0000_4000_8000_00000000001E" name="woont op">
+				<source xmi:idref="EAID_4D4E000A_0000_4000_8000_00000000000A">
+					<model ea_localid="3" type="Class"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<documentation/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_4D4E000B_0000_4000_8000_00000000000B">
+					<model ea_localid="4" type="Class"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<documentation/>
+					<tags/>
+				</target>
+				<model ea_localid="200"/>
+				<properties ea_type="Association" direction="Source -&gt; Destination"/>
+				<documentation/>
+				<labels mt="woont op"/>
+				<tags/>
+			</connector>
+			<connector xmi:idref="EAID_4D4E001F_0000_4000_8000_00000000001F" name="bestaat uit">
+				<source xmi:idref="EAID_4D4E000A_0000_4000_8000_00000000000A">
+					<model ea_localid="3" type="Class"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<documentation/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_4D4E000C_0000_4000_8000_00000000000C">
+					<model ea_localid="5" type="Class"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="shared" containment="Unspecified"/>
+					<documentation/>
+					<tags/>
+				</target>
+				<model ea_localid="201"/>
+				<properties ea_type="Aggregation" direction="Source -&gt; Destination"/>
+				<documentation/>
+				<labels mt="bestaat uit"/>
+				<tags>
+					<tag xmi:id="EAID_4D4E003F_0000_4000_8000_00000000003F" name="herkomst" value="MiniM4" modelElement="EAID_4D4E001F_0000_4000_8000_00000000001F"/>
+				</tags>
+			</connector>
+			<connector xmi:idref="EAID_4D4E0020_0000_4000_8000_000000000020">
+				<source xmi:idref="EAID_4D4E000D_0000_4000_8000_00000000000D">
+					<model ea_localid="6" type="Class"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<documentation/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_4D4E000A_0000_4000_8000_00000000000A">
+					<model ea_localid="3" type="Class"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<documentation/>
+					<tags/>
+				</target>
+				<model ea_localid="202"/>
+				<properties ea_type="Generalization" direction="Source -&gt; Destination"/>
+				<documentation/>
+				<tags/>
+			</connector>
+		</connectors>
+		<diagrams>
+			<diagram xmi:id="EAID_4D4E0028_0000_4000_8000_000000000028">
+				<model package="EAPK_4D4E0002_0000_4000_8000_000000000002" localID="1" owner="EAPK_4D4E0002_0000_4000_8000_000000000002"/>
+				<properties name="Kern overzicht" type="Logical"/>
+				<project author="crunch_uml tests" version="1.0" created="2026-09-17 12:00:00" modified="2026-09-17 12:30:00"/>
+				<style1 value="HideRelationships=0;ShowTags=0;ShowReqs=0;ShowCons=0;OpParams=1;ShowSN=0;ScalePI=0;PPgs.cx=1;PPgs.cy=1;PSize=9;ShowIcons=1;SuppCN=0;HideProps=0;HideParents=0;UseAlias=0;HideAtts=1;HideOps=1;HideStereo=0;HideElemStereo=0;ShowRec=1;ShowRes=0;ShowShape=1;FormName=;ShowPublic=1;ShowPrivate=1;ShowProtected=1;Zoom=100;"/>
+				<style2 value="ExcludeRTF=0;DocAll=0;HideQuals=0;AttPkg=1;ShowTests=0;ShowMaint=0;SuppressFOC=1;SuppressedCompartments=;"/>
+				<elements>
+					<element geometry="Left=50;Top=40;Right=170;Bottom=120;" subject="EAID_4D4E000A_0000_4000_8000_00000000000A" seqno="1" style="DUID=4D4E0010;"/>
+					<element geometry="Left=300;Top=40;Right=420;Bottom=100;" subject="EAID_4D4E000B_0000_4000_8000_00000000000B" seqno="2" style="DUID=4D4E0011;"/>
+					<element geometry="Left=50;Top=220;Right=170;Bottom=280;" subject="EAID_4D4E000C_0000_4000_8000_00000000000C" seqno="3" style="DUID=4D4E0012;"/>
+					<element geometry="Left=300;Top=220;Right=410;Bottom=290;" subject="EAID_{4D4E0010_0000_4000_8000_000000000010}" seqno="4" style="DUID=4D4E0013;"/>
+					<element geometry="Left=20;Top=10;Right=520;Bottom=410;" subject="EAID_4D4E000E_0000_4000_8000_00000000000E" seqno="5" style="DUID=4D4E0014;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=235:-80$235:-70$;" subject="EAID_4D4E001E_0000_4000_8000_00000000001E" style="Mode=3;EOID=4D4E0011;SOID=4D4E0010;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_4D4E001F_0000_4000_8000_00000000001F" style="Mode=3;EOID=4D4E0012;SOID=4D4E0010;Color=-1;LWidth=0;Hidden=0;"/>
+				</elements>
+			</diagram>
+			<diagram xmi:id="EAID_4D4E0029_0000_4000_8000_000000000029">
+				<model package="EAPK_4D4E0002_0000_4000_8000_000000000002" localID="2" owner="EAPK_4D4E0002_0000_4000_8000_000000000002"/>
+				<properties name="Kern details" type="Logical"/>
+				<project author="crunch_uml tests" version="1.0" created="2026-09-17 12:00:00" modified="2026-09-17 12:30:00"/>
+				<style1 value="HideRelationships=0;ShowTags=0;ShowReqs=0;ShowCons=0;OpParams=1;ShowSN=0;ScalePI=0;PPgs.cx=1;PPgs.cy=1;PSize=9;ShowIcons=1;SuppCN=0;HideProps=0;HideParents=0;UseAlias=0;HideAtts=0;HideOps=0;HideStereo=0;HideElemStereo=0;ShowRec=1;ShowRes=0;ShowShape=1;FormName=;ShowPublic=1;ShowPrivate=1;ShowProtected=1;Zoom=100;"/>
+				<style2 value="ExcludeRTF=0;DocAll=0;HideQuals=0;AttPkg=1;ShowTests=0;ShowMaint=0;SuppressFOC=1;SuppressedCompartments=;"/>
+				<elements>
+					<element geometry="Left=60;Top=60;Right=210;Bottom=160;" subject="EAID_4D4E000A_0000_4000_8000_00000000000A" seqno="1" style="AttPro=0;AttPri=0;AttPub=0;AttPkg=0;DUID=4D4E0001;"/>
+					<element geometry="Left=60;Top=260;Right=180;Bottom=320;" subject="EAID_4D4E000D_0000_4000_8000_00000000000D" seqno="2" style="DUID=4D4E0015;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_4D4E0020_0000_4000_8000_000000000020" style="Mode=3;EOID=4D4E0010;SOID=4D4E0015;Color=-1;LWidth=0;Hidden=1;"/>
+				</elements>
+			</diagram>
+			<diagram xmi:id="EAID_4D4E002A_0000_4000_8000_00000000002A">
+				<model package="EAPK_4D4E0003_0000_4000_8000_000000000003" localID="3" owner="EAPK_4D4E0003_0000_4000_8000_000000000003"/>
+				<properties name="Packages" type="Package"/>
+				<project author="crunch_uml tests" version="1.0" created="2026-09-17 12:00:00" modified="2026-09-17 12:30:00"/>
+				<style1 value="HideRelationships=0;ShowTags=0;ShowReqs=0;ShowCons=0;OpParams=1;ShowSN=0;ScalePI=0;PPgs.cx=1;PPgs.cy=1;PSize=9;ShowIcons=1;SuppCN=0;HideProps=0;HideParents=0;UseAlias=0;HideAtts=0;HideOps=0;HideStereo=0;HideElemStereo=0;ShowRec=1;ShowRes=0;ShowShape=1;FormName=;ShowPublic=1;ShowPrivate=1;ShowProtected=1;Zoom=100;"/>
+				<style2 value="ExcludeRTF=0;DocAll=0;HideQuals=0;AttPkg=1;ShowTests=0;ShowMaint=0;SuppressFOC=1;SuppressedCompartments=;"/>
+				<elements>
+					<element geometry="Left=40;Top=40;Right=140;Bottom=90;" subject="EAID_4D4E000F_0000_4000_8000_00000000000F" seqno="1" style="DUID=4D4E0016;"/>
+				</elements>
+			</diagram>
+		</diagrams>
+	</xmi:Extension>
+</xmi:XMI>

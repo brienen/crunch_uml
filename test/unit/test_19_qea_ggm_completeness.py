@@ -115,12 +115,14 @@ def test_generalizations_count_matches_source(imported_schema, src_cursor):
 def test_associations_count_matches_source_after_filter(imported_schema, src_cursor):
     """Phase 4 of the QEA parser only keeps connectors whose endpoints are
     Class/DataType/Enumeration objects. The handful of connectors that point
-    at ProxyConnector/Component/Actor must NOT inflate the imported count."""
+    at ProxyConnector/Component/Actor must NOT inflate the imported count.
+    Aggregations ARE associations: before 0.7.0 the parser skipped all of them
+    (87 in this model), and this test encoded that loss as expected."""
     src_n = src_cursor.execute("""
         SELECT COUNT(*) FROM t_connector c
         JOIN t_object so ON c.Start_Object_ID = so.Object_ID
         JOIN t_object eo ON c.End_Object_ID   = eo.Object_ID
-        WHERE c.Connector_Type IN ('Association', 'Realisation')
+        WHERE c.Connector_Type IN ('Association', 'Aggregation', 'Realisation')
           AND so.Object_Type IN ('Class', 'DataType', 'Enumeration')
           AND eo.Object_Type IN ('Class', 'DataType', 'Enumeration')
         """).fetchone()[0]
@@ -280,7 +282,7 @@ def test_attribute_tagged_values_are_applied(imported_schema, src_cursor):
 @pytest.mark.slow
 def test_literals_with_null_ea_guid_are_imported_with_synthetic_ids(imported_schema, src_cursor):
     """The QEA file has enum literals (and some attributes) with ea_guid IS
-    NULL. The parser mints synthetic IDs of the form ``EAID_attr_<n>`` so
+    NULL. The parser mints synthetic IDs of the form ``EAID_syn_<sha1>`` so
     these rows are preserved instead of crashing the import."""
     src_n = src_cursor.execute("""
         SELECT COUNT(*) FROM t_attribute a
@@ -295,14 +297,14 @@ def test_literals_with_null_ea_guid_are_imported_with_synthetic_ids(imported_sch
     with Session(imported_schema.database.engine) as session:
         synth_attr = (
             session.query(db.Attribute)
-            .filter(db.Attribute.schema_id == SCHEMA, db.Attribute.id.like("EAID_attr_%"))
+            .filter(db.Attribute.schema_id == SCHEMA, db.Attribute.id.like("EAID_syn_%"))
             .count()
         )
         synth_lit = (
             session.query(db.EnumerationLiteral)
             .filter(
                 db.EnumerationLiteral.schema_id == SCHEMA,
-                db.EnumerationLiteral.id.like("EAID_attr_%"),
+                db.EnumerationLiteral.id.like("EAID_syn_%"),
             )
             .count()
         )
