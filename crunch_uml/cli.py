@@ -4,6 +4,7 @@ import os
 import sys
 
 import crunch_uml.db as db
+import crunch_uml.pack as pack
 import crunch_uml.parsers.parser as parsers
 import crunch_uml.renderers.renderer as renderers
 import crunch_uml.schema as sch
@@ -106,6 +107,17 @@ def main(args=None):
             help="Export datamodel from a schema in the Crunch UML database to various formats",
             formatter_class=argparse.RawTextHelpFormatter,
         ),
+        const.CMD_PACK: subparsers.add_parser(
+            const.CMD_PACK,
+            help=(
+                "Parse an Enterprise Architect model (.qea or EA-XMI 2.1) into a row artifact (.cua.gz);"
+                " prints one JSON line"
+            ),
+        ),
+        const.CMD_DETECT: subparsers.add_parser(
+            const.CMD_DETECT,
+            help="Classify a model file by its content (reads at most 64 KiB); prints one JSON line",
+        ),
     }
 
     # let sub modules add there own arguments
@@ -114,6 +126,7 @@ def main(args=None):
     parsers.add_args(argumentparser, subparser_dict)
     renderers.add_args(argumentparser, subparser_dict)
     transformers.add_args(argumentparser, subparser_dict)
+    pack.add_args(argumentparser, subparser_dict)
     args = argumentparser.parse_args(args)
 
     # Propagate translation-backend CLI args into env-vars so the rest of the
@@ -131,6 +144,13 @@ def main(args=None):
     if args.command is None:
         argumentparser.print_help()
         return 1
+
+    # pack and detect answer with one JSON line and their own exit codes; they
+    # never touch the crunch_uml database given by -db_url.
+    if args.command == const.CMD_PACK:
+        return pack.run_pack(args)
+    if args.command == const.CMD_DETECT:
+        return pack.run_detect(args)
 
     try:
         # Parse input
