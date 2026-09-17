@@ -1,4 +1,3 @@
-import importlib.metadata
 import logging
 import re
 import uuid
@@ -30,6 +29,7 @@ from sqlalchemy.orm.relationships import RelationshipProperty
 
 import crunch_uml.const as const
 import crunch_uml.util as util
+from crunch_uml._version import __version__
 from crunch_uml.exceptions import CrunchException
 
 logger = logging.getLogger()
@@ -77,10 +77,9 @@ crunch_runs_table = Table(
 
 
 def _crunch_version():
-    try:
-        return importlib.metadata.version("crunch_uml")
-    except importlib.metadata.PackageNotFoundError:
-        return "unknown"
+    # The package's own version, not importlib.metadata: an editable install
+    # keeps reporting the version it was installed with (0.6.0 markers said 0.4.11).
+    return __version__
 
 
 def add_args(argumentparser, subparser_dict):

@@ -1,3 +1,5 @@
+import re
+
 import setuptools
 
 long_description = None
@@ -9,9 +11,13 @@ def parse_requirements(filename):
     with open(filename, 'r') as f:
         return f.read().splitlines()
 
+# The version lives in crunch_uml/_version.py (read without importing the package).
+with open('crunch_uml/_version.py', 'r') as fh:
+    version = re.search(r'^__version__ = [\'"]([^\'"]+)[\'"]', fh.read(), re.M).group(1)
+
 setuptools.setup(
     name='crunch_uml',
-    version='0.6.0',
+    version=version,
     description="Crunch_uml reads UML Class model from multiple formats (including XMI, Enterprise Architect XMI, Excel, Json, and others), can perform transformations and renders them to other formats (including Markdown, json, json schema and many others).",
     long_description=long_description,
     long_description_content_type="text/markdown",
