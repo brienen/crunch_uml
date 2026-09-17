@@ -4,6 +4,9 @@ test/data/MiniM4.qea and test/data/MiniM4.xml describe the same model (generated
 by tools/make_mini_m4_fixture.py). The tests pin what both parsers must yield,
 plus the one documented asymmetry: the eaxmi parser still reads an EA Boundary
 as a class (the QEA marks it t_object 'Boundary' and it is skipped there).
+
+Every import is also checked for referential integrity: Postgres enforces the
+foreign keys during an import, SQLite does not unless asked.
 """
 
 import os
@@ -12,17 +15,20 @@ import sqlite3
 import pytest
 
 import crunch_uml.db as db
-from crunch_uml import cli, ea_geometry, ea_ids
+from crunch_uml import cli, const, ea_geometry, ea_ids
 
 MINI_QEA = "./test/data/MiniM4.qea"
 MINI_XMI = "./test/data/MiniM4.xml"
 
 KERN = "EAPK_4D4E0002_0000_4000_8000_000000000002"
 PERSOON = "EAID_4D4E000A_0000_4000_8000_00000000000A"
+HUISHOUDEN = "EAID_4D4E000C_0000_4000_8000_00000000000C"
 GRENS = "EAID_4D4E000E_0000_4000_8000_00000000000E"
 POSTCODE = "EAID_4D4E000F_0000_4000_8000_00000000000F"
 GESLACHT = "EAID_4D4E0010_0000_4000_8000_000000000010"
 AGGREGATIE = "EAID_4D4E001F_0000_4000_8000_00000000001F"
+NAAR_ENUMERATIE = "EAID_4D4E0021_0000_4000_8000_000000000021"
+VAN_ENUMERATIE = "EAID_4D4E0022_0000_4000_8000_000000000022"
 DIAGRAM_KERN = "EAID_4D4E0028_0000_4000_8000_000000000028"
 DIAGRAM_DETAILS = "EAID_4D4E0029_0000_4000_8000_000000000029"
 DIAGRAM_PACKAGES = "EAID_4D4E002A_0000_4000_8000_00000000002A"
@@ -163,6 +169,50 @@ def test_diagraminstellingen(mini):
     assert "AttPub=0" in node_style
 
 
+def test_associatie_met_enumeratie_als_eind_krijgt_een_plaatshouderklasse(mini):
+    """EA lets an association end on an enumeration (GGM 2.5.1 has three, 2.4.0 nineteen).
+    Association ends live in ``classes``, so both parsers add one ``<Orphan Class>`` with the
+    enumeration's id, also when two associations share that end. Before the fix the QEA parser
+    left the end dangling and a Postgres import stopped on ``fk_dst_class``."""
+    _, con = mini
+    ends = {
+        r["id"]: (r["src_class_id"], r["dst_class_id"])
+        for r in con.execute(
+            "SELECT id, src_class_id, dst_class_id FROM associations WHERE id IN (?, ?)",
+            (NAAR_ENUMERATIE, VAN_ENUMERATIE),
+        )
+    }
+    assert ends == {NAAR_ENUMERATIE: (HUISHOUDEN, GESLACHT), VAN_ENUMERATIE: (GESLACHT, PERSOON)}
+    placeholders = con.execute("SELECT id, name, package_id, is_datatype FROM classes WHERE id = ?", (GESLACHT,))
+    assert [tuple(r) for r in placeholders] == [(GESLACHT, const.ORPHAN_CLASS, None, 0)]
+    # The enumeration keeps its own tagged value; the placeholder with the same id gets none.
+    assert con.execute("SELECT herkomst FROM enumerations WHERE id = ?", (GESLACHT,)).fetchone()[0] == "EA"
+    assert con.execute("SELECT herkomst FROM classes WHERE id = ?", (GESLACHT,)).fetchone()[0] is None
+
+
+def test_herimport_qea_houdt_het_enumeratietype_van_een_attribuut(tmp_path):
+    """A re-import into the same schema finds the placeholder class with the enumeration's id;
+    the attribute typed by that enumeration must still point at the enumeration."""
+    path = tmp_path / "herimport_qea.db"
+    parse_into(path, MINI_QEA, "qea")
+    parse_into(path, MINI_QEA, "qea", create=False)
+    con = connect(path)
+    try:
+        row = con.execute("SELECT enumeration_id, type_class_id FROM attributes WHERE name = 'geslacht'").fetchone()
+        assert tuple(row) == (GESLACHT, None)
+        assert con.execute("SELECT herkomst FROM enumerations WHERE id = ?", (GESLACHT,)).fetchone()[0] == "EA"
+        assert con.execute("SELECT COUNT(*) FROM classes WHERE name = ?", (const.ORPHAN_CLASS,)).fetchone()[0] == 1
+        assert [tuple(r) for r in con.execute("PRAGMA foreign_key_check")] == []
+    finally:
+        con.close()
+
+
+def test_referentiele_integriteit(mini):
+    """Every foreign key holds, so the same parse also succeeds on Postgres."""
+    _, con = mini
+    assert [tuple(r) for r in con.execute("PRAGMA foreign_key_check")] == []
+
+
 def test_boundary_asymmetrie_is_gedocumenteerd(mini):
     """QEA skips the Boundary; eaxmi still reads it as a class (filtering it is later work)."""
     parser, con = mini
@@ -207,8 +257,11 @@ def test_parse_is_deterministisch(tmp_path):
             rows_a = sorted((tuple(r) for r in a.execute(f"SELECT * FROM {table}")), key=repr)
             rows_b = sorted((tuple(r) for r in b.execute(f"SELECT * FROM {table}")), key=repr)
             assert rows_a == rows_b, table
-        orphans = [r[0] for r in a.execute("SELECT id FROM classes WHERE name = '<Orphan Class>'")]
-        assert orphans and all(o.startswith(ea_ids.PLACEHOLDER_ID_PREFIX) for o in orphans)
+        orphans = {r[0] for r in a.execute("SELECT id FROM classes WHERE name = '<Orphan Class>'")}
+        dangling_end = {o for o in orphans if o.startswith(ea_ids.PLACEHOLDER_ID_PREFIX)}
+        # One hashed placeholder for the dangling end, one for the enumeration end.
+        assert len(dangling_end) == 1
+        assert orphans - dangling_end == {GESLACHT}
     finally:
         a.close()
         b.close()
@@ -227,7 +280,8 @@ def test_herimport_maakt_geen_extra_plaatshouders(tmp_path):
     parse_into(path, str(xmi), "eaxmi", create=False)
     con = connect(path)
     try:
-        assert con.execute("SELECT COUNT(*) FROM classes WHERE name = '<Orphan Class>'").fetchone()[0] == 1
+        orphans = [r[0] for r in con.execute("SELECT id FROM classes WHERE name = '<Orphan Class>' ORDER BY id")]
+        assert len(orphans) == 2 and GESLACHT in orphans
     finally:
         con.close()
 

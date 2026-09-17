@@ -208,7 +208,8 @@ def test_qea_wordt_alleen_lezend_geopend(tmp_path):
     assert _sha256(source) == before
     con = sqlite3.connect(database)
     try:
-        assert con.execute("SELECT COUNT(*) FROM classes").fetchone()[0] == 5
+        # Four classes, one datatype and the placeholder for the enumeration at an association end.
+        assert con.execute("SELECT COUNT(*) FROM classes").fetchone()[0] == 6
     finally:
         con.close()
 

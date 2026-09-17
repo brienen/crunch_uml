@@ -7,6 +7,7 @@ import sqlalchemy as sa
 
 import crunch_uml.db as db
 import crunch_uml.schema as sch
+from crunch_uml import const
 from crunch_uml import ea_geometry as geo
 from crunch_uml import ea_ids
 from crunch_uml.parsers.parser import Parser, ParserRegistry, fixtag
@@ -188,14 +189,18 @@ class QEAParser(Parser):
             )
         ).fetchall()
 
-        # Build lookup: Object_ID (int) -> EAID_ string
+        # Build lookups: Object_ID (int) -> EAID_ string, and the ids that land
+        # in `classes` (connector ends must, see _phase4_connectors).
         self._obj_id_map = {}
+        self._class_ids = set()
         for row in rows:
-            obj_id, _, name, package_id, ea_guid = row[:5]
+            obj_id, obj_type, name, package_id, ea_guid = row[:5]
             eaid = guid_to_eaid(ea_guid)
             if eaid is None:
                 eaid = self._minter.mint(self._pkg_id_map.get(package_id), name, kind="element")
             self._obj_id_map[obj_id] = eaid
+            if obj_type != "Enumeration":
+                self._class_ids.add(eaid)
 
         for row in rows:
             (
@@ -317,14 +322,14 @@ class QEAParser(Parser):
                 if classifier and classifier != 0:
                     classifier_eaid = self._obj_id_map.get(int(classifier))
                     if classifier_eaid is not None:
-                        # Determine if classifier is a Class/DataType or an Enumeration
-                        classifier_obj = schema.get_class(classifier_eaid) or schema.get_datatype(classifier_eaid)
-                        if classifier_obj is not None:
+                        # Every object in _obj_id_map was saved in phase 2, as a
+                        # Class/DataType or as an Enumeration. Route on that
+                        # instead of a lookup in `classes`, which on a re-import
+                        # also finds a placeholder class with an enumeration's id.
+                        if classifier_eaid in self._class_ids:
                             type_class_id = classifier_eaid
                         else:
-                            enum_obj = schema.get_enumeration(classifier_eaid)
-                            if enum_obj is not None:
-                                enumeration_id = classifier_eaid
+                            enumeration_id = classifier_eaid
 
                 attribute = db.Attribute(
                     id=eaid,
@@ -345,7 +350,14 @@ class QEAParser(Parser):
         )
 
     def _phase4_connectors(self, conn, schema: sch.Schema):
-        """Parse t_connector into Association and Generalization objects."""
+        """Parse t_connector into Association and Generalization objects.
+
+        Both ends of an association or generalization reference `classes`
+        (foreign keys fk_src_class/fk_dst_class, enforced by Postgres). EA also
+        draws associations to and from an Enumeration, which lives in
+        `enumerations`; such an end gets a placeholder class, see
+        _ensure_class_end.
+        """
         logger.info("Phase 4: parsing connectors")
 
         rows = conn.execute(
@@ -365,6 +377,7 @@ class QEAParser(Parser):
         self._conn_id_map = {}
         self._assoc_ids = set()
         self._gen_ids = set()
+        self._placeholder_ids: set = set()
 
         for row in rows:
             (
@@ -395,6 +408,8 @@ class QEAParser(Parser):
             if eaid is None:
                 eaid = self._minter.mint(src_eaid, name, kind="connector")
             self._conn_id_map[conn_id] = eaid
+            self._ensure_class_end(schema, src_eaid, conn_type, name, eaid)
+            self._ensure_class_end(schema, dst_eaid, conn_type, name, eaid)
 
             if conn_type == "Generalization":
                 gen = db.Generalization(
@@ -434,6 +449,27 @@ class QEAParser(Parser):
             f"{schema.count_generalizations()} generalizations"
         )
 
+    def _ensure_class_end(self, schema: sch.Schema, end_eaid, conn_type, conn_name, conn_eaid):
+        """Give a connector end that is not a class a placeholder row in `classes`.
+
+        The eaxmi parser does the same for an association end whose type is not
+        a class: a class named ``<Orphan Class>`` with the id of the referenced
+        element, without package. Using that rule here keeps both formats on the
+        same rows, and the enumeration itself is still imported unchanged.
+        Without it the association references a missing class: SQLite accepts
+        that, Postgres rejects the import on fk_dst_class.
+        """
+        if end_eaid in self._class_ids:
+            return
+        logger.warning(
+            f"QEA import: {conn_type} '{conn_name or ''}' ({conn_eaid}) ends on {end_eaid}, which is not a class; "
+            f"it points to a placeholder class '{const.ORPHAN_CLASS}' with that id."
+        )
+        if end_eaid in self._placeholder_ids:
+            return
+        self._placeholder_ids.add(end_eaid)
+        schema.save(db.Class(id=end_eaid, name=const.ORPHAN_CLASS))
+
     def _phase5_tagged_values(self, conn, schema: sch.Schema):
         """Apply tagged values from t_objectproperties, t_attributetag, t_connectortag.
 
@@ -471,9 +507,12 @@ class QEAParser(Parser):
                 continue
             if obj_type == "Package":
                 obj = packages_by_id.get(self._pkg_obj_map.get(obj_id))
+            elif obj_type == "Enumeration":
+                # Not classes_by_id first: a placeholder class of phase 4 can
+                # carry the same id as the enumeration.
+                obj = enums_by_id.get(self._obj_id_map.get(obj_id))
             else:
-                eaid = self._obj_id_map.get(obj_id)
-                obj = classes_by_id.get(eaid) or enums_by_id.get(eaid)
+                obj = classes_by_id.get(self._obj_id_map.get(obj_id))
             field = fixtag(prop)
             if obj is not None and hasattr(obj, field):
                 setattr(obj, field, normalize_newlines(value))

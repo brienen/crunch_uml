@@ -82,6 +82,34 @@
 						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LUsrc" value="1"/>
 					</ownedEnd>
 				</packagedElement>
+				<packagedElement xmi:type="uml:Association" xmi:id="EAID_4D4E0021_0000_4000_8000_000000000021" name="heeft" visibility="public">
+					<memberEnd xmi:idref="EAID_dst4E0021_0000_4000_8000_000000000021"/>
+					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dst4E0021_0000_4000_8000_000000000021" visibility="public" association="EAID_4D4E0021_0000_4000_8000_000000000021" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_{4D4E0010_0000_4000_8000_000000000010}"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LIdst" value="1"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LUdst" value="1"/>
+					</ownedEnd>
+					<memberEnd xmi:idref="EAID_src4E0021_0000_4000_8000_000000000021"/>
+					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src4E0021_0000_4000_8000_000000000021" visibility="public" association="EAID_4D4E0021_0000_4000_8000_000000000021" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_4D4E000C_0000_4000_8000_00000000000C"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LIsrc" value="1"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LUsrc" value="1"/>
+					</ownedEnd>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Association" xmi:id="EAID_4D4E0022_0000_4000_8000_000000000022" name="hoort bij" visibility="public">
+					<memberEnd xmi:idref="EAID_dst4E0022_0000_4000_8000_000000000022"/>
+					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dst4E0022_0000_4000_8000_000000000022" visibility="public" association="EAID_4D4E0022_0000_4000_8000_000000000022" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_4D4E000A_0000_4000_8000_00000000000A"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LIdst" value="1"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LUdst" value="1"/>
+					</ownedEnd>
+					<memberEnd xmi:idref="EAID_src4E0022_0000_4000_8000_000000000022"/>
+					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src4E0022_0000_4000_8000_000000000022" visibility="public" association="EAID_4D4E0022_0000_4000_8000_000000000022" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+						<type xmi:idref="EAID_{4D4E0010_0000_4000_8000_000000000010}"/>
+						<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LIsrc" value="1"/>
+						<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LUsrc" value="1"/>
+					</ownedEnd>
+				</packagedElement>
 			</packagedElement>
 			<packagedElement xmi:type="uml:Package" xmi:id="EAPK_4D4E0003_0000_4000_8000_000000000003" name="Overig" visibility="public">
 				<packagedElement xmi:type="uml:DataType" xmi:id="EAID_4D4E000F_0000_4000_8000_00000000000F" name="Postcode" visibility="public"/>
@@ -224,7 +252,9 @@
 				<model package="EAPK_4D4E0002_0000_4000_8000_000000000002" tpos="0" ea_localid="9" ea_eleType="element"/>
 				<properties isSpecification="false" sType="Enumeration" nType="0" scope="public"/>
 				<project author="crunch_uml tests" version="1.0" phase="1.0" created="2026-09-17 12:00:00" modified="2026-09-17 12:30:00" complexity="1" status="Proposed"/>
-				<tags/>
+				<tags>
+					<tag xmi:id="EAID_4D4E003F_0000_4000_8000_00000000003F" name="herkomst" value="EA" modelElement="EAID_{4D4E0010_0000_4000_8000_000000000010}"/>
+				</tags>
 				<attributes>
 					<attribute xmi:idref="EAID_4D4E0017_0000_4000_8000_000000000017" name="man" scope="Public">
 						<initial/>
@@ -304,7 +334,7 @@
 				<documentation/>
 				<labels mt="bestaat uit"/>
 				<tags>
-					<tag xmi:id="EAID_4D4E003F_0000_4000_8000_00000000003F" name="herkomst" value="MiniM4" modelElement="EAID_4D4E001F_0000_4000_8000_00000000001F"/>
+					<tag xmi:id="EAID_4D4E0040_0000_4000_8000_000000000040" name="herkomst" value="MiniM4" modelElement="EAID_4D4E001F_0000_4000_8000_00000000001F"/>
 				</tags>
 			</connector>
 			<connector xmi:idref="EAID_4D4E0020_0000_4000_8000_000000000020">
@@ -325,6 +355,48 @@
 				<model ea_localid="202"/>
 				<properties ea_type="Generalization" direction="Source -&gt; Destination"/>
 				<documentation/>
+				<tags/>
+			</connector>
+			<connector xmi:idref="EAID_4D4E0021_0000_4000_8000_000000000021" name="heeft">
+				<source xmi:idref="EAID_4D4E000C_0000_4000_8000_00000000000C">
+					<model ea_localid="5" type="Class"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<documentation/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_{4D4E0010_0000_4000_8000_000000000010}">
+					<model ea_localid="9" type="Enumeration"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<documentation/>
+					<tags/>
+				</target>
+				<model ea_localid="203"/>
+				<properties ea_type="Association" direction="Source -&gt; Destination"/>
+				<documentation/>
+				<labels mt="heeft"/>
+				<tags/>
+			</connector>
+			<connector xmi:idref="EAID_4D4E0022_0000_4000_8000_000000000022" name="hoort bij">
+				<source xmi:idref="EAID_{4D4E0010_0000_4000_8000_000000000010}">
+					<model ea_localid="9" type="Enumeration"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<documentation/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_4D4E000A_0000_4000_8000_00000000000A">
+					<model ea_localid="3" type="Class"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<documentation/>
+					<tags/>
+				</target>
+				<model ea_localid="204"/>
+				<properties ea_type="Association" direction="Source -&gt; Destination"/>
+				<documentation/>
+				<labels mt="hoort bij"/>
 				<tags/>
 			</connector>
 		</connectors>

@@ -14,6 +14,9 @@ every EA quirk crunch_uml 0.7.0 fixed, in both source formats:
   EAID_{...} in the XMI), referenced as an attribute type;
 * a Boundary on a diagram (QEA: t_object 'Boundary'; XMI: uml:Class with an
   extension element of type uml:Boundary);
+* associations with an enumeration at one end, in both directions (the GGM has
+  them); crunch_uml keeps association ends in ``classes``, so both parsers add
+  one ``<Orphan Class>`` placeholder with the enumeration's id;
 * diagram settings: HideAtts=1 on one diagram, a per-node attribute override
   (AttPub=0;...) on another, and a non-class diagram type.
 
@@ -69,7 +72,7 @@ GESLACHT_INNER = guid(16)
 GESLACHT_QEA = "{" + GESLACHT_INNER + "}"  # doubled braces, as found in the GGM
 ATTR_NAAM, ATTR_GESLACHT, ATTR_POSTCODE = guid(20), guid(21), guid(22)
 LIT_MAN, LIT_ONBEKEND = guid(23), guid(24)
-ASSOC, AGGR, GEN = guid(30), guid(31), guid(32)
+ASSOC, AGGR, GEN, ASSOC_TO_ENUM, ASSOC_FROM_ENUM = (guid(n) for n in range(30, 35))
 DIA_KERN, DIA_DETAILS, DIA_PACKAGES = guid(40), guid(41), guid(42)
 TAG_IDS = iter(guid(n) for n in range(50, 60))
 
@@ -116,9 +119,11 @@ CONNECTORS = [
     (200, "woont op", "Association", O_PERSOON, O_ADRES, ASSOC),
     (201, "bestaat uit", "Aggregation", O_PERSOON, O_HUISHOUDEN, AGGR),
     (202, None, "Generalization", O_INGEZETENE, O_PERSOON, GEN),
+    (203, "heeft", "Association", O_HUISHOUDEN, O_GESLACHT, ASSOC_TO_ENUM),
+    (204, "hoort bij", "Association", O_GESLACHT, O_PERSOON, ASSOC_FROM_ENUM),
 ]
 
-OBJECT_TAGS = [(O_KERN, "afkorting", "KRN"), (O_PERSOON, "herkomst", "MiniM4")]
+OBJECT_TAGS = [(O_KERN, "afkorting", "KRN"), (O_PERSOON, "herkomst", "MiniM4"), (O_GESLACHT, "herkomst", "EA")]
 ATTRIBUTE_TAGS = [(100, "lengte", "200")]
 CONNECTOR_TAGS = [(201, "herkomst", "MiniM4")]
 
@@ -303,6 +308,8 @@ def write_xmi(path):
         "assoc": eaid(ASSOC),
         "aggr": eaid(AGGR),
         "gen": eaid(GEN),
+        "assoc_to_enum": eaid(ASSOC_TO_ENUM),
+        "assoc_from_enum": eaid(ASSOC_FROM_ENUM),
     }
     obj_ids = {
         O_PERSOON: ids["persoon"],
@@ -403,6 +410,8 @@ def write_xmi(path):
     for key, name, aggregation, src, dst in (
         ("assoc", "woont op", "none", ids["persoon"], ids["adres"]),
         ("aggr", "bestaat uit", "shared", ids["persoon"], ids["huishouden"]),
+        ("assoc_to_enum", "heeft", "none", ids["huishouden"], ids["geslacht"]),
+        ("assoc_from_enum", "hoort bij", "none", ids["geslacht"], ids["persoon"]),
     ):
         assoc_id = ids[key]
         w(
@@ -550,7 +559,8 @@ def write_xmi(path):
         w(f"\t\t\t<connector {a(xmi__idref=conn_xmi, name=name)}>")
         for role, obj_id in (("source", start), ("target", end)):
             w(f"\t\t\t\t<{role} {a(xmi__idref=obj_ids[obj_id])}>")
-            w(f"\t\t\t\t\t<model {a(ea_localid=str(obj_id), type='Class')}/>")
+            obj_type = next(o[1] for o in OBJECTS if o[0] == obj_id)
+            w(f"\t\t\t\t\t<model {a(ea_localid=str(obj_id), type=obj_type)}/>")
             w("\t\t\t\t\t<role visibility=\"Public\" targetScope=\"instance\"/>")
             aggregation = "shared" if (typ == "Aggregation" and role == "target") else "none"
             w(f"\t\t\t\t\t<type {a(aggregation=aggregation, containment='Unspecified')}/>")
