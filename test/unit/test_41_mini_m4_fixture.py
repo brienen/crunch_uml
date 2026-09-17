@@ -323,3 +323,18 @@ def test_minter_telt_duplicaten_per_eigenaar_en_naam():
 )
 def test_parse_diagram_hide_flags(style, expected):
     assert ea_geometry.parse_diagram_hide_flags(style) == expected
+
+
+def test_accolade_ids_worden_in_de_tekst_genormaliseerd():
+    from crunch_uml.parsers.xmiparser import normalize_braced_ids
+
+    data = (
+        b'<a xmi:id="EAID_{AB_CD}" type="EAPK_{{EF}}" other="EAID_12"'
+        b' note="EAJava_{x}"/>\n<b>tekst "EAID_{AB CD" zonder sluiting</b>'
+    )
+    assert normalize_braced_ids(data) == (
+        b'<a xmi:id="EAID_AB_CD" type="EAPK_EF" other="EAID_12"'
+        b' note="EAJava_{x}"/>\n<b>tekst "EAID_{AB CD" zonder sluiting</b>'
+    )
+    unchanged = b'<a xmi:id="EAID_1"/>'
+    assert normalize_braced_ids(unchanged) is unchanged
