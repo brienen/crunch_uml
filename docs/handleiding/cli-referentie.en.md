@@ -91,7 +91,7 @@ crunch_uml export [-h] -f FILE -t TYPE [-pi IDS] [-xpi IDS]
 
 | Command | Options | Output |
 |---|---|---|
-| `detect` | `-f` file | One JSON line with `verdict`, `format` (`eaxmi`, `qea`, `artifact`, `unknown`), `accepted` and `code`. Reads at most 64 KiB (plus the last 64 KiB of an XML file). Exit code 0 = accepted, 2 = refused. |
+| `detect` | `-f` file | One JSON line with `verdict`, `format` (`eaxmi`, `qea`, `artifact`, `unknown`), `accepted` and `code`. Reads at most 64 KiB (plus the last 64 KiB of an XML file); an XML prolog that has not ended within that head is followed, and nothing else, up to 1 MiB, so a DOCTYPE behind a very long comment is still seen. Exit code 0 = accepted, 2 = refused. |
 | `pack` | `-f` file, `-t eaxmi\|qea` (optional), `-o` artifact | Writes a row artifact (`.cua.gz`): gzip JSON with every crunch_uml table, rows sorted by primary key, without the file name. One JSON line; exit code 0 = success, 2 = refused or empty input (`code`), 1 = `parse_failed`. |
 
 Refusal codes: `file_type_unknown`, `xmi_not_ea`, `xml_malformed`, `xml_forbidden`, `qea_unreadable`, `model_empty`, `parse_oom`.

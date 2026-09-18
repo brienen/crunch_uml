@@ -4,8 +4,12 @@ Decides what a file *is* - never trusting its name or extension - before any
 parser touches it. Rules:
 
 * Read at most 64 KiB from the start of the file, plus at most 64 KiB from its
-  end for XML (EA writes its ``xmi:Extension`` block last).
-* No DOM parser: XML is recognised with bounded regular expressions on text.
+  end for XML (EA writes its ``xmi:Extension`` block last). The one exception is
+  an XML prolog that has not ended within that head: a DOCTYPE hidden behind a
+  very long leading comment is still a DOCTYPE, so the prolog is followed - and
+  nothing else - up to :data:`PROLOG_BYTES`.
+* No DOM parser: XML is recognised with bounded regular expressions on text, and
+  the prolog with a small walk that stops at the root element.
 * SQLite files are opened read-only and immutable, and only ``sqlite_master``
   is read.
 * Standard library only, so the same rules can be mirrored elsewhere (the
@@ -28,6 +32,13 @@ import zlib
 from urllib.parse import quote
 
 SNIFF_BYTES = 64 * 1024
+
+#: How far detection follows an XML prolog that has not ended within the head.
+PROLOG_BYTES = 1024 * 1024
+
+_PROLOG_CLEAN = "clean"
+_PROLOG_DOCTYPE = "doctype"
+_PROLOG_TRUNCATED = "truncated"
 
 QEA_TABLES = frozenset(
     {
@@ -215,8 +226,60 @@ def _sniff_text(head):
     return head.decode("latin-1"), None
 
 
-def _detect_xml(text, tail_text, size):
-    if re.search(r"<!DOCTYPE|<!ENTITY", text):
+def _scan_prolog(text):
+    """Walk the XML prolog and say what precedes the root element.
+
+    Mirrors :func:`crunch_uml.xmlsafe.scan_prolog` with the standard library
+    only. The walk covers whitespace, processing instructions (the XML
+    declaration among them) and comments, and stops at the root element - so
+    the text ``<!DOCTYPE`` inside a comment or a CDATA section of the document
+    is never mistaken for a declaration, which the old blanket search over the
+    whole head was.
+    """
+    position = 0
+    while True:
+        while text[position : position + 1].isspace():
+            position += 1
+        if position >= len(text):
+            return _PROLOG_TRUNCATED
+        if text.startswith("<!--", position):
+            end = text.find("-->", position + 4)
+            if end < 0:
+                return _PROLOG_TRUNCATED
+            position = end + 3
+        elif text.startswith("<?", position):
+            end = text.find("?>", position + 2)
+            if end < 0:
+                return _PROLOG_TRUNCATED
+            position = end + 2
+        elif text.startswith("<!", position):
+            # A DOCTYPE is the only markup declaration XML allows here.
+            return _PROLOG_DOCTYPE
+        else:
+            return _PROLOG_CLEAN
+
+
+def _prolog_verdict(path, head_text):
+    """:func:`_scan_prolog` over the head, reading on while the prolog has not ended."""
+    verdict = _scan_prolog(head_text)
+    if verdict != _PROLOG_TRUNCATED:
+        return verdict
+    with open(path, "rb") as f:
+        buffer = b""
+        while len(buffer) < PROLOG_BYTES:
+            block = f.read(SNIFF_BYTES)
+            if not block:
+                break
+            buffer += block
+            text = buffer[3:] if buffer.startswith(b"\xef\xbb\xbf") else buffer
+            verdict = _scan_prolog(text.decode("latin-1"))
+            if verdict != _PROLOG_TRUNCATED:
+                return verdict
+    return _PROLOG_TRUNCATED
+
+
+def _detect_xml(path, text, tail_text, size):
+    if _prolog_verdict(path, text) == _PROLOG_DOCTYPE:
         return _result("xml-doctype", size)
     declared = _DECLARED_ENCODING_RE.search(text)
     encoding = declared.group(1) if declared else None
@@ -293,7 +356,7 @@ def detect(path):
     stripped = text.lstrip()
     if stripped.startswith("<"):
         tail_text, tail_refused = _sniff_text(tail)
-        return _detect_xml(text, tail_text if tail_refused is None else "", size)
+        return _detect_xml(path, text, tail_text if tail_refused is None else "", size)
     if stripped.startswith("{") or stripped.startswith("["):
         if set(_JSON_TABLE_KEY_RE.findall(text)) & CRUNCH_TABLES:
             return _result("crunch-json", size)

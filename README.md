@@ -204,7 +204,7 @@ crunch_uml [-sch SCHEMA] export -t <type> -f <file> [options]
 
 ### detect
 
-Classify a model file by its content, never by its extension. Reads at most 64 KiB (plus the last 64 KiB of an XML file), opens SQLite read-only, and prints one JSON line.
+Classify a model file by its content, never by its extension. Reads at most 64 KiB (plus the last 64 KiB of an XML file, and a prolog that has not ended there up to 1 MiB, so a DOCTYPE behind a very long comment is still seen), opens SQLite read-only, and prints one JSON line.
 
 ```bash
 crunch_uml detect -f model.qea

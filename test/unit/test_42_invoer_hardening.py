@@ -3,7 +3,9 @@
 * ``translators`` is imported lazily: it contacts the network on import, which
   made even ``crunch_uml -h`` fail offline without ``translators_default_region``.
 * EA-XMI goes through one hardened lxml parser: no entity expansion, no network,
-  no DOCTYPE, no silent recovery from broken XML.
+  no DOCTYPE, no silent recovery from broken XML. The DOCTYPE is refused on the
+  bytes, before libxml2 sees them, so the error class does not depend on the
+  libxml2 build.
 * chardet never reads more than 64 KiB.
 * A .qea is opened read-only and immutable.
 * The "table started empty" fast path is decided per schema, so a second schema
@@ -11,6 +13,7 @@
 """
 
 import hashlib
+import json
 import os
 import shutil
 import sqlite3
@@ -23,7 +26,7 @@ from lxml import etree
 from sqlalchemy import event
 
 import crunch_uml.db as db
-from crunch_uml import cli, xmlsafe
+from crunch_uml import cli, detect, pack, xmlsafe
 from crunch_uml.parsers import xmiparser
 from crunch_uml.parsers.xmiparser import load_xmi
 
@@ -113,15 +116,138 @@ def test_doctype_wordt_geweigerd(tmp_path, content):
         load_xmi(str(path))
 
 
-def test_doctype_achter_lang_commentaar_wordt_ook_geweigerd(tmp_path):
-    """The prolog scan reads 64 KiB; a DOCTYPE behind a longer comment is caught
-    on the parsed tree - and its entities are never expanded."""
+ENTITY_LOOP = """<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE lolz [
+  <!ENTITY a "&b;">
+  <!ENTITY b "&a;">
+]>
+<xmi:XMI xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmi:version="2.1"><x>&a;</x></xmi:XMI>
+"""
+
+BARE_ENTITY = """<?xml version="1.0" encoding="UTF-8"?>
+<!ENTITY xxe SYSTEM "file:///etc/passwd">
+<xmi:XMI xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmi:version="2.1"><a/></xmi:XMI>
+"""
+
+
+def _behind_long_comment(content):
+    """The same document with a comment longer than the sniff window in front of it."""
     comment = "<!--" + "x" * (xmlsafe.SNIFF_BYTES + 1000) + "-->\n"
-    content = BILLION_LAUGHS.replace("<!DOCTYPE", comment + "<!DOCTYPE", 1)
+    declaration = "<!DOCTYPE" if "<!DOCTYPE" in content else "<!ENTITY"
+    return content.replace(declaration, comment + declaration, 1)
+
+
+@pytest.mark.parametrize(
+    "content",
+    [BILLION_LAUGHS, EXTERNAL_ENTITY, ENTITY_LOOP, BARE_ENTITY],
+    ids=["billion-laughs", "external-entity", "entity-loop", "bare-entity"],
+)
+def test_doctype_achter_lang_commentaar_wordt_ook_geweigerd(tmp_path, content):
+    """A DOCTYPE behind a comment longer than the sniff window is still a DOCTYPE.
+
+    It used to be caught on the parsed tree, which made the error class depend on
+    the libxml2 build: a recursive entity in the internal subset is refused by
+    libxml2 itself ("Detected an entity reference loop") and the tree to inspect
+    never exists. The walk over the prolog answers before the parser runs.
+    """
     path = tmp_path / "evil_late.xml"
-    path.write_text(content, encoding="utf-8")
+    path.write_text(_behind_long_comment(content), encoding="utf-8")
     with pytest.raises(xmlsafe.XMLForbiddenError):
         load_xmi(str(path))
+
+
+def test_doctype_na_een_bom_wordt_geweigerd(tmp_path):
+    path = tmp_path / "bom.xml"
+    path.write_bytes(b"\xef\xbb\xbf" + EXTERNAL_ENTITY.encode("utf-8"))
+    with pytest.raises(xmlsafe.XMLForbiddenError):
+        load_xmi(str(path))
+
+
+@pytest.mark.parametrize("encoding", ["utf-16", "utf-16-le", "utf-32"])
+def test_doctype_in_utf16_of_utf32_wordt_geweigerd(tmp_path, encoding):
+    """`detect` refuses these on the byte-order mark; should one reach the parser
+    anyway, the walk sees the declaration in the decoded text."""
+    path = tmp_path / f"{encoding}.xml"
+    path.write_bytes(EXTERNAL_ENTITY.replace("UTF-8", encoding).encode(encoding))
+    with pytest.raises(xmlsafe.XMLForbiddenError):
+        load_xmi(str(path))
+
+
+DOCTYPE_AS_CONTENT = """<?xml version="1.0" encoding="UTF-8"?>
+<!-- an export may describe what it refuses: <!DOCTYPE x [<!ENTITY e "e">]> -->
+<xmi:XMI xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmi:version="2.1">
+  <!-- <!DOCTYPE inside a comment in the document -->
+  <a><![CDATA[<!DOCTYPE x [<!ENTITY e "e">]>]]></a>
+</xmi:XMI>
+"""
+
+
+def test_doctype_tekst_in_het_document_is_geen_doctype(tmp_path):
+    """Only a declaration before the root element counts; the words in a comment or
+    a CDATA section do not. The blanket search over the head refused this."""
+    path = tmp_path / "praat_erover.xml"
+    path.write_text(DOCTYPE_AS_CONTENT, encoding="utf-8")
+    root = load_xmi(str(path))
+    assert root.find("a").text == '<!DOCTYPE x [<!ENTITY e "e">]>'
+    assert detect.detect(str(path))["verdict"] != "xml-doctype"
+
+
+def test_onbekende_entiteit_zonder_doctype_blijft_malformed(tmp_path):
+    """The net under the walk catches DTD constructs only: an undefined entity in a
+    document without a DOCTYPE stays broken XML, not forbidden XML."""
+    path = tmp_path / "losse_entiteit.xml"
+    path.write_text('<?xml version="1.0"?>\n<a>&nbsp;</a>\n', encoding="utf-8")
+    with pytest.raises(etree.XMLSyntaxError):
+        load_xmi(str(path))
+
+
+@pytest.mark.parametrize(
+    "content",
+    [BILLION_LAUGHS, EXTERNAL_ENTITY, ENTITY_LOOP, _behind_long_comment(ENTITY_LOOP)],
+    ids=["billion-laughs", "external-entity", "entity-loop", "entity-loop-behind-comment"],
+)
+def test_pack_en_detect_weigeren_met_xml_forbidden(tmp_path, content):
+    """One code for the whole family, on every libxml2: the toolkit runner turns
+    `xml_forbidden` and `xml_malformed` into different messages for the user."""
+    source = tmp_path / "evil.xml"
+    source.write_text(content, encoding="utf-8")
+    assert detect.detect(str(source))["code"] == detect.CODE_XML_FORBIDDEN
+    exit_code, result = pack.pack(str(source), str(tmp_path / "x.cua.gz"))
+    assert (exit_code, result["code"]) == (2, detect.CODE_XML_FORBIDDEN)
+
+
+def test_pack_geeft_een_json_regel_met_xml_forbidden(tmp_path):
+    source = tmp_path / "evil.xml"
+    source.write_text(_behind_long_comment(ENTITY_LOOP), encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, "-m", "crunch_uml.cli", "pack", "-f", str(source), "-o", str(tmp_path / "x.cua.gz")],
+        env=_clean_env(),
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+    lines = [line for line in result.stdout.splitlines() if line.strip()]
+    assert result.returncode == 2, result.stderr
+    assert len(lines) == 1
+    assert json.loads(lines[0])["code"] == detect.CODE_XML_FORBIDDEN
+
+
+@pytest.mark.parametrize(
+    "data, verdict",
+    [
+        ('<?xml version="1.0"?><a/>', xmlsafe.PROLOG_CLEAN),
+        ("\ufeff<!DOCTYPE a><a/>", xmlsafe.PROLOG_DOCTYPE),
+        ("<!-- <a/> --> <!DOCTYPE a><a/>", xmlsafe.PROLOG_DOCTYPE),
+        ("<a><!DOCTYPE b></a>", xmlsafe.PROLOG_CLEAN),
+        ("  <!-- never closed", xmlsafe.PROLOG_TRUNCATED),
+        ("<?pi never closed", xmlsafe.PROLOG_TRUNCATED),
+        ("   ", xmlsafe.PROLOG_TRUNCATED),
+    ],
+    ids=["clean", "bom-doctype", "comment-then-doctype", "doctype-in-root", "open-comment", "open-pi", "blank"],
+)
+def test_prolog_wandeling_stopt_bij_het_wortelelement(data, verdict):
+    assert xmlsafe.scan_prolog(data) == verdict
+    assert xmlsafe.scan_prolog(data.encode("utf-8")) == verdict
 
 
 def test_import_met_doctype_faalt_zonder_iets_op_te_slaan(tmp_path):

@@ -197,37 +197,80 @@ def test_artefact_wordt_herkend(tmp_path):
     assert (result["format_version"], result["datamodel_version"], result["crunch_version"]) == (1, 1, "0.7.0")
 
 
-def test_leest_hooguit_64_kib_kop_en_staart(tmp_path, monkeypatch):
-    content = EA_XMI_HEAD + "<!--" + "y" * 5_000_000 + "-->\n<xmi:Extension/>\n</xmi:XMI>\n"
-    path = write(tmp_path, "huge.xml", content)
+class CountingFile:
+    """Wraps a file object so a test can see how much detection actually reads."""
+
+    def __init__(self, f, reads):
+        self._f = f
+        self._reads = reads
+
+    def read(self, n=-1):
+        assert n != -1, "detect must never read a whole file"
+        data = self._f.read(n)
+        self._reads.append(len(data))
+        return data
+
+    def seek(self, *args):
+        return self._f.seek(*args)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        self._f.close()
+
+
+def count_reads(monkeypatch):
+    """Patch ``detect.open`` to count every read; returns the list of read sizes."""
     reads = []
     real_open = open
 
-    class CountingFile:
-        def __init__(self, f):
-            self._f = f
+    def counting_open(path, mode="r", *args, **kwargs):
+        return CountingFile(real_open(path, mode, *args, **kwargs), reads)
 
-        def read(self, n=-1):
-            assert n != -1, "detect must never read a whole file"
-            data = self._f.read(n)
-            reads.append(len(data))
-            return data
+    monkeypatch.setattr(detect, "open", counting_open, raising=False)
+    return reads
 
-        def seek(self, *args):
-            return self._f.seek(*args)
 
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *exc):
-            self._f.close()
-
-    monkeypatch.setattr(
-        detect, "open", lambda p, mode="r", *a, **k: CountingFile(real_open(p, mode, *a, **k)), raising=False
-    )
+def test_leest_hooguit_64_kib_kop_en_staart(tmp_path, monkeypatch):
+    content = EA_XMI_HEAD + "<!--" + "y" * 5_000_000 + "-->\n<xmi:Extension/>\n</xmi:XMI>\n"
+    path = write(tmp_path, "huge.xml", content)
+    reads = count_reads(monkeypatch)
     result = detect.detect(path)
     assert result["verdict"] == "ea-xmi-2.1"
+    # The prolog ends in the head (the comment sits inside the root element), so
+    # the follow of a long prolog never starts.
     assert sum(reads) <= 2 * detect.SNIFF_BYTES
+
+
+def _doctype_behind_comment(comment_size):
+    comment = "<!--" + "y" * comment_size + "-->\n"
+    doctype = "<!DOCTYPE x [<!ENTITY e SYSTEM 'file:///etc/passwd'>]>\n"
+    return '<?xml version="1.0"?>\n' + comment + doctype + EA_XMI_HEAD + "<xmi:Extension/>\n</xmi:XMI>\n"
+
+
+def test_doctype_achter_een_lang_commentaar_wordt_gezien(tmp_path, monkeypatch):
+    """A prolog longer than the head is followed: a DOCTYPE hidden behind a comment
+    that outruns the sniff window is still a DOCTYPE."""
+    path = write(tmp_path, "laat.xml", _doctype_behind_comment(4 * detect.SNIFF_BYTES))
+    reads = count_reads(monkeypatch)
+
+    result = detect.detect(path)
+
+    assert (result["verdict"], result["code"]) == ("xml-doctype", "xml_forbidden")
+    assert sum(reads) <= 3 * detect.SNIFF_BYTES + detect.PROLOG_BYTES
+
+
+def test_de_prologwandeling_leest_niet_eindeloos_door(tmp_path, monkeypatch):
+    """Past PROLOG_BYTES detection stops following and says it cannot place the file;
+    a refusal either way, and never a read of the whole document."""
+    path = write(tmp_path, "eindeloos.xml", _doctype_behind_comment(2 * detect.PROLOG_BYTES))
+    reads = count_reads(monkeypatch)
+
+    result = detect.detect(path)
+
+    assert (result["verdict"], result["code"]) == ("xml-unknown", "file_type_unknown")
+    assert sum(reads) <= 3 * detect.SNIFF_BYTES + detect.PROLOG_BYTES
 
 
 def test_cli_geeft_een_json_regel(tmp_path):

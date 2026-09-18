@@ -91,7 +91,7 @@ crunch_uml export [-h] -f FILE -t TYPE [-pi IDS] [-xpi IDS]
 
 | Commando | Opties | Uitvoer |
 |---|---|---|
-| `detect` | `-f` bestand | Eén JSON-regel met `verdict`, `format` (`eaxmi`, `qea`, `artifact`, `unknown`), `accepted` en `code`. Leest hooguit 64 KiB (plus de laatste 64 KiB van een XML-bestand). Exitcode 0 = geaccepteerd, 2 = geweigerd. |
+| `detect` | `-f` bestand | Eén JSON-regel met `verdict`, `format` (`eaxmi`, `qea`, `artifact`, `unknown`), `accepted` en `code`. Leest hooguit 64 KiB (plus de laatste 64 KiB van een XML-bestand); loopt alleen een XML-prolog die daar nog niet klaar is verder na, tot 1 MiB, zodat een DOCTYPE achter een heel lang commentaar toch gezien wordt. Exitcode 0 = geaccepteerd, 2 = geweigerd. |
 | `pack` | `-f` bestand, `-t eaxmi\|qea` (optioneel), `-o` artefact | Schrijft een rij-artefact (`.cua.gz`): gzip-JSON met alle crunch_uml-tabellen, rijen gesorteerd op primaire sleutel, zonder bestandsnaam. Eén JSON-regel; exitcode 0 = gelukt, 2 = geweigerde of lege invoer (`code`), 1 = `parse_failed`. |
 
 Weigercodes: `file_type_unknown`, `xmi_not_ea`, `xml_malformed`, `xml_forbidden`, `qea_unreadable`, `model_empty`, `parse_oom`.
