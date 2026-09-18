@@ -60,6 +60,7 @@ _NON_TAG_COLUMNS = {
     "type_class_id",
     "primitive",
     "is_datatype",
+    "object_type",  # the element kind is the extension element's xmi:type (_EXTENSION_TYPES), never a tag
     "verplicht",
     "src_class_id",
     "dst_class_id",
@@ -72,6 +73,14 @@ _NON_TAG_COLUMNS = {
     "superclass_id",
     "subclass_id",
 }
+
+# EA element kinds that EA exports as a plain uml:Class in the uml:Model tree
+# but with their own type on the extension element (Class.object_type,
+# lowercase; the eaxmi parser reads it from there). Written back the same way
+# so a re-parse yields the same kind. Any other kind — None, 'class', the
+# 'enumeration' of a placeholder, or one this renderer does not know EA's
+# spelling of — is written as uml:Class, as before.
+_EXTENSION_TYPES = {"boundary": "uml:Boundary", "proxyconnector": "uml:ProxyConnector", "text": "uml:Text"}
 
 # EA derives the xmi:id of association ends from the association id by
 # replacing the first three hex characters with src/dst, e.g.
@@ -330,7 +339,7 @@ class XMIRenderer(Renderer):
             self._render_element_extension(elements, package, "uml:Package")
         for clazz in sorted(schema.get_all_classes(), key=lambda c: c.id):
             if clazz.name != const.ORPHAN_CLASS:
-                self._render_element_extension(elements, clazz, "uml:Class")
+                self._render_element_extension(elements, clazz, _EXTENSION_TYPES.get(clazz.object_type, "uml:Class"))
         for datatype in sorted(schema.get_all_datatypes(), key=lambda c: c.id):
             self._render_element_extension(elements, datatype, "uml:DataType")
         for enum in sorted(schema.get_all_enumerations(), key=lambda e: e.id):
@@ -399,13 +408,15 @@ class XMIRenderer(Renderer):
 
         _add_tags(element, obj)
 
-        if xmi_type in ("uml:Class", "uml:DataType"):
+        if xmi_type == "uml:Enumeration":
+            for literal in sorted(obj.literals, key=lambda lit: lit.id):
+                self._render_literal_extension(element, literal)
+        elif xmi_type != "uml:Package":
+            # Every class row: uml:Class, uml:DataType and the EA kinds of
+            # _EXTENSION_TYPES.
             for attribute in sorted(obj.attributes, key=lambda a: a.id):
                 if not is_association_end_attribute(attribute.id):
                     self._render_attribute_extension(element, attribute)
-        elif xmi_type == "uml:Enumeration":
-            for literal in sorted(obj.literals, key=lambda lit: lit.id):
-                self._render_literal_extension(element, literal)
 
     def _render_attribute_extension(self, parent, attribute):
         attr_el = etree.SubElement(parent, "attribute")

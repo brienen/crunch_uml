@@ -157,6 +157,40 @@ def test_booleans_zijn_json_booleans(packed):
     assert {row[hide] for row in diagrams["rows"]} == {True, False}
 
 
+def _column(table, name):
+    return table["columns"].index(name)
+
+
+def _kind_counts(artifact):
+    classes = artifact["tables"]["classes"]
+    kind = _column(classes, "object_type")
+    counts = {}
+    for row in classes["rows"]:
+        counts[row[kind]] = counts.get(row[kind], 0) + 1
+    return counts
+
+
+def test_object_type_reist_mee_in_het_artefact(packed):
+    """The consumer reads the element kind of every class row from the artifact: the
+    EA-XMI lands a Boundary and a ProxyConnector as classes and says so; the QEA never
+    imported them. Both say 'enumeration' for the placeholder of an enumeration end."""
+    fmt, *_, artifact, _ = packed
+    classes = artifact["tables"]["classes"]
+    name, kind = _column(classes, "name"), _column(classes, "object_type")
+    kinds = {row[name]: row[kind] for row in classes["rows"]}
+    expected = {
+        "Persoon": "class",
+        "Adres": "class",
+        "Huishouden": "class",
+        "Ingezetene": "class",
+        "Postcode": "datatype",
+        "<Orphan Class>": "enumeration",
+    }
+    if fmt == "eaxmi":
+        expected.update({"Grens": "boundary", "ProxyConnector": "proxyconnector"})
+    assert kinds == expected
+
+
 def test_pack_raakt_de_database_van_het_proces_niet(tmp_path):
     own = tmp_path / "eigen.db"
     instance = db.Database(f"sqlite:///{own}", db_create=True)
@@ -273,16 +307,22 @@ def test_cli_schrijft_een_json_regel_en_exitcode(tmp_path):
 # --------------------------------------------------------------------------
 
 
-@pytest.mark.slow
-@pytest.mark.parametrize("source, fmt", [(GGM251_XMI, "eaxmi"), (GGM251_QEA, "qea")], ids=["xmi", "qea"])
-def test_ggm251(tmp_path, source, fmt):
+@pytest.fixture(scope="module", params=[(GGM251_XMI, "eaxmi"), (GGM251_QEA, "qea")], ids=["xmi", "qea"])
+def ggm251(request, tmp_path_factory):
+    source, fmt = request.param
     if not os.path.exists(source):
         pytest.skip("GGM 2.5.1 source files not available")
-    output = tmp_path / "ggm.cua.gz"
+    output = tmp_path_factory.mktemp(f"ggm_{fmt}") / "ggm.cua.gz"
     exit_code, result = pack.pack(source, str(output), inputtype=fmt)
     assert exit_code == 0, result
-    assert os.path.getsize(output) < 8 * 1024 * 1024
     artifact, raw = read_artifact(output)
+    return fmt, output, artifact, raw
+
+
+@pytest.mark.slow
+def test_ggm251(ggm251):
+    fmt, output, artifact, raw = ggm251
+    assert os.path.getsize(output) < 8 * 1024 * 1024
     assert len(raw) < 32 * 1024 * 1024
     packages = artifact["tables"]["packages"]
     stereotype = packages["columns"].index("stereotype")
@@ -290,6 +330,28 @@ def test_ggm251(tmp_path, source, fmt):
     for table in ("attributes", "enumerationliterals"):
         id_column = artifact["tables"][table]["columns"].index("id")
         assert all(row[id_column] for row in artifact["tables"][table]["rows"]), table
+
+
+@pytest.mark.slow
+def test_ggm251_object_type(ggm251):
+    """GGM 2.5.1 holds 13 Boundary, 8 ProxyConnector and 1 Text elements (t_object rows in
+    the QEA, uml:Class in the XMI model tree). The eaxmi parser lands them as classes and
+    now says what they are; the qea parser never imported them, so they are absent there.
+    The three placeholders for association ends on an enumeration say 'enumeration' in
+    both formats; a placeholder for an end the export does not hold says nothing (NULL)."""
+    fmt, _, artifact, _ = ggm251
+    counts = _kind_counts(artifact)
+    assert counts["datatype"] == 11
+    assert counts["enumeration"] == 3
+    if fmt == "eaxmi":
+        assert counts["boundary"] == 13
+        assert counts["proxyconnector"] == 8
+        assert counts["text"] == 1
+        assert counts[None] == 7  # EAID_orphan_* placeholders: the other end is not in the export
+        assert counts["class"] == 955
+    else:
+        assert set(counts) == {"class", "datatype", "enumeration"}
+        assert counts["class"] == 1000
 
 
 @pytest.mark.parametrize("module", ["crunch_uml/artifact.py", "crunch_uml/detect.py"])

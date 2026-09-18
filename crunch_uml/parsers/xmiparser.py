@@ -146,6 +146,17 @@ def zetOpLeeg():
     return ""
 
 
+def object_type_of(xmi_type):
+    """``Class.object_type`` from an ``xmi:type`` value: ``uml:DataType`` -> ``datatype``.
+
+    The same normalization the qea parser applies to ``t_object.Object_Type``,
+    so both formats yield the same value for the same element. None stays None.
+    """
+    if not xmi_type:
+        return None
+    return xmi_type.removeprefix("uml:").lower() or None
+
+
 @ParserRegistry.register(
     "xmi",
     descr="XMI-Parser for strict XMI files. No extensions (like EA extensions) are parsed. Tested on XMI v2.1 spec ",
@@ -176,11 +187,15 @@ class XMIParser(Parser):
                 logger.debug(f"Package with {name} does not have id value: discarded")
 
         elif tp in ["uml:Class", "uml:DataType"]:
+            # object_type from the model tree is 'class' or 'datatype'; the EA
+            # extension knows better (Boundary, ProxyConnector, Text are all
+            # uml:Class here) and overrides it in phase 3 of the eaxmi parser.
             clazz = db.Class(
                 id=node.get("{" + ns["xmi"] + "}id"),
                 name=node.get("name"),
                 package_id=parent_package_id,
                 is_datatype=(tp == "uml:DataType"),
+                object_type=object_type_of(tp),
             )
             logger.debug(f"Class {clazz.name} met id {clazz.id} ingelezen met inhoud: {clazz}")
             schema.save(clazz)
@@ -328,7 +343,13 @@ class XMIParser(Parser):
                             clsid = typenode[0].get("{" + ns["xmi"] + "}idref")
                             cls = schema.get_class(clsid)
                             if cls is None:
-                                clazz = db.Class(id=clsid, name=const.ORPHAN_CLASS)
+                                # The end is no class (an enumeration, say): a
+                                # placeholder with that id, recording the kind
+                                # of the element it stands in for when the
+                                # export holds it.
+                                referenced = xmi_id_index.get(clsid)
+                                kind = None if referenced is None else referenced.get("{" + ns["xmi"] + "}type")
+                                clazz = db.Class(id=clsid, name=const.ORPHAN_CLASS, object_type=object_type_of(kind))
                                 schema.save(clazz)
                             if "src" in id:
                                 association.src_class_id = clsid  # type: ignore

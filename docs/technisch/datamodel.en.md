@@ -47,6 +47,7 @@ erDiagram
         string name
         string package_id FK
         boolean is_datatype
+        string object_type
         string definitie
         string bron
         string toelichting
@@ -177,6 +178,10 @@ UML Class entity with attributes and relationships.
 - `get_attribute_by_name()` — Look up attribute by name
 - `copy_attributes()` — Copy attributes to another class
 - `get_copy()` — Deep copy including attributes
+
+#### Element kind
+
+Since 0.7.0 the **nullable** column `object_type` says what kind of EA element a row came from, in lowercase: `t_object.Object_Type` in a QEA, the `xmi:type` of the extension element in an EA-XMI (the `uml:Model` tree exports a Boundary, ProxyConnector or Text as a plain `uml:Class`). Values: `class`, `datatype`, `boundary`, `proxyconnector`, `text`, … and `enumeration` for the placeholder class of an association end on an enumeration. NULL = unknown (an older database, a placeholder for an element outside the export, generic formats). It is information for the consumer, not a filter: which rows land in `classes` is unchanged — the qea parser reads only Class/DataType/Enumeration, the eaxmi parser also reads Boundary/ProxyConnector/Text as classes. The column arrives through the additive migration; `DATAMODEL_VERSION` stays 1. The xmi renderer writes the kind back the way EA exports it: `uml:Class` in the model tree, the kind as the extension element's `xmi:type` (see `renderers/EA_QUIRKS.md`).
 
 ### Attribute
 

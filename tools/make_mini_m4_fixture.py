@@ -12,8 +12,10 @@ every EA quirk crunch_uml 0.7.0 fixed, in both source formats:
   one of them without a GUID);
 * an enumeration whose GUID has a doubled brace pair ({{...}} in the QEA,
   EAID_{...} in the XMI), referenced as an attribute type;
-* a Boundary on a diagram (QEA: t_object 'Boundary'; XMI: uml:Class with an
-  extension element of type uml:Boundary);
+* a Boundary and a ProxyConnector on a diagram (QEA: t_object 'Boundary' /
+  'ProxyConnector'; XMI: uml:Class in the model tree with an extension element
+  of type uml:Boundary / uml:ProxyConnector), so ``classes.object_type`` has
+  something to record;
 * associations with an enumeration at one end, in both directions (the GGM has
   them); crunch_uml keeps association ends in ``classes``, so both parsers add
   one ``<Orphan Class>`` placeholder with the enumeration's id;
@@ -21,8 +23,9 @@ every EA quirk crunch_uml 0.7.0 fixed, in both source formats:
   (AttPub=0;...) on another, and a non-class diagram type.
 
 Both files describe the same model the way EA writes it, so the two parsers
-must agree on everything except the documented Boundary asymmetry (the eaxmi
-parser still reads it as a class). The QEA table definitions are copied from
+must agree on everything except the documented asymmetry for the Boundary and
+the ProxyConnector (the eaxmi parser reads them as classes, the qea parser does
+not import them). The QEA table definitions are copied from
 test/data/Monumenten.qea, an EA-written repository.
 
 Run from the repository root:  python tools/make_mini_m4_fixture.py
@@ -69,6 +72,7 @@ def eaid(g, prefix="EAID"):
 PKG_ROOT, PKG_KERN, PKG_OVERIG = guid(1), guid(2), guid(3)
 PERSOON, ADRES, HUISHOUDEN, INGEZETENE, GRENS, POSTCODE = (guid(n) for n in range(10, 16))
 GESLACHT_INNER = guid(16)
+PROXY = guid(17)
 GESLACHT_QEA = "{" + GESLACHT_INNER + "}"  # doubled braces, as found in the GGM
 ATTR_NAAM, ATTR_GESLACHT, ATTR_POSTCODE = guid(20), guid(21), guid(22)
 LIT_MAN, LIT_ONBEKEND = guid(23), guid(24)
@@ -87,6 +91,7 @@ NODE_HIDE_ATTS = "AttPro=0;AttPri=0;AttPub=0;AttPkg=0;DUID=4D4E0001;"
 
 # QEA object ids
 O_KERN, O_OVERIG, O_PERSOON, O_ADRES, O_HUISHOUDEN, O_INGEZETENE, O_GRENS, O_POSTCODE, O_GESLACHT = range(1, 10)
+O_PROXY = 10
 
 OBJECTS = [
     # Object_ID, Object_Type, Name, Package_ID, ea_guid, Note, Stereotype, Alias, Phase, PDATA1
@@ -99,6 +104,8 @@ OBJECTS = [
     (O_GRENS, "Boundary", "Grens", 2, GRENS, None, None, None, "1.0", None),
     (O_POSTCODE, "DataType", "Postcode", 3, POSTCODE, None, None, None, "1.0", None),
     (O_GESLACHT, "Enumeration", "Geslacht", 2, GESLACHT_QEA, None, None, None, "1.0", None),
+    # A proxy connector for Huishouden, as EA draws one on a diagram (t_object.Classifier = Huishouden).
+    (O_PROXY, "ProxyConnector", "ProxyConnector", 2, PROXY, None, None, None, "1.0", None),
 ]
 
 ATTRIBUTES = [
@@ -141,6 +148,7 @@ DIAGRAM_OBJECTS = [
     (1, O_HUISHOUDEN, 50, 220, 120, 60, 3, "DUID=4D4E0012;"),
     (1, O_GESLACHT, 300, 220, 110, 70, 4, "DUID=4D4E0013;"),
     (1, O_GRENS, 20, 10, 500, 400, 5, "DUID=4D4E0014;"),
+    (1, O_PROXY, 450, 120, 30, 30, 6, "DUID=4D4E0017;"),
     (2, O_PERSOON, 60, 60, 150, 100, 1, NODE_HIDE_ATTS),
     (2, O_INGEZETENE, 60, 260, 120, 60, 2, "DUID=4D4E0015;"),
     (3, O_POSTCODE, 40, 40, 100, 50, 1, "DUID=4D4E0016;"),
@@ -193,8 +201,8 @@ def write_qea(path):
     for obj_id, obj_type, name, pkg, g, note, stereo, alias, phase, pdata1 in OBJECTS:
         con.execute(
             "INSERT INTO t_object (Object_ID, Object_Type, Name, Package_ID, ea_guid, Note, Stereotype, Author,"
-            " Version, CreatedDate, ModifiedDate, Status, Alias, Phase, PDATA1)"
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            " Version, CreatedDate, ModifiedDate, Status, Alias, Phase, PDATA1, Classifier)"
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
                 obj_id,
                 obj_type,
@@ -211,6 +219,7 @@ def write_qea(path):
                 alias,
                 phase,
                 pdata1,
+                O_HUISHOUDEN if obj_type == "ProxyConnector" else 0,
             ),
         )
     for attr_id, obj_id, name, pos, g, typ, classifier, style_ex in ATTRIBUTES:
@@ -303,6 +312,7 @@ def write_xmi(path):
         "huishouden": eaid(HUISHOUDEN),
         "ingezetene": eaid(INGEZETENE),
         "grens": eaid(GRENS),
+        "proxy": eaid(PROXY),
         "postcode": eaid(POSTCODE),
         "geslacht": "EAID_{" + GESLACHT_INNER.strip("{}").replace("-", "_") + "}",
         "assoc": eaid(ASSOC),
@@ -317,6 +327,7 @@ def write_xmi(path):
         O_HUISHOUDEN: ids["huishouden"],
         O_INGEZETENE: ids["ingezetene"],
         O_GRENS: ids["grens"],
+        O_PROXY: ids["proxy"],
         O_POSTCODE: ids["postcode"],
         O_GESLACHT: ids["geslacht"],
     }
@@ -390,8 +401,11 @@ def write_xmi(path):
     )
     w(f'\t\t\t\t\t<generalization {a(xmi__type="uml:Generalization", xmi__id=ids["gen"], general=ids["persoon"])}/>')
     w("\t\t\t\t</packagedElement>")
-    # Boundary: EA exports it as a plain uml:Class in the model tree
+    # Boundary and ProxyConnector: EA exports both as a plain uml:Class in the model tree
     w(f'\t\t\t\t<packagedElement {a(xmi__type="uml:Class", xmi__id=ids["grens"], name="Grens", visibility="public")}/>')
+    w(
+        f'\t\t\t\t<packagedElement {a(xmi__type="uml:Class", xmi__id=ids["proxy"], name="ProxyConnector", visibility="public")}/>'
+    )
     # Enumeration with a braced id; IsLiteral=1 -> ownedLiteral, others -> ownedAttribute uml:Property
     w(
         f'\t\t\t\t<packagedElement {a(xmi__type="uml:Enumeration", xmi__id=ids["geslacht"], name="Geslacht", visibility="public")}>'
@@ -511,9 +525,13 @@ def write_xmi(path):
             "DataType": "uml:DataType",
             "Enumeration": "uml:Enumeration",
             "Boundary": "uml:Boundary",
+            "ProxyConnector": "uml:ProxyConnector",
         }[obj_type]
         package_id = ids["kern"] if pkg == 2 else ids["overig"]
-        w(f'\t\t\t<element {a(xmi__idref=element_id, xmi__type=xmi_type, name=name, scope="public")}>')
+        classifier = ids["huishouden"] if obj_type == "ProxyConnector" else None
+        w(
+            f'\t\t\t<element {a(xmi__idref=element_id, xmi__type=xmi_type, name=name, scope="public", classifier=classifier)}>'
+        )
         w(f'\t\t\t\t<model {a(package=package_id, tpos="0", ea_localid=str(obj_id), ea_eleType="element")}/>')
         w(
             f'\t\t\t\t<properties {a(documentation=note, isSpecification="false", sType=obj_type, nType="0", scope="public", stereotype=stereo)}/>'

@@ -43,6 +43,7 @@
 					<generalization xmi:type="uml:Generalization" xmi:id="EAID_4D4E0020_0000_4000_8000_000000000020" general="EAID_4D4E000A_0000_4000_8000_00000000000A"/>
 				</packagedElement>
 				<packagedElement xmi:type="uml:Class" xmi:id="EAID_4D4E000E_0000_4000_8000_00000000000E" name="Grens" visibility="public"/>
+				<packagedElement xmi:type="uml:Class" xmi:id="EAID_4D4E0011_0000_4000_8000_000000000011" name="ProxyConnector" visibility="public"/>
 				<packagedElement xmi:type="uml:Enumeration" xmi:id="EAID_{4D4E0010_0000_4000_8000_000000000010}" name="Geslacht" visibility="public">
 					<ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="EAID_4D4E0017_0000_4000_8000_000000000017" name="man" visibility="public"/>
 					<ownedAttribute xmi:type="uml:Property" xmi:id="" name="vrouw" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
@@ -291,6 +292,12 @@
 					</attribute>
 				</attributes>
 			</element>
+			<element xmi:idref="EAID_4D4E0011_0000_4000_8000_000000000011" xmi:type="uml:ProxyConnector" name="ProxyConnector" scope="public" classifier="EAID_4D4E000C_0000_4000_8000_00000000000C">
+				<model package="EAPK_4D4E0002_0000_4000_8000_000000000002" tpos="0" ea_localid="10" ea_eleType="element"/>
+				<properties isSpecification="false" sType="ProxyConnector" nType="0" scope="public"/>
+				<project author="crunch_uml tests" version="1.0" phase="1.0" created="2026-09-17 12:00:00" modified="2026-09-17 12:30:00" complexity="1" status="Proposed"/>
+				<tags/>
+			</element>
 		</elements>
 		<connectors>
 			<connector xmi:idref="EAID_4D4E001E_0000_4000_8000_00000000001E" name="woont op">
@@ -413,6 +420,7 @@
 					<element geometry="Left=50;Top=220;Right=170;Bottom=280;" subject="EAID_4D4E000C_0000_4000_8000_00000000000C" seqno="3" style="DUID=4D4E0012;"/>
 					<element geometry="Left=300;Top=220;Right=410;Bottom=290;" subject="EAID_{4D4E0010_0000_4000_8000_000000000010}" seqno="4" style="DUID=4D4E0013;"/>
 					<element geometry="Left=20;Top=10;Right=520;Bottom=410;" subject="EAID_4D4E000E_0000_4000_8000_00000000000E" seqno="5" style="DUID=4D4E0014;"/>
+					<element geometry="Left=450;Top=120;Right=480;Bottom=150;" subject="EAID_4D4E0011_0000_4000_8000_000000000011" seqno="6" style="DUID=4D4E0017;"/>
 					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=235:-80$235:-70$;" subject="EAID_4D4E001E_0000_4000_8000_00000000001E" style="Mode=3;EOID=4D4E0011;SOID=4D4E0010;Color=-1;LWidth=0;Hidden=0;"/>
 					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_4D4E001F_0000_4000_8000_00000000001F" style="Mode=3;EOID=4D4E0012;SOID=4D4E0010;Color=-1;LWidth=0;Hidden=0;"/>
 				</elements>

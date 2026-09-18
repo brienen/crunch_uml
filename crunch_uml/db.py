@@ -735,6 +735,16 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
     authentiek = Column(String)
     nullable = Column(String)
     is_datatype = Column(Boolean, default=False)
+    # The kind of EA element this row came from, lowercase: QEA
+    # t_object.Object_Type, EA-XMI the xmi:type of the extension element (the
+    # uml:Model tree only says uml:Class/uml:DataType). 'class', 'datatype',
+    # 'boundary', 'proxyconnector', 'text', ... and 'enumeration' for the
+    # placeholder of an association end on an enumeration. Information for
+    # the consumer, not a filter: which rows land here is unchanged. NULL when
+    # unknown (a database written before the column, a placeholder for an
+    # element outside the export, generic formats). Nullable, so it rides on
+    # the additive migration; DATAMODEL_VERSION stays 1.
+    object_type = Column(String, nullable=True)
 
     # @hybrid_property
     # def domain(self):

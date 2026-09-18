@@ -5,7 +5,7 @@ import crunch_uml.schema as sch
 from crunch_uml import ea_geometry as geo
 from crunch_uml import ea_ids
 from crunch_uml.parsers.parser import ParserRegistry, copy_values, fixtag
-from crunch_uml.parsers.xmiparser import XMIParser
+from crunch_uml.parsers.xmiparser import XMIParser, object_type_of
 
 logger = logging.getLogger()
 
@@ -142,6 +142,32 @@ class EAXMIParser(XMIParser):
             project = clazzref.xpath("./project")
             copy_values(project, clazz)
             copy_values(properties, clazz)
+
+        # The kind of element behind every class row. The uml:Model tree
+        # exports a Boundary, ProxyConnector or Text as a plain uml:Class (and
+        # phase 1 read it as one); the extension element carries the EA kind
+        # in its xmi:type, like t_object.Object_Type in a QEA. The rows stay
+        # classes: this records what they are, it does not filter them. A
+        # placeholder class for an association end on an enumeration gets
+        # 'enumeration' from the enumeration's own extension element.
+        logger.info("Processing element kinds of classes")
+        kinds: dict = {}
+        for elementref in extension.xpath(".//element[@xmi:idref and @xmi:type]", namespaces=ns):  # type: ignore
+            idref = elementref.get("{" + ns["xmi"] + "}idref")
+            clazz = classes_by_id.get(idref) or datatypes_by_id.get(idref)
+            if clazz is None:
+                continue
+            kind = object_type_of(elementref.get("{" + ns["xmi"] + "}type"))
+            if kind is None:
+                continue
+            if kind != clazz.object_type:
+                kinds[kind] = kinds.get(kind, 0) + 1
+            clazz.object_type = kind
+        if kinds:
+            logger.info(
+                "Element kinds from the EA extension that differ from the model tree: "
+                + ", ".join(f"{kind} {count}" for kind, count in sorted(kinds.items()))
+            )
 
         logger.info("Processing references to enumerations")
         enumrefs = extension.xpath(".//element[@xmi:type='uml:Enumeration' and @xmi:idref]", namespaces=ns)  # type: ignore

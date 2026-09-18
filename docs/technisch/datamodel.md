@@ -47,6 +47,7 @@ erDiagram
         string name
         string package_id FK
         boolean is_datatype
+        string object_type
         string definitie
         string bron
         string toelichting
@@ -177,6 +178,10 @@ UML Class entiteit met attributen en relaties.
 - `get_attribute_by_name()` — Zoek attribuut op naam
 - `copy_attributes()` — Kopieer attributen naar andere class
 - `get_copy()` — Deep copy inclusief attributen
+
+#### Elementsoort
+
+Sinds 0.7.0 zegt de **nullable** kolom `object_type` van welke soort EA-element een rij afkomstig is, in kleine letters: `t_object.Object_Type` uit een QEA, het `xmi:type` van het extensie-element uit een EA-XMI (de `uml:Model`-boom exporteert een Boundary, ProxyConnector of Text als gewone `uml:Class`). Waarden: `class`, `datatype`, `boundary`, `proxyconnector`, `text`, … en `enumeration` voor de plaatshouderklasse van een associatie-einde op een enumeratie. NULL = onbekend (oudere database, plaatshouder voor een element buiten de export, generieke formaten). Het is informatie voor de afnemer, geen filter: welke rijen in `classes` landen verandert niet — de qea-parser leest alleen Class/DataType/Enumeration, de eaxmi-parser leest ook Boundary/ProxyConnector/Text als klasse. De kolom komt er via de additieve migratie bij; `DATAMODEL_VERSION` blijft 1. De xmi-renderer schrijft de soort terug zoals EA het exporteert: `uml:Class` in de modelboom, de soort als `xmi:type` van het extensie-element (zie `renderers/EA_QUIRKS.md`).
 
 ### Attribute
 

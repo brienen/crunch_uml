@@ -3,7 +3,9 @@
 test/data/MiniM4.qea and test/data/MiniM4.xml describe the same model (generated
 by tools/make_mini_m4_fixture.py). The tests pin what both parsers must yield,
 plus the one documented asymmetry: the eaxmi parser still reads an EA Boundary
-as a class (the QEA marks it t_object 'Boundary' and it is skipped there).
+and ProxyConnector as a class (the QEA marks them t_object 'Boundary' /
+'ProxyConnector' and skips them). Since 0.7.0 every class row says what kind of
+element it came from (``classes.object_type``), so a consumer can tell.
 
 Every import is also checked for referential integrity: Postgres enforces the
 foreign keys during an import, SQLite does not unless asked.
@@ -26,6 +28,7 @@ HUISHOUDEN = "EAID_4D4E000C_0000_4000_8000_00000000000C"
 GRENS = "EAID_4D4E000E_0000_4000_8000_00000000000E"
 POSTCODE = "EAID_4D4E000F_0000_4000_8000_00000000000F"
 GESLACHT = "EAID_4D4E0010_0000_4000_8000_000000000010"
+PROXY = "EAID_4D4E0011_0000_4000_8000_000000000011"
 AGGREGATIE = "EAID_4D4E001F_0000_4000_8000_00000000001F"
 NAAR_ENUMERATIE = "EAID_4D4E0021_0000_4000_8000_000000000021"
 VAN_ENUMERATIE = "EAID_4D4E0022_0000_4000_8000_000000000022"
@@ -213,11 +216,36 @@ def test_referentiele_integriteit(mini):
     assert [tuple(r) for r in con.execute("PRAGMA foreign_key_check")] == []
 
 
-def test_boundary_asymmetrie_is_gedocumenteerd(mini):
-    """QEA skips the Boundary; eaxmi still reads it as a class (filtering it is later work)."""
+@pytest.mark.parametrize("element", [GRENS, PROXY], ids=["boundary", "proxyconnector"])
+def test_boundary_asymmetrie_is_gedocumenteerd(mini, element):
+    """QEA skips the Boundary and the ProxyConnector; eaxmi still reads them as classes
+    (filtering them is the consumer's call, on ``object_type``)."""
     parser, con = mini
-    grens = con.execute("SELECT COUNT(*) FROM classes WHERE id = ?", (GRENS,)).fetchone()[0]
-    assert grens == (1 if parser == "eaxmi" else 0)
+    count = con.execute("SELECT COUNT(*) FROM classes WHERE id = ?", (element,)).fetchone()[0]
+    assert count == (1 if parser == "eaxmi" else 0)
+
+
+def test_object_type_zegt_wat_voor_element_een_klasse_was(mini):
+    """``classes.object_type`` is the EA element kind in lowercase: ``t_object.Object_Type``
+    in a QEA, the ``xmi:type`` of the EA extension element in an EA-XMI (the uml:Model tree
+    exports a Boundary or ProxyConnector as a plain uml:Class). The placeholder for an
+    association end on an enumeration records 'enumeration'. Same value in both formats
+    for every row both formats have; the rows themselves are unchanged (no filter)."""
+    parser, con = mini
+    kinds = {r["id"]: r["object_type"] for r in con.execute("SELECT id, object_type FROM classes")}
+    expected = {
+        PERSOON: "class",
+        HUISHOUDEN: "class",
+        "EAID_4D4E000B_0000_4000_8000_00000000000B": "class",  # Adres
+        "EAID_4D4E000D_0000_4000_8000_00000000000D": "class",  # Ingezetene
+        POSTCODE: "datatype",
+        GESLACHT: "enumeration",
+    }
+    if parser == "eaxmi":
+        expected[GRENS] = "boundary"
+        expected[PROXY] = "proxyconnector"
+    assert kinds == expected
+    assert con.execute("SELECT is_datatype FROM classes WHERE id = ?", (POSTCODE,)).fetchone()[0] == 1
 
 
 def test_beide_formaten_leveren_dezelfde_ids(pair):
@@ -236,7 +264,10 @@ def test_beide_formaten_leveren_dezelfde_ids(pair):
         assert q == x, table
     q_classes = {r[0] for r in qea.execute("SELECT id FROM classes")}
     x_classes = {r[0] for r in xmi.execute("SELECT id FROM classes")}
-    assert x_classes - q_classes == {GRENS}
+    assert x_classes - q_classes == {GRENS, PROXY}
+    q_kinds = {r[0]: r[1] for r in qea.execute("SELECT id, object_type FROM classes")}
+    x_kinds = {r[0]: r[1] for r in xmi.execute("SELECT id, object_type FROM classes")}
+    assert {k: v for k, v in x_kinds.items() if k in q_kinds} == q_kinds
 
 
 def test_parse_is_deterministisch(tmp_path):

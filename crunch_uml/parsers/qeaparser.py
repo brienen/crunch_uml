@@ -189,16 +189,20 @@ class QEAParser(Parser):
             )
         ).fetchall()
 
-        # Build lookups: Object_ID (int) -> EAID_ string, and the ids that land
-        # in `classes` (connector ends must, see _phase4_connectors).
+        # Build lookups: Object_ID (int) -> EAID_ string, the ids that land
+        # in `classes` (connector ends must, see _phase4_connectors), and the
+        # lowercase Object_Type per id (Class.object_type; a placeholder class
+        # for an enumeration end records 'enumeration').
         self._obj_id_map = {}
         self._class_ids = set()
+        self._obj_type_map = {}
         for row in rows:
             obj_id, obj_type, name, package_id, ea_guid = row[:5]
             eaid = guid_to_eaid(ea_guid)
             if eaid is None:
                 eaid = self._minter.mint(self._pkg_id_map.get(package_id), name, kind="element")
             self._obj_id_map[obj_id] = eaid
+            self._obj_type_map[eaid] = obj_type.lower()
             if obj_type != "Enumeration":
                 self._class_ids.add(eaid)
 
@@ -246,6 +250,7 @@ class QEAParser(Parser):
                     name=name,
                     package_id=pkg_eapk,
                     is_datatype=(obj_type == "DataType"),
+                    object_type=self._obj_type_map[eaid],
                     definitie=normalize_newlines(note),
                     stereotype=stereotype,
                     author=author,
@@ -457,7 +462,9 @@ class QEAParser(Parser):
         element, without package. Using that rule here keeps both formats on the
         same rows, and the enumeration itself is still imported unchanged.
         Without it the association references a missing class: SQLite accepts
-        that, Postgres rejects the import on fk_dst_class.
+        that, Postgres rejects the import on fk_dst_class. The placeholder
+        records the kind of the element it stands in for (``object_type``,
+        'enumeration'), so a consumer can tell it from a real class.
         """
         if end_eaid in self._class_ids:
             return
@@ -468,7 +475,7 @@ class QEAParser(Parser):
         if end_eaid in self._placeholder_ids:
             return
         self._placeholder_ids.add(end_eaid)
-        schema.save(db.Class(id=end_eaid, name=const.ORPHAN_CLASS))
+        schema.save(db.Class(id=end_eaid, name=const.ORPHAN_CLASS, object_type=self._obj_type_map.get(end_eaid)))
 
     def _phase5_tagged_values(self, conn, schema: sch.Schema):
         """Apply tagged values from t_objectproperties, t_attributetag, t_connectortag.
