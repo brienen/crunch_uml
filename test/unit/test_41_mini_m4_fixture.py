@@ -423,3 +423,23 @@ def test_accolade_ids_worden_in_de_tekst_genormaliseerd():
     )
     unchanged = b'<a xmi:id="EAID_1"/>'
     assert normalize_braced_ids(unchanged) is unchanged
+
+
+@pytest.mark.parametrize("source,parser", [(MINI_QEA, "qea"), (MINI_XMI, "eaxmi")])
+def test_synthetic_ids_are_reported_once_not_per_element(source, parser, tmp_path, caplog):
+    """A model can have hundreds of members without a guid (InkomenMIM: 827). The
+    import says so in one WARNING with the count; each minted id is DEBUG, so it
+    does not bury every other warning in the log of an import or of the runner."""
+    import logging
+
+    with caplog.at_level(logging.DEBUG):
+        parse_into(tmp_path / "log.db", source, parser)
+
+    about_ids = [r for r in caplog.records if "synthetic id" in r.getMessage()]
+    warnings = [r for r in about_ids if r.levelno >= logging.WARNING]
+    per_element = [r for r in about_ids if "has no source id" in r.getMessage()]
+
+    assert len(warnings) == 1, [r.getMessage() for r in warnings]
+    assert "4 elements" in warnings[0].getMessage()
+    assert len(per_element) == 4
+    assert all(r.levelno == logging.DEBUG for r in per_element)

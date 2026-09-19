@@ -71,7 +71,9 @@ def placeholder_class_id(association_id, member_end_id):
 
 class SyntheticIdMinter:
     """Mints :func:`synthetic_id` values, tracking the duplicate index per owner
-    and name, and logs one WARNING per minted id."""
+    and name. Each minted id is logged at DEBUG; the parsers log one WARNING per
+    import with :attr:`count`, so a model with hundreds of GUID-less members
+    (InkomenMIM: 827) does not bury every other warning."""
 
     def __init__(self, source_label):
         self._source_label = source_label
@@ -84,7 +86,7 @@ class SyntheticIdMinter:
         self._seen[key] = dup_index + 1
         new_id = synthetic_id(owner_id, name, dup_index)
         self.count += 1
-        logger.warning(
+        logger.debug(
             f"{self._source_label}: {kind} '{name}' of owner {owner_id} has no source id; using synthetic id {new_id}"
         )
         return new_id
