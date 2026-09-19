@@ -202,6 +202,28 @@ crunch_uml [-sch SCHEMA] export -t <type> -f <file> [options]
 | `earepo` | Update existing EA v16 repository, including diagram membership and layout |
 | `eamimrepo` | Update EA repository with MIM tags |
 
+### detect
+
+Classify a model file by its content, never by its extension. Reads at most 64 KiB (plus the last 64 KiB of an XML file, and a prolog that has not ended there up to 1 MiB, so a DOCTYPE behind a very long comment is still seen), opens SQLite read-only, and prints one JSON line.
+
+```bash
+crunch_uml detect -f model.qea
+# {"verdict": "qea", "format": "qea", "accepted": true, "code": null, "size": 51961856, ...}
+```
+
+Accepted: `eaxmi` (EA-XMI 2.1 from Enterprise Architect with its extension block), `qea` (EA repository in rollback-journal mode with the ten `t_*` tables and no views or triggers) and `artifact` (a row artifact written by `pack`). Anything else gets a `verdict` and a refusal `code` (`file_type_unknown`, `xmi_not_ea`, `xml_malformed`, `xml_forbidden`, `qea_unreadable`). Exit code 0 when accepted, 2 when refused.
+
+### pack
+
+Parse an Enterprise Architect model into a **row artifact** (`.cua.gz`): gzip-compressed JSON with every crunch_uml table, readable with nothing but a standard library.
+
+```bash
+crunch_uml pack -f model.qea -o model.cua.gz        # format as detected
+crunch_uml pack -f model.xml -t eaxmi -o model.cua.gz
+```
+
+`pack` runs `detect`, parses into a fresh temporary SQLite and writes the artifact: a header (`format` = `semtk-crunch-artifact`, `format_version`, `datamodel_version`, `producer`, `source` with format, exporter, SHA-256 and size but never the file name, `capabilities`, `run`) and `tables` with columns and rows sorted by primary key. It prints one JSON line; exit code 0 on success, 2 with a `code` for refused or empty input (including `model_empty` for a model without classes), 1 with `parse_failed` otherwise.
+
 ## Multi-Schema: Version Comparison & Translations
 
 One of the most powerful features is multi-schema support. Import the same model multiple times into different schemas to compare versions or create translations:

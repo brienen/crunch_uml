@@ -1,24 +1,44 @@
 import logging
+import os
 import re
 from collections import defaultdict
 
 import chardet
 import requests
-from lxml import etree
 
 import crunch_uml.schema as sch
-from crunch_uml import const, db, util
+from crunch_uml import const, db, ea_ids, xmlsafe
 from crunch_uml.exceptions import CrunchException
 from crunch_uml.parsers.parser import Parser, ParserRegistry
 
 logger = logging.getLogger()
 
+_DECLARED_ENCODING_RE = re.compile(br'<\?xml[^>]*encoding=["\']([^"\']+)["\']')
+_HEADER_ENCODING_RE = re.compile(r'(<\?xml[^>]*encoding=["\'])([^"\']+)(["\'])', flags=re.IGNORECASE)
+
+# Elements that become rows; only these get a synthetic id when EA exported them
+# with xmi:id="" (their lowerValue/upperValue children are not stored).
+_ROW_ELEMENT_TAGS = ("packagedElement", "ownedAttribute", "ownedLiteral", "ownedEnd", "generalization")
+# A quoted EA id whose GUID carried braces: "EAID_{X}" or "EAID_{{X}}" -> "EAID_X".
+_BRACED_ID_RE = re.compile(rb'"(EA(?:ID|PK)_)\{+([^"{}<>]*)\}+"')
+
 
 def extract_declared_encoding(xml_bytes):
-    match = re.search(br'<\?xml[^>]*encoding=["\']([^"\']+)["\']', xml_bytes)
+    # The XML declaration is at the very start of the document: never scan
+    # the whole file for it.
+    match = _DECLARED_ENCODING_RE.search(xml_bytes[: xmlsafe.SNIFF_BYTES])
     if match:
         return match.group(1).decode("ascii")
     return None
+
+
+def detect_encoding(raw):
+    """Guess the encoding from at most the first 64 KiB.
+
+    chardet over a complete multi-megabyte model costs tens of seconds of CPU
+    and makes the parse cost depend on a header an uploader controls.
+    """
+    return chardet.detect(raw[: xmlsafe.SNIFF_BYTES])["encoding"]
 
 
 def load_xmi(source):
@@ -30,29 +50,81 @@ def load_xmi(source):
             raw = f.read()
 
     declared_encoding = extract_declared_encoding(raw)
-    # chardet.detect() leest het volledige bestand en schaalt lineair met de
-    # omvang: op een XMI van tientallen MB's kost dat het leeuwendeel van de
-    # importtijd. Zodra de XML-declaratie een encoding geeft wint die toch,
-    # dus alleen detecteren als de declaratie ontbreekt (of verderop, als de
-    # foutmelding de gedetecteerde waarde nodig heeft).
-    detected_encoding = None if declared_encoding else chardet.detect(raw)["encoding"]
+    # Only detect when the declaration names no encoding; the detected value
+    # is also needed further down when the declared one fails.
+    detected_encoding = None if declared_encoding else detect_encoding(raw)
     used_encoding = declared_encoding or detected_encoding or const.ENCODING
 
     try:
         text = raw.decode(used_encoding).lstrip('\ufeff')
-        # Corrigeer header
-        text = re.sub(r'(<\?xml[^>]*encoding=["\'])([^"\']+)(["\'])', r'\1utf-8\3', text, flags=re.IGNORECASE)
-        utf8_bytes = text.encode(const.ENCODING)
-        parser = etree.XMLParser(recover=True, encoding=const.ENCODING)
-        return etree.fromstring(utf8_bytes, parser)
     except Exception as e:
         if detected_encoding is None:
             # Uitzonderingspad: hier is de detectie de moeite waard, want ze
             # vertelt waarom de gedeclareerde encoding niet werkte.
-            detected_encoding = chardet.detect(raw)["encoding"]
+            detected_encoding = detect_encoding(raw)
         raise RuntimeError(
             f"Probleem met XMI inlezen (declared: {declared_encoding}, detected: {detected_encoding}): {e}"
         )
+    del raw
+    xmlsafe.reject_doctype(text=text)
+    # Corrigeer header: the text is re-encoded as UTF-8 below, so the
+    # declaration must say so. Only the declaration itself, never content.
+    header = _HEADER_ENCODING_RE.search(text, 0, xmlsafe.SNIFF_BYTES)
+    if header:
+        text = text[: header.start(2)] + "utf-8" + text[header.end(2) :]
+    utf8_bytes = text.encode(const.ENCODING)
+    del text
+    utf8_bytes = normalize_braced_ids(utf8_bytes)
+    return xmlsafe.parse_bytes(utf8_bytes, encoding=const.ENCODING)
+
+
+def normalize_braced_ids(data):
+    """Rewrite quoted ``"EAID_{X}"``/``"EAID_{{X}}"`` values to ``"EAID_X"`` in UTF-8 document bytes.
+
+    EA exports an element whose GUID carries a doubled brace pair with a
+    braced id, while the QEA parser (and EA's own id scheme) yield the
+    brace-less form. Normalizing every occurrence - the id and all references
+    to it - keeps both formats in step. Done on the bytes before parsing: a
+    regular expression over a GGM-sized export takes ~0.04 s, an XPath scan of
+    every attribute of the parsed tree ~0.6 s. The result is assembled from
+    memoryview slices in one allocation, so no pile of intermediate copies
+    raises the peak memory of the parse.
+    """
+    view = memoryview(data)
+    pieces = []
+    position = 0
+    for match in _BRACED_ID_RE.finditer(data):
+        pieces.append(view[position : match.start()])
+        pieces.append(b'"' + match.group(1) + match.group(2) + b'"')
+        position = match.end()
+    if not pieces:
+        return data
+    pieces.append(view[position:])
+    count = len(pieces) // 2
+    normalized = b"".join(pieces)
+    del pieces
+    view.release()
+    logger.info(f"Normalized {count} braced EA ids (EAID_{{...}}) to EAID_...")
+    return normalized
+
+
+def mint_missing_ids(model, ns, source_label):
+    """Give every row element exported with ``xmi:id=""`` a deterministic synthetic id.
+
+    The owner is the nearest ancestor with an id; see :mod:`crunch_uml.ea_ids`.
+    Returns the number of minted ids.
+    """
+    xmi_id = "{" + ns["xmi"] + "}id"
+    minter = ea_ids.SyntheticIdMinter(source_label)
+    condition = " or ".join(f"self::{tag}" for tag in _ROW_ELEMENT_TAGS)
+    for element in model.xpath(f".//*[@xmi:id=''][{condition}]", namespaces=ns):
+        owner_id = None
+        for ancestor in element.iterancestors():
+            owner_id = ancestor.get(xmi_id)
+            if owner_id:
+                break
+        element.set(xmi_id, minter.mint(owner_id, element.get("name"), kind=element.tag))
+    return minter.count
 
 
 def get_end_value(endpoint, tag):
@@ -72,6 +144,17 @@ def remove_EADatatype(input_string):
 
 def zetOpLeeg():
     return ""
+
+
+def object_type_of(xmi_type):
+    """``Class.object_type`` from an ``xmi:type`` value: ``uml:DataType`` -> ``datatype``.
+
+    The same normalization the qea parser applies to ``t_object.Object_Type``,
+    so both formats yield the same value for the same element. None stays None.
+    """
+    if not xmi_type:
+        return None
+    return xmi_type.removeprefix("uml:").lower() or None
 
 
 @ParserRegistry.register(
@@ -104,11 +187,15 @@ class XMIParser(Parser):
                 logger.debug(f"Package with {name} does not have id value: discarded")
 
         elif tp in ["uml:Class", "uml:DataType"]:
+            # object_type from the model tree is 'class' or 'datatype'; the EA
+            # extension knows better (Boundary, ProxyConnector, Text are all
+            # uml:Class here) and overrides it in phase 3 of the eaxmi parser.
             clazz = db.Class(
                 id=node.get("{" + ns["xmi"] + "}id"),
                 name=node.get("name"),
                 package_id=parent_package_id,
                 is_datatype=(tp == "uml:DataType"),
+                object_type=object_type_of(tp),
             )
             logger.debug(f"Class {clazz.name} met id {clazz.id} ingelezen met inhoud: {clazz}")
             schema.save(clazz)
@@ -150,7 +237,12 @@ class XMIParser(Parser):
 
             for childnode in node:
                 sub_tp = childnode.get("{" + ns["xmi"] + "}type")
-                if sub_tp == "uml:EnumerationLiteral":
+                # EA exports an enumeration value that lacks IsLiteral=1 as an
+                # ownedAttribute of type uml:Property instead of an
+                # ownedLiteral; it is still a value of the enumeration (the
+                # QEA holds both kinds as t_attribute rows of the enumeration).
+                is_value_property = sub_tp == "uml:Property" and childnode.get("association") is None
+                if sub_tp == "uml:EnumerationLiteral" or is_value_property:
                     enumliteral = db.EnumerationLiteral(
                         id=childnode.get("{" + ns["xmi"] + "}id"),
                         name=childnode.get("name"),
@@ -212,10 +304,10 @@ class XMIParser(Parser):
                     ep = xmi_id_index.get(id)
                     endpoints = [ep] if ep is not None else []
                     if len(endpoints) == 0:
-                        clsid = util.getEAGuid()
+                        clsid = ea_ids.placeholder_class_id(association.id, id)
                         msg = (
                             f"Association '{association.name}' with {association.id} only has information on one edge:"
-                            f" generating placeholder class with uudi {clsid}."
+                            f" generating placeholder class with id {clsid}."
                         )
                         logger.debug(msg)
 
@@ -235,10 +327,10 @@ class XMIParser(Parser):
                         endpoint = endpoints[0]
                         typenode = endpoint.xpath("./type")
                         if len(typenode) == 0:
-                            clsid = util.getEAGuid()
+                            clsid = ea_ids.placeholder_class_id(association.id, id)
                             msg = (
                                 f"Association '{association.name}' with {association.id} only has information on one"
-                                f" edge: generating placeholder class with uudi {clsid}."
+                                f" edge: generating placeholder class with id {clsid}."
                             )
                             logger.debug(msg)
                             cls = db.Class(id=clsid, name=const.ORPHAN_CLASS, definitie=msg)
@@ -251,7 +343,13 @@ class XMIParser(Parser):
                             clsid = typenode[0].get("{" + ns["xmi"] + "}idref")
                             cls = schema.get_class(clsid)
                             if cls is None:
-                                clazz = db.Class(id=clsid, name=const.ORPHAN_CLASS)
+                                # The end is no class (an enumeration, say): a
+                                # placeholder with that id, recording the kind
+                                # of the element it stands in for when the
+                                # export holds it.
+                                referenced = xmi_id_index.get(clsid)
+                                kind = None if referenced is None else referenced.get("{" + ns["xmi"] + "}type")
+                                clazz = db.Class(id=clsid, name=const.ORPHAN_CLASS, object_type=object_type_of(kind))
                                 schema.save(clazz)
                             if "src" in id:
                                 association.src_class_id = clsid  # type: ignore
@@ -387,7 +485,7 @@ class XMIParser(Parser):
         logger.info(f"Parsing from source {source}")
         root = load_xmi(source)
 
-        ns = root.nsmap
+        ns = dict(root.nsmap)
         if "xmi" not in ns.keys():
             logger.warning(f'missing namespace "xmi" in file {args.inputfile}: trying "{const.NS_XMI}"')
             ns["xmi"] = const.NS_XMI
@@ -399,6 +497,10 @@ class XMIParser(Parser):
             self.checkSupport(root, ns)
 
             model = root.xpath('//uml:Model[@xmi:type="uml:Model"][1]', namespaces=ns)[0]  # type: ignore
+            source_label = f"XMI {os.path.basename(source)}"
+            minted = mint_missing_ids(model, ns, source_label)
+            if minted:
+                logger.warning(f"{source_label}: {minted} elements without xmi:id got a synthetic id.")
             self.phase1_process_packages_classes(model, ns, schema)
             if not args.skip_xmi_relations:
                 self.phase2_process_connectors(model, ns, schema)

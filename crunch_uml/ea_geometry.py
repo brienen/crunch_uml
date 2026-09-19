@@ -198,3 +198,44 @@ def compose_xmi_edge_style(ea_style, hidden):
     if base and not base.endswith(";"):
         base += ";"
     return f"{base}Hidden={1 if hidden else 0};"
+
+
+def parse_style_pairs(style):
+    """Parse an EA ``key=value;key=value;`` settings string into a dict.
+
+    Used for diagram settings: QEA ``t_diagram.PDATA``/``StyleEx`` and their
+    XMI counterparts ``<style1>``/``<style2>``. Pieces without '=' are ignored;
+    the first occurrence of a key wins.
+    """
+    pairs = {}
+    if not style:
+        return pairs
+    for piece in style.split(";"):
+        key, sep, value = piece.partition("=")
+        key = key.strip()
+        if sep and key and key not in pairs:
+            pairs[key] = value
+    return pairs
+
+
+def _flag(value):
+    if value is None:
+        return None
+    value = value.strip()
+    if value in ("1", "true", "True"):
+        return True
+    if value in ("0", "false", "False"):
+        return False
+    return None
+
+
+def parse_diagram_hide_flags(style):
+    """(hide_attributes, hide_operations) from a diagram settings string.
+
+    ``HideAtts``/``HideOps`` carry the same name in QEA PDATA and in the XMI
+    ``style1`` value, unlike other keys (``HideEStereo`` vs ``HideElemStereo``,
+    ``AttPub`` vs ``ShowPublic``). A flag the string does not mention is None
+    (unknown), not False.
+    """
+    pairs = parse_style_pairs(style)
+    return _flag(pairs.get("HideAtts")), _flag(pairs.get("HideOps"))

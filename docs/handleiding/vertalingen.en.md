@@ -157,7 +157,7 @@ backend short-circuits these patterns entirely — no model call, source
 returned verbatim:
 
 * XML/HTML-like single tags: `<memo>`, `<typing>`, `</br>`, `<UML:Class>`
-* EA identifiers: `EAID_…`, `EAPK_…`, `EAID_attr_…`
+* EA identifiers: `EAID_…`, `EAPK_…`, `EAID_syn_…`
 * URLs: `http://…`, `https://…`, `www.…`
 * ISO dates and timestamps: `2024-05-13`, `2024-05-13T10:30:00Z`
 * Pure punctuation or numbers

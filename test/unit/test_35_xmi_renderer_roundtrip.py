@@ -298,3 +298,38 @@ def test_rendered_file_contains_ea_extension():
     assert "<uml:Model" in content
     assert "Path=" in content  # edge geometry present
     assert 'geometry="Left=' in content  # node geometry present
+
+
+def test_roundtrip_mini_m4_object_type():
+    """The EA element kind survives the round-trip the way EA exports it: the model tree
+    says uml:Class for a Boundary or ProxyConnector, the extension element carries the
+    kind. The placeholder for an association end on an enumeration is not rendered and
+    comes back from the enumeration it stands in for."""
+    roundtrip(
+        "./test/data/MiniM4.xml",
+        "eaxmi",
+        "xmirt_mini_a",
+        "xmirt_mini_b",
+        "./test/output/xmirt_mini_m4.xml",
+    )
+    assert_semantically_equal("xmirt_mini_a", "xmirt_mini_b")
+
+    database = db.Database(const.DATABASE_URL, db_create=False)
+    session = database.session
+    kinds = {
+        row.id: row.object_type
+        for row in session.query(db.Class).filter_by(schema_id="xmirt_mini_b")
+        if row.object_type != "class"
+    }
+    assert kinds == {
+        "EAID_4D4E000E_0000_4000_8000_00000000000E": "boundary",
+        "EAID_4D4E0011_0000_4000_8000_000000000011": "proxyconnector",
+        "EAID_4D4E000F_0000_4000_8000_00000000000F": "datatype",
+        "EAID_4D4E0010_0000_4000_8000_000000000010": "enumeration",
+    }
+    with open("./test/output/xmirt_mini_m4.xml", encoding="utf-8") as f:
+        content = f.read()
+    assert 'xmi:idref="EAID_4D4E0011_0000_4000_8000_000000000011" xmi:type="uml:ProxyConnector"' in content
+    assert 'xmi:id="EAID_4D4E0011_0000_4000_8000_000000000011" name="ProxyConnector"' in content
+    assert 'xmi:type="uml:Class" xmi:id="EAID_4D4E0011' in content
+    assert 'name="object_type"' not in content  # the kind is the element type, never a tagged value

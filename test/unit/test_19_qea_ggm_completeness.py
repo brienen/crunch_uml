@@ -69,8 +69,25 @@ def test_packages_count_matches_source(imported_schema, src_cursor):
 
 @pytest.mark.slow
 def test_classes_count_matches_source(imported_schema, src_cursor):
+    """Every Class object becomes a class. On top of that, each Enumeration at the end of an
+    imported connector gets one placeholder class with its id (17 in this model, for 19
+    associations), as the eaxmi parser does: connector ends must exist in ``classes``, or a
+    Postgres import fails on the foreign key."""
     src_n = src_cursor.execute("SELECT COUNT(*) FROM t_object WHERE Object_Type = 'Class'").fetchone()[0]
-    assert imported_schema.count_class() == src_n
+    enum_ends = src_cursor.execute("""
+        SELECT COUNT(DISTINCT o.Object_ID) FROM t_connector c
+        JOIN t_object so ON c.Start_Object_ID = so.Object_ID
+        JOIN t_object eo ON c.End_Object_ID   = eo.Object_ID
+        JOIN t_object o  ON o.Object_ID IN (c.Start_Object_ID, c.End_Object_ID)
+        WHERE c.Connector_Type IN ('Association', 'Aggregation', 'Realisation', 'Generalization')
+          AND so.Object_Type IN ('Class', 'DataType', 'Enumeration')
+          AND eo.Object_Type IN ('Class', 'DataType', 'Enumeration')
+          AND o.Object_Type = 'Enumeration'
+        """).fetchone()[0]
+    placeholders = [c for c in imported_schema.get_all_classes() if c.name == const.ORPHAN_CLASS]
+    assert len(placeholders) == enum_ends == 17
+    assert all(imported_schema.get_enumeration(c.id) is not None for c in placeholders)
+    assert imported_schema.count_class() == src_n + enum_ends
 
 
 @pytest.mark.slow
@@ -115,12 +132,14 @@ def test_generalizations_count_matches_source(imported_schema, src_cursor):
 def test_associations_count_matches_source_after_filter(imported_schema, src_cursor):
     """Phase 4 of the QEA parser only keeps connectors whose endpoints are
     Class/DataType/Enumeration objects. The handful of connectors that point
-    at ProxyConnector/Component/Actor must NOT inflate the imported count."""
+    at ProxyConnector/Component/Actor must NOT inflate the imported count.
+    Aggregations ARE associations: before 0.7.0 the parser skipped all of them
+    (87 in this model), and this test encoded that loss as expected."""
     src_n = src_cursor.execute("""
         SELECT COUNT(*) FROM t_connector c
         JOIN t_object so ON c.Start_Object_ID = so.Object_ID
         JOIN t_object eo ON c.End_Object_ID   = eo.Object_ID
-        WHERE c.Connector_Type IN ('Association', 'Realisation')
+        WHERE c.Connector_Type IN ('Association', 'Aggregation', 'Realisation')
           AND so.Object_Type IN ('Class', 'DataType', 'Enumeration')
           AND eo.Object_Type IN ('Class', 'DataType', 'Enumeration')
         """).fetchone()[0]
@@ -195,7 +214,7 @@ def test_object_tagged_values_are_applied(imported_schema, src_cursor):
     column. This exercises phase 5 — the same loop where dropping the
     per-row save() saved ~50 seconds on this fixture."""
     rows = src_cursor.execute("""
-        SELECT o.ea_guid, LOWER(op.Property) AS prop, op.Value
+        SELECT o.ea_guid, o.Object_Type, LOWER(op.Property) AS prop, op.Value
         FROM t_objectproperties op
         JOIN t_object o ON op.Object_ID = o.Object_ID
         WHERE o.Object_Type IN ('Class', 'DataType', 'Enumeration')
@@ -213,13 +232,13 @@ def test_object_tagged_values_are_applied(imported_schema, src_cursor):
     }
     mismatches = []
     sample = rows[: min(200, len(rows))]
-    for ea_guid, prop, expected in sample:
+    for ea_guid, obj_type, prop, expected in sample:
         eaid = guid_to_eaid(ea_guid)
-        obj = (
-            imported_schema.get_class(eaid)
-            or imported_schema.get_datatype(eaid)
-            or imported_schema.get_enumeration(eaid)
-        )
+        # An enumeration can share its id with a placeholder class; look it up by type.
+        if obj_type == "Enumeration":
+            obj = imported_schema.get_enumeration(eaid)
+        else:
+            obj = imported_schema.get_class(eaid) or imported_schema.get_datatype(eaid)
         if obj is None:
             mismatches.append((eaid, prop, expected, "<object not found>"))
             continue
@@ -280,7 +299,7 @@ def test_attribute_tagged_values_are_applied(imported_schema, src_cursor):
 @pytest.mark.slow
 def test_literals_with_null_ea_guid_are_imported_with_synthetic_ids(imported_schema, src_cursor):
     """The QEA file has enum literals (and some attributes) with ea_guid IS
-    NULL. The parser mints synthetic IDs of the form ``EAID_attr_<n>`` so
+    NULL. The parser mints synthetic IDs of the form ``EAID_syn_<sha1>`` so
     these rows are preserved instead of crashing the import."""
     src_n = src_cursor.execute("""
         SELECT COUNT(*) FROM t_attribute a
@@ -295,14 +314,14 @@ def test_literals_with_null_ea_guid_are_imported_with_synthetic_ids(imported_sch
     with Session(imported_schema.database.engine) as session:
         synth_attr = (
             session.query(db.Attribute)
-            .filter(db.Attribute.schema_id == SCHEMA, db.Attribute.id.like("EAID_attr_%"))
+            .filter(db.Attribute.schema_id == SCHEMA, db.Attribute.id.like("EAID_syn_%"))
             .count()
         )
         synth_lit = (
             session.query(db.EnumerationLiteral)
             .filter(
                 db.EnumerationLiteral.schema_id == SCHEMA,
-                db.EnumerationLiteral.id.like("EAID_attr_%"),
+                db.EnumerationLiteral.id.like("EAID_syn_%"),
             )
             .count()
         )

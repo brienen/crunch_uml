@@ -3,8 +3,9 @@ import logging
 import crunch_uml.db as db
 import crunch_uml.schema as sch
 from crunch_uml import ea_geometry as geo
+from crunch_uml import ea_ids
 from crunch_uml.parsers.parser import ParserRegistry, copy_values, fixtag
-from crunch_uml.parsers.xmiparser import XMIParser
+from crunch_uml.parsers.xmiparser import XMIParser, object_type_of
 
 logger = logging.getLogger()
 
@@ -142,6 +143,32 @@ class EAXMIParser(XMIParser):
             copy_values(project, clazz)
             copy_values(properties, clazz)
 
+        # The kind of element behind every class row. The uml:Model tree
+        # exports a Boundary, ProxyConnector or Text as a plain uml:Class (and
+        # phase 1 read it as one); the extension element carries the EA kind
+        # in its xmi:type, like t_object.Object_Type in a QEA. The rows stay
+        # classes: this records what they are, it does not filter them. A
+        # placeholder class for an association end on an enumeration gets
+        # 'enumeration' from the enumeration's own extension element.
+        logger.info("Processing element kinds of classes")
+        kinds: dict = {}
+        for elementref in extension.xpath(".//element[@xmi:idref and @xmi:type]", namespaces=ns):  # type: ignore
+            idref = elementref.get("{" + ns["xmi"] + "}idref")
+            clazz = classes_by_id.get(idref) or datatypes_by_id.get(idref)
+            if clazz is None:
+                continue
+            kind = object_type_of(elementref.get("{" + ns["xmi"] + "}type"))
+            if kind is None:
+                continue
+            if kind != clazz.object_type:
+                kinds[kind] = kinds.get(kind, 0) + 1
+            clazz.object_type = kind
+        if kinds:
+            logger.info(
+                "Element kinds from the EA extension that differ from the model tree: "
+                + ", ".join(f"{kind} {count}" for kind, count in sorted(kinds.items()))
+            )
+
         logger.info("Processing references to enumerations")
         enumrefs = extension.xpath(".//element[@xmi:type='uml:Enumeration' and @xmi:idref]", namespaces=ns)  # type: ignore
         for enumref in enumrefs:
@@ -216,7 +243,12 @@ class EAXMIParser(XMIParser):
                         setattr(literal, fixtag(tag.get("name")), tag.get("value"))
 
         logger.info("Processing references to associations")
-        connectorrefs = extension.xpath(".//connector[@xmi:idref and properties/@ea_type='Association']", namespaces=ns)  # type: ignore
+        # Aggregations are uml:Association elements in the model tree; EA marks
+        # them ea_type='Aggregation' in the extension.
+        connectorrefs = extension.xpath(
+            ".//connector[@xmi:idref and (properties/@ea_type='Association' or properties/@ea_type='Aggregation')]",
+            namespaces=ns,
+        )  # type: ignore
         for connectorref in connectorrefs:
             idref = connectorref.get("{" + ns["xmi"] + "}idref")
             association = assocs_by_id.get(idref)
@@ -285,15 +317,25 @@ class EAXMIParser(XMIParser):
 
         logger.info("Processing references to diagrams")
         diagramrefs = extension.xpath(".//diagram[@xmi:id]", namespaces=ns)  # type: ignore
+        diagram_minter = ea_ids.SyntheticIdMinter("XMI diagrams")
         for diagramref in diagramrefs:
             idref = diagramref.get("{" + ns["xmi"] + "}id")
             package_id = diagramref.xpath("./model")[0].get("package")
             name = diagramref.xpath("./properties")[0].get("name")
+            if not idref:
+                idref = diagram_minter.mint(package_id, name, kind="diagram")
             author = diagramref.xpath("./project")[0].get("author")
             version = diagramref.xpath("./project")[0].get("version")
             created = diagramref.xpath("./project")[0].get("created")
             modified = diagramref.xpath("./project")[0].get("modified")
             documentation = diagramref.xpath("./properties")[0].get("documentation")
+            # Diagram settings: <style1> is QEA t_diagram.PDATA, <style2> is
+            # StyleEx. Kept raw; HideAtts/HideOps also as canonical booleans.
+            style1 = diagramref.xpath("./style1")
+            style1_value = style1[0].get("value") if style1 else None
+            style2 = diagramref.xpath("./style2")
+            style2_value = style2[0].get("value") if style2 else None
+            hide_attributes, hide_operations = geo.parse_diagram_hide_flags(style1_value)
             diagram = db.Diagram(
                 id=idref,
                 name=name,
@@ -303,6 +345,11 @@ class EAXMIParser(XMIParser):
                 created=created,
                 modified=modified,
                 definitie=documentation,
+                diagram_type=diagramref.xpath("./properties")[0].get("type"),
+                hide_attributes=hide_attributes,
+                hide_operations=hide_operations,
+                ea_style=style1_value,
+                ea_style_ex=style2_value,
             )
             # Bewust nog niet opslaan: het diagram gaat pas na het verzamelen
             # van zijn leden naar de database, via schema.save() onderaan deze
