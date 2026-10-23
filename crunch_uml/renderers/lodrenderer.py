@@ -174,8 +174,17 @@ class LodRenderer(ModelRenderer):
 
     default_exclude_package_names = const.LOD_EXCLUDE_PACKAGE_NAMES
 
+    # Taaltag voor labels, definities en toelichtingen (--lod_language);
+    # None geeft literals zonder taaltag.
+    _lang: Optional[str] = "nl"
+
     def writeToFile(self, graph, args):
         pass
+
+    def lit(self, text):
+        """Tekstliteral in de taal van de export (MIM 6.4.9.2: rdfs:label met
+        de taal van het model), of zonder taaltag als die leeg is."""
+        return mim.lang_literal(text, self._lang)
 
     def addIdentifier(self, g, uri, obj_id, what):
         """Voeg dcterms:identifier toe en meld lege of afwijkende identifiers.
@@ -303,10 +312,10 @@ class LodRenderer(ModelRenderer):
             else:
                 namespace = str(model_ns[pkg.id][1]) if pkg.id in model_ns else str(uri)
                 self.annotator.annotate_domein(uri, pkg, namespace)
-            g.add((uri, RDFS.label, Literal(pkg.name)))
+            g.add((uri, RDFS.label, self.lit(pkg.name)))
             self.addIdentifier(g, uri, pkg.id, "pakket")
             if pkg.definitie:
-                g.add((uri, RDFS.comment, Literal(pkg.definitie)))
+                g.add((uri, RDFS.comment, self.lit(pkg.definitie)))
             parent = pkg.parent_package
             if parent is not None and parent.name:
                 parent_uri = add_package(parent)
@@ -329,10 +338,10 @@ class LodRenderer(ModelRenderer):
         sh:in-constraints)."""
         g.add((enum_uri, RDF.type, OWL.Class))
         g.add((enum_uri, RDF.type, SKOS.ConceptScheme))
-        g.add((enum_uri, RDFS.label, Literal(enum.name)))
+        g.add((enum_uri, RDFS.label, self.lit(enum.name)))
         self.addIdentifier(g, enum_uri, enum.id, "enumeratie")
         if enum.definitie:
-            g.add((enum_uri, RDFS.comment, Literal(enum.definitie)))
+            g.add((enum_uri, RDFS.comment, self.lit(enum.definitie)))
         if model_uri is not None:
             g.add((enum_uri, RDFS.isDefinedBy, model_uri))
         self.annotator.annotate_enumeration(enum_uri, enum, shape_uri)
@@ -348,10 +357,10 @@ class LodRenderer(ModelRenderer):
             g.add((concept_uri, SKOS.inScheme, enum_uri))
             g.add((concept_uri, SKOS.topConceptOf, enum_uri))
             if literal.name:
-                g.add((concept_uri, SKOS.prefLabel, Literal(literal.name)))
+                g.add((concept_uri, SKOS.prefLabel, self.lit(literal.name)))
             self.addIdentifier(g, concept_uri, literal.id, "enumeratiewaarde")
             if literal.definitie:
-                g.add((concept_uri, SKOS.definition, Literal(literal.definitie)))
+                g.add((concept_uri, SKOS.definition, self.lit(literal.definitie)))
             self.annotator.annotate_enum_literal(concept_uri, literal, enum_uri)
         return concepts
 
@@ -454,8 +463,10 @@ class LodRenderer(ModelRenderer):
 
             # Create graph
             g = Graph()
-            # MIM 1.2-laag: typering en metagegevens op de resources hieronder.
-            self.annotator = MimAnnotator(g, base, getattr(args, "lod_language", None))
+            # Taal van labels en definities (standaard nl); MIM 1.2-laag: typering en
+            # metagegevens op de resources hieronder.
+            self._lang = getattr(args, "lod_language", "nl") or None
+            self.annotator = MimAnnotator(g, base, self._lang)
 
             # Namespaces en bindings
             shape_ns = Namespace(base + "shapes/")
@@ -599,11 +610,11 @@ class LodRenderer(ModelRenderer):
                             g.add((class_uri, RDF.type, SH.NodeShape))
                         else:
                             g.add((class_uri, RDF.type, OWL.Class))
-                        g.add((class_uri, RDFS.label, Literal(cls.name)))
+                        g.add((class_uri, RDFS.label, self.lit(cls.name)))
                         self.addIdentifier(g, class_uri, cls.id, "klasse")
                         g.add((class_uri, RDFS.isDefinedBy, model_uri))
                         if cls.definitie is not None:
-                            g.add((class_uri, RDFS.comment, Literal(cls.definitie)))
+                            g.add((class_uri, RDFS.comment, self.lit(cls.definitie)))
                         self.annotator.annotate_class(class_uri, cls, soort)
 
                         for attribute in self.rendered_attributes(cls):
@@ -612,12 +623,12 @@ class LodRenderer(ModelRenderer):
                             prop_type = OWL.DatatypeProperty if kind == "datatype" else OWL.ObjectProperty
                             g.add((attr_uri, RDF.type, prop_type))
                             g.add((attr_uri, RDFS.domain, class_uri))
-                            g.add((attr_uri, RDFS.label, Literal(attribute.name)))
+                            g.add((attr_uri, RDFS.label, self.lit(attribute.name)))
                             g.add((attr_uri, RDFS.range, range_uri))
                             g.add((attr_uri, RDFS.isDefinedBy, model_uri))
                             self.addIdentifier(g, attr_uri, attribute.id, "attribuut")
                             if attribute.definitie is not None:
-                                g.add((attr_uri, RDFS.comment, Literal(attribute.definitie)))
+                                g.add((attr_uri, RDFS.comment, self.lit(attribute.definitie)))
 
                     # Enumeraties van dit model als ConceptScheme + concepten.
                     for enum in model.enumerations:
@@ -643,7 +654,7 @@ class LodRenderer(ModelRenderer):
                             shape_uri = shape_ns[modelname + "/" + slugify(cls.name)]
                             g.add((shape_uri, RDF.type, SH.NodeShape))
                             g.add((shape_uri, SH.targetClass, class_uri))
-                            g.add((shape_uri, RDFS.label, Literal(cls.name)))
+                            g.add((shape_uri, RDFS.label, self.lit(cls.name)))
                             self.addIdentifier(g, shape_uri, cls.id, "SHACL-shape van klasse")
                         shape_uris[cls.id] = shape_uri
 
@@ -680,9 +691,9 @@ class LodRenderer(ModelRenderer):
                                         [self.enumConceptUri(range_uri, lit) for lit in enum.literals],
                                     )
                                     g.add((prop_bnode, SH["in"], list_node))
-                            g.add((prop_bnode, SH.name, Literal(attribute.name)))
+                            g.add((prop_bnode, SH.name, self.lit(attribute.name)))
                             if attribute.definitie:
-                                g.add((prop_bnode, SH.description, Literal(attribute.definitie)))
+                                g.add((prop_bnode, SH.description, self.lit(attribute.definitie)))
                             # MIM-typering en -metagegevens; zet ook sh:minCount/sh:maxCount
                             # uit de kardinaliteit (6.4.9.15/18) en de lengte-, patroon- en
                             # waardebereik-constraints op de shape.
@@ -740,11 +751,11 @@ class LodRenderer(ModelRenderer):
                             g.add((assoc_uri, RDF.type, OWL.ObjectProperty))
                             g.add((assoc_uri, RDFS.domain, from_cls))
                             g.add((assoc_uri, RDFS.range, to_cls))
-                            g.add((assoc_uri, RDFS.label, Literal(label)))
+                            g.add((assoc_uri, RDFS.label, self.lit(label)))
                             g.add((assoc_uri, RDFS.isDefinedBy, URIRef(str(ns))))
                             self.addIdentifier(g, assoc_uri, assoc.id, "associatie")
                             if assoc.definitie is not None:
-                                g.add((assoc_uri, RDFS.comment, Literal(assoc.definitie)))
+                                g.add((assoc_uri, RDFS.comment, self.lit(assoc.definitie)))
                             # De relatie als sh:property van de NodeShape van de
                             # bronklasse (6.4.5.6, 6.4.9.31/32), met kardinaliteit.
                             prop_bnode = BNode()
@@ -752,9 +763,9 @@ class LodRenderer(ModelRenderer):
                             g.add((prop_bnode, SH.path, assoc_uri))
                             g.add((prop_bnode, getattr(SH, "class"), to_cls))
                             g.add((prop_bnode, SH.nodeKind, SH.IRI))
-                            g.add((prop_bnode, SH.name, Literal(label)))
+                            g.add((prop_bnode, SH.name, self.lit(label)))
                             if assoc.definitie:
-                                g.add((prop_bnode, SH.description, Literal(assoc.definitie)))
+                                g.add((prop_bnode, SH.description, self.lit(assoc.definitie)))
                             self.annotator.annotate_association(
                                 assoc_uri, prop_bnode, assoc, from_cls, to_cls, naam=label
                             )

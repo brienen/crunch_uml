@@ -136,7 +136,24 @@ def bouw_model():
 
 
 def exporteer(outputfile=OUTPUT, extra=()):
-    cli.main(["-sch", SCHEMA, "export", "-f", outputfile, "-t", "ttl", "--linked_data_namespace", BASE, *extra])
+    # Zonder taaltag: deze tests zoeken labels op als kale literals; de taal
+    # van de export wordt in test_50 getest.
+    cli.main(
+        [
+            "-sch",
+            SCHEMA,
+            "export",
+            "-f",
+            outputfile,
+            "-t",
+            "ttl",
+            "--linked_data_namespace",
+            BASE,
+            "--lod_language",
+            "",
+            *extra,
+        ]
+    )
     graph = Graph()
     graph.parse(outputfile, format="turtle")
     return graph
