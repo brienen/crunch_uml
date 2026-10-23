@@ -433,14 +433,20 @@ class LodRenderer(ModelRenderer):
             for model in models:
                 modelname, ns = model_ns[model.id]
                 for cls in model.classes:
-                    # First set inheritance
-                    for subclass in cls.subclasses:
-                        super_cls = class_dict.get(cls.id)
-                        if subclass.superclass is not None:
-                            sub_cls = class_dict.get(subclass.superclass.id)
-
-                            if super_cls is not None and sub_cls is not None:
-                                g.add((sub_cls, RDFS.subClassOf, super_cls))
+                    # First set inheritance. cls.superclasses levert Generalization-
+                    # objecten waarin cls de subklasse is en .superclass de ouder.
+                    sub_cls = class_dict.get(cls.id)
+                    for gener in cls.superclasses:
+                        if gener.superclass is None or sub_cls is None:
+                            continue
+                        if gener.superclass.id == cls.id:
+                            logger.warning(
+                                f"Generalisatie van klasse '{cls.name}' naar zichzelf overgeslagen: {gener.id}"
+                            )
+                            continue
+                        super_cls = class_dict.get(gener.superclass.id)
+                        if super_cls is not None:
+                            g.add((sub_cls, RDFS.subClassOf, super_cls))
 
                     # Then set associations
                     for assoc in cls.uitgaande_associaties:

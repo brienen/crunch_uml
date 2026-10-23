@@ -1,0 +1,171 @@
+"""
+Tests voor de reparaties van de LOD-renderer, geverifieerd op de GGM v3.0.0-export
+(oktober 2026):
+
+1. generalisaties stonden verkeerd om (``X rdfs:subClassOf X``; de echte
+   generalisaties ontbraken);
+2. spaties en haakjes in model-IRI's (``%20``, ``%28``) en een basis-URI met
+   pad die door ``urljoin`` werd weggegooid;
+3. 'model' werd overal uit de modelnaam geknipt, zodat het package ``Model``
+   een lege naam kreeg;
+4. gelijknamige associaties en attributen vielen samen tot één property met
+   meerdere ranges;
+5. technische packages (``Diagram``, ``Tekenwijze``, ``View*``) en klassen
+   zonder stereotype kwamen in de ontologie terecht;
+6. gelijknamige modelpakketten deelden één namespace;
+7. lege of afwijkende identifiers bleven onopgemerkt.
+
+Het testmodel wordt programmatisch opgebouwd (geen EA-fixture), zodat elke
+situatie klein en expliciet is.
+"""
+
+import logging
+import os
+
+import pytest
+from rdflib import Graph, Literal
+from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SH
+
+import crunch_uml.schema as sch
+from crunch_uml import cli, const, db
+
+SCHEMA = "lod_fixes"
+# Basis-URI mét pad: urljoin(base, "/slug/") gooide dat pad weg.
+BASE = "https://voorbeeld.nl/lod/"
+OUTPUT = "./test/output/lod_fixes.ttl"
+
+
+def bouw_model():
+    database = db.Database(const.DATABASE_URL, db_create=True)
+    schema = sch.Schema(database, SCHEMA)
+
+    def pkg(id, name, parent=None):
+        schema.save(db.Package(id=id, name=name, parent_package_id=parent))
+
+    def cls(id, name, package, stereotype="Objecttype", **kwargs):
+        schema.save(db.Class(id=id, name=name, package_id=package, stereotype=stereotype, **kwargs))
+
+    def attr(id, name, clazz, primitive=None, type_class=None):
+        schema.save(db.Attribute(id=id, name=name, clazz_id=clazz, primitive=primitive, type_class_id=type_class))
+
+    def assoc(id, name, src, dst, src_role=None):
+        schema.save(db.Association(id=id, name=name, src_class_id=src, dst_class_id=dst, src_role=src_role))
+
+    def gener(id, sub, sup):
+        schema.save(db.Generalization(id=id, subclass_id=sub, superclass_id=sup))
+
+    pkg("EAPK_ROOT", "Gegevensmodel Test")
+
+    # 1. Generalisaties: Medewerker en Burger zijn subklassen van Persoon.
+    pkg("EAPK_KERN", "Kern", "EAPK_ROOT")
+    cls("EAID_PERSOON", "Persoon", "EAPK_KERN")
+    cls("EAID_MEDEWERKER", "Medewerker", "EAPK_KERN")
+    cls("EAID_BURGER", "Burger", "EAPK_KERN")
+    gener("EAID_GEN1", "EAID_MEDEWERKER", "EAID_PERSOON")
+    gener("EAID_GEN2", "EAID_BURGER", "EAID_PERSOON")
+    attr("EAID_PERSOON_NAAM", "naam", "EAID_PERSOON", "AN80")
+
+    # 2. Spaties en haakjes in de modelnaam.
+    pkg("EAPK_RGBZ", "Model Kern (RGBZ)", "EAPK_ROOT")
+    cls("EAID_ZAAK", "Zaak", "EAPK_RGBZ")
+    attr("EAID_ZAAK_ID", "identificatie", "EAID_ZAAK", "AN40")
+
+    # 3. Naamopschoning: 'Model' kaal, 'Model' als deel van een woord, 'Model' achteraan.
+    pkg("EAPK_MODEL", "Model", "EAPK_ROOT")
+    cls("EAID_PERIODE", "Periode", "EAPK_MODEL")
+    attr("EAID_PERIODE_START", "datum start", "EAID_PERIODE", "Datum")
+    pkg("EAPK_WONEN", "Gegevensmodel Wonen", "EAPK_ROOT")
+    cls("EAID_WONING", "Woning", "EAPK_WONEN")
+    pkg("EAPK_ARCHIEF", "Archief", "EAPK_ROOT")
+    pkg("EAPK_ARCHIEF_MODEL", "Archief Model", "EAPK_ARCHIEF")
+    cls("EAID_ARCHIEFSTUK", "Archiefstuk", "EAPK_ARCHIEF_MODEL")
+
+    # 4. Unieke relatie-URI's: gelijknamige associaties naar verschillende
+    #    doelen, een associatie met de naam van een attribuut, naamloze
+    #    associaties en dubbele attribuutnamen binnen één klasse.
+    pkg("EAPK_PROJ", "Projecten", "EAPK_ROOT")
+    cls("EAID_PROJECT", "Project", "EAPK_PROJ")
+    cls("EAID_ACTIVITEIT", "Activiteit", "EAPK_PROJ")
+    cls("EAID_LOCATIE", "Locatie", "EAPK_PROJ")
+    attr("EAID_PROJ_NAAM", "naam", "EAID_PROJECT", "AN80")
+    attr("EAID_PROJ_OID1", "objectidentificatie", "EAID_PROJECT", "AN40")
+    attr("EAID_PROJ_OID2", "objectidentificatie", "EAID_PROJECT", type_class="EAID_LOCATIE")
+    assoc("EAID_AS_HEEFT1", "heeft", "EAID_PROJECT", "EAID_ACTIVITEIT")
+    assoc("EAID_AS_HEEFT2", "heeft", "EAID_PROJECT", "EAID_LOCATIE")
+    assoc("EAID_AS_NAAM", "naam", "EAID_PROJECT", "EAID_ACTIVITEIT")
+    assoc("EAID_AS_NAAMLOOS1", None, "EAID_PROJECT", "EAID_LOCATIE")
+    assoc("EAID_AS_NAAMLOOS2", None, "EAID_PROJECT", "EAID_ACTIVITEIT", src_role="uitvoerder")
+    assoc("EAID_AS_BETREFT", "betreft", "EAID_PROJECT", "EAID_LOCATIE")
+
+    # 5. Technische packages en klassen zonder stereotype.
+    pkg("EAPK_DIAGRAM", "Diagram", "EAPK_KERN")
+    cls("EAID_PROXY", "ProxyConnector", "EAPK_DIAGRAM", stereotype=None)
+    cls("EAID_DIAGRAMOBJECT", "Zaakdiagramobject", "EAPK_DIAGRAM")
+    pkg("EAPK_TEKENWIJZE", "Tekenwijze", "EAPK_ROOT")
+    cls("EAID_OBJECTTYPE_A", "ObjecttypeA", "EAPK_TEKENWIJZE")
+    pkg("EAPK_VIEW", "View Betrokkene", "EAPK_ROOT")
+    cls("EAID_RSGB", "RSGB", "EAPK_VIEW", stereotype=None)
+    pkg("EAPK_INTERN", "Diagrammen intern gebruik", "EAPK_ROOT")
+    pkg("EAPK_SEMANTISCH", "Semantische relaties", "EAPK_INTERN")
+    cls("EAID_DETAILLERING", "DetailleringSubjecten", "EAPK_SEMANTISCH")
+    cls("EAID_ZONDER", "Zonder stereotype", "EAPK_KERN", stereotype=None)
+    # Een datatype-klasse heeft van nature geen Objecttype-stereotype en blijft.
+    cls("EAID_TYPEBEDRAG", "TypeBedrag", "EAPK_KERN", stereotype=None, is_datatype=True)
+    attr("EAID_TYPEBEDRAG_BEDRAG", "bedrag", "EAID_TYPEBEDRAG", "Bedrag")
+    attr("EAID_PERSOON_VERMOGEN", "vermogen", "EAID_PERSOON", type_class="EAID_TYPEBEDRAG")
+
+    # 6. Namespace-botsingen: twee modelpakketten 'Groepattribuutsoort' onder
+    #    verschillende ouders, en twee domeinen 'Archief'/'archief'.
+    pkg("EAPK_RGBZ_OUDER", "RGBZ", "EAPK_ROOT")
+    pkg("EAPK_GAS1", "Groepattribuutsoort", "EAPK_RGBZ_OUDER")
+    cls("EAID_VERBLIJFSADRES", "Verblijfsadres", "EAPK_GAS1")
+    pkg("EAPK_RSGB_OUDER", "RSGB", "EAPK_ROOT")
+    pkg("EAPK_GAS2", "Groepattribuutsoort", "EAPK_RSGB_OUDER")
+    cls("EAID_CORRESPONDENTIEADRES", "Correspondentieadres", "EAPK_GAS2")
+    pkg("EAPK_ARCHIEF2", "archief", "EAPK_ROOT")
+    pkg("EAPK_DEPOT_MODEL", "Model Depot", "EAPK_ARCHIEF2")
+    cls("EAID_DEPOT", "Depot", "EAPK_DEPOT_MODEL")
+
+    # 7. Identifiers: één leeg, één zonder EAID_-prefix.
+    attr("", "priotype", "EAID_ZAAK", "AN10")
+    cls("12345", "Afwijkend", "EAPK_KERN")
+
+    database.commit()
+
+
+def exporteer(outputfile=OUTPUT, extra=()):
+    cli.main(["-sch", SCHEMA, "export", "-f", outputfile, "-t", "ttl", "--linked_data_namespace", BASE, *extra])
+    graph = Graph()
+    graph.parse(outputfile, format="turtle")
+    return graph
+
+
+@pytest.fixture(scope="module")
+def graaf():
+    bouw_model()
+    graph = exporteer()
+    yield graph
+    os.remove(OUTPUT)
+
+
+def klasse(graph, label):
+    """De owl:Class met dit label (de SHACL-shape draagt hetzelfde label)."""
+    kandidaten = [s for s in graph.subjects(RDFS.label, Literal(label)) if (s, RDF.type, OWL.Class) in graph]
+    assert len(kandidaten) == 1, f"verwacht precies één klasse '{label}', gevonden: {kandidaten}"
+    return kandidaten[0]
+
+
+# ---------------------------------------------------------------------------
+# 1. Generalisaties
+# ---------------------------------------------------------------------------
+
+
+def test_generalisaties_wijzen_van_sub_naar_superklasse(graaf):
+    persoon, medewerker, burger = (klasse(graaf, naam) for naam in ("Persoon", "Medewerker", "Burger"))
+    assert (medewerker, RDFS.subClassOf, persoon) in graaf
+    assert (burger, RDFS.subClassOf, persoon) in graaf
+
+
+def test_geen_klasse_is_haar_eigen_superklasse(graaf):
+    zelf = [(s, o) for s, o in graaf.subject_objects(RDFS.subClassOf) if s == o]
+    assert zelf == [], f"klasse mag niet haar eigen superklasse zijn: {zelf}"
