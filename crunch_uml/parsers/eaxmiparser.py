@@ -192,6 +192,14 @@ class EAXMIParser(XMIParser):
                 attr.definitie = documentation[0].get("value") if documentation is not None else None
                 stereotype = attrref.xpath("./stereotype")
                 copy_values(stereotype, attr)
+                # Multipliciteit: de modelboom (lowerValue/upperValue) gaat voor;
+                # EA zet hem ook in de extensie als <bounds lower="0" upper="*"/>.
+                bounds = attrref.xpath("./bounds")
+                if bounds:
+                    if attr.mult_start is None and bounds[0].get("lower") not in (None, ""):
+                        attr.mult_start = bounds[0].get("lower")
+                    if attr.mult_end is None and bounds[0].get("upper") not in (None, ""):
+                        attr.mult_end = bounds[0].get("upper")
 
                 tags = get_sorted_tags(attrref.xpath("./tags/tag"))
                 for tag in tags:

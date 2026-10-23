@@ -280,6 +280,9 @@ class QEAParser(Parser):
                     enumeration_id=enumeration_id,
                     definitie=normalize_newlines(notes),
                     stereotype=stereotype,
+                    # t_attribute.LowerBound/UpperBound: '0'/'1', '1'/'*'.
+                    mult_start=str(lower) if lower not in (None, "") else None,
+                    mult_end=str(upper) if upper not in (None, "") else None,
                 )
                 logger.debug(f"Attribute {name} met id {eaid}")
                 schema.save(attribute)

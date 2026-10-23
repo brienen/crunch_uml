@@ -61,6 +61,8 @@ _NON_TAG_COLUMNS = {
     "primitive",
     "is_datatype",
     "verplicht",
+    "mult_start",
+    "mult_end",
     "src_class_id",
     "dst_class_id",
     "src_mult_start",
@@ -267,6 +269,18 @@ class XMIRenderer(Renderer):
             if type_ref is not None:
                 type_el = etree.SubElement(attr_el, "type")
                 type_el.set(XMI + "idref", type_ref)
+            # Multipliciteit zoals EA haar in de modelboom zet; de parser leest
+            # haar daar weer uit (mult_start/mult_end).
+            if attribute.mult_start not in (None, "", "None"):
+                lower_el = etree.SubElement(attr_el, "lowerValue")
+                lower_el.set(XMI + "type", "uml:LiteralInteger")
+                lower_el.set(XMI + "id", f"EAID_LI_lower_{attribute.id[5:]}")
+                _set_attrs(lower_el, value=attribute.mult_start)
+            if attribute.mult_end not in (None, "", "None"):
+                upper_el = etree.SubElement(attr_el, "upperValue")
+                upper_el.set(XMI + "type", "uml:LiteralUnlimitedNatural")
+                upper_el.set(XMI + "id", f"EAID_LI_upper_{attribute.id[5:]}")
+                _set_attrs(upper_el, value=attribute.mult_end)
 
         for gener in sorted(clazz.superclasses, key=lambda g: g.id):
             gener_el = etree.SubElement(class_el, "generalization")

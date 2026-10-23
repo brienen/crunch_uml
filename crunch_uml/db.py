@@ -873,6 +873,13 @@ class Attribute(Base, UML_Generic, UMLTagsAttribute):  # type: ignore
         overlaps="attributes,clazz,enumeration",
     )
     verplicht = Column(Boolean, default=False)
+    # Multipliciteit van het attribuut zoals de bron die geeft (EA: LowerBound/
+    # UpperBound, XMI: lowerValue/upperValue): '0'/'1' en '1'/'*' (of '-1' voor
+    # onbegrensd). NULL als de bron niets zegt. Nullable, dus rijdt mee op de
+    # additieve migratie; DATAMODEL_VERSION blijft 1. ``verplicht`` blijft het
+    # losse, door de gebruiker gezette veld (JSON-schema, Excel).
+    mult_start = Column(String)
+    mult_end = Column(String)
 
     __table_args__ = (
         ForeignKeyConstraint(

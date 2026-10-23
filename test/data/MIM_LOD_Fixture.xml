@@ -1,0 +1,706 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Testmodel voor de MIM 1.2-laag van de LOD-export (crunch_uml). Opgebouwd naar
+  het voorbeeld van GGM_Monumenten_EA2.1.xml (Enterprise Architect XMI 2.1):
+
+  Testmodel Zorg (wortel, informatiemodel)
+    Domein Zorg (stereotype Domein)
+      Model Zorg
+        Patient (Objecttype, met alle MIM-metagegevens en attributen met
+                 uiteenlopende multipliciteit, enumeratie-, groep- en
+                 datatype-getypeerde attributen)
+        Zorgverlener (Objecttype; attribuut 'naam' alleen met <bounds> in de
+                      EA-extensie, geen lowerValue/upperValue in de modelboom)
+        Huisarts (Objecttype, generalisatie naar Zorgverlener)
+        Behandelrelatie (stereotype Relatieklasse)
+        PatientStatus (Enumeratie, waarden met code via style/initial)
+        heeft zorgverlener: Patient 0..* -> Zorgverlener 1..1
+        heeft huisarts:     Patient 0..* -> Huisarts 0..1 (mogelijk geen waarde Ja)
+      Groepattribuutsoort
+        Adres (gegevensgroeptype)
+      Complex datatype
+        TypeBedrag (uml:DataType, gestructureerd datatype)
+-->
+<xmi:XMI xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmi:version="2.1" xmlns:uml="http://schema.omg.org/spec/UML/2.1">
+	<xmi:Documentation exporter="Enterprise Architect" exporterVersion="6.5" exporterID="1704"/>
+	<uml:Model xmi:type="uml:Model" name="EA_Model" visibility="public">
+		<packagedElement xmi:type="uml:Package" xmi:id="EAPK_00000001_0000_4000_8000_00000000A001" name="Testmodel Zorg" visibility="public">
+			<packagedElement xmi:type="uml:Package" xmi:id="EAPK_00000002_0000_4000_8000_00000000A002" name="Domein Zorg" visibility="public">
+				<packagedElement xmi:type="uml:Package" xmi:id="EAPK_00000003_0000_4000_8000_00000000A003" name="Model Zorg" visibility="public">
+					<packagedElement xmi:type="uml:Class" xmi:id="EAID_00000011_0000_4000_8000_00000000C001" name="Patient" visibility="public">
+						<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_00000101_0000_4000_8000_00000000F001" name="naam" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+							<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000101_0000_4000_8000_00000000F001" value="1"/>
+							<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000102_0000_4000_8000_00000000F001" value="1"/>
+							<type xmi:idref="EAJava_AN80"/>
+						</ownedAttribute>
+						<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_00000102_0000_4000_8000_00000000F002" name="geboortedatum" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+							<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000103_0000_4000_8000_00000000F002" value="0"/>
+							<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000104_0000_4000_8000_00000000F002" value="1"/>
+							<type xmi:idref="EAJava_Date"/>
+						</ownedAttribute>
+						<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_00000103_0000_4000_8000_00000000F003" name="telefoonnummers" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+							<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000105_0000_4000_8000_00000000F003" value="0"/>
+							<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000106_0000_4000_8000_00000000F003" value="-1"/>
+							<type xmi:idref="EAJava_AN15"/>
+						</ownedAttribute>
+						<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_00000104_0000_4000_8000_00000000F004" name="gewicht" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+							<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000107_0000_4000_8000_00000000F004" value="1"/>
+							<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000108_0000_4000_8000_00000000F004" value="1"/>
+							<type xmi:idref="EAJava_Decimal"/>
+						</ownedAttribute>
+						<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_00000105_0000_4000_8000_00000000F005" name="status" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+							<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000109_0000_4000_8000_00000000F005" value="1"/>
+							<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000110_0000_4000_8000_00000000F005" value="1"/>
+							<type xmi:idref="EAID_00000015_0000_4000_8000_00000000E001"/>
+						</ownedAttribute>
+						<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_00000106_0000_4000_8000_00000000F006" name="adres" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+							<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000111_0000_4000_8000_00000000F006" value="0"/>
+							<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000112_0000_4000_8000_00000000F006" value="1"/>
+							<type xmi:idref="EAID_00000021_0000_4000_8000_00000000C021"/>
+						</ownedAttribute>
+						<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_00000107_0000_4000_8000_00000000F007" name="eigen bijdrage" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+							<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000113_0000_4000_8000_00000000F007" value="0"/>
+							<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000114_0000_4000_8000_00000000F007" value="1"/>
+							<type xmi:idref="EAID_00000031_0000_4000_8000_00000000D001"/>
+						</ownedAttribute>
+						<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_dst00001_0000_4000_8000_00000000A101" visibility="public" association="EAID_A1A00001_0000_4000_8000_00000000A101" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+							<type xmi:idref="EAID_00000012_0000_4000_8000_00000000C002"/>
+							<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000201_0000_4000_8000_00000000A101" value="1"/>
+							<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000202_0000_4000_8000_00000000A101" value="1"/>
+						</ownedAttribute>
+						<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_dst00002_0000_4000_8000_00000000A102" visibility="public" association="EAID_A1A00002_0000_4000_8000_00000000A102" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+							<type xmi:idref="EAID_00000013_0000_4000_8000_00000000C003"/>
+							<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000203_0000_4000_8000_00000000A102" value="0"/>
+							<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000204_0000_4000_8000_00000000A102" value="1"/>
+						</ownedAttribute>
+					</packagedElement>
+					<packagedElement xmi:type="uml:Association" xmi:id="EAID_A1A00001_0000_4000_8000_00000000A101" name="heeft zorgverlener" visibility="public">
+						<memberEnd xmi:idref="EAID_dst00001_0000_4000_8000_00000000A101"/>
+						<memberEnd xmi:idref="EAID_src00001_0000_4000_8000_00000000A101"/>
+						<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src00001_0000_4000_8000_00000000A101" visibility="public" association="EAID_A1A00001_0000_4000_8000_00000000A101" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+							<type xmi:idref="EAID_00000011_0000_4000_8000_00000000C001"/>
+							<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000205_0000_4000_8000_00000000A101" value="0"/>
+							<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000206_0000_4000_8000_00000000A101" value="-1"/>
+						</ownedEnd>
+					</packagedElement>
+					<packagedElement xmi:type="uml:Association" xmi:id="EAID_A1A00002_0000_4000_8000_00000000A102" name="heeft huisarts" visibility="public">
+						<memberEnd xmi:idref="EAID_dst00002_0000_4000_8000_00000000A102"/>
+						<memberEnd xmi:idref="EAID_src00002_0000_4000_8000_00000000A102"/>
+						<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src00002_0000_4000_8000_00000000A102" visibility="public" association="EAID_A1A00002_0000_4000_8000_00000000A102" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+							<type xmi:idref="EAID_00000011_0000_4000_8000_00000000C001"/>
+							<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000207_0000_4000_8000_00000000A102" value="0"/>
+							<upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="EAID_LI000208_0000_4000_8000_00000000A102" value="-1"/>
+						</ownedEnd>
+					</packagedElement>
+					<packagedElement xmi:type="uml:Class" xmi:id="EAID_00000012_0000_4000_8000_00000000C002" name="Zorgverlener" visibility="public">
+						<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_00000111_0000_4000_8000_00000000F011" name="naam" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+							<type xmi:idref="EAJava_AN80"/>
+						</ownedAttribute>
+						<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_00000112_0000_4000_8000_00000000F012" name="registratienummer" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+							<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000115_0000_4000_8000_00000000F012" value="1"/>
+							<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000116_0000_4000_8000_00000000F012" value="1"/>
+							<type xmi:idref="EAJava_AN11"/>
+						</ownedAttribute>
+					</packagedElement>
+					<packagedElement xmi:type="uml:Class" xmi:id="EAID_00000013_0000_4000_8000_00000000C003" name="Huisarts" visibility="public">
+						<generalization xmi:type="uml:Generalization" xmi:id="EAID_00000041_0000_4000_8000_00000000G001" general="EAID_00000012_0000_4000_8000_00000000C002" isSubstitutable="true"/>
+					</packagedElement>
+					<packagedElement xmi:type="uml:Class" xmi:id="EAID_00000014_0000_4000_8000_00000000C004" name="Behandelrelatie" visibility="public">
+						<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_00000121_0000_4000_8000_00000000F021" name="startdatum" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+							<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000117_0000_4000_8000_00000000F021" value="1"/>
+							<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000118_0000_4000_8000_00000000F021" value="1"/>
+							<type xmi:idref="EAJava_Date"/>
+						</ownedAttribute>
+					</packagedElement>
+					<packagedElement xmi:type="uml:Enumeration" xmi:id="EAID_00000015_0000_4000_8000_00000000E001" name="PatientStatus" visibility="public">
+						<ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="EAID_00000131_0000_4000_8000_00000000L001" name="actief" visibility="public"/>
+						<ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="EAID_00000132_0000_4000_8000_00000000L002" name="inactief" visibility="public"/>
+					</packagedElement>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Package" xmi:id="EAPK_00000004_0000_4000_8000_00000000A004" name="Groepattribuutsoort" visibility="public">
+					<packagedElement xmi:type="uml:Class" xmi:id="EAID_00000021_0000_4000_8000_00000000C021" name="Adres" visibility="public">
+						<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_00000141_0000_4000_8000_00000000F031" name="straat" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+							<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000119_0000_4000_8000_00000000F031" value="1"/>
+							<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000120_0000_4000_8000_00000000F031" value="1"/>
+							<type xmi:idref="EAJava_AN80"/>
+						</ownedAttribute>
+						<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_00000142_0000_4000_8000_00000000F032" name="huisnummer" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+							<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000121_0000_4000_8000_00000000F032" value="1"/>
+							<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000122_0000_4000_8000_00000000F032" value="1"/>
+							<type xmi:idref="EAJava_int"/>
+						</ownedAttribute>
+					</packagedElement>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Package" xmi:id="EAPK_00000005_0000_4000_8000_00000000A005" name="Complex datatype" visibility="public">
+					<packagedElement xmi:type="uml:DataType" xmi:id="EAID_00000031_0000_4000_8000_00000000D001" name="TypeBedrag" visibility="public">
+						<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_00000151_0000_4000_8000_00000000F041" name="waarde" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+							<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000123_0000_4000_8000_00000000F041" value="1"/>
+							<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000124_0000_4000_8000_00000000F041" value="1"/>
+							<type xmi:idref="EAJava_Decimal"/>
+						</ownedAttribute>
+						<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_00000152_0000_4000_8000_00000000F042" name="valuta" visibility="public" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false">
+							<lowerValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000125_0000_4000_8000_00000000F042" value="1"/>
+							<upperValue xmi:type="uml:LiteralInteger" xmi:id="EAID_LI000126_0000_4000_8000_00000000F042" value="1"/>
+							<type xmi:idref="EAJava_AN3"/>
+						</ownedAttribute>
+					</packagedElement>
+				</packagedElement>
+			</packagedElement>
+		</packagedElement>
+	</uml:Model>
+	<xmi:Extension extender="Enterprise Architect" extenderID="6.5">
+		<elements>
+			<element xmi:idref="EAPK_00000001_0000_4000_8000_00000000A001" xmi:type="uml:Package" name="Testmodel Zorg" scope="public">
+				<model package2="EAID_00000001_0000_4000_8000_00000000A001" tpos="0" ea_localid="1" ea_eleType="package"/>
+				<properties documentation="Testmodel voor de MIM-laag van de LOD-export." isSpecification="false" sType="Package" nType="0" scope="public" stereotype="Informatiemodel"/>
+				<project author="Testauteur" version="1.0.0" phase="1.0" created="2024-01-15 10:00:00" modified="2026-10-01 12:00:00" complexity="1" status="Proposed"/>
+				<tags/>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Model"/>
+				<packageproperties version="1.0.0" tpos="0"/>
+			</element>
+			<element xmi:idref="EAPK_00000002_0000_4000_8000_00000000A002" xmi:type="uml:Package" name="Domein Zorg" scope="public">
+				<model package2="EAID_00000002_0000_4000_8000_00000000A002" package="EAPK_00000001_0000_4000_8000_00000000A001" tpos="0" ea_localid="2" ea_eleType="package"/>
+				<properties documentation="Het informatiedomein zorg." isSpecification="false" sType="Package" nType="0" scope="public" stereotype="Domein"/>
+				<project author="Testauteur" version="1.2" phase="1.0" created="2024-01-15 10:00:00" modified="2026-10-01 12:00:00" complexity="1" status="Proposed"/>
+				<tags/>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Testmodel Zorg"/>
+				<packageproperties version="1.2" tpos="0"/>
+			</element>
+			<element xmi:idref="EAPK_00000003_0000_4000_8000_00000000A003" xmi:type="uml:Package" name="Model Zorg" scope="public">
+				<model package2="EAID_00000003_0000_4000_8000_00000000A003" package="EAPK_00000002_0000_4000_8000_00000000A002" tpos="0" ea_localid="3" ea_eleType="package"/>
+				<properties documentation="Het model zorg." isSpecification="false" sType="Package" nType="0" scope="public"/>
+				<project author="Testauteur" version="2.1.0" phase="1.0" created="2024-01-15 10:00:00" modified="2026-10-01 12:00:00" complexity="1" status="Proposed"/>
+				<tags/>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Domein Zorg"/>
+				<packageproperties version="2.1.0" tpos="0"/>
+			</element>
+			<element xmi:idref="EAPK_00000004_0000_4000_8000_00000000A004" xmi:type="uml:Package" name="Groepattribuutsoort" scope="public">
+				<model package2="EAID_00000004_0000_4000_8000_00000000A004" package="EAPK_00000002_0000_4000_8000_00000000A002" tpos="1" ea_localid="4" ea_eleType="package"/>
+				<properties documentation="Gegevensgroeptypen van het domein zorg." isSpecification="false" sType="Package" nType="0" scope="public"/>
+				<project author="Testauteur" version="1.0" phase="1.0" created="2024-01-15 10:00:00" modified="2026-10-01 12:00:00" complexity="1" status="Proposed"/>
+				<tags/>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Domein Zorg"/>
+				<packageproperties version="1.0" tpos="1"/>
+			</element>
+			<element xmi:idref="EAPK_00000005_0000_4000_8000_00000000A005" xmi:type="uml:Package" name="Complex datatype" scope="public">
+				<model package2="EAID_00000005_0000_4000_8000_00000000A005" package="EAPK_00000002_0000_4000_8000_00000000A002" tpos="2" ea_localid="5" ea_eleType="package"/>
+				<properties documentation="Gestructureerde datatypen van het domein zorg." isSpecification="false" sType="Package" nType="0" scope="public"/>
+				<project author="Testauteur" version="1.0" phase="1.0" created="2024-01-15 10:00:00" modified="2026-10-01 12:00:00" complexity="1" status="Proposed"/>
+				<tags/>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Domein Zorg"/>
+				<packageproperties version="1.0" tpos="2"/>
+			</element>
+			<element xmi:idref="EAID_00000011_0000_4000_8000_00000000C001" xmi:type="uml:Class" name="Patient" scope="public">
+				<model package="EAPK_00000003_0000_4000_8000_00000000A003" tpos="0" ea_localid="11" ea_eleType="element"/>
+				<properties documentation="Een natuurlijk persoon die zorg ontvangt van een zorgverlener." isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Objecttype" alias="Zorgvrager" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Testauteur" version="1.0" phase="1.0" created="2024-01-15 10:00:00" modified="2026-10-01 12:00:00" complexity="1" status="Proposed"/>
+				<tags>
+					<tag xmi:id="EAID_T0000001_0000_4000_8000_00000000T001" name="herkomst" value="BRP#NOTES#Description: De registratie of het informatiemodel waaraan het modelelement ontleend is." modelElement="EAID_00000011_0000_4000_8000_00000000C001"/>
+					<tag xmi:id="EAID_T0000002_0000_4000_8000_00000000T002" name="herkomst definitie" value="BRP" modelElement="EAID_00000011_0000_4000_8000_00000000C001"/>
+					<tag xmi:id="EAID_T0000003_0000_4000_8000_00000000T003" name="datum opname" value="1 mei 2016" modelElement="EAID_00000011_0000_4000_8000_00000000C001"/>
+					<tag xmi:id="EAID_T0000004_0000_4000_8000_00000000T004" name="toelichting" value="Alleen ingeschreven patienten tellen mee." modelElement="EAID_00000011_0000_4000_8000_00000000C001"/>
+					<tag xmi:id="EAID_T0000005_0000_4000_8000_00000000T005" name="populatie" value="Alle patienten van de praktijk." modelElement="EAID_00000011_0000_4000_8000_00000000C001"/>
+					<tag xmi:id="EAID_T0000006_0000_4000_8000_00000000T006" name="kwaliteit" value="Dagelijks bijgewerkt vanuit de BRP." modelElement="EAID_00000011_0000_4000_8000_00000000C001"/>
+					<tag xmi:id="EAID_T0000007_0000_4000_8000_00000000T007" name="authentiek" value="Authentiek" modelElement="EAID_00000011_0000_4000_8000_00000000C001"/>
+					<tag xmi:id="EAID_T0000008_0000_4000_8000_00000000T008" name="indicatie formele historie" value="Ja" modelElement="EAID_00000011_0000_4000_8000_00000000C001"/>
+					<tag xmi:id="EAID_T0000009_0000_4000_8000_00000000T009" name="begrip" value="https://begrippen.example.org/id/begrip/patient" modelElement="EAID_00000011_0000_4000_8000_00000000C001"/>
+				</tags>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Model Zorg"/>
+				<attributes>
+					<attribute xmi:idref="EAID_00000101_0000_4000_8000_00000000F001" name="naam" scope="Public">
+						<initial/>
+						<documentation value="De volledige naam van de patient."/>
+						<model ea_localid="101" ea_guid="{00000101-0000-4000-8000-00000000F001}"/>
+						<properties type="AN80" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="0"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags>
+							<tag xmi:id="EAID_T0000101_0000_4000_8000_00000000T101" name="herkomst" value="BRP"/>
+							<tag xmi:id="EAID_T0000102_0000_4000_8000_00000000T102" name="herkomst definitie" value="BRP"/>
+							<tag xmi:id="EAID_T0000103_0000_4000_8000_00000000T103" name="datum opname" value="2016-05-01"/>
+							<tag xmi:id="EAID_T0000104_0000_4000_8000_00000000T104" name="mogelijk geen waarde" value="Nee"/>
+							<tag xmi:id="EAID_T0000105_0000_4000_8000_00000000T105" name="indicatie formele historie" value="Ja"/>
+							<tag xmi:id="EAID_T0000106_0000_4000_8000_00000000T106" name="indicatie materiele historie" value="Nee"/>
+							<tag xmi:id="EAID_T0000107_0000_4000_8000_00000000T107" name="authentiek" value="Authentiek"/>
+							<tag xmi:id="EAID_T0000108_0000_4000_8000_00000000T108" name="lengte" value="80"/>
+							<tag xmi:id="EAID_T0000109_0000_4000_8000_00000000T109" name="patroon" value="Letters en spaties"/>
+							<tag xmi:id="EAID_T0000110_0000_4000_8000_00000000T110" name="formeel patroon" value="^[A-Za-z ]+$"/>
+							<tag xmi:id="EAID_T0000111_0000_4000_8000_00000000T111" name="toelichting" value="Zoals geregistreerd in de BRP."/>
+						</tags>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_00000102_0000_4000_8000_00000000F002" name="geboortedatum" scope="Public">
+						<initial/>
+						<documentation value="De datum waarop de patient is geboren."/>
+						<model ea_localid="102" ea_guid="{00000102-0000-4000-8000-00000000F002}"/>
+						<properties type="Date" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="1"/>
+						<stereotype/>
+						<bounds lower="0" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags>
+							<tag xmi:id="EAID_T0000112_0000_4000_8000_00000000T112" name="herkomst" value="BRP"/>
+							<tag xmi:id="EAID_T0000113_0000_4000_8000_00000000T113" name="datum opname" value="9 april 2007"/>
+							<tag xmi:id="EAID_T0000114_0000_4000_8000_00000000T114" name="mogelijk geen waarde" value="Ja"/>
+						</tags>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_00000103_0000_4000_8000_00000000F003" name="telefoonnummers" scope="Public">
+						<initial/>
+						<documentation value="Telefoonnummers waarop de patient bereikbaar is."/>
+						<model ea_localid="103" ea_guid="{00000103-0000-4000-8000-00000000F003}"/>
+						<properties type="AN15" derived="0" precision="0" collection="true" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="2"/>
+						<stereotype/>
+						<bounds lower="0" upper="*"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags>
+							<tag xmi:id="EAID_T0000115_0000_4000_8000_00000000T115" name="mogelijk geen waarde" value="Nee"/>
+						</tags>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_00000104_0000_4000_8000_00000000F004" name="gewicht" scope="Public">
+						<initial/>
+						<documentation value="Het lichaamsgewicht van de patient."/>
+						<model ea_localid="104" ea_guid="{00000104-0000-4000-8000-00000000F004}"/>
+						<properties type="Decimal" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="3"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags>
+							<tag xmi:id="EAID_T0000116_0000_4000_8000_00000000T116" name="eenheid" value="kg"/>
+							<tag xmi:id="EAID_T0000117_0000_4000_8000_00000000T117" name="minimumwaarde inclusief" value="0"/>
+							<tag xmi:id="EAID_T0000118_0000_4000_8000_00000000T118" name="maximumwaarde inclusief" value="500"/>
+							<tag xmi:id="EAID_T0000119_0000_4000_8000_00000000T119" name="mogelijk geen waarde" value="Ja"/>
+						</tags>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_00000105_0000_4000_8000_00000000F005" name="status" scope="Public">
+						<initial/>
+						<documentation value="De status van de patient in de praktijk."/>
+						<model ea_localid="105" ea_guid="{00000105-0000-4000-8000-00000000F005}"/>
+						<properties type="PatientStatus" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="4"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags>
+							<tag xmi:id="EAID_T0000120_0000_4000_8000_00000000T120" name="indicatie classificerend" value="Ja"/>
+							<tag xmi:id="EAID_T0000121_0000_4000_8000_00000000T121" name="mogelijk geen waarde" value="Nee"/>
+						</tags>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_00000106_0000_4000_8000_00000000F006" name="adres" scope="Public">
+						<initial/>
+						<documentation value="Het woonadres van de patient."/>
+						<model ea_localid="106" ea_guid="{00000106-0000-4000-8000-00000000F006}"/>
+						<properties type="Adres" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="5"/>
+						<stereotype/>
+						<bounds lower="0" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_00000107_0000_4000_8000_00000000F007" name="eigen bijdrage" scope="Public">
+						<initial/>
+						<documentation value="De eigen bijdrage die de patient betaalt."/>
+						<model ea_localid="107" ea_guid="{00000107-0000-4000-8000-00000000F007}"/>
+						<properties type="TypeBedrag" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="6"/>
+						<stereotype/>
+						<bounds lower="0" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+				</attributes>
+				<links>
+					<Association xmi:id="EAID_A1A00001_0000_4000_8000_00000000A101" start="EAID_00000011_0000_4000_8000_00000000C001" end="EAID_00000012_0000_4000_8000_00000000C002"/>
+					<Association xmi:id="EAID_A1A00002_0000_4000_8000_00000000A102" start="EAID_00000011_0000_4000_8000_00000000C001" end="EAID_00000013_0000_4000_8000_00000000C003"/>
+				</links>
+			</element>
+			<element xmi:idref="EAID_00000012_0000_4000_8000_00000000C002" xmi:type="uml:Class" name="Zorgverlener" scope="public">
+				<model package="EAPK_00000003_0000_4000_8000_00000000A003" tpos="1" ea_localid="12" ea_eleType="element"/>
+				<properties documentation="Een persoon die beroepsmatig zorg verleent." isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Objecttype" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Testauteur" version="1.0" phase="1.0" created="2024-01-15 10:00:00" modified="2026-10-01 12:00:00" complexity="1" status="Proposed"/>
+				<tags>
+					<tag xmi:id="EAID_T0000021_0000_4000_8000_00000000T021" name="herkomst" value="GGM" modelElement="EAID_00000012_0000_4000_8000_00000000C002"/>
+					<tag xmi:id="EAID_T0000022_0000_4000_8000_00000000T022" name="herkomst definitie" value="GGM" modelElement="EAID_00000012_0000_4000_8000_00000000C002"/>
+					<tag xmi:id="EAID_T0000023_0000_4000_8000_00000000T023" name="datum opname" value="24-Apr-09" modelElement="EAID_00000012_0000_4000_8000_00000000C002"/>
+				</tags>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Model Zorg"/>
+				<attributes>
+					<attribute xmi:idref="EAID_00000111_0000_4000_8000_00000000F011" name="naam" scope="Public">
+						<initial/>
+						<documentation value="De naam van de zorgverlener."/>
+						<model ea_localid="111" ea_guid="{00000111-0000-4000-8000-00000000F011}"/>
+						<properties type="AN80" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="0"/>
+						<stereotype/>
+						<bounds lower="0" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_00000112_0000_4000_8000_00000000F012" name="registratienummer" scope="Public">
+						<initial/>
+						<documentation value="Het BIG-registratienummer van de zorgverlener."/>
+						<model ea_localid="112" ea_guid="{00000112-0000-4000-8000-00000000F012}"/>
+						<properties type="AN11" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="1"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags>
+							<tag xmi:id="EAID_T0000122_0000_4000_8000_00000000T122" name="patroon" value="&lt;memo&gt;" notes="Elf cijfers."/>
+							<tag xmi:id="EAID_T0000123_0000_4000_8000_00000000T123" name="indicatie formele historie" value="n.v.t.#NOTES#Values: Ja,Nee,Zie groep,n.v.t.&#xA;"/>
+						</tags>
+						<xrefs/>
+					</attribute>
+				</attributes>
+			</element>
+			<element xmi:idref="EAID_00000013_0000_4000_8000_00000000C003" xmi:type="uml:Class" name="Huisarts" scope="public">
+				<model package="EAPK_00000003_0000_4000_8000_00000000A003" tpos="2" ea_localid="13" ea_eleType="element"/>
+				<properties documentation="Zorgverlener die als huisarts is ingeschreven." isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Objecttype" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Testauteur" version="1.0" phase="1.0" created="2024-01-15 10:00:00" modified="2026-10-01 12:00:00" complexity="1" status="Proposed"/>
+				<tags>
+					<tag xmi:id="EAID_T0000031_0000_4000_8000_00000000T031" name="herkomst" value="GGM" modelElement="EAID_00000013_0000_4000_8000_00000000C003"/>
+					<tag xmi:id="EAID_T0000032_0000_4000_8000_00000000T032" name="herkomst definitie" value="GGM" modelElement="EAID_00000013_0000_4000_8000_00000000C003"/>
+					<tag xmi:id="EAID_T0000033_0000_4000_8000_00000000T033" name="datum opname" value="2009-04-24 00:00:00" modelElement="EAID_00000013_0000_4000_8000_00000000C003"/>
+				</tags>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Model Zorg"/>
+				<links>
+					<Generalization xmi:id="EAID_00000041_0000_4000_8000_00000000G001" start="EAID_00000013_0000_4000_8000_00000000C003" end="EAID_00000012_0000_4000_8000_00000000C002"/>
+				</links>
+			</element>
+			<element xmi:idref="EAID_00000014_0000_4000_8000_00000000C004" xmi:type="uml:Class" name="Behandelrelatie" scope="public">
+				<model package="EAPK_00000003_0000_4000_8000_00000000A003" tpos="3" ea_localid="14" ea_eleType="element"/>
+				<properties documentation="De relatie tussen patient en zorgverlener met eigenschappen." isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Relatieklasse" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Testauteur" version="1.0" phase="1.0" created="2024-01-15 10:00:00" modified="2026-10-01 12:00:00" complexity="1" status="Proposed"/>
+				<tags/>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Model Zorg"/>
+				<attributes>
+					<attribute xmi:idref="EAID_00000121_0000_4000_8000_00000000F021" name="startdatum" scope="Public">
+						<initial/>
+						<documentation value="De datum waarop de behandelrelatie begon."/>
+						<model ea_localid="121" ea_guid="{00000121-0000-4000-8000-00000000F021}"/>
+						<properties type="Date" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="0"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+				</attributes>
+			</element>
+			<element xmi:idref="EAID_00000015_0000_4000_8000_00000000E001" xmi:type="uml:Enumeration" name="PatientStatus" scope="public">
+				<model package="EAPK_00000003_0000_4000_8000_00000000A003" tpos="4" ea_localid="15" ea_eleType="element"/>
+				<properties documentation="De mogelijke statussen van een patient." isSpecification="false" sType="Enumeration" nType="0" scope="public" stereotype="Enumeratie" isRoot="false" isLeaf="false" isAbstract="false"/>
+				<project author="Testauteur" version="1.0" phase="1.0" created="2024-01-15 10:00:00" modified="2026-10-01 12:00:00" complexity="1" status="Proposed"/>
+				<tags>
+					<tag xmi:id="EAID_T0000051_0000_4000_8000_00000000T051" name="datum opname" value="2016-05-01" modelElement="EAID_00000015_0000_4000_8000_00000000E001"/>
+					<tag xmi:id="EAID_T0000052_0000_4000_8000_00000000T052" name="herkomst" value="GGM" modelElement="EAID_00000015_0000_4000_8000_00000000E001"/>
+				</tags>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Model Zorg"/>
+				<attributes>
+					<attribute xmi:idref="EAID_00000131_0000_4000_8000_00000000L001" name="actief" scope="Public">
+						<initial/>
+						<documentation value="De patient is in behandeling."/>
+						<model ea_localid="131" ea_guid="{00000131-0000-4000-8000-00000000L001}"/>
+						<properties derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="0"/>
+						<stereotype stereotype="enum"/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style value="1"/>
+						<styleex value="IsLiteral=1;volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_00000132_0000_4000_8000_00000000L002" name="inactief" scope="Public">
+						<initial/>
+						<documentation value="De patient is niet meer in behandeling."/>
+						<model ea_localid="132" ea_guid="{00000132-0000-4000-8000-00000000L002}"/>
+						<properties derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="1"/>
+						<stereotype stereotype="enum"/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style value="2"/>
+						<styleex value="IsLiteral=1;volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+				</attributes>
+			</element>
+			<element xmi:idref="EAID_00000021_0000_4000_8000_00000000C021" xmi:type="uml:Class" name="Adres" scope="public">
+				<model package="EAPK_00000004_0000_4000_8000_00000000A004" tpos="0" ea_localid="21" ea_eleType="element"/>
+				<properties documentation="Een adres als groep van samenhangende gegevens." isSpecification="false" sType="Class" nType="0" scope="public" stereotype="Objecttype" isRoot="false" isLeaf="false" isAbstract="false" isActive="false"/>
+				<project author="Testauteur" version="1.0" phase="1.0" created="2024-01-15 10:00:00" modified="2026-10-01 12:00:00" complexity="1" status="Proposed"/>
+				<tags>
+					<tag xmi:id="EAID_T0000061_0000_4000_8000_00000000T061" name="herkomst" value="BAG" modelElement="EAID_00000021_0000_4000_8000_00000000C021"/>
+					<tag xmi:id="EAID_T0000062_0000_4000_8000_00000000T062" name="datum opname" value="2016-05-01" modelElement="EAID_00000021_0000_4000_8000_00000000C021"/>
+				</tags>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Groepattribuutsoort"/>
+				<attributes>
+					<attribute xmi:idref="EAID_00000141_0000_4000_8000_00000000F031" name="straat" scope="Public">
+						<initial/>
+						<documentation value="De straatnaam."/>
+						<model ea_localid="141" ea_guid="{00000141-0000-4000-8000-00000000F031}"/>
+						<properties type="AN80" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="0"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_00000142_0000_4000_8000_00000000F032" name="huisnummer" scope="Public">
+						<initial/>
+						<documentation value="Het huisnummer."/>
+						<model ea_localid="142" ea_guid="{00000142-0000-4000-8000-00000000F032}"/>
+						<properties type="int" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="1"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+				</attributes>
+			</element>
+			<element xmi:idref="EAID_00000031_0000_4000_8000_00000000D001" xmi:type="uml:DataType" name="TypeBedrag" scope="public">
+				<model package="EAPK_00000005_0000_4000_8000_00000000A005" tpos="0" ea_localid="31" ea_eleType="element"/>
+				<properties documentation="Een geldbedrag met valuta." isSpecification="false" sType="DataType" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false"/>
+				<project author="Testauteur" version="1.0" phase="1.0" created="2024-01-15 10:00:00" modified="2026-10-01 12:00:00" complexity="1" status="Proposed"/>
+				<tags>
+					<tag xmi:id="EAID_T0000071_0000_4000_8000_00000000T071" name="herkomst" value="GGM" modelElement="EAID_00000031_0000_4000_8000_00000000D001"/>
+					<tag xmi:id="EAID_T0000072_0000_4000_8000_00000000T072" name="datum opname" value="2016-05-01" modelElement="EAID_00000031_0000_4000_8000_00000000D001"/>
+				</tags>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="Complex datatype"/>
+				<attributes>
+					<attribute xmi:idref="EAID_00000151_0000_4000_8000_00000000F041" name="waarde" scope="Public">
+						<initial/>
+						<documentation value="Het bedrag."/>
+						<model ea_localid="151" ea_guid="{00000151-0000-4000-8000-00000000F041}"/>
+						<properties type="Decimal" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="0"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+					<attribute xmi:idref="EAID_00000152_0000_4000_8000_00000000F042" name="valuta" scope="Public">
+						<initial/>
+						<documentation value="De valutacode (ISO 4217)."/>
+						<model ea_localid="152" ea_guid="{00000152-0000-4000-8000-00000000F042}"/>
+						<properties type="AN3" derived="0" precision="0" collection="false" length="0" static="0" duplicates="0" changeability="changeable"/>
+						<coords ordered="0" scale="0"/>
+						<containment containment="Not Specified" position="1"/>
+						<stereotype/>
+						<bounds lower="1" upper="1"/>
+						<options/>
+						<style/>
+						<styleex value="volatile=0;"/>
+						<tags/>
+						<xrefs/>
+					</attribute>
+				</attributes>
+			</element>
+		</elements>
+		<connectors>
+			<connector xmi:idref="EAID_A1A00001_0000_4000_8000_00000000A101" name="heeft zorgverlener">
+				<source xmi:idref="EAID_00000011_0000_4000_8000_00000000C001">
+					<model ea_localid="11" type="Class" name="Patient"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_00000012_0000_4000_8000_00000000C002">
+					<model ea_localid="12" type="Class" name="Zorgverlener"/>
+					<role name="behandelaar" visibility="Public" targetScope="instance"/>
+					<type multiplicity="1..1" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="true"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Navigable;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>
+				<model ea_localid="1001"/>
+				<properties ea_type="Association" direction="Source -&gt; Destination"/>
+				<modifiers isRoot="false" isLeaf="false"/>
+				<parameterSubstitutions/>
+				<documentation value="De zorgverlener die de patient behandelt."/>
+				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
+				<labels lb="0..*" mt="heeft zorgverlener" rb="1..1"/>
+				<extendedProperties virtualInheritance="0"/>
+				<style/>
+				<xrefs/>
+				<tags>
+					<tag xmi:id="EAID_T0000201_0000_4000_8000_00000000T201" name="herkomst" value="GGM"/>
+					<tag xmi:id="EAID_T0000202_0000_4000_8000_00000000T202" name="datum opname" value="2016-05-01"/>
+					<tag xmi:id="EAID_T0000203_0000_4000_8000_00000000T203" name="mogelijk geen waarde" value="Nee"/>
+					<tag xmi:id="EAID_T0000204_0000_4000_8000_00000000T204" name="authentiek" value="Basisgegeven"/>
+					<tag xmi:id="EAID_T0000205_0000_4000_8000_00000000T205" name="toelichting" value="Elke patient heeft precies een behandelaar."/>
+					<tag xmi:id="EAID_T0000206_0000_4000_8000_00000000T206" name="indicatie formele historie" value="Ja"/>
+				</tags>
+			</connector>
+			<connector xmi:idref="EAID_A1A00002_0000_4000_8000_00000000A102" name="heeft huisarts">
+				<source xmi:idref="EAID_00000011_0000_4000_8000_00000000C001">
+					<model ea_localid="11" type="Class" name="Patient"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..*" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_00000013_0000_4000_8000_00000000C003">
+					<model ea_localid="13" type="Class" name="Huisarts"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type multiplicity="0..1" aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="true"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Navigable;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>
+				<model ea_localid="1002"/>
+				<properties ea_type="Association" direction="Source -&gt; Destination"/>
+				<modifiers isRoot="false" isLeaf="false"/>
+				<parameterSubstitutions/>
+				<documentation value="De huisarts bij wie de patient is ingeschreven."/>
+				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
+				<labels lb="0..*" mt="heeft huisarts" rb="0..1"/>
+				<extendedProperties virtualInheritance="0"/>
+				<style/>
+				<xrefs/>
+				<tags>
+					<tag xmi:id="EAID_T0000211_0000_4000_8000_00000000T211" name="herkomst" value="GGM"/>
+					<tag xmi:id="EAID_T0000212_0000_4000_8000_00000000T212" name="datum opname" value="2016-05-01"/>
+					<tag xmi:id="EAID_T0000213_0000_4000_8000_00000000T213" name="mogelijk geen waarde" value="Ja"/>
+				</tags>
+			</connector>
+			<connector xmi:idref="EAID_00000041_0000_4000_8000_00000000G001">
+				<source xmi:idref="EAID_00000013_0000_4000_8000_00000000C003">
+					<model ea_localid="13" type="Class" name="Huisarts"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_00000012_0000_4000_8000_00000000C002">
+					<model ea_localid="12" type="Class" name="Zorgverlener"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="true"/>
+					<style/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>
+				<model ea_localid="1003"/>
+				<properties ea_type="Generalization" direction="Source -&gt; Destination"/>
+				<modifiers isRoot="false" isLeaf="false"/>
+				<parameterSubstitutions/>
+				<documentation/>
+				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
+				<labels/>
+				<extendedProperties virtualInheritance="0"/>
+				<style/>
+				<xrefs/>
+				<tags>
+					<tag xmi:id="EAID_T0000301_0000_4000_8000_00000000T301" name="datum opname" value="2016-05-01"/>
+				</tags>
+			</connector>
+		</connectors>
+		<primitivetypes>
+			<packagedElement xmi:type="uml:Package" xmi:id="EAPrimitiveTypesPackage" name="EA_PrimitiveTypes_Package" visibility="public">
+				<packagedElement xmi:type="uml:Package" xmi:id="EAJavaTypesPackage" name="EA_Java_Types_Package" visibility="public">
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_int" name="int" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_Date" name="Date" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_Decimal" name="Decimal" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN3" name="AN3" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN11" name="AN11" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN15" name="AN15" visibility="public"/>
+					<packagedElement xmi:type="uml:PrimitiveType" xmi:id="EAJava_AN80" name="AN80" visibility="public"/>
+				</packagedElement>
+			</packagedElement>
+		</primitivetypes>
+		<profiles/>
+		<diagrams/>
+	</xmi:Extension>
+</xmi:XMI>
