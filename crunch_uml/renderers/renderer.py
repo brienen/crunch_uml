@@ -84,6 +84,53 @@ def add_args(argumentparser, subparser_dict):
         type=util.urlparse,
         help="Namespace for linked data renderers",
     )
+    # MIM-metadata voor de linked-data-renderers (ttl, rdf, json-ld).
+    output_subparser.add_argument(
+        "-ldlang",
+        "--lod_language",
+        type=str,
+        default="nl",
+        help=(
+            "Taaltag (BCP 47) voor labels, definities en toelichtingen in de linked-data-renderers;"
+            " een lege string geeft literals zonder taaltag. Standaard 'nl'."
+        ),
+    )
+    output_subparser.add_argument(
+        "-ldver",
+        "--lod_version",
+        type=str,
+        help=(
+            "Versie van het informatiemodel voor de linked-data-renderers (owl:versionInfo en"
+            " owl:versionIRI), bijvoorbeeld v3.0.0."
+        ),
+    )
+    output_subparser.add_argument(
+        "--lod_title",
+        type=str,
+        help="Titel van het informatiemodel (dcterms:title); standaard de naam van het wortelpakket.",
+    )
+    output_subparser.add_argument(
+        "--lod_publisher",
+        type=str,
+        help="Uitgever van het informatiemodel (dcterms:publisher), als naam of als URI.",
+    )
+    output_subparser.add_argument(
+        "--lod_license",
+        type=str,
+        help="Licentie van het informatiemodel (dcterms:license), als URI.",
+    )
+    output_subparser.add_argument(
+        "--lod_informatiedomein",
+        type=str,
+        help="Functioneel domein waartoe het informatiemodel behoort (mim:informatiedomein).",
+    )
+    output_subparser.add_argument(
+        "--lod_informatiemodeltype",
+        type=str,
+        default="logisch",
+        choices=["conceptueel", "logisch", "technisch"],
+        help="MIM-informatiemodeltype van het model (mim:informatiemodeltype). Standaard 'logisch'.",
+    )
     output_subparser.add_argument(
         "-js_url",
         "--json_schema_url",
