@@ -2,7 +2,7 @@ import logging
 import os
 import re
 from typing import Optional, Tuple
-from urllib.parse import quote, urljoin, urlunparse
+from urllib.parse import urlunparse
 
 from rdflib import BNode, Graph, Literal, Namespace, URIRef
 from rdflib.collection import Collection
@@ -257,15 +257,19 @@ class LodRenderer(ModelRenderer):
             # Voorbereiding over ALLE modellen: namespaces en klasse-indexen,
             # zodat attribuut- en associatie-ranges ook klassen uit andere
             # modellen kunnen aanwijzen.
-            model_ns: dict = {}  # package id -> (modelname, Namespace)
+            model_ns: dict = {}  # package id -> (modelslug, Namespace)
             class_dict: dict = {}  # class guid -> uri
             class_by_name: dict = {}  # klassenaam (casefold) -> uri
             enum_uris: dict = {}  # enum guid -> uri
             enum_by_name: dict = {}  # enumnaam (casefold) -> enum
             enum_by_uri: dict = {}  # enum uri -> enum (voor sh:in)
             for model in models:
-                modelname = util.remove_substring(model.name, "model").lower()
-                ns = Namespace(urljoin(str(args.linked_data_namespace), f"/{quote(modelname)}/"))
+                # Het modelsegment krijgt dezelfde slug-vorm als klassen en
+                # attributen (geen %20 of %28 in IRI's). De namespace wordt
+                # achter de basis geplakt: urljoin(base, "/slug/") gooide een
+                # eventueel pad in de basis-URI weg.
+                modelname = slugify(util.remove_substring(model.name, "model"))
+                ns = Namespace(base + modelname + "/")
                 model_ns[model.id] = (modelname, ns)
                 for cls in model.classes:
                     if not cls.name:
@@ -380,7 +384,7 @@ class LodRenderer(ModelRenderer):
                             logger.warning(f"SHACL-shape overgeslagen voor klasse zonder naam: {cls.id}")
                             continue
                         class_uri = class_dict[cls.id]
-                        shape_uri = shape_ns[slugify(modelname) + "/" + slugify(cls.name)]
+                        shape_uri = shape_ns[modelname + "/" + slugify(cls.name)]
                         g.add((shape_uri, RDF.type, SH.NodeShape))
                         g.add((shape_uri, SH.targetClass, class_uri))
                         g.add((shape_uri, RDFS.label, Literal(cls.name)))

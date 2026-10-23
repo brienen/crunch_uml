@@ -23,7 +23,7 @@ import logging
 import os
 
 import pytest
-from rdflib import Graph, Literal
+from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SH
 
 import crunch_uml.schema as sch
@@ -169,3 +169,27 @@ def test_generalisaties_wijzen_van_sub_naar_superklasse(graaf):
 def test_geen_klasse_is_haar_eigen_superklasse(graaf):
     zelf = [(s, o) for s, o in graaf.subject_objects(RDFS.subClassOf) if s == o]
     assert zelf == [], f"klasse mag niet haar eigen superklasse zijn: {zelf}"
+
+
+# ---------------------------------------------------------------------------
+# 2. Spaties en haakjes in IRI's; basis-URI met pad
+# ---------------------------------------------------------------------------
+
+
+def test_modelsegment_is_slug_en_basispad_blijft_behouden(graaf):
+    """'Model Kern (RGBZ)' werd 'kern%20%28rgbz%29' en het pad '/lod/' van de
+    basis-URI viel weg; nu 'kern-rgbz' achter de volledige basis."""
+    assert klasse(graaf, "Zaak") == URIRef(BASE + "kern-rgbz/zaak")
+    assert (URIRef(BASE + "kern-rgbz/zaak/identificatie"), RDF.type, OWL.DatatypeProperty) in graaf
+    assert (URIRef(BASE + "kern-rgbz/"), RDF.type, OWL.Ontology) in graaf
+
+
+def test_geen_procent_codering_in_eigen_iris(graaf):
+    eigen = {
+        t for triple in graaf for t in triple if isinstance(t, URIRef) and str(t).startswith("https://voorbeeld.nl/")
+    }
+    assert eigen, "er moeten eigen IRI's zijn"
+    fout = sorted(str(i) for i in eigen if "%" in str(i))
+    assert fout == [], f"IRI's met procent-codering: {fout}"
+    buiten = sorted(str(i) for i in eigen if not str(i).startswith(BASE))
+    assert buiten == [], f"IRI's buiten de basis-URI: {buiten}"
