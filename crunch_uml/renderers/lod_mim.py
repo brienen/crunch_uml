@@ -184,7 +184,6 @@ class MimAnnotator:
         g.add((uri, MIM.basisUri, Literal(self.base, datatype=XSD.anyURI)))
         g.add((uri, RDFS.label, self.lit(pkg.name)))
         g.add((uri, DCTERMS.title, self.lit(titel or pkg.name)))
-        g.add((uri, DCTERMS.identifier, Literal(pkg.id)))
         if self._tekst(uri, RDFS.comment, pkg.definitie):
             self._tekst(uri, DCTERMS.description, pkg.definitie)
         self._tekst(uri, MIM.definitie, pkg.definitie)
@@ -495,12 +494,14 @@ class MimAnnotator:
     # Relatiesoorten
     # ------------------------------------------------------------------
 
-    def annotate_association(self, prop_uri: URIRef, shape_node, assoc, bron_uri: URIRef, doel_uri: URIRef):
+    def annotate_association(
+        self, prop_uri: URIRef, shape_node, assoc, bron_uri: URIRef, doel_uri: URIRef, naam: Optional[str] = None
+    ):
         """Associatie als mim:Relatiesoort (6.4.5.6) met bron, doel,
         kardinaliteit (doelzijde) en kardinaliteit relatie bron (bronzijde)."""
         g = self.g
         soort = "Relatiesoort"
-        naam = assoc.name or getattr(assoc, "dst_role", None) or getattr(assoc, "src_role", None)
+        naam = naam or assoc.name or getattr(assoc, "dst_role", None) or getattr(assoc, "src_role", None)
         self._identificeer(prop_uri, naam, MIM.Relatiesoort)
         self._algemeen(prop_uri, assoc, soort)
         g.add((prop_uri, MIM.bron, bron_uri))

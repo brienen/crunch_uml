@@ -24,6 +24,7 @@ from rdflib import Graph, Literal, Namespace, URIRef
 from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SH, SKOS, XSD
 
 from crunch_uml import cli, const
+from crunch_uml.renderers.lod_mim import MIM
 from crunch_uml.renderers.lodrenderer import GEO, map_datatype
 
 OUTPUTFILE = "./test/output/Monumenten_datatypes.ttl"
@@ -136,24 +137,29 @@ def test_model_packages_are_ontologies_with_defined_classes(monumenten_graph):
 
 
 def test_domain_hierarchy_is_rendered(monumenten_graph):
-    """Bovenliggende pakketten verschijnen als Domein-entiteiten en de
-    hiërarchie is navigeerbaar via dcterms:isPartOf."""
-    myns = Namespace(const.DEFAULT_LOD_NS)
-    domein_cls = myns["Domein"]
-    domains = set(monumenten_graph.subjects(RDF.type, domein_cls))
-    assert domains, "bovenliggende pakketten moeten als Domein-entiteit bestaan"
+    """Pakketten verschijnen als owl:Ontology + mim:Domein (het wortelpakket
+    als mim:Informatiemodel op de basis-URI) en de hiërarchie is navigeerbaar
+    via dcterms:isPartOf omhoog en owl:imports omlaag (MIM 6.4.7, 6.4.9.40)."""
+    domains = set(monumenten_graph.subjects(RDF.type, MIM.Domein))
+    assert domains, "pakketten moeten als mim:Domein bestaan"
+    ontologies = set(monumenten_graph.subjects(RDF.type, OWL.Ontology))
+    assert domains <= ontologies, "elk domein is ook een owl:Ontology"
+
+    informatiemodel = URIRef(const.DEFAULT_LOD_NS)
+    assert (informatiemodel, RDF.type, MIM.Informatiemodel) in monumenten_graph
+    assert (informatiemodel, RDF.type, OWL.Ontology) in monumenten_graph
+    assert (None, RDF.type, Namespace(const.DEFAULT_LOD_NS)["Domein"]) not in monumenten_graph
 
     part_of = list(monumenten_graph.subject_objects(DCTERMS.isPartOf))
     assert part_of, "de pakkethiërarchie moet via dcterms:isPartOf gelegd zijn"
-    # Elke isPartOf wijst naar een bestaande entiteit (Domein of Ontology).
-    ontologies = set(monumenten_graph.subjects(RDF.type, OWL.Ontology))
-    for _, parent in part_of:
-        assert parent in domains | ontologies
+    for child, parent in part_of:
+        assert parent in ontologies
+        assert (parent, OWL.imports, child) in monumenten_graph
+    assert informatiemodel in {parent for _, parent in part_of}
 
 
 def test_domain_entities_carry_labels(monumenten_graph):
-    myns = Namespace(const.DEFAULT_LOD_NS)
-    for domain in monumenten_graph.subjects(RDF.type, myns["Domein"]):
+    for domain in monumenten_graph.subjects(RDF.type, MIM.Domein):
         assert isinstance(domain, URIRef)
         assert list(monumenten_graph.objects(domain, RDFS.label))
         assert list(monumenten_graph.objects(domain, DCTERMS.identifier))

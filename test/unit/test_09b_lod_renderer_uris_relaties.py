@@ -28,6 +28,7 @@ from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SH, XSD
 
 import crunch_uml.schema as sch
 from crunch_uml import cli, const, db
+from crunch_uml.renderers.lod_mim import MIM
 from crunch_uml.renderers.lodrenderer import model_segment_name
 
 SCHEMA = "lod_fixes"
@@ -330,7 +331,12 @@ def test_technische_packages_worden_standaard_overgeslagen(graaf):
 def test_klassen_zonder_stereotype_worden_overgeslagen_behalve_datatypes(graaf):
     labels = set(graaf.objects(None, RDFS.label))
     assert Literal("Zonder stereotype") not in labels
-    typebedrag = klasse(graaf, "TypeBedrag")  # is_datatype, blijft
+    # is_datatype, blijft: in MIM een gestructureerd datatype, dus een
+    # sh:NodeShape (6.4.6.3) en geen owl:Class.
+    typebedrag = URIRef(BASE + "kern/typebedrag")
+    assert (typebedrag, RDF.type, SH.NodeShape) in graaf
+    assert (typebedrag, RDF.type, MIM.GestructureerdDatatype) in graaf
+    assert (typebedrag, RDFS.label, Literal("TypeBedrag")) in graaf
     assert (URIRef(BASE + "kern/persoon/vermogen"), RDFS.range, typebedrag) in graaf
     assert (URIRef(BASE + "kern/typebedrag/bedrag"), RDFS.range, XSD.decimal) in graaf
 
@@ -375,7 +381,7 @@ def test_gelijknamige_modelpakketten_krijgen_eigen_namespace(graaf):
 
 
 def test_gelijknamige_domeinen_krijgen_eigen_uri(graaf):
-    domein_type = URIRef(BASE + "Domein")
+    domein_type = MIM.Domein
     archief = [
         d for d in graaf.subjects(RDF.type, domein_type) if str(graaf.value(d, RDFS.label)).casefold() == "archief"
     ]
@@ -385,7 +391,7 @@ def test_gelijknamige_domeinen_krijgen_eigen_uri(graaf):
 
 
 def test_elke_ontologie_en_elk_domein_heeft_precies_een_identifier(graaf):
-    entiteiten = set(graaf.subjects(RDF.type, OWL.Ontology)) | set(graaf.subjects(RDF.type, URIRef(BASE + "Domein")))
+    entiteiten = set(graaf.subjects(RDF.type, OWL.Ontology)) | set(graaf.subjects(RDF.type, MIM.Domein))
     assert entiteiten
     for entiteit in entiteiten:
         assert len(set(graaf.objects(entiteit, DCTERMS.identifier))) == 1, entiteit
