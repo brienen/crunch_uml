@@ -24,7 +24,7 @@ import os
 
 import pytest
 from rdflib import Graph, Literal, URIRef
-from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SH
+from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SH, XSD
 
 import crunch_uml.schema as sch
 from crunch_uml import cli, const, db
@@ -227,3 +227,81 @@ def test_pakket_model_houdt_een_segment(graaf):
 def test_alleen_los_woord_model_wordt_verwijderd(graaf):
     assert klasse(graaf, "Woning") == URIRef(BASE + "gegevensmodel-wonen/woning")
     assert klasse(graaf, "Archiefstuk") == URIRef(BASE + "archief/archiefstuk")
+
+
+# ---------------------------------------------------------------------------
+# 4. Unieke relatie-URI's
+# ---------------------------------------------------------------------------
+
+
+def test_gelijknamige_associaties_krijgen_eigen_uri(graaf):
+    """Twee associaties 'heeft' vanuit Project (naar Activiteit en Locatie)
+    vielen samen tot één ObjectProperty met twee ranges en twee identifiers."""
+    project = klasse(graaf, "Project")
+    heeft = [p for p in graaf.subjects(RDFS.domain, project) if (p, RDFS.label, Literal("heeft")) in graaf]
+    assert {str(p) for p in heeft} == {
+        BASE + "projecten/project/heeft-activiteit",
+        BASE + "projecten/project/heeft-locatie",
+    }
+    for prop in heeft:
+        assert len(set(graaf.objects(prop, RDFS.range))) == 1
+        assert len(set(graaf.objects(prop, DCTERMS.identifier))) == 1
+
+
+def test_associatie_botst_niet_met_gelijknamig_attribuut(graaf):
+    naam_attribuut = URIRef(BASE + "projecten/project/naam")
+    assert (naam_attribuut, RDF.type, OWL.DatatypeProperty) in graaf
+    assert (naam_attribuut, RDF.type, OWL.ObjectProperty) not in graaf
+    assert (naam_attribuut, DCTERMS.identifier, Literal("EAID_PROJ_NAAM")) in graaf
+    naam_associatie = URIRef(BASE + "projecten/project/naam-activiteit")
+    assert (naam_associatie, RDF.type, OWL.ObjectProperty) in graaf
+    assert (naam_associatie, DCTERMS.identifier, Literal("EAID_AS_NAAM")) in graaf
+
+
+def test_naamloze_associaties_heten_naar_rol_en_doelklasse(graaf):
+    """Naamloze associaties kregen een GUID-slug als URI en 'None' als label."""
+    assert (
+        URIRef(BASE + "projecten/project/relatie-locatie"),
+        DCTERMS.identifier,
+        Literal("EAID_AS_NAAMLOOS1"),
+    ) in graaf
+    assert (
+        URIRef(BASE + "projecten/project/uitvoerder-activiteit"),
+        DCTERMS.identifier,
+        Literal("EAID_AS_NAAMLOOS2"),
+    ) in graaf
+    assert (None, RDFS.label, Literal("None")) not in graaf
+    assert not [s for s in graaf.subjects(RDF.type, OWL.ObjectProperty) if "eaid" in str(s).lower()]
+
+
+def test_associatie_zonder_botsing_houdt_korte_uri(graaf):
+    assert (URIRef(BASE + "projecten/project/betreft"), RDFS.range, klasse(graaf, "Locatie")) in graaf
+
+
+def test_dubbele_attribuutnamen_binnen_klasse_worden_uniek(graaf):
+    """Twee attributen 'objectidentificatie' (AN40 en klasse Locatie) werden
+    stilzwijgend één property met twee ranges; nu krijgt elk het type als
+    achtervoegsel en zijn eigen identifier."""
+    tekst = URIRef(BASE + "projecten/project/objectidentificatie-string")
+    locatie = URIRef(BASE + "projecten/project/objectidentificatie-locatie")
+    assert (tekst, RDFS.range, XSD.string) in graaf
+    assert (tekst, DCTERMS.identifier, Literal("EAID_PROJ_OID1")) in graaf
+    assert (locatie, RDFS.range, klasse(graaf, "Locatie")) in graaf
+    assert (locatie, DCTERMS.identifier, Literal("EAID_PROJ_OID2")) in graaf
+    assert (URIRef(BASE + "projecten/project/objectidentificatie"), None, None) not in graaf
+
+
+def test_elke_property_heeft_precies_een_range_en_identifier(graaf):
+    properties = set(graaf.subjects(RDF.type, OWL.ObjectProperty)) | set(graaf.subjects(RDF.type, OWL.DatatypeProperty))
+    assert properties
+    for prop in properties:
+        assert len(set(graaf.objects(prop, RDFS.range))) == 1, prop
+        assert len(set(graaf.objects(prop, RDFS.domain))) == 1, prop
+        assert len(set(graaf.objects(prop, DCTERMS.identifier))) <= 1, prop
+
+
+def test_shacl_paden_verwijzen_naar_gerenderde_properties(graaf):
+    paden = set(graaf.objects(None, SH.path))
+    assert paden
+    for pad in paden:
+        assert (pad, RDF.type, None) in graaf, f"sh:path {pad} wijst naar een onbekende property"
