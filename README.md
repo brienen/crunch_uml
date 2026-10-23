@@ -160,9 +160,12 @@ crunch_uml [-sch SCHEMA] export -t <type> -f <file> [options]
 | `-t, --outputtype` | Output type (see table below) |
 | `-pi` | Comma-separated list of package IDs to include |
 | `-xpi` | Comma-separated list of package IDs to exclude |
+| `-xpn` | Comma-separated package-name patterns (case-insensitive, `*`/`?` wildcards) excluded with their subpackages; the LOD renderers default to `Diagram,Diagrammen intern gebruik,Tekenwijze,View*`, pass `""` to disable |
 | `-jt` | Jinja2 template file |
 | `-jtd` | Jinja2 template directory |
 | `-ldns` | Namespace for Linked Data renderers |
+| `-ldlang` | Language tag for labels and definitions in the LOD export (default `nl`, `""` for none) |
+| `-ldver`, `--lod_title`, `--lod_publisher`, `--lod_license`, `--lod_informatiedomein`, `--lod_informatiemodeltype` | Version and MIM metadata of the information model in the LOD export (see the export manual) |
 | `-js_url` | URL for JSON Schema references |
 | `-vt` | EA Repo version update: `minor`, `major`, `none` |
 | `-ts` | EA Repo tag strategy: `update`, `upsert`, `replace` |
@@ -191,7 +194,7 @@ crunch_uml [-sch SCHEMA] export -t <type> -f <file> [options]
 | `plain_html` | HTML output |
 | `er_diagram` | Entity-Relationship diagram |
 | `uml_mmd` | Mermaid UML diagrams |
-| `ttl` | RDF in Turtle syntax. Requires `-ldns` |
+| `ttl` | RDF in Turtle syntax with the MIM 1.2 layer (OWL/SHACL plus `mim:` typing and metadata). Requires `-ldns` |
 | `rdf` | RDF/XML. Requires `-ldns` |
 | `json-ld` | JSON-LD. Requires `-ldns` |
 | `shex` | Shape Expressions |

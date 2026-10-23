@@ -57,7 +57,7 @@ crunch_uml transform [-h] [-sch_from SCHEMA] -sch_to SCHEMA -ttp TYPE
 ## Export
 
 ```bash
-crunch_uml export [-h] -f FILE -t TYPE [-pi IDS] [-xpi IDS]
+crunch_uml export [-h] -f FILE -t TYPE [-pi IDS] [-xpi IDS] [-xpn PATTERNS]
                    [-jt TEMPLATE] [-jtd DIR] [-ldns NS] [-js_url URL]
                    [-vt TYPE] [-ts STRATEGY] [--mapper JSON]
                    [--entity_name NAME] [--compare_schema_name SCHEMA]
@@ -71,9 +71,15 @@ crunch_uml export [-h] -f FILE -t TYPE [-pi IDS] [-xpi IDS]
 | `-t` | `--outputtype` | Output type (see [Export](export.md)) |
 | `-pi` | `--output_package_ids` | Comma-separated package IDs |
 | `-xpi` | `--output_exclude_package_ids` | Package IDs to exclude |
+| `-xpn` | `--output_exclude_package_names` | Comma-separated package-name patterns (case-insensitive, `*`/`?`) excluded with their subpackages; LOD renderers default to `Diagram,Diagrammen intern gebruik,Tekenwijze,View*`, `""` disables this |
 | `-jt` | `--output_jinja2_template` | Jinja2 template file |
 | `-jtd` | `--output_jinja2_templatedir` | Template directory |
 | `-ldns` | `--linked_data_namespace` | Namespace for LOD |
+| `-ldlang` | `--lod_language` | Language tag for labels and definitions in the LOD export (default `nl`, `""` = none) |
+| `-ldver` | `--lod_version` | Version of the information model (`owl:versionInfo`/`owl:versionIRI`) |
+| | `--lod_title`, `--lod_publisher`, `--lod_license` | Title, publisher and licence of the information model (`dcterms:`) |
+| | `--lod_informatiedomein` | Functional domain (`mim:informatiedomein`) |
+| | `--lod_informatiemodeltype` | `conceptueel`, `logisch` (default) or `technisch` |
 | `-js_url` | `--json_schema_url` | URL for JSON Schema |
 | `-vt` | `--version_type` | EA version update: `minor`, `major`, `none` |
 | `-ts` | `--tag_strategy` | EA tag strategy: `update`, `upsert`, `replace` |

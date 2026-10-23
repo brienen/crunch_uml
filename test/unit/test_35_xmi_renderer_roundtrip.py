@@ -56,6 +56,8 @@ NORMALIZED_FIELDS = {
     "src_mult_end",
     "dst_mult_start",
     "dst_mult_end",
+    "mult_start",
+    "mult_end",
     "primitive",
     "name",
 }

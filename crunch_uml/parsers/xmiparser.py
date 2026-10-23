@@ -221,6 +221,13 @@ class XMIParser(Parser):
                         else:
                             # EA primitive datatype (e.g. EAJava_int, EASomeProfile_String, etc.)
                             attribute.primitive = remove_EADatatype(datatype)
+                    # Multipliciteit uit de modelboom: <lowerValue value="0"/>
+                    # <upperValue value="-1"/>. Ontbreekt die, dan kan de
+                    # EA-extensie (<bounds lower upper>) hem nog leveren.
+                    for tag, field in (("lowerValue", "mult_start"), ("upperValue", "mult_end")):
+                        valuenodes = childnode.xpath(f"./{tag}")
+                        if valuenodes and valuenodes[0].get("value") not in (None, ""):
+                            setattr(attribute, field, valuenodes[0].get("value"))
                     logger.debug(
                         f"Attribute {attribute.name} met id {attribute.id} ingelezen met inhoud: {vars(attribute)}"
                     )

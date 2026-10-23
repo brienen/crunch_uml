@@ -101,9 +101,15 @@ crunch_uml -sch my_schema export -t <type> -f <file>
 | `-t, --outputtype` | Output type (see tables above) |
 | `-pi, --output_package_ids` | Comma-separated list of package IDs to export |
 | `-xpi, --output_exclude_package_ids` | Package IDs to exclude |
+| `-xpn, --output_exclude_package_names` | Comma-separated package-name patterns (case-insensitive, `*` and `?`) excluded together with their subpackages; the Linked Data renderers default to `Diagram,Diagrammen intern gebruik,Tekenwijze,View*`, an empty string (`""`) disables this |
 | `-jt, --output_jinja2_template` | Jinja2 template file |
 | `-jtd, --output_jinja2_templatedir` | Directory with Jinja2 templates |
 | `-ldns, --linked_data_namespace` | Namespace for Linked Data renderers |
+| `-ldlang, --lod_language` | Language tag for labels, definitions and explanations in the Linked Data export (default `nl`; `""` gives literals without a tag) |
+| `-ldver, --lod_version` | Version of the information model (`owl:versionInfo`, `owl:versionIRI`) |
+| `--lod_title`, `--lod_publisher`, `--lod_license` | Title, publisher and licence of the information model (`dcterms:title`, `dcterms:publisher`, `dcterms:license`) |
+| `--lod_informatiedomein` | Functional domain of the information model (`mim:informatiedomein`) |
+| `--lod_informatiemodeltype` | `conceptueel`, `logisch` (default) or `technisch` (`mim:informatiemodeltype`) |
 | `-js_url, --json_schema_url` | URL for JSON Schema references |
 | `--mapper` | JSON string for renaming columns in output |
 | `--entity_name` | Specific entity to export (with CSV) |
@@ -154,6 +160,56 @@ crunch_uml -sch my_model export -t ttl \
     -f ontology.ttl \
     --linked_data_namespace https://example.org/model/
 ```
+
+Every model package (a package with at least one class) becomes an `owl:Ontology` with its own namespace
+`{namespace}{model}/`, where `{model}` is the slug of the package name without the standalone word *Model*
+(`Model Kern RGBZ` → `kern-rgbz/`). Classes get `{model}/{class}`, attributes and associations
+`{model}/{class}/{name}`. Same-named associations from one class get the target class as suffix
+(`project/heeft-projectlocatie`), nameless associations are named `{role or relatie}-{target}` and
+same-named attributes get their datatype or target class as suffix, so every property keeps exactly one
+`rdfs:range` and its own `dcterms:identifier`. Model packages sharing a name are prefixed with the parent
+package name, with a warning.
+
+Classes without a stereotype (technical EA elements such as `ProxyConnector`) are skipped; datatype
+classes stay. Packages named `Diagram`, `Diagrammen intern gebruik`, `Tekenwijze` and `View*` are left
+out with their subpackages by default; adjust this with `--output_exclude_package_names` or disable it
+with `--output_exclude_package_names ""`.
+
+#### MIM 1.2 layer
+
+The export follows the normative transformation of MIM 1.2 (annex 6.4, *Transformatie MIM – RDFS/OWL/SHACL*):
+every resource carries the MIM metaclass and the MIM metadata from the model next to its OWL/SHACL typing.
+
+| Model element | OWL/SHACL | MIM |
+|---|---|---|
+| root package | `owl:Ontology` on the base URI | `mim:Informatiemodel` with `mim:mimversie "1.2"`, `mim:informatiemodeltype`, `mim:relatiemodelleringstype`, `mim:informatiedomein`, `owl:versionInfo`/`owl:versionIRI` and `dcterms:title/modified/publisher/license` from the `--lod_*` options |
+| other packages | `owl:Ontology`, `dcterms:isPartOf` to the parent, `owl:imports` from parent to child | `mim:Domein` |
+| class | `owl:Class` + `sh:NodeShape` | `mim:Objecttype`; `mim:Gegevensgroeptype` (package *Groepattribuutsoort*), `mim:Relatieklasse` (`rdfs:subClassOf rdf:Statement`), `mim:Referentielijst`/`mim:Codelijst` |
+| datatype class (*Complex datatype*, *Union*, `is_datatype`) | `sh:NodeShape` only, no `owl:Class` | `mim:GestructureerdDatatype`; its attributes `mim:DataElement`, referring attributes `sh:node` |
+| attribute | `owl:DatatypeProperty`/`owl:ObjectProperty` + `sh:PropertyShape` | `mim:Attribuutsoort` (`mim:Gegevensgroep` when typed by a gegevensgroeptype, `mim:Relatiesoort` when typed by an object type) with `mim:type` and `mim:kardinaliteit` |
+| association | `owl:ObjectProperty`, also `sh:property` of the source class NodeShape | `mim:Relatiesoort` with `mim:bron`, `mim:doel`, `mim:kardinaliteit` and `mim:kardinaliteitRelatieBron` |
+| enumeration | `owl:Class` `rdfs:subClassOf skos:Concept`, `skos:ConceptScheme`, `sh:NodeShape` | `mim:Enumeratie`; values `mim:Enumeratiewaarde` with the code as `skos:notation` |
+
+The metadata from the EA tags travels as `mim:herkomst`, `mim:herkomstDefinitie`, `mim:datumOpname`
+(`xsd:date`), `mim:toelichting`, `mim:alias`, `mim:begrip` (also `dct:subject`), `mim:populatie`,
+`mim:kwaliteit`, `mim:authentiek` (a concept from `mim:Authenticiteit`), `mim:lengte` (with
+`sh:minLength`/`sh:maxLength`), `mim:patroon`, `mim:formeelPatroon` (`sh:pattern`), the history indications,
+`mim:indicatieClassificerend`, `mim:mogelijkGeenWaarde`, `mim:eenheid` and the value range
+(`sh:minInclusive` etc.). Tag values are stripped of the `#NOTES#` tag-definition notes and `<memo>`
+placeholders. Cardinality comes from the multiplicity in the model: `sh:minCount`/`sh:maxCount` per
+MIM 6.4.9.15, where `sh:minCount` is dropped when *mogelijk geen waarde* is Ja (6.4.9.18). Nothing is
+invented: only the MIM defaults (indications `false`, cardinality `1..1`, `mim:unidirectioneel true`,
+`mim:aggregatietype mim:Geen`) are written, and at the end of the export crunch_uml logs which mandatory
+metadata the source lacks.
+
+Validate against the MIM shapes (pyshacl, from `dev_requirements.txt`):
+
+```bash
+python tools/validate_mim_lod.py ontology.ttl
+```
+
+The tool checks the export against `test/data/mim/mim-shapes.ttl` (with `mim.ttl` as vocabulary) and
+summarises the findings per shape, path and constraint with example resources; `--json` writes the report.
 
 ### Schema comparison
 

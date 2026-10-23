@@ -882,6 +882,13 @@ class Attribute(Base, UML_Generic, UMLTagsAttribute):  # type: ignore
         overlaps="attributes,clazz,enumeration",
     )
     verplicht = Column(Boolean, default=False)
+    # Multipliciteit van het attribuut zoals de bron die geeft (EA: LowerBound/
+    # UpperBound, XMI: lowerValue/upperValue): '0'/'1' en '1'/'*' (of '-1' voor
+    # onbegrensd). NULL als de bron niets zegt. Nullable, dus rijdt mee op de
+    # additieve migratie; DATAMODEL_VERSION blijft 1. ``verplicht`` blijft het
+    # losse, door de gebruiker gezette veld (JSON-schema, Excel).
+    mult_start = Column(String)
+    mult_end = Column(String)
 
     __table_args__ = (
         ForeignKeyConstraint(
@@ -1421,6 +1428,13 @@ class Database:
         return cls._instance
 
     def _reset_database(self):
+        # Objecten die de sessie nog kent (uit een eerdere import of export in
+        # hetzelfde proces, vaak alleen nog als niet-opgeruimde referentiecycli)
+        # horen bij de tabellen die hieronder verdwijnen. Blijven ze in de
+        # identity map, dan maakt een herimport er UPDATE's van op rijen die
+        # niet meer bestaan ("expected to update 1 row(s); 0 were matched").
+        self.session.rollback()
+        self.session.expunge_all()
         Base.metadata.drop_all(bind=self.engine)  # Drop all tables
         Base.metadata.create_all(bind=self.engine)  # Create all tables
         # De tabellen zijn nieuw: eerdere aannames over hun inhoud vervallen.

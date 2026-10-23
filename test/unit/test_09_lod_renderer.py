@@ -1,6 +1,7 @@
 import os
 
 from rdflib import Graph, exceptions
+from rdflib.namespace import OWL, RDF
 
 import crunch_uml.schema as sch
 from crunch_uml import cli, const, db
@@ -67,13 +68,13 @@ def test_lod_renderer():
     assert os.path.exists(outputfile)
     assert is_valid_ttl_file(outputfile)
 
-    # Test if all classes are there: 6 modelklassen plus de declaratie van
-    # het Domein-type (pakkethiërarchie). De enumeratie TypeMonument is óók
-    # een owl:Class, maar serialiseert als "owl:Class," (dubbel type met
-    # skos:ConceptScheme) en telt in deze woordtelling dus niet mee; de
-    # semantische controle daarvan zit in test_09a.
-    assert count_occurences("owl:Class", outputfile) == 7
-    # assert count_occurences('RDF:Property', outputfile) == 31
+    # Test if all classes are there: 6 modelklassen plus de enumeratie
+    # TypeMonument (óók een owl:Class). Geteld in de graaf, want met de
+    # MIM-typering ("a owl:Class, mim:Objecttype") is een woordtelling in de
+    # Turtle-tekst niet meer betrouwbaar.
+    graph = Graph()
+    graph.parse(outputfile, format="turtle")
+    assert len(set(graph.subjects(RDF.type, OWL.Class))) == 7
 
     # Cleanup
     os.remove(outputfile)

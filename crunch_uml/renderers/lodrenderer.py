@@ -2,15 +2,17 @@ import logging
 import os
 import re
 from typing import Optional, Tuple
-from urllib.parse import quote, urljoin, urlunparse
+from urllib.parse import urlunparse
 
 from rdflib import BNode, Graph, Literal, Namespace, URIRef
 from rdflib.collection import Collection
 from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SH, SKOS, XSD
 
 import crunch_uml.schema as sch
-from crunch_uml import const, util
+from crunch_uml import const
 from crunch_uml.exceptions import CrunchException
+from crunch_uml.renderers import mim
+from crunch_uml.renderers.lod_mim import MimAnnotator
 from crunch_uml.renderers.renderer import ModelRenderer, RendererRegistry
 
 logger = logging.getLogger()
@@ -21,6 +23,26 @@ GEO = Namespace("http://www.opengis.net/ont/geosparql#")
 
 def slugify(name):
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+
+
+# Enterprise Architect-GUID's: EAID_ (elementen) of EAPK_ (pakketten) met
+# alfanumerieke groepen; ook de synthetische id's van de parsers (EAID_dst...).
+_EA_GUID_RE = re.compile(r"^EA(ID|PK)_[0-9A-Za-z]+(_[0-9A-Za-z]+)*$")
+
+# Het losse woord 'Model' aan het begin of einde van een pakketnaam.
+_MODEL_WORD_RE = re.compile(r"^\s*model\b\s*|\s*\bmodel\s*$", re.IGNORECASE)
+
+
+def model_segment_name(name):
+    """Naam van een modelpakket zonder het losse woord 'Model' voor- of achteraan.
+
+    'Model Kern RGBZ' -> 'Kern RGBZ', 'RSGB Model' -> 'RSGB'; 'Gegevensmodel
+    Wonen' blijft intact. Blijft er niets over (pakket 'Model'), dan is de
+    volledige naam het segment, zodat de IRI nooit een leeg segment krijgt.
+    """
+    name = (name or "").strip()
+    cleaned = _MODEL_WORD_RE.sub("", name).strip()
+    return cleaned or name
 
 
 # ---------------------------------------------------------------------------
@@ -128,61 +150,177 @@ class LodRenderer(ModelRenderer):
       krijgen bovendien ``sh:maxLength``. Attributen waarvan het type de
       naam van een modelklasse is, worden ``owl:ObjectProperty`` met die
       klasse als range (``sh:class`` in de shape);
-    * **de domeinhiërarchie**: elk modelpakket wordt een ``owl:Ontology``
-      waar zijn klassen met ``rdfs:isDefinedBy`` naar verwijzen; de
-      bovenliggende (domein)pakketten worden entiteiten van het zelf
-      gedeclareerde type ``Domein``, met ``dcterms:isPartOf``-relaties die
-      de pakkethiërarchie van het model volgen tot aan de wortel;
+    * **de domeinhiërarchie**: elk pakket wordt een ``owl:Ontology`` — het
+      wortelpakket als ``mim:Informatiemodel`` op de basis-URI, de overige
+      (model- en domein)pakketten als ``mim:Domein`` — waar zijn klassen met
+      ``rdfs:isDefinedBy`` naar verwijzen, met ``dcterms:isPartOf`` naar het
+      bovenliggende pakket en ``owl:imports`` van ouder naar kind (MIM 6.4.9.40);
     * **enumeraties**: elke enumeratie wordt een ``owl:Class`` én
       ``skos:ConceptScheme``; de waarden worden ``skos:Concept``-en (met
       ``skos:inScheme``/``skos:topConceptOf`` en de enumeratie als klasse).
       Attributen die een enumeratie als type hebben — via de directe
       koppeling in het model of via de typenaam — worden
       ``owl:ObjectProperty`` met de enumeratie als range; hun SHACL-shape
-      somt de toegestane concepten op met ``sh:in``.
+      somt de toegestane concepten op met ``sh:in``;
+    * **MIM 1.2** (bijlage 6.4): elke resource draagt naast de OWL/SHACL-
+      typering de MIM-metaklasse (``mim:Objecttype``, ``mim:Attribuutsoort``,
+      ``mim:Relatiesoort``, ``mim:Gegevensgroeptype``,
+      ``mim:GestructureerdDatatype``, ...) en de MIM-metagegevens uit het
+      model (herkomst, datum opname, kardinaliteit met ``sh:minCount``/
+      ``sh:maxCount``, lengte, patroon, authentiek, ...); relaties worden ook
+      ``sh:property`` van de NodeShape van de bronklasse. Zie
+      :mod:`crunch_uml.renderers.lod_mim`.
     """
+
+    default_exclude_package_names = const.LOD_EXCLUDE_PACKAGE_NAMES
+
+    # Taaltag voor labels, definities en toelichtingen (--lod_language);
+    # None geeft literals zonder taaltag.
+    _lang: Optional[str] = "nl"
 
     def writeToFile(self, graph, args):
         pass
 
-    def addPackageHierarchy(self, g, models, myns, domain_ns, model_ns):
-        """Voeg de pakkethiërarchie toe als Linked Data-entiteiten."""
-        domein_cls = myns["Domein"]
-        g.add((domein_cls, RDF.type, OWL.Class))
-        g.add((domein_cls, RDFS.label, Literal("Domein", lang="nl")))
-        g.add(
-            (
-                domein_cls,
-                RDFS.comment,
-                Literal("Informatiedomein: groepering van modellen binnen het gegevensmodel.", lang="nl"),
-            )
-        )
+    def lit(self, text):
+        """Tekstliteral in de taal van de export (MIM 6.4.9.2: rdfs:label met
+        de taal van het model), of zonder taaltag als die leeg is."""
+        return mim.lang_literal(text, self._lang)
 
+    def addIdentifier(self, g, uri, obj_id, what):
+        """Voeg dcterms:identifier toe en meld lege of afwijkende identifiers.
+
+        De GGM-export had één lege identifier en één zonder EAID_-prefix; zo'n
+        element is in Enterprise Architect niet terug te vinden. Een lege
+        identifier wordt niet als lege literal geschreven; identifiers die niet
+        op een EA-GUID lijken worden verzameld en aan het eind van de export in
+        één waarschuwing gemeld.
+        """
+        if obj_id is None or not str(obj_id).strip():
+            logger.warning(f"Lege identifier voor {what} <{uri}>; dcterms:identifier weggelaten")
+            return
+        obj_id = str(obj_id)
+        if not _EA_GUID_RE.match(obj_id):
+            self._odd_identifiers.setdefault(obj_id, f"{what} <{uri}>")
+        g.add((uri, DCTERMS.identifier, Literal(obj_id)))
+
+    def reportOddIdentifiers(self):
+        if self._odd_identifiers:
+            voorbeelden = ", ".join(f"'{k}' ({v})" for k, v in list(self._odd_identifiers.items())[:10])
+            logger.warning(
+                f"{len(self._odd_identifiers)} identifiers wijken af van het EA-GUID-patroon (EAID_.../EAPK_...):"
+                f" {voorbeelden}" + (" ..." if len(self._odd_identifiers) > 10 else "")
+            )
+
+    @staticmethod
+    def isRenderableClass(cls):
+        """Klassen zonder stereotype zijn in EA-modellen technische elementen
+        (ProxyConnector, diagram- en view-hulpklassen) en horen niet in de
+        ontologie; datatype-klassen hebben van nature geen Objecttype-stereotype
+        en blijven."""
+        return bool((cls.stereotype or "").strip()) or bool(cls.is_datatype)
+
+    @staticmethod
+    def uniqueSlugs(packages, name_of, soort):
+        """Slug per package-id, uniek over de hele verzameling.
+
+        Pakketten met dezelfde slug (acht keer 'Diagram', twee keer
+        'Groepattribuutsoort' in het GGM) deelden één namespace, zodat hun
+        klassen door elkaar liepen en de ontologie twee identifiers kreeg.
+        Botsende pakketten krijgen de slug van het bovenliggende pakket als
+        voorvoegsel en, als dat niet volstaat, een volgnummer (deterministisch
+        op id). Er wordt gewaarschuwd, want het model zelf is dan dubbelzinnig.
+        """
+        groups: dict = {}
+        for pkg in packages:
+            slug = slugify(name_of(pkg) or "") or slugify(pkg.id or "") or "pakket"
+            groups.setdefault(slug, []).append(pkg)
+        result: dict = {}
+        taken = set(groups)
+        for slug in sorted(groups):
+            group = groups[slug]
+            if len(group) == 1:
+                result[group[0].id] = slug
+                continue
+            namen = ", ".join(sorted(f"{p.name} ({p.id})" for p in group))
+            logger.warning(
+                f"{len(group)} {soort} delen de naam '{slug}': {namen}; ze krijgen de naam van het"
+                " bovenliggende pakket als voorvoegsel"
+            )
+            for pkg in sorted(group, key=lambda p: p.id or ""):
+                parent = pkg.parent_package
+                parent_slug = slugify(name_of(parent) or "") if parent is not None else ""
+                candidate = f"{parent_slug}-{slug}" if parent_slug else slug
+                unique, n = candidate, 2
+                while unique in taken:
+                    unique = f"{candidate}-{n}"
+                    n += 1
+                taken.add(unique)
+                result[pkg.id] = unique
+        return result
+
+    def addPackageHierarchy(self, g, models, domain_ns, model_ns, args):
+        """Voeg de pakkethiërarchie toe als owl:Ontology-entiteiten.
+
+        Het wortelpakket is het informatiemodel (``mim:Informatiemodel``, op de
+        basis-URI, met versie- en MIM-metadata uit de ``--lod_*``-opties); elk
+        ander pakket in de hiërarchie is een ``mim:Domein`` (MIM 6.4.7.1).
+        Kinderen verwijzen met ``dcterms:isPartOf`` omhoog, ouders importeren
+        hun kinderen met ``owl:imports`` (6.4.9.40).
+        """
         seen = {}
+
+        # Alle bovenliggende (domein)pakketten vooraf verzamelen, zodat
+        # gelijknamige domeinen ('Archief' en 'archief') unieke URI's krijgen.
+        domains: dict = {}
+        for model in models:
+            parent = model.parent_package
+            while parent is not None and parent.name and parent.id not in domains:
+                if parent.id not in model_ns:
+                    domains[parent.id] = parent
+                parent = parent.parent_package
+        domain_slugs = self.uniqueSlugs(domains.values(), lambda p: p.name, "domeinpakketten")
+
+        def is_root(pkg):
+            return pkg.parent_package is None or not pkg.parent_package.name
 
         def entity_uri(pkg):
             # Een bovenliggend pakket kan zelf ook een model zijn: dan is de
-            # ontologie-URI van dat model het ankerpunt, geen Domein-entiteit.
+            # ontologie-URI van dat model het ankerpunt, geen domein-URI.
             if pkg.id in model_ns:
                 return URIRef(str(model_ns[pkg.id][1]))
-            return domain_ns[slugify(pkg.name)]
+            if is_root(pkg):
+                # Het informatiemodel zelf: de basis-URI van de export.
+                return URIRef(self.annotator.base)
+            return domain_ns[domain_slugs.get(pkg.id) or slugify(pkg.name)]
 
         def add_package(pkg):
             if pkg.id in seen:
                 return seen[pkg.id]
             uri = entity_uri(pkg)
             seen[pkg.id] = uri
-            if pkg.id in model_ns:
-                g.add((uri, RDF.type, OWL.Ontology))
+            if is_root(pkg):
+                self.annotator.annotate_informatiemodel(
+                    uri,
+                    pkg,
+                    versie=getattr(args, "lod_version", None),
+                    titel=getattr(args, "lod_title", None),
+                    uitgever=getattr(args, "lod_publisher", None),
+                    licentie=getattr(args, "lod_license", None),
+                    informatiedomein=getattr(args, "lod_informatiedomein", None),
+                    informatiemodeltype=getattr(args, "lod_informatiemodeltype", None) or "logisch",
+                )
             else:
-                g.add((uri, RDF.type, domein_cls))
-            g.add((uri, RDFS.label, Literal(pkg.name)))
-            g.add((uri, DCTERMS.identifier, Literal(pkg.id)))
+                namespace = str(model_ns[pkg.id][1]) if pkg.id in model_ns else str(uri)
+                self.annotator.annotate_domein(uri, pkg, namespace)
+            g.add((uri, RDFS.label, self.lit(pkg.name)))
+            self.addIdentifier(g, uri, pkg.id, "pakket")
             if pkg.definitie:
-                g.add((uri, RDFS.comment, Literal(pkg.definitie)))
+                g.add((uri, RDFS.comment, self.lit(pkg.definitie)))
             parent = pkg.parent_package
             if parent is not None and parent.name:
-                g.add((uri, DCTERMS.isPartOf, add_package(parent)))
+                parent_uri = add_package(parent)
+                g.add((uri, DCTERMS.isPartOf, parent_uri))
+                self.annotator.imports(parent_uri, uri)
             return uri
 
         for model in models:
@@ -192,18 +330,21 @@ class LodRenderer(ModelRenderer):
     def enumConceptUri(enum_uri, literal):
         return URIRef(f"{enum_uri}/{slugify(literal.name) if literal.name else slugify(literal.id)}")
 
-    def addEnumeration(self, g, enum, enum_uri, model_uri=None):
-        """Render één enumeratie als owl:Class + skos:ConceptScheme met haar
-        waarden als skos:Concept-en. Retourneert de concept-URI's (voor
+    def addEnumeration(self, g, enum, enum_uri, model_uri, shape_uri):
+        """Render één enumeratie als owl:Class + skos:ConceptScheme (en
+        mim:Enumeratie, rdfs:subClassOf skos:Concept, met een NodeShape op
+        ``shape_uri``; MIM 6.4.5.12) met haar waarden als skos:Concept-en en
+        mim:Enumeratiewaarde. Retourneert de concept-URI's (voor
         sh:in-constraints)."""
         g.add((enum_uri, RDF.type, OWL.Class))
         g.add((enum_uri, RDF.type, SKOS.ConceptScheme))
-        g.add((enum_uri, RDFS.label, Literal(enum.name)))
-        g.add((enum_uri, DCTERMS.identifier, Literal(enum.id)))
+        g.add((enum_uri, RDFS.label, self.lit(enum.name)))
+        self.addIdentifier(g, enum_uri, enum.id, "enumeratie")
         if enum.definitie:
-            g.add((enum_uri, RDFS.comment, Literal(enum.definitie)))
+            g.add((enum_uri, RDFS.comment, self.lit(enum.definitie)))
         if model_uri is not None:
             g.add((enum_uri, RDFS.isDefinedBy, model_uri))
+        self.annotator.annotate_enumeration(enum_uri, enum, shape_uri)
 
         concepts = []
         for literal in enum.literals:
@@ -216,13 +357,99 @@ class LodRenderer(ModelRenderer):
             g.add((concept_uri, SKOS.inScheme, enum_uri))
             g.add((concept_uri, SKOS.topConceptOf, enum_uri))
             if literal.name:
-                g.add((concept_uri, SKOS.prefLabel, Literal(literal.name)))
-            g.add((concept_uri, DCTERMS.identifier, Literal(literal.id)))
+                g.add((concept_uri, SKOS.prefLabel, self.lit(literal.name)))
+            self.addIdentifier(g, concept_uri, literal.id, "enumeratiewaarde")
             if literal.definitie:
-                g.add((concept_uri, SKOS.definition, Literal(literal.definitie)))
+                g.add((concept_uri, SKOS.definition, self.lit(literal.definitie)))
+            self.annotator.annotate_enum_literal(concept_uri, literal, enum_uri)
         return concepts
 
+    @staticmethod
+    def rendered_attributes(cls):
+        """De attributen die een property worden: met een naam en met een type."""
+        return [
+            attribute
+            for attribute in cls.attributes
+            if attribute.name is not None
+            and (
+                attribute.primitive is not None or attribute.enumeration is not None or attribute.type_class is not None
+            )
+        ]
+
+    @staticmethod
+    def rangeSlug(range_uri):
+        """Kort achtervoegsel voor een range: 'string', 'wktliteral', 'pand'."""
+        text = str(range_uri).rstrip("/")
+        return slugify(text.rsplit("#", 1)[-1].rsplit("/", 1)[-1]) or "type"
+
+    def propertyUris(self, cls, ns, class_dict, resolve_range, notes):
+        """Unieke, deterministische URI's voor alle properties van een klasse.
+
+        Attributen en uitgaande associaties delen de ruimte ``{model}/{klasse}/``.
+        Zonder botsing is de URI simpelweg ``{klasse}/{naam}``. Bij botsing:
+
+        * gelijknamige attributen krijgen het datatype of de doelklasse als
+          achtervoegsel (``objectidentificatie-string``, ``objectidentificatie-pand``);
+        * gelijknamige associaties, of een associatie met de naam van een
+          attribuut, krijgen de doelklasse als achtervoegsel (``heeft-projectlocatie``);
+        * naamloze associaties heten naar hun rol of 'relatie', plus doelklasse
+          (``relatie-locatie``);
+        * blijft er dan nog een botsing over, dan volgt een volgnummer.
+
+        Gelijknamige associaties vielen voorheen samen tot één owl:ObjectProperty
+        met meerdere rdfs:range (OWL leest dat als doorsnede). Retourneert
+        (attribuut-id -> URI, associatie-id -> URI); botsingen worden in ``notes``
+        verzameld voor één samenvattende waarschuwing.
+        """
+        prefix = slugify(cls.name) + "/"
+        taken: set = set()
+        attr_uris: dict = {}
+        assoc_uris: dict = {}
+
+        def claim(slug):
+            candidate, n = slug, 2
+            while candidate in taken:
+                candidate = f"{slug}-{n}"
+                n += 1
+            taken.add(candidate)
+            return ns[prefix + candidate]
+
+        attr_groups: dict = {}
+        for attribute in self.rendered_attributes(cls):
+            slug = slugify(attribute.name) if attribute.name else slugify(attribute.id)
+            attr_groups.setdefault(slug, []).append(attribute)
+        for slug in sorted(attr_groups):
+            group = attr_groups[slug]
+            if len(group) == 1:
+                attr_uris[group[0].id] = claim(slug)
+                continue
+            notes["attributen"].append(f"{cls.name}.{group[0].name} ({len(group)}x)")
+            for attribute in sorted(group, key=lambda a: a.id or ""):
+                _, range_uri, _ = resolve_range(attribute)
+                attr_uris[attribute.id] = claim(f"{slug}-{self.rangeSlug(range_uri)}")
+
+        assocs = [a for a in cls.uitgaande_associaties if a.dst_class is not None and a.dst_class.id in class_dict]
+        assoc_groups: dict = {}
+        for assoc in assocs:
+            if assoc.name:
+                assoc_groups.setdefault(slugify(assoc.name), []).append(assoc)
+        for assoc in sorted(assocs, key=lambda a: a.id or ""):
+            target = slugify(assoc.dst_class.name) if assoc.dst_class.name else slugify(assoc.dst_class.id)
+            if assoc.name:
+                slug = slugify(assoc.name)
+                if len(assoc_groups[slug]) > 1 or slug in taken:
+                    if slug not in notes["_gemeld"]:
+                        notes["_gemeld"].add(slug)
+                        notes["associaties"].append(f"{cls.name}.{assoc.name} ({len(assoc_groups[slug])}x)")
+                    slug = f"{slug}-{target}"
+            else:
+                rol = slugify(assoc.src_role) if assoc.src_role else "relatie"
+                slug = f"{rol}-{target}"
+            assoc_uris[assoc.id] = claim(slug)
+        return attr_uris, assoc_uris
+
     def render(self, args, zchema: sch.Schema):
+        self._odd_identifiers: dict = {}
         try:
             if args.linked_data_namespace is None:
                 logger.warning(
@@ -233,10 +460,13 @@ class LodRenderer(ModelRenderer):
                 args.linked_data_namespace = urlunparse(args.linked_data_namespace)
 
             base = args.linked_data_namespace + ("" if args.linked_data_namespace.endswith("/") else "/")
-            myns = Namespace(base)
 
             # Create graph
             g = Graph()
+            # Taal van labels en definities (standaard nl); MIM 1.2-laag: typering en
+            # metagegevens op de resources hieronder.
+            self._lang = getattr(args, "lod_language", "nl") or None
+            self.annotator = MimAnnotator(g, base, self._lang)
 
             # Namespaces en bindings
             shape_ns = Namespace(base + "shapes/")
@@ -257,28 +487,60 @@ class LodRenderer(ModelRenderer):
             # Voorbereiding over ALLE modellen: namespaces en klasse-indexen,
             # zodat attribuut- en associatie-ranges ook klassen uit andere
             # modellen kunnen aanwijzen.
-            model_ns: dict = {}  # package id -> (modelname, Namespace)
+            model_ns: dict = {}  # package id -> (modelslug, Namespace)
             class_dict: dict = {}  # class guid -> uri
             class_by_name: dict = {}  # klassenaam (casefold) -> uri
+            soorten: dict = {}  # class guid -> MIM-soort (mim.mim_soort)
+            soort_by_uri: dict = {}  # class uri -> MIM-soort, voor de doelzijde van attributen
+            shape_uris: dict = {}  # class guid -> NodeShape-URI, voor de relatie-shapes
             enum_uris: dict = {}  # enum guid -> uri
             enum_by_name: dict = {}  # enumnaam (casefold) -> enum
             enum_by_uri: dict = {}  # enum uri -> enum (voor sh:in)
+            skipped_classes: list = []
+            # Het modelsegment krijgt dezelfde slug-vorm als klassen en
+            # attributen (geen %20 of %28 in IRI's) en is uniek per model. De
+            # namespace wordt achter de basis geplakt: urljoin(base, "/slug/")
+            # gooide een eventueel pad in de basis-URI weg.
+            model_slugs = self.uniqueSlugs(models, lambda p: model_segment_name(p.name), "modelpakketten")
             for model in models:
-                modelname = util.remove_substring(model.name, "model").lower()
-                ns = Namespace(urljoin(str(args.linked_data_namespace), f"/{quote(modelname)}/"))
+                modelname = model_slugs[model.id]
+                ns = Namespace(base + modelname + "/")
                 model_ns[model.id] = (modelname, ns)
                 for cls in model.classes:
                     if not cls.name:
+                        logger.warning(f"Klasse zonder naam overgeslagen: {cls.id}")
+                        continue
+                    if not self.isRenderableClass(cls):
+                        skipped_classes.append(f"{model.name}/{cls.name}")
                         continue
                     class_uri = ns[slugify(cls.name)]
                     class_dict[cls.id] = class_uri
                     class_by_name.setdefault(cls.name.strip().casefold(), class_uri)
+                    soorten[cls.id] = mim.mim_soort(cls)
+                    soort_by_uri[class_uri] = soorten[cls.id]
                 for enum in model.enumerations:
                     if not enum.name:
                         continue
                     enum_uris[enum.id] = ns[slugify(enum.name)]
                     enum_by_uri[enum_uris[enum.id]] = enum
                     enum_by_name.setdefault(enum.name.strip().casefold(), enum)
+
+            if skipped_classes:
+                logger.warning(
+                    f"{len(skipped_classes)} klassen zonder stereotype overgeslagen: "
+                    + ", ".join(sorted(skipped_classes))
+                )
+
+            # Modellen waarvan alle klassen technisch zijn en die geen enumeraties
+            # hebben, leveren geen ontologie op.
+            leeg = [m for m in models if not any(c.id in class_dict for c in m.classes) and not m.enumerations]
+            if leeg:
+                logger.info("Modelpakketten zonder te renderen inhoud overgeslagen: " + ", ".join(m.name for m in leeg))
+                models = [m for m in models if m not in leeg]
+                if not models:
+                    msg = "Geen modellen met te renderen klassen of enumeraties gevonden."
+                    logger.error(msg)
+                    raise CrunchException(msg)
 
             # Enumeraties die buiten de modelpakketten leven maar wel als
             # attribuuttype voorkomen, krijgen een URI onder /enumeraties/.
@@ -316,115 +578,137 @@ class LodRenderer(ModelRenderer):
                 unmapped_types.add(attribute.primitive)
                 return "datatype", XSD.string, None
 
-            # Domeinhiërarchie: modelpakketten als owl:Ontology, bovenliggende
-            # pakketten als Domein-entiteiten met dcterms:isPartOf-relaties.
-            self.addPackageHierarchy(g, models, myns, domain_ns, model_ns)
+            # Pakkethiërarchie: wortel als mim:Informatiemodel, overige pakketten
+            # als mim:Domein (allemaal owl:Ontology), met dcterms:isPartOf omhoog
+            # en owl:imports omlaag.
+            self.addPackageHierarchy(g, models, domain_ns, model_ns, args)
+
+            # Property-URI's per klasse (attributen én associaties), uniek binnen
+            # de klasse; ook de SHACL-shapes en het relatieblok gebruiken deze.
+            prop_uris: dict = {}  # class guid -> (attribuut-id -> uri, associatie-id -> uri)
+            uri_notes: dict = {"attributen": [], "associaties": [], "_gemeld": set()}
 
             # First add all classes
             try:
                 for model in models:
                     modelname, ns = model_ns[model.id]
                     model_uri = URIRef(str(ns))
+                    verwerkt_voor = len(prop_uris)
 
                     for cls in model.classes:
-                        if not cls.name:
-                            logger.warning(f"Klasse zonder naam gevonden: {cls.id}")
+                        if cls.id not in class_dict:
                             continue
                         class_uri = class_dict[cls.id]
+                        uri_notes["_gemeld"] = set()
+                        prop_uris[cls.id] = self.propertyUris(cls, ns, class_dict, resolve_range, uri_notes)
+                        attr_uris, _ = prop_uris[cls.id]
 
-                        # Voeg de klasse toe
-                        g.add((class_uri, RDF.type, OWL.Class))
-                        g.add((class_uri, RDFS.label, Literal(cls.name)))
-                        g.add((class_uri, DCTERMS.identifier, Literal(cls.id)))
+                        # Voeg de klasse toe. Een gestructureerd datatype is in MIM
+                        # alleen een sh:NodeShape (6.4.6.3), geen owl:Class.
+                        soort = soorten[cls.id]
+                        if soort == mim.GESTRUCTUREERD_DATATYPE:
+                            g.add((class_uri, RDF.type, SH.NodeShape))
+                        else:
+                            g.add((class_uri, RDF.type, OWL.Class))
+                        g.add((class_uri, RDFS.label, self.lit(cls.name)))
+                        self.addIdentifier(g, class_uri, cls.id, "klasse")
                         g.add((class_uri, RDFS.isDefinedBy, model_uri))
                         if cls.definitie is not None:
-                            g.add((class_uri, RDFS.comment, Literal(cls.definitie)))
+                            g.add((class_uri, RDFS.comment, self.lit(cls.definitie)))
+                        self.annotator.annotate_class(class_uri, cls, soort)
 
-                        for attribute in cls.attributes:
-                            if attribute.name is not None and (
-                                attribute.primitive is not None
-                                or attribute.enumeration is not None
-                                or attribute.type_class is not None
-                            ):
-                                attr_uri = (
-                                    ns[slugify(cls.name) + "/" + slugify(attribute.name)]
-                                    if attribute.name
-                                    else ns[slugify(cls.name) + "/" + slugify(attribute.id)]
-                                )
-                                kind, range_uri, _ = resolve_range(attribute)
-                                prop_type = OWL.DatatypeProperty if kind == "datatype" else OWL.ObjectProperty
-                                g.add((attr_uri, RDF.type, prop_type))
-                                g.add((attr_uri, RDFS.domain, class_uri))
-                                g.add((attr_uri, RDFS.label, Literal(attribute.name)))
-                                g.add((attr_uri, RDFS.range, range_uri))
-                                g.add((attr_uri, DCTERMS.identifier, Literal(attribute.id)))
-                                if attribute.definitie is not None:
-                                    g.add(
-                                        (
-                                            attr_uri,
-                                            RDFS.comment,
-                                            Literal(attribute.definitie),
-                                        )
-                                    )
+                        for attribute in self.rendered_attributes(cls):
+                            attr_uri = attr_uris[attribute.id]
+                            kind, range_uri, _ = resolve_range(attribute)
+                            prop_type = OWL.DatatypeProperty if kind == "datatype" else OWL.ObjectProperty
+                            g.add((attr_uri, RDF.type, prop_type))
+                            g.add((attr_uri, RDFS.domain, class_uri))
+                            g.add((attr_uri, RDFS.label, self.lit(attribute.name)))
+                            g.add((attr_uri, RDFS.range, range_uri))
+                            g.add((attr_uri, RDFS.isDefinedBy, model_uri))
+                            self.addIdentifier(g, attr_uri, attribute.id, "attribuut")
+                            if attribute.definitie is not None:
+                                g.add((attr_uri, RDFS.comment, self.lit(attribute.definitie)))
 
                     # Enumeraties van dit model als ConceptScheme + concepten.
                     for enum in model.enumerations:
                         if not enum.name:
                             logger.warning(f"Enumeratie zonder naam overgeslagen: {enum.id}")
                             continue
-                        self.addEnumeration(g, enum, enum_uris[enum.id], model_uri)
+                        self.addEnumeration(
+                            g, enum, enum_uris[enum.id], model_uri, shape_ns[modelname + "/" + slugify(enum.name)]
+                        )
 
                     # Add SHACL NodeShapes for each class
                     for cls in model.classes:
-                        if not cls.name:
-                            logger.warning(f"SHACL-shape overgeslagen voor klasse zonder naam: {cls.id}")
+                        if cls.id not in class_dict:
                             continue
                         class_uri = class_dict[cls.id]
-                        shape_uri = shape_ns[slugify(modelname) + "/" + slugify(cls.name)]
-                        g.add((shape_uri, RDF.type, SH.NodeShape))
-                        g.add((shape_uri, SH.targetClass, class_uri))
-                        g.add((shape_uri, RDFS.label, Literal(cls.name)))
-                        g.add((shape_uri, DCTERMS.identifier, Literal(f"{cls.id}")))
+                        attr_uris, _ = prop_uris[cls.id]
+                        soort = soorten[cls.id]
+                        if soort == mim.GESTRUCTUREERD_DATATYPE:
+                            # De structuur hangt direct aan het datatype, dat zelf de
+                            # NodeShape is (6.4.6.3/6.4.6.4).
+                            shape_uri = class_uri
+                        else:
+                            shape_uri = shape_ns[modelname + "/" + slugify(cls.name)]
+                            g.add((shape_uri, RDF.type, SH.NodeShape))
+                            g.add((shape_uri, SH.targetClass, class_uri))
+                            g.add((shape_uri, RDFS.label, self.lit(cls.name)))
+                            self.addIdentifier(g, shape_uri, cls.id, "SHACL-shape van klasse")
+                        shape_uris[cls.id] = shape_uri
 
-                        for attribute in cls.attributes:
-                            if attribute.name is not None and (
-                                attribute.primitive is not None
-                                or attribute.enumeration is not None
-                                or attribute.type_class is not None
-                            ):
-                                prop_bnode = BNode()
-                                attr_uri = (
-                                    ns[slugify(cls.name) + "/" + slugify(attribute.name)]
-                                    if attribute.name
-                                    else ns[slugify(cls.name) + "/" + slugify(attribute.id)]
-                                )
-                                g.add((shape_uri, SH.property, prop_bnode))
-                                g.add((prop_bnode, SH.path, attr_uri))
-                                kind, range_uri, max_length = resolve_range(attribute)
-                                if kind == "datatype":
-                                    g.add((prop_bnode, SH.datatype, range_uri))
-                                    if max_length is not None:
-                                        g.add((prop_bnode, SH.maxLength, Literal(max_length)))
-                                else:
-                                    g.add((prop_bnode, getattr(SH, "class"), range_uri))
-                                    g.add((prop_bnode, SH.nodeKind, SH.IRI))
-                                if kind == "enum":
-                                    # Toegestane waarden expliciet opsommen.
-                                    enum = enum_by_uri.get(range_uri)
-                                    if enum is not None and enum.literals:
-                                        list_node = BNode()
-                                        Collection(
-                                            g,
-                                            list_node,
-                                            [self.enumConceptUri(range_uri, lit) for lit in enum.literals],
-                                        )
-                                        g.add((prop_bnode, SH["in"], list_node))
-                                g.add((prop_bnode, SH.minCount, Literal(0)))
-                                g.add((prop_bnode, SH.maxCount, Literal(1)))
-                                g.add((prop_bnode, SH.name, Literal(attribute.name)))
-                                if attribute.definitie:
-                                    g.add((prop_bnode, SH.description, Literal(attribute.definitie)))
-                    logger.info(f"Aantal klassen verwerkt in model '{modelname}': {len(model.classes)}")
+                        for attribute in self.rendered_attributes(cls):
+                            prop_bnode = BNode()
+                            attr_uri = attr_uris[attribute.id]
+                            g.add((shape_uri, SH.property, prop_bnode))
+                            g.add((prop_bnode, SH.path, attr_uri))
+                            kind, range_uri, max_length = resolve_range(attribute)
+                            doel_soort = soort_by_uri.get(range_uri)
+                            if kind == "datatype":
+                                g.add((prop_bnode, SH.datatype, range_uri))
+                                if max_length is not None:
+                                    g.add((prop_bnode, SH.maxLength, Literal(max_length)))
+                            elif doel_soort == mim.GESTRUCTUREERD_DATATYPE:
+                                # Een gestructureerd datatype heeft geen klasse: de waarde
+                                # moet aan de structuur (NodeShape) voldoen.
+                                g.add((prop_bnode, SH.node, range_uri))
+                                g.add((prop_bnode, SH.nodeKind, SH.BlankNodeOrIRI))
+                            elif doel_soort == mim.GEGEVENSGROEPTYPE:
+                                g.add((prop_bnode, getattr(SH, "class"), range_uri))
+                                g.add((prop_bnode, SH.nodeKind, SH.BlankNodeOrIRI))
+                            else:
+                                g.add((prop_bnode, getattr(SH, "class"), range_uri))
+                                g.add((prop_bnode, SH.nodeKind, SH.IRI))
+                            if kind == "enum":
+                                # Toegestane waarden expliciet opsommen.
+                                enum = enum_by_uri.get(range_uri)
+                                if enum is not None and enum.literals:
+                                    list_node = BNode()
+                                    Collection(
+                                        g,
+                                        list_node,
+                                        [self.enumConceptUri(range_uri, lit) for lit in enum.literals],
+                                    )
+                                    g.add((prop_bnode, SH["in"], list_node))
+                            g.add((prop_bnode, SH.name, self.lit(attribute.name)))
+                            if attribute.definitie:
+                                g.add((prop_bnode, SH.description, self.lit(attribute.definitie)))
+                            # MIM-typering en -metagegevens; zet ook sh:minCount/sh:maxCount
+                            # uit de kardinaliteit (6.4.9.15/18) en de lengte-, patroon- en
+                            # waardebereik-constraints op de shape.
+                            self.annotator.annotate_attribute(
+                                attr_uri,
+                                prop_bnode,
+                                attribute,
+                                eigenaar_uri=class_uri,
+                                eigenaar_soort=soort,
+                                kind=kind,
+                                range_uri=range_uri,
+                                doel_soort=doel_soort,
+                                max_length=max_length,
+                            )
+                    logger.info(f"Aantal klassen verwerkt in model '{modelname}': {len(prop_uris) - verwerkt_voor}")
             except Exception as e:
                 logger.exception("Fout tijdens het renderen van modellen:")
                 raise CrunchException(f"Renderproces mislukt: {e}") from e
@@ -433,16 +717,27 @@ class LodRenderer(ModelRenderer):
             for model in models:
                 modelname, ns = model_ns[model.id]
                 for cls in model.classes:
-                    # First set inheritance
-                    for subclass in cls.subclasses:
-                        super_cls = class_dict.get(cls.id)
-                        if subclass.superclass is not None:
-                            sub_cls = class_dict.get(subclass.superclass.id)
-
-                            if super_cls is not None and sub_cls is not None:
-                                g.add((sub_cls, RDFS.subClassOf, super_cls))
+                    if cls.id not in class_dict:
+                        continue
+                    # First set inheritance. cls.superclasses levert Generalization-
+                    # objecten waarin cls de subklasse is en .superclass de ouder.
+                    sub_cls = class_dict.get(cls.id)
+                    for gener in cls.superclasses:
+                        if gener.superclass is None or sub_cls is None:
+                            continue
+                        if gener.superclass.id == cls.id:
+                            logger.warning(
+                                f"Generalisatie van klasse '{cls.name}' naar zichzelf overgeslagen: {gener.id}"
+                            )
+                            continue
+                        super_cls = class_dict.get(gener.superclass.id)
+                        if super_cls is not None:
+                            g.add((sub_cls, RDFS.subClassOf, super_cls))
 
                     # Then set associations
+                    if cls.id not in prop_uris:
+                        continue
+                    _, assoc_uris = prop_uris[cls.id]
                     for assoc in cls.uitgaande_associaties:
                         from_cls = class_dict.get(cls.id)
                         to_cls = class_dict.get(getattr(assoc.dst_class, "id", None))
@@ -451,23 +746,45 @@ class LodRenderer(ModelRenderer):
                             continue
 
                         if from_cls is not None and to_cls is not None:
-                            assoc_uri = (
-                                ns[slugify(cls.name) + "/" + slugify(assoc.name)]
-                                if assoc.name
-                                else ns[slugify(cls.name) + "/" + slugify(assoc.id)]
-                            )
+                            assoc_uri = assoc_uris[assoc.id]
+                            label = assoc.name or assoc.src_role or f"relatie naar {assoc.dst_class.name}"
                             g.add((assoc_uri, RDF.type, OWL.ObjectProperty))
                             g.add((assoc_uri, RDFS.domain, from_cls))
                             g.add((assoc_uri, RDFS.range, to_cls))
-                            g.add((assoc_uri, RDFS.label, Literal(assoc.name)))
-                            g.add((assoc_uri, DCTERMS.identifier, Literal(assoc.id)))
+                            g.add((assoc_uri, RDFS.label, self.lit(label)))
+                            g.add((assoc_uri, RDFS.isDefinedBy, URIRef(str(ns))))
+                            self.addIdentifier(g, assoc_uri, assoc.id, "associatie")
                             if assoc.definitie is not None:
-                                g.add((assoc_uri, RDFS.comment, Literal(assoc.definitie)))
+                                g.add((assoc_uri, RDFS.comment, self.lit(assoc.definitie)))
+                            # De relatie als sh:property van de NodeShape van de
+                            # bronklasse (6.4.5.6, 6.4.9.31/32), met kardinaliteit.
+                            prop_bnode = BNode()
+                            g.add((shape_uris[cls.id], SH.property, prop_bnode))
+                            g.add((prop_bnode, SH.path, assoc_uri))
+                            g.add((prop_bnode, getattr(SH, "class"), to_cls))
+                            g.add((prop_bnode, SH.nodeKind, SH.IRI))
+                            g.add((prop_bnode, SH.name, self.lit(label)))
+                            if assoc.definitie:
+                                g.add((prop_bnode, SH.description, self.lit(assoc.definitie)))
+                            self.annotator.annotate_association(
+                                assoc_uri, prop_bnode, assoc, from_cls, to_cls, naam=label
+                            )
 
             # Enumeraties die buiten de modelpakketten leven maar wel als
             # attribuuttype zijn aangetroffen.
             for enum in orphan_enums.values():
-                self.addEnumeration(g, enum, enum_uris[enum.id])
+                self.addEnumeration(g, enum, enum_uris[enum.id], None, shape_ns["enumeraties/" + slugify(enum.name)])
+
+            for soort, voorbeelden in (
+                ("attributen", uri_notes["attributen"]),
+                ("associaties", uri_notes["associaties"]),
+            ):
+                if voorbeelden:
+                    logger.warning(
+                        f"{len(voorbeelden)} klassen hebben gelijknamige {soort}; hun URI's kregen het type of de"
+                        f" doelklasse als achtervoegsel: {', '.join(voorbeelden[:10])}"
+                        + (" ..." if len(voorbeelden) > 10 else "")
+                    )
 
             if unmapped_types:
                 overview = ", ".join(sorted(unmapped_types))
@@ -476,6 +793,8 @@ class LodRenderer(ModelRenderer):
                     f" -enumeratie): {overview}"
                 )
 
+            self.reportOddIdentifiers()
+            logger.info(self.annotator.samenvatting())
             self.writeToFile(g, args)
         except CrunchException:
             raise  # Laat eigen excepties door
