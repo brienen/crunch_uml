@@ -300,22 +300,24 @@ class MimAnnotator:
     def attribute_metaklasse(self, kind: str, eigenaar_soort: str, doel_soort: Optional[str]) -> URIRef:
         """Welke MIM-metaklasse een attribuut krijgt.
 
+        * attribuut getypeerd met een objecttype (klasse als type) -> in MIM
+          een relatie, dus mim:Relatiesoort, wie de eigenaar ook is (een
+          referentie-element of data-element met een objecttype als type is
+          in MIM geen datatype-element);
         * attribuut van een gestructureerd datatype -> mim:DataElement;
         * attribuut van een referentielijst -> mim:ReferentieElement;
         * attribuut getypeerd met een gegevensgroeptype -> mim:Gegevensgroep;
-        * attribuut getypeerd met een objecttype (klasse als type) -> in MIM
-          een relatie, dus mim:Relatiesoort;
         * anders mim:Attribuutsoort (primitief datatype, enumeratie,
           gestructureerd datatype, referentielijst).
         """
+        if kind == "object" and doel_soort in (mim.OBJECTTYPE, mim.RELATIEKLASSE):
+            return MIM.Relatiesoort
         if eigenaar_soort == mim.GESTRUCTUREERD_DATATYPE:
             return MIM.DataElement
         if eigenaar_soort in (mim.REFERENTIELIJST, mim.CODELIJST):
             return MIM.ReferentieElement
         if kind == "object" and doel_soort == mim.GEGEVENSGROEPTYPE:
             return MIM.Gegevensgroep
-        if kind == "object" and doel_soort in (mim.OBJECTTYPE, mim.RELATIEKLASSE):
-            return MIM.Relatiesoort
         return MIM.Attribuutsoort
 
     def annotate_attribute(

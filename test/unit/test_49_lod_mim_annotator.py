@@ -684,6 +684,8 @@ def test_samenvatting_noemt_typering_en_gaten():
         ("object", mim.OBJECTTYPE, mim.GEGEVENSGROEPTYPE, MIM.Gegevensgroep),
         ("object", mim.OBJECTTYPE, mim.OBJECTTYPE, MIM.Relatiesoort),
         ("object", mim.GEGEVENSGROEPTYPE, mim.OBJECTTYPE, MIM.Relatiesoort),
+        ("object", mim.REFERENTIELIJST, mim.OBJECTTYPE, MIM.Relatiesoort),
+        ("object", mim.GESTRUCTUREERD_DATATYPE, mim.RELATIEKLASSE, MIM.Relatiesoort),
         ("datatype", mim.GESTRUCTUREERD_DATATYPE, None, MIM.DataElement),
         ("datatype", mim.REFERENTIELIJST, None, MIM.ReferentieElement),
         ("datatype", mim.CODELIJST, None, MIM.ReferentieElement),
