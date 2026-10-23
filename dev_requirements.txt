@@ -8,3 +8,5 @@ mypy == 1.14.*
 pytest >= 9.0.3, < 10
 pytest-cov == 7.*
 twine == 5.*
+# SHACL-validatie van de LOD-export tegen de MIM-shapes (tools/validate_mim_lod.py, test_49)
+pyshacl >= 0.30, < 1
