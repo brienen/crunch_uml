@@ -23,6 +23,22 @@ def slugify(name):
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
 
+# Het losse woord 'Model' aan het begin of einde van een pakketnaam.
+_MODEL_WORD_RE = re.compile(r"^\s*model\b\s*|\s*\bmodel\s*$", re.IGNORECASE)
+
+
+def model_segment_name(name):
+    """Naam van een modelpakket zonder het losse woord 'Model' voor- of achteraan.
+
+    'Model Kern RGBZ' -> 'Kern RGBZ', 'RSGB Model' -> 'RSGB'; 'Gegevensmodel
+    Wonen' blijft intact. Blijft er niets over (pakket 'Model'), dan is de
+    volledige naam het segment, zodat de IRI nooit een leeg segment krijgt.
+    """
+    name = (name or "").strip()
+    cleaned = _MODEL_WORD_RE.sub("", name).strip()
+    return cleaned or name
+
+
 # ---------------------------------------------------------------------------
 # Datatype-mapping: GGM/EA-primitieven -> XSD (of GeoSPARQL)
 # ---------------------------------------------------------------------------
@@ -268,7 +284,7 @@ class LodRenderer(ModelRenderer):
                 # attributen (geen %20 of %28 in IRI's). De namespace wordt
                 # achter de basis geplakt: urljoin(base, "/slug/") gooide een
                 # eventueel pad in de basis-URI weg.
-                modelname = slugify(util.remove_substring(model.name, "model"))
+                modelname = slugify(model_segment_name(model.name))
                 ns = Namespace(base + modelname + "/")
                 model_ns[model.id] = (modelname, ns)
                 for cls in model.classes:

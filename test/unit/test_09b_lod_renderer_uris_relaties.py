@@ -28,6 +28,7 @@ from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SH
 
 import crunch_uml.schema as sch
 from crunch_uml import cli, const, db
+from crunch_uml.renderers.lodrenderer import model_segment_name
 
 SCHEMA = "lod_fixes"
 # Basis-URI mét pad: urljoin(base, "/slug/") gooide dat pad weg.
@@ -193,3 +194,36 @@ def test_geen_procent_codering_in_eigen_iris(graaf):
     assert fout == [], f"IRI's met procent-codering: {fout}"
     buiten = sorted(str(i) for i in eigen if not str(i).startswith(BASE))
     assert buiten == [], f"IRI's buiten de basis-URI: {buiten}"
+
+
+# ---------------------------------------------------------------------------
+# 3. Naamopschoning van modelpakketten
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "naam,verwacht",
+    [
+        ("Model Kern RGBZ", "Kern RGBZ"),
+        ("RSGB Model", "RSGB"),
+        ("model Afval", "Afval"),
+        ("Gegevensmodel Wonen", "Gegevensmodel Wonen"),
+        ("Modelmatig Werken", "Modelmatig Werken"),
+        ("Model", "Model"),
+        ("  Model  ", "Model"),
+    ],
+)
+def test_model_segment_name(naam, verwacht):
+    assert model_segment_name(naam) == verwacht
+
+
+def test_pakket_model_houdt_een_segment(graaf):
+    """Het package 'Model' kreeg een lege naam en daarmee IRI's direct onder
+    (of zelfs náást) de basis-URI: ...nlperiode."""
+    assert klasse(graaf, "Periode") == URIRef(BASE + "model/periode")
+    assert (URIRef(BASE + "model/periode/datum-start"), RDF.type, OWL.DatatypeProperty) in graaf
+
+
+def test_alleen_los_woord_model_wordt_verwijderd(graaf):
+    assert klasse(graaf, "Woning") == URIRef(BASE + "gegevensmodel-wonen/woning")
+    assert klasse(graaf, "Archiefstuk") == URIRef(BASE + "archief/archiefstuk")
