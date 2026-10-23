@@ -160,6 +160,7 @@ crunch_uml [-sch SCHEMA] export -t <type> -f <file> [options]
 | `-t, --outputtype` | Output type (see table below) |
 | `-pi` | Comma-separated list of package IDs to include |
 | `-xpi` | Comma-separated list of package IDs to exclude |
+| `-xpn` | Comma-separated package-name patterns (case-insensitive, `*`/`?` wildcards) excluded with their subpackages; the LOD renderers default to `Diagram,Diagrammen intern gebruik,Tekenwijze,View*`, pass `""` to disable |
 | `-jt` | Jinja2 template file |
 | `-jtd` | Jinja2 template directory |
 | `-ldns` | Namespace for Linked Data renderers |

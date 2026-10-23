@@ -149,9 +149,13 @@ def graaf():
     os.remove(OUTPUT)
 
 
+def klassen_met_label(graph, label):
+    return [s for s in graph.subjects(RDFS.label, Literal(label)) if (s, RDF.type, OWL.Class) in graph]
+
+
 def klasse(graph, label):
     """De owl:Class met dit label (de SHACL-shape draagt hetzelfde label)."""
-    kandidaten = [s for s in graph.subjects(RDFS.label, Literal(label)) if (s, RDF.type, OWL.Class) in graph]
+    kandidaten = klassen_met_label(graph, label)
     assert len(kandidaten) == 1, f"verwacht precies één klasse '{label}', gevonden: {kandidaten}"
     return kandidaten[0]
 
@@ -305,3 +309,49 @@ def test_shacl_paden_verwijzen_naar_gerenderde_properties(graaf):
     assert paden
     for pad in paden:
         assert (pad, RDF.type, None) in graaf, f"sh:path {pad} wijst naar een onbekende property"
+
+
+# ---------------------------------------------------------------------------
+# 5. Technische packages en klassen zonder stereotype
+# ---------------------------------------------------------------------------
+
+
+def test_technische_packages_worden_standaard_overgeslagen(graaf):
+    """Diagram, Tekenwijze, View* en alles onder 'Diagrammen intern gebruik'
+    zijn EA-hulpmiddelen, geen model."""
+    for naam in ("ProxyConnector", "Zaakdiagramobject", "ObjecttypeA", "RSGB", "DetailleringSubjecten"):
+        assert not klassen_met_label(graaf, naam), naam
+    assert Literal("Diagrammen intern gebruik") not in set(graaf.objects(None, RDFS.label))
+    ontologieen = {str(o) for o in graaf.subjects(RDF.type, OWL.Ontology)}
+    technisch = {o for o in ontologieen if any(w in o for w in ("diagram", "tekenwijze", "view", "semantische"))}
+    assert technisch == set()
+
+
+def test_klassen_zonder_stereotype_worden_overgeslagen_behalve_datatypes(graaf):
+    labels = set(graaf.objects(None, RDFS.label))
+    assert Literal("Zonder stereotype") not in labels
+    typebedrag = klasse(graaf, "TypeBedrag")  # is_datatype, blijft
+    assert (URIRef(BASE + "kern/persoon/vermogen"), RDFS.range, typebedrag) in graaf
+    assert (URIRef(BASE + "kern/typebedrag/bedrag"), RDFS.range, XSD.decimal) in graaf
+
+
+def test_uitsluiting_op_packagenaam_is_instelbaar(graaf):
+    alles = "./test/output/lod_fixes_alles.ttl"
+    eigen = "./test/output/lod_fixes_eigen.ttl"
+    try:
+        # Lege lijst: niets op naam uitsluiten; de stereotype-regel blijft gelden.
+        labels = set(exporteer(alles, ["--output_exclude_package_names", ""]).objects(None, RDFS.label))
+        assert Literal("ObjecttypeA") in labels
+        assert Literal("Zaakdiagramobject") in labels
+        assert Literal("ProxyConnector") not in labels
+        # Eigen patronen (hoofdletterongevoelig, met jokers).
+        labels = set(
+            exporteer(eigen, ["--output_exclude_package_names", "project*,TEKENWIJZE"]).objects(None, RDFS.label)
+        )
+        assert Literal("Project") not in labels
+        assert Literal("ObjecttypeA") not in labels
+        assert Literal("Zaakdiagramobject") in labels
+    finally:
+        for bestand in (alles, eigen):
+            if os.path.exists(bestand):
+                os.remove(bestand)

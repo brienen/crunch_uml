@@ -158,8 +158,18 @@ class LodRenderer(ModelRenderer):
       somt de toegestane concepten op met ``sh:in``.
     """
 
+    default_exclude_package_names = const.LOD_EXCLUDE_PACKAGE_NAMES
+
     def writeToFile(self, graph, args):
         pass
+
+    @staticmethod
+    def isRenderableClass(cls):
+        """Klassen zonder stereotype zijn in EA-modellen technische elementen
+        (ProxyConnector, diagram- en view-hulpklassen) en horen niet in de
+        ontologie; datatype-klassen hebben van nature geen Objecttype-stereotype
+        en blijven."""
+        return bool((cls.stereotype or "").strip()) or bool(cls.is_datatype)
 
     def addPackageHierarchy(self, g, models, myns, domain_ns, model_ns):
         """Voeg de pakkethiërarchie toe als Linked Data-entiteiten."""
@@ -363,6 +373,7 @@ class LodRenderer(ModelRenderer):
             enum_uris: dict = {}  # enum guid -> uri
             enum_by_name: dict = {}  # enumnaam (casefold) -> enum
             enum_by_uri: dict = {}  # enum uri -> enum (voor sh:in)
+            skipped_classes: list = []
             for model in models:
                 # Het modelsegment krijgt dezelfde slug-vorm als klassen en
                 # attributen (geen %20 of %28 in IRI's). De namespace wordt
@@ -373,6 +384,10 @@ class LodRenderer(ModelRenderer):
                 model_ns[model.id] = (modelname, ns)
                 for cls in model.classes:
                     if not cls.name:
+                        logger.warning(f"Klasse zonder naam overgeslagen: {cls.id}")
+                        continue
+                    if not self.isRenderableClass(cls):
+                        skipped_classes.append(f"{model.name}/{cls.name}")
                         continue
                     class_uri = ns[slugify(cls.name)]
                     class_dict[cls.id] = class_uri
@@ -383,6 +398,23 @@ class LodRenderer(ModelRenderer):
                     enum_uris[enum.id] = ns[slugify(enum.name)]
                     enum_by_uri[enum_uris[enum.id]] = enum
                     enum_by_name.setdefault(enum.name.strip().casefold(), enum)
+
+            if skipped_classes:
+                logger.warning(
+                    f"{len(skipped_classes)} klassen zonder stereotype overgeslagen: "
+                    + ", ".join(sorted(skipped_classes))
+                )
+
+            # Modellen waarvan alle klassen technisch zijn en die geen enumeraties
+            # hebben, leveren geen ontologie op.
+            leeg = [m for m in models if not any(c.id in class_dict for c in m.classes) and not m.enumerations]
+            if leeg:
+                logger.info("Modelpakketten zonder te renderen inhoud overgeslagen: " + ", ".join(m.name for m in leeg))
+                models = [m for m in models if m not in leeg]
+                if not models:
+                    msg = "Geen modellen met te renderen klassen of enumeraties gevonden."
+                    logger.error(msg)
+                    raise CrunchException(msg)
 
             # Enumeraties die buiten de modelpakketten leven maar wel als
             # attribuuttype voorkomen, krijgen een URI onder /enumeraties/.
@@ -434,10 +466,10 @@ class LodRenderer(ModelRenderer):
                 for model in models:
                     modelname, ns = model_ns[model.id]
                     model_uri = URIRef(str(ns))
+                    verwerkt_voor = len(prop_uris)
 
                     for cls in model.classes:
-                        if not cls.name:
-                            logger.warning(f"Klasse zonder naam gevonden: {cls.id}")
+                        if cls.id not in class_dict:
                             continue
                         class_uri = class_dict[cls.id]
                         uri_notes["_gemeld"] = set()
@@ -473,8 +505,7 @@ class LodRenderer(ModelRenderer):
 
                     # Add SHACL NodeShapes for each class
                     for cls in model.classes:
-                        if not cls.name:
-                            logger.warning(f"SHACL-shape overgeslagen voor klasse zonder naam: {cls.id}")
+                        if cls.id not in class_dict:
                             continue
                         class_uri = class_dict[cls.id]
                         attr_uris, _ = prop_uris[cls.id]
@@ -513,7 +544,7 @@ class LodRenderer(ModelRenderer):
                             g.add((prop_bnode, SH.name, Literal(attribute.name)))
                             if attribute.definitie:
                                 g.add((prop_bnode, SH.description, Literal(attribute.definitie)))
-                    logger.info(f"Aantal klassen verwerkt in model '{modelname}': {len(model.classes)}")
+                    logger.info(f"Aantal klassen verwerkt in model '{modelname}': {len(prop_uris) - verwerkt_voor}")
             except Exception as e:
                 logger.exception("Fout tijdens het renderen van modellen:")
                 raise CrunchException(f"Renderproces mislukt: {e}") from e
@@ -522,6 +553,8 @@ class LodRenderer(ModelRenderer):
             for model in models:
                 modelname, ns = model_ns[model.id]
                 for cls in model.classes:
+                    if cls.id not in class_dict:
+                        continue
                     # First set inheritance. cls.superclasses levert Generalization-
                     # objecten waarin cls de subklasse is en .superclass de ouder.
                     sub_cls = class_dict.get(cls.id)

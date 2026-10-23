@@ -57,7 +57,7 @@ crunch_uml transform [-h] [-sch_from SCHEMA] -sch_to SCHEMA -ttp TYPE
 ## Export
 
 ```bash
-crunch_uml export [-h] -f FILE -t TYPE [-pi IDS] [-xpi IDS]
+crunch_uml export [-h] -f FILE -t TYPE [-pi IDS] [-xpi IDS] [-xpn PATRONEN]
                    [-jt TEMPLATE] [-jtd DIR] [-ldns NS] [-js_url URL]
                    [-vt TYPE] [-ts STRATEGY] [--mapper JSON]
                    [--entity_name NAME] [--compare_schema_name SCHEMA]
@@ -71,6 +71,7 @@ crunch_uml export [-h] -f FILE -t TYPE [-pi IDS] [-xpi IDS]
 | `-t` | `--outputtype` | Uitvoertype (zie [Export](export.md)) |
 | `-pi` | `--output_package_ids` | Kommagescheiden package ID's |
 | `-xpi` | `--output_exclude_package_ids` | Uit te sluiten package ID's |
+| `-xpn` | `--output_exclude_package_names` | Kommagescheiden packagenaam-patronen (hoofdletterongevoelig, `*`/`?`) die met hun subpackages worden weggelaten; LOD-renderers gebruiken standaard `Diagram,Diagrammen intern gebruik,Tekenwijze,View*`, `""` schakelt dit uit |
 | `-jt` | `--output_jinja2_template` | Jinja2 template-bestand |
 | `-jtd` | `--output_jinja2_templatedir` | Template directory |
 | `-ldns` | `--linked_data_namespace` | Namespace voor LOD |

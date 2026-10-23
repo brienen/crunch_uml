@@ -1,3 +1,4 @@
+import fnmatch
 import logging
 from abc import ABC, abstractmethod
 
@@ -58,6 +59,16 @@ def add_args(argumentparser, subparser_dict):
         "--output_exclude_package_ids",
         type=str,
         help="List of package ids to be excluded from output separated by comma",
+    )
+    output_subparser.add_argument(
+        "-xpn",
+        "--output_exclude_package_names",
+        type=str,
+        help=(
+            "Kommagescheiden lijst van packagenaam-patronen (hoofdletterongevoelig, * en ? toegestaan) die met hun"
+            f" subpackages uit de output worden weggelaten. De LOD-renderers gebruiken standaard '{const.LOD_EXCLUDE_PACKAGE_NAMES}';"
+            " geef een lege string op om niets op naam uit te sluiten."
+        ),
     )
     output_subparser.add_argument(
         "-jtd",
@@ -343,6 +354,33 @@ class ModelRenderer(Renderer):
     A model package is a package with at least 1 class inside
     """
 
+    # Packagenaam-patronen die een renderer standaard uitsluit als de gebruiker
+    # --output_exclude_package_names niet opgeeft (None: niets uitsluiten).
+    default_exclude_package_names = None
+
+    def excludePackagePatterns(self, args):
+        """De patronen uit --output_exclude_package_names, of de renderer-default."""
+        value = getattr(args, "output_exclude_package_names", None)
+        if value is None:
+            value = self.default_exclude_package_names
+        if not value:
+            return []
+        return [pattern.strip().casefold() for pattern in value.split(",") if pattern.strip()]
+
+    @staticmethod
+    def isExcludedByName(package, patterns):
+        """Waar als het package zelf of een bovenliggend package een patroon matcht."""
+        if not patterns:
+            return False
+        seen = set()
+        while package is not None and package.id not in seen:
+            seen.add(package.id)
+            name = (package.name or "").casefold()
+            if any(fnmatch.fnmatchcase(name, pattern) for pattern in patterns):
+                return True
+            package = package.parent_package
+        return False
+
     def getModels(self, args, schema: sch.Schema):
         lst = []  # type: ignore
         if args.output_exclude_package_ids is not None:
@@ -393,6 +431,15 @@ class ModelRenderer(Renderer):
                 .distinct()
                 .all()
             )
+        patterns = self.excludePackagePatterns(args)
+        if patterns:
+            excluded = [package for package in lst if self.isExcludedByName(package, patterns)]
+            if excluded:
+                logger.info(
+                    f"{len(excluded)} modelpakketten op naam uitgesloten ({', '.join(patterns)}): "
+                    + ", ".join(sorted({package.name or package.id for package in excluded}))
+                )
+                lst = [package for package in lst if package not in excluded]
         if len(lst) == 0:
             logger.warning("Could not find any model packages to render ")
         return lst

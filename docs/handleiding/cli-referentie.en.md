@@ -57,7 +57,7 @@ crunch_uml transform [-h] [-sch_from SCHEMA] -sch_to SCHEMA -ttp TYPE
 ## Export
 
 ```bash
-crunch_uml export [-h] -f FILE -t TYPE [-pi IDS] [-xpi IDS]
+crunch_uml export [-h] -f FILE -t TYPE [-pi IDS] [-xpi IDS] [-xpn PATTERNS]
                    [-jt TEMPLATE] [-jtd DIR] [-ldns NS] [-js_url URL]
                    [-vt TYPE] [-ts STRATEGY] [--mapper JSON]
                    [--entity_name NAME] [--compare_schema_name SCHEMA]
@@ -71,6 +71,7 @@ crunch_uml export [-h] -f FILE -t TYPE [-pi IDS] [-xpi IDS]
 | `-t` | `--outputtype` | Output type (see [Export](export.md)) |
 | `-pi` | `--output_package_ids` | Comma-separated package IDs |
 | `-xpi` | `--output_exclude_package_ids` | Package IDs to exclude |
+| `-xpn` | `--output_exclude_package_names` | Comma-separated package-name patterns (case-insensitive, `*`/`?`) excluded with their subpackages; LOD renderers default to `Diagram,Diagrammen intern gebruik,Tekenwijze,View*`, `""` disables this |
 | `-jt` | `--output_jinja2_template` | Jinja2 template file |
 | `-jtd` | `--output_jinja2_templatedir` | Template directory |
 | `-ldns` | `--linked_data_namespace` | Namespace for LOD |
