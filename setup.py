@@ -57,7 +57,8 @@ setuptools.setup(
             'mypy == 1.14.*',
             'pytest >= 9.0.3, < 10',
             'pytest-cov == 7.*',
-            'twine == 5.*']
+            'twine == 5.*',
+            'pyshacl >= 0.30, < 1']
     },
     entry_points={
         'console_scripts': [

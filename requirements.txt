@@ -1,4 +1,4 @@
-SQLAlchemy>=2.0.20,<3
+SQLAlchemy>=2.0.20,<2.1
 lxml>=4.9.3,<6
 lxml-stubs
 openpyxl>=3.0.10,<4
