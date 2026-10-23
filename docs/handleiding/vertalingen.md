@@ -156,7 +156,7 @@ backend skipt deze patronen volledig — geen model-call, brontekst
 verbatim terug:
 
 * XML/HTML-achtige enkelvoudige tags: `<memo>`, `<typing>`, `</br>`, `<UML:Class>`
-* EA-identifiers: `EAID_…`, `EAPK_…`, `EAID_attr_…`
+* EA-identifiers: `EAID_…`, `EAPK_…`, `EAID_syn_…`
 * URLs: `http://…`, `https://…`, `www.…`
 * ISO-datums en -timestamps: `2024-05-13`, `2024-05-13T10:30:00Z`
 * Pure leestekens of cijfers

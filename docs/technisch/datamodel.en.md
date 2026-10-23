@@ -47,6 +47,7 @@ erDiagram
         string name
         string package_id FK
         boolean is_datatype
+        string object_type
         string definitie
         string bron
         string toelichting
@@ -115,6 +116,11 @@ erDiagram
         string schema_id
         string name
         string package_id FK
+        string diagram_type
+        bool hide_attributes
+        bool hide_operations
+        text ea_style
+        text ea_style_ex
     }
 
     DiagramClass {
@@ -173,6 +179,10 @@ UML Class entity with attributes and relationships.
 - `copy_attributes()` — Copy attributes to another class
 - `get_copy()` — Deep copy including attributes
 
+#### Element kind
+
+Since 0.7.0 the **nullable** column `object_type` says what kind of EA element a row came from, in lowercase: `t_object.Object_Type` in a QEA, the `xmi:type` of the extension element in an EA-XMI (the `uml:Model` tree exports a Boundary, ProxyConnector or Text as a plain `uml:Class`). Values: `class`, `datatype`, `boundary`, `proxyconnector`, `text`, … and `enumeration` for the placeholder class of an association end on an enumeration. NULL = unknown (an older database, a placeholder for an element outside the export, generic formats). It is information for the consumer, not a filter: which rows land in `classes` is unchanged — the qea parser reads only Class/DataType/Enumeration, the eaxmi parser also reads Boundary/ProxyConnector/Text as classes. The column arrives through the additive migration; `DATAMODEL_VERSION` stays 1. The xmi renderer writes the kind back the way EA exports it: `uml:Class` in the model tree, the kind as the extension element's `xmi:type` (see `renderers/EA_QUIRKS.md`).
+
 ### Attribute
 
 Property of a Class. Can have a primitive type (`primitive` as string) or a reference to an Enumeration.
@@ -198,6 +208,20 @@ Enumeration type with named values. EnumerationLiteral contains the individual v
 ### Diagram
 
 Visual diagram that references classes, enumerations, associations and generalizations via junction tables.
+
+#### Diagram settings
+
+Since 0.7.0 `diagrams` also stores Enterprise Architect's display settings, in five **nullable** columns (NULL = unknown, not "off"). The additive migration adds them to an existing database; `DATAMODEL_VERSION` stays 1.
+
+| Column | Type | Source (QEA / EA-XMI) |
+|---|---|---|
+| `diagram_type` | String | `t_diagram.Diagram_Type` / `properties@type`, e.g. `Logical` |
+| `hide_attributes` | Boolean | `HideAtts` in PDATA / `style1` |
+| `hide_operations` | Boolean | `HideOps` in PDATA / `style1` |
+| `ea_style` | Text | raw `t_diagram.PDATA` / `style1` — lossless, in the source's dialect |
+| `ea_style_ex` | Text | raw `t_diagram.StyleEx` / `style2` — lossless |
+
+These settings are deliberately not stored in the junction tables' `ea_style`: that holds the ObjectStyle of one element on the diagram (e.g. `AttPub=0;…` to hide the attributes of that one node) and is written back verbatim.
 
 #### Diagram geometry
 

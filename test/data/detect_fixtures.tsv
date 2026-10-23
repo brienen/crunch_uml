@@ -1,0 +1,56 @@
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	AlleRelatieSitiuaties.xml
+csv?	kop="GEMMA-naam","GGM-naam","GEMMA-guid","GGM-guid","GEMMA-type","GGM-uml-type","GEM	GEMMA_Bedrijfsobjecten_element.csv
+xlsx	entries=11	GEMMA_Bedrijfsobjecten_element.xlsx
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	GGM_Erfgoed.xml
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	GGM_Monumenten_Changed_EA2.1.xml
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	GGM_Monumenten_EA2.1.xml
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	GGM_Onderwijs_EA2.1.xml
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	GGM_Onderwijs_XMI.2.1.xml
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	GML3.xml
+qea	page=4096 journal=rollback app_id=0 tables=100 views/triggers=0	Gemeentelijk Gegevensmodel 2.4.0.qea
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	Gemeentelijk Gegevensmodel 2.4.0.xml
+rdf-xml	enc=geen root=rdf:RDF xmi=None uml_ns=None exporter=None	Gemeentelijk Gegevensmodel RDF
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	Gemeentelijk Gegevensmodel XMI2.1 Sociaal Domein.xml
+qea	page=4096 journal=rollback app_id=0 tables=100 views/triggers=0	Gemeentelijk Gegevensmodel v2.5.1.qea
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	Gemeentelijk Gegevensmodel.xml
+qea	page=4096 journal=rollback app_id=0 tables=100 views/triggers=0	InkomenMIM.qea
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	InkomenMIM.xml
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	MIM Primitieven.xml
+ea-native-xml	enc=windows-1252 root=Package xmi=None uml_ns=None exporter=None	MIM native.xml
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	Materialize_Generalizations.xml
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	Model Schuldhulpverlening.xml
+qea	page=4096 journal=rollback app_id=0 tables=100 views/triggers=0	Monumenten changes.qea
+json-anders	keys=[]	Monumenten.i18n.json
+crunch-json	tabellen-in-kop=['attributes', 'classes', 'enumerationliterals', 'generalizations', 'packages']	Monumenten.json
+qea	page=4096 journal=rollback app_id=0 tables=100 views/triggers=0	Monumenten.qea
+qea	page=4096 journal=rollback app_id=0 tables=100 views/triggers=0	MonumentenMIM.qea
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	MonumentenMIM.xml
+crunch-json	tabellen-in-kop=['classes', 'packages']	Monumenten_changes.json
+crunch-json	tabellen-in-kop=['associations', 'attributes', 'classes', 'diagram_association', 'diagram_class', 'diagram_enumeration', 'diagram_generalization', 'diagrams', 'enumerationliterals', 'enumerations', 'generalizations', 'packages']	Monumenten_test_15.json
+crunch-json	tabellen-in-kop=['associations', 'attributes', 'classes', 'diagram_association', 'diagram_class', 'diagram_enumeration', 'diagram_generalization', 'diagrams', 'enumerationliterals', 'enumerations', 'generalizations', 'packages']	Monumenten_test_15_delete.json
+crunch-json	tabellen-in-kop=['associations', 'attributes', 'classes', 'diagram_association', 'diagram_class', 'diagram_enumeration', 'diagram_generalization', 'diagrams', 'enumerationliterals', 'enumerations', 'generalizations', 'packages']	Monumenten_test_15_insert.json
+ea-native-xml	enc=windows-1252 root=Package xmi=None uml_ns=None exporter=None	Native Economie.xml
+xlsx	entries=16	Onderwijs.xlsx
+xlsx	entries=11	Onderwijs_changes.xlsx
+xlsx	entries=21	OntbrekendeDefinitiesGGM.xlsx
+crunch-i18n-json		RSGBPlus.i18n.json
+qea	page=4096 journal=rollback app_id=0 tables=100 views/triggers=0	RSGBPlus.qea
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	RSGBPlus.xml
+crunch-json	tabellen-in-kop=['classes', 'packages']	RelTestExtra.json
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	RelationTest.xml
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	SchuldenXMI.xml
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	Sociaal Domein XMI2.1.xml
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	TestMetDatatypes.xml
+qea	page=4096 journal=rollback app_id=0 tables=100 views/triggers=0	TestProject.qea
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	Test_models.xml
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	Voorbeeld Componenten.xml
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	Voorbeeld Generatie Relaties
+ea-xmi-2.1	enc=windows-1252 root=xmi:XMI xmi=2.1 uml_ns=http://schema.omg.org/spec/UML/2.1 exporter=Enterprise Architect	Voorbeeld Generatie Relaties.xml
+onbekend	8bit	ddasplugin.py
+onbekend	8bit	ddasplugin_informatiemodel.py
+onbekend	8bit	ddasplugin_uitwisselmodel.py
+crunch-i18n-json		ggm.i18n.json
+json-anders	keys=['type']	meta-schema.json
+xml-anders	enc=utf-8 root=martif xmi=None uml_ns=None exporter=None	termbank_fixture.tbx
+turtle+skos		termbank_fixture.ttl
+onbekend	8bit	testplugin.py

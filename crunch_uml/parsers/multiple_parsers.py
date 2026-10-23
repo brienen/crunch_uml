@@ -218,7 +218,13 @@ class CSVParser(TransformableParser):
             tables = db.getTables()
             if entity_name in tables and entity_name != "schemas":
                 # Lees het CSV-bestand in een dataframe
-                df = pd.read_csv(args.inputfile if args.inputfile is not None else args.url)
+                try:
+                    df = pd.read_csv(args.inputfile if args.inputfile is not None else args.url)
+                except pd.errors.EmptyDataError:
+                    # Een bestand zonder kopregel hoort bij een lege tabel. Oudere
+                    # exports schreven die zo weg; dat is niets om over te vallen.
+                    logger.info(f"CSV file {args.inputfile} is empty: no {entity_name} records to import")
+                    df = pd.DataFrame()
 
                 # Converteer het dataframe naar een lijst van woordenboeken (records)
                 records = df.to_dict(orient="records")

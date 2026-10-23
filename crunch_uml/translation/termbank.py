@@ -41,6 +41,8 @@ from rdflib.namespace import DC, DCTERMS, OWL, RDFS, SKOS
 from rdflib.term import Literal
 from rdflib.util import guess_format
 
+from crunch_uml import xmlsafe
+
 logger = logging.getLogger()
 
 # Extensions the directory scanner picks up. ``.xml`` is ambiguous (RDF/XML
@@ -233,6 +235,13 @@ def _strip_ns(tag: str) -> str:
     return tag.rsplit("}", 1)[-1] if "}" in tag else tag
 
 
+# Termbanks are operator-configured translation sources, not uploaded models:
+# they get the hardened parser options (no entity expansion, no network, no DTD
+# loading, bounded trees) but a DOCTYPE is tolerated, as TBX exports commonly
+# declare one.
+_TBX_PARSER_OPTIONS = xmlsafe.SAFE_PARSER_OPTIONS
+
+
 def _xml_lang(elem) -> str:
     lang = elem.get("{http://www.w3.org/XML/1998/namespace}lang") or elem.get("lang") or ""
     return lang.lower().split("-")[0]
@@ -242,7 +251,7 @@ def is_tbx_file(path: str) -> bool:
     """Cheap root-element sniff: TBX roots are ``martif`` (TBX v2/IATE) or
     ``tbx`` (TBX core)."""
     try:
-        for _, elem in etree.iterparse(path, events=("start",)):
+        for _, elem in etree.iterparse(path, events=("start",), **_TBX_PARSER_OPTIONS):
             return _strip_ns(elem.tag).lower() in ("martif", "tbx")
     except Exception:
         return False
@@ -308,7 +317,7 @@ def _load_tbx(
     and detached, so memory stays bounded by the surviving Concepts."""
     date = None
     concepts: List[Concept] = []
-    for _, elem in etree.iterparse(path, events=("end",)):
+    for _, elem in etree.iterparse(path, events=("end",), **_TBX_PARSER_OPTIONS):
         tag = _strip_ns(elem.tag)
         if tag.lower() in ("martifheader", "tbxheader") and date is None:
             header_text = " ".join(str(t) for t in elem.itertext())

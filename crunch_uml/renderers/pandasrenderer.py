@@ -457,7 +457,13 @@ class CSVRenderer(Renderer):
 
             # Retrieve data
             records = session.query(model).filter(model.schema_id == schema.schema_id).all()
-            df = pd.DataFrame([object_as_dict(record, session) for record in records])
+            if records:
+                df = pd.DataFrame([object_as_dict(record, session) for record in records])
+            else:
+                # Zonder rijen kent een DataFrame ook geen kolommen, en dan
+                # schrijft to_csv een volledig leeg bestand dat niet terug te
+                # lezen is. De kopregel maakt de lege tabel zelfbeschrijvend.
+                df = pd.DataFrame(columns=[column.key for column in table.columns])
 
             # Map columns
             mapper = json.loads(args.mapper)

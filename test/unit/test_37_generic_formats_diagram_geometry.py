@@ -73,8 +73,10 @@ def test_csv_roundtrip_includes_diagram_geometry():
     prefix = "./test/output/fmt_geo_csv"
     cli.main(["-sch", SOURCE, "export", "-f", prefix, "-t", "csv"])
     # The csv renderer writes one file per table; junction tables included.
+    # diagram_generalization is empty for this model: the export must still be
+    # readable, so the return code of every import is checked.
     for table in ("diagram_class", "diagram_enumeration", "diagram_association", "diagram_generalization"):
-        cli.main(
+        rc = cli.main(
             [
                 "-sch",
                 "fmt_geo_csv",
@@ -87,7 +89,24 @@ def test_csv_roundtrip_includes_diagram_geometry():
                 table,
             ]
         )
+        assert rc == 0, f"importing exported csv for {table} failed"
     assert_junction_rows_equal(SOURCE, "fmt_geo_csv")
+
+
+def test_csv_export_of_empty_table_keeps_its_header():
+    """Een tabel zonder rijen leverde een volledig leeg bestand op, dat bij
+    het teruglezen afbrak op 'No columns to parse from file'."""
+    prefix = "./test/output/fmt_geo_csv_leeg"
+    cli.main(["-sch", SOURCE, "export", "-f", prefix, "-t", "csv"])
+
+    with open(f"{prefix}_diagram_generalization.csv") as f:
+        regels = f.read().splitlines()
+
+    assert regels, "export van een lege tabel moet nog altijd een kopregel bevatten"
+    kopregel = regels[0].split(",")
+    assert "diagram_id" in kopregel
+    assert "generalization_id" in kopregel
+    assert len(regels) == 1, "lege tabel hoort geen datarijen te bevatten"
 
 
 def test_old_json_without_geometry_still_imports():

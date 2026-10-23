@@ -17,6 +17,8 @@ ENCODING = "utf-8"
 CMD_IMPORT = "import"
 CMD_EXPORT = "export"
 CMD_TRANSFORM = "transform"
+CMD_PACK = "pack"
+CMD_DETECT = "detect"
 
 # Policy when the database's stored datamodel version does not match this
 # build's DATAMODEL_VERSION. 'auto' resolves to 'recreate' for the local

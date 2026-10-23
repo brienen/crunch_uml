@@ -1,12 +1,45 @@
+import importlib
 import logging
 import os
 import time
 
-import translators as ts  # type: ignore
-
 from crunch_uml import ollama_translator
 
 logger = logging.getLogger()
+
+
+class _LazyModule:
+    """Import a module on first attribute access.
+
+    The ``translators`` package contacts the network while it is imported (it
+    looks up the caller's region unless ``translators_default_region`` is set).
+    Importing it only when a translation actually runs keeps every other
+    command - ``crunch_uml -h``, import, pack, detect - offline and fast.
+    Attribute writes are forwarded too, so tests can monkeypatch ``ts``.
+    """
+
+    def __init__(self, name):
+        object.__setattr__(self, "_name", name)
+        object.__setattr__(self, "_module", None)
+
+    def _load(self):
+        module = object.__getattribute__(self, "_module")
+        if module is None:
+            module = importlib.import_module(object.__getattribute__(self, "_name"))
+            object.__setattr__(self, "_module", module)
+        return module
+
+    def __getattr__(self, attr):
+        return getattr(self._load(), attr)
+
+    def __setattr__(self, attr, value):
+        setattr(self._load(), attr, value)
+
+    def __delattr__(self, attr):
+        delattr(self._load(), attr)
+
+
+ts = _LazyModule("translators")
 ALTERNATIVE_TRANSLATOR = "google"  # Alternatieve vertaalmachine
 
 

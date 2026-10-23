@@ -55,6 +55,15 @@ EA-specific choice, so future changes do not "fix" them by accident.
 - `<element>` entries are written with `xmi:type="uml:DataType"` for
   datatypes, matching EA. The eaxmi parser was extended (phase 3) to read
   documentation/tags for `uml:DataType` extension elements as well.
+- `Class.object_type` (the EA element kind) is written the way EA exports
+  it: the model tree says `uml:Class` for every class row, the extension
+  `<element>` carries the kind as its `xmi:type` (and `sType`) — for
+  `boundary`, `proxyconnector` and `text` (`_EXTENSION_TYPES`), the kinds
+  EA exports as `uml:Class` and the eaxmi parser reads as classes. Any
+  other kind (NULL, `class`, a placeholder's `enumeration`, or one whose EA
+  spelling the renderer does not know) is written as `uml:Class`. The kind
+  is never a tagged value. What EA needs beyond that (the `classifier` of a
+  proxy connector, say) is not in the database and not written.
 - Generalization connectors *are* written to the extension section
   (`ea_type="Generalization"`), because generalization names, definitions
   and stereotypes have no place in the strict part (EA does not put them

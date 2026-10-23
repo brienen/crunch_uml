@@ -1,4 +1,3 @@
-import importlib.metadata
 import logging
 import re
 import uuid
@@ -30,6 +29,7 @@ from sqlalchemy.orm.relationships import RelationshipProperty
 
 import crunch_uml.const as const
 import crunch_uml.util as util
+from crunch_uml._version import __version__
 from crunch_uml.exceptions import CrunchException
 
 logger = logging.getLogger()
@@ -77,10 +77,9 @@ crunch_runs_table = Table(
 
 
 def _crunch_version():
-    try:
-        return importlib.metadata.version("crunch_uml")
-    except importlib.metadata.PackageNotFoundError:
-        return "unknown"
+    # The package's own version, not importlib.metadata: an editable install
+    # keeps reporting the version it was installed with (0.6.0 markers said 0.4.11).
+    return __version__
 
 
 def add_args(argumentparser, subparser_dict):
@@ -736,6 +735,16 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
     authentiek = Column(String)
     nullable = Column(String)
     is_datatype = Column(Boolean, default=False)
+    # The kind of EA element this row came from, lowercase: QEA
+    # t_object.Object_Type, EA-XMI the xmi:type of the extension element (the
+    # uml:Model tree only says uml:Class/uml:DataType). 'class', 'datatype',
+    # 'boundary', 'proxyconnector', 'text', ... and 'enumeration' for the
+    # placeholder of an association end on an enumeration. Information for
+    # the consumer, not a filter: which rows land here is unchanged. NULL when
+    # unknown (a database written before the column, a placeholder for an
+    # element outside the export, generic formats). Nullable, so it rides on
+    # the additive migration; DATAMODEL_VERSION stays 1.
+    object_type = Column(String, nullable=True)
 
     # @hybrid_property
     # def domain(self):
@@ -1188,6 +1197,17 @@ class Diagram(Base, UMLBase):  # type: ignore
     __tablename__ = "diagrams"
 
     package_id = Column(String, index=True, nullable=False)
+    # Diagram-level display settings. All nullable: NULL means "unknown" (a
+    # database written before these columns existed, or a source without the
+    # setting), never "false". ea_style/ea_style_ex keep the raw EA settings
+    # strings losslessly: QEA t_diagram.PDATA/StyleEx, XMI <style1>/<style2>.
+    # They are deliberately not stored in the junction-table ea_style, which
+    # holds the per-element ObjectStyle and is written back verbatim.
+    diagram_type = Column(String, nullable=True)  # EA Diagram_Type / properties@type, e.g. 'Logical'
+    hide_attributes = Column(Boolean, nullable=True)  # EA HideAtts
+    hide_operations = Column(Boolean, nullable=True)  # EA HideOps
+    ea_style = Column(Text, nullable=True)
+    ea_style_ex = Column(Text, nullable=True)
     package = relationship("Package", back_populates="diagrams")
     classes = relationship("Class", secondary="diagram_class", back_populates="diagrams")
     diagram_classes = relationship("DiagramClass", cascade="all, delete-orphan", overlaps="classes,diagrams")
@@ -1396,6 +1416,9 @@ class Database:
             Session = sessionmaker(bind=cls._instance.engine)
             cls._instance.session = Session()
             cls._instance._db_url = db_url
+            # Boekhouding voor het schrijfpad, zie _can_insert_without_lookup.
+            cls._instance._table_empty_at_start = {}
+            cls._instance._inserted_keys = {}
         # Policy may differ per invocation (CLI flag), so set it on every call.
         cls._instance._on_version_mismatch = on_version_mismatch
         if db_create:
@@ -1414,6 +1437,9 @@ class Database:
         self.session.expunge_all()
         Base.metadata.drop_all(bind=self.engine)  # Drop all tables
         Base.metadata.create_all(bind=self.engine)  # Create all tables
+        # De tabellen zijn nieuw: eerdere aannames over hun inhoud vervallen.
+        self._table_empty_at_start = {}
+        self._inserted_keys = {}
         self._write_datamodel_version()
         # The model data the run markers vouched for is gone — stale
         # "completed" rows would falsely promise consistent schemas.
@@ -1590,15 +1616,88 @@ class Database:
                     logger.info(f"Adding missing column '{column.name}' to table '{table.name}'")
                     connection.execute(sqlalchemy_text(ddl))
 
+    def _table_started_empty(self, mapper, schema_id=None):
+        """Had the table behind ``mapper`` no rows *of this schema* when this
+        session first touched it?
+
+        Only then is it certain that a primary key we have not inserted
+        ourselves does not exist yet: every primary key includes schema_id, so
+        rows of other schemas can never collide. Checking per (table, schema)
+        instead of per table keeps the fast insert path for the second and
+        later schemas in a shared database (the per-table check sent a GGM
+        parse into a shared database down the merge path: 1.5-2x slower and
+        3-10x more statements). One ``SELECT ... LIMIT 1`` per (table, schema),
+        cached for the session.
+        """
+        table = mapper.local_table
+        if table is None:
+            return False
+        key = (table, schema_id)
+        known = self._table_empty_at_start.get(key)
+        if known is None:
+            query = select(table)
+            if schema_id is not None and "schema_id" in table.c:
+                query = query.where(table.c.schema_id == schema_id)
+            try:
+                known = self.session.execute(query.limit(1)).first() is None
+            except sa_exc.SQLAlchemyError as e:
+                logger.debug(f"Could not determine whether table '{table.name}' was empty: {e}")
+                known = False
+            self._table_empty_at_start[key] = known
+        return known
+
+    def _can_insert_without_lookup(self, obj):
+        """Mag ``obj`` rechtstreeks worden toegevoegd, zonder merge?
+
+        ``session.merge()`` doet per object een SELECT op de primaire sleutel om
+        te bepalen of het een INSERT of een UPDATE wordt. Bij een import in een
+        verse database - of een schema dat nog niet in de database staat - is
+        dat antwoord altijd 'bestaat nog niet': duizenden SELECTs die niets
+        opleveren. Deze check zegt alleen 'ja' als het schema van ``obj`` in de
+        tabel leeg was bij aanvang én wij deze sleutel nog niet zelf hebben
+        ingevoegd; in alle andere gevallen blijft merge() het werk doen, zodat
+        bestaande rijen gewoon worden bijgewerkt.
+        """
+        mapper = inspect(obj).mapper
+        if not self._table_started_empty(mapper, getattr(obj, "schema_id", None)):
+            return False
+
+        identity = mapper.primary_key_from_instance(obj)
+        if any(value is None for value in identity):
+            return False  # onvolledige sleutel: laat merge het uitzoeken
+
+        seen = self._inserted_keys.setdefault(mapper, set())
+        key = tuple(identity)
+        if key in seen:
+            return False  # tweede keer dezelfde rij: merge werkt hem bij
+        seen.add(key)
+        return True
+
+    def _remember_inserted(self, obj):
+        """Leg vast dat ``obj`` via deze sessie in de tabel terechtkomt, zodat
+        een latere save() op dezelfde sleutel bijwerkt in plaats van invoegt."""
+        try:
+            mapper = inspect(obj).mapper
+            identity = mapper.primary_key_from_instance(obj)
+        except Exception as e:  # geen mapped object of onvolledige sleutel
+            logger.debug(f"Could not register primary key for {obj}: {e}")
+            return
+        if not any(value is None for value in identity):
+            self._inserted_keys.setdefault(mapper, set()).add(tuple(identity))
+
     def save(self, obj):
         # NB: no per-call flush. autoflush=True ensures any subsequent ORM
         # query in the same unit-of-work sees pending changes; parsers that
         # touch many rows in a tight loop call session.flush() explicitly at
         # phase boundaries instead. Flushing per save() turns each row into a
         # SQL round-trip — that was the dominant cost on large imports.
+        if self._can_insert_without_lookup(obj):
+            self.session.add(obj)
+            return obj
         return self.session.merge(obj)
 
     def add(self, obj):
+        self._remember_inserted(obj)
         return self.session.add(obj)
 
     def count_package(self):
