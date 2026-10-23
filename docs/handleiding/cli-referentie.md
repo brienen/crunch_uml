@@ -75,6 +75,11 @@ crunch_uml export [-h] -f FILE -t TYPE [-pi IDS] [-xpi IDS] [-xpn PATRONEN]
 | `-jt` | `--output_jinja2_template` | Jinja2 template-bestand |
 | `-jtd` | `--output_jinja2_templatedir` | Template directory |
 | `-ldns` | `--linked_data_namespace` | Namespace voor LOD |
+| `-ldlang` | `--lod_language` | Taaltag voor labels en definities in de LOD-export (standaard `nl`, `""` = geen) |
+| `-ldver` | `--lod_version` | Versie van het informatiemodel (`owl:versionInfo`/`owl:versionIRI`) |
+| | `--lod_title`, `--lod_publisher`, `--lod_license` | Titel, uitgever en licentie van het informatiemodel (`dcterms:`) |
+| | `--lod_informatiedomein` | Functioneel domein (`mim:informatiedomein`) |
+| | `--lod_informatiemodeltype` | `conceptueel`, `logisch` (standaard) of `technisch` |
 | `-js_url` | `--json_schema_url` | URL voor JSON Schema |
 | `-vt` | `--version_type` | EA versie-update: `minor`, `major`, `none` |
 | `-ts` | `--tag_strategy` | EA tag-strategie: `update`, `upsert`, `replace` |
