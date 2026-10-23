@@ -101,6 +101,7 @@ crunch_uml -sch my_schema export -t <type> -f <file>
 | `-t, --outputtype` | Output type (see tables above) |
 | `-pi, --output_package_ids` | Comma-separated list of package IDs to export |
 | `-xpi, --output_exclude_package_ids` | Package IDs to exclude |
+| `-xpn, --output_exclude_package_names` | Comma-separated package-name patterns (case-insensitive, `*` and `?`) excluded together with their subpackages; the Linked Data renderers default to `Diagram,Diagrammen intern gebruik,Tekenwijze,View*`, an empty string (`""`) disables this |
 | `-jt, --output_jinja2_template` | Jinja2 template file |
 | `-jtd, --output_jinja2_templatedir` | Directory with Jinja2 templates |
 | `-ldns, --linked_data_namespace` | Namespace for Linked Data renderers |
@@ -154,6 +155,20 @@ crunch_uml -sch my_model export -t ttl \
     -f ontology.ttl \
     --linked_data_namespace https://example.org/model/
 ```
+
+Every model package (a package with at least one class) becomes an `owl:Ontology` with its own namespace
+`{namespace}{model}/`, where `{model}` is the slug of the package name without the standalone word *Model*
+(`Model Kern RGBZ` → `kern-rgbz/`). Classes get `{model}/{class}`, attributes and associations
+`{model}/{class}/{name}`. Same-named associations from one class get the target class as suffix
+(`project/heeft-projectlocatie`), nameless associations are named `{role or relatie}-{target}` and
+same-named attributes get their datatype or target class as suffix, so every property keeps exactly one
+`rdfs:range` and its own `dcterms:identifier`. Model packages sharing a name are prefixed with the parent
+package name, with a warning.
+
+Classes without a stereotype (technical EA elements such as `ProxyConnector`) are skipped; datatype
+classes stay. Packages named `Diagram`, `Diagrammen intern gebruik`, `Tekenwijze` and `View*` are left
+out with their subpackages by default; adjust this with `--output_exclude_package_names` or disable it
+with `--output_exclude_package_names ""`.
 
 ### Schema comparison
 

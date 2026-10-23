@@ -100,6 +100,7 @@ crunch_uml -sch mijn_schema export -t <type> -f <bestand>
 | `-t, --outputtype` | Uitvoertype (zie tabellen hierboven) |
 | `-pi, --output_package_ids` | Kommagescheiden lijst van package ID's om te exporteren |
 | `-xpi, --output_exclude_package_ids` | Package ID's om uit te sluiten |
+| `-xpn, --output_exclude_package_names` | Kommagescheiden packagenaam-patronen (hoofdletterongevoelig, `*` en `?`) die met hun subpackages worden weggelaten; de Linked Data-renderers gebruiken standaard `Diagram,Diagrammen intern gebruik,Tekenwijze,View*`, een lege string (`""`) schakelt dit uit |
 | `-jt, --output_jinja2_template` | Jinja2 template-bestand |
 | `-jtd, --output_jinja2_templatedir` | Directory met Jinja2 templates |
 | `-ldns, --linked_data_namespace` | Namespace voor Linked Data renderers |
@@ -153,6 +154,20 @@ crunch_uml -sch mijn_model export -t ttl \
     -f ontologie.ttl \
     --linked_data_namespace https://example.org/model/
 ```
+
+Elk modelpakket (een package met minstens één klasse) wordt een `owl:Ontology` met een eigen namespace
+`{namespace}{model}/`, waarin `{model}` de slug van de pakketnaam is zonder het losse woord *Model*
+(`Model Kern RGBZ` → `kern-rgbz/`). Klassen krijgen `{model}/{klasse}`, attributen en associaties
+`{model}/{klasse}/{naam}`. Gelijknamige associaties vanuit één klasse krijgen de doelklasse als
+achtervoegsel (`project/heeft-projectlocatie`), naamloze associaties heten `{rol of relatie}-{doelklasse}`
+en gelijknamige attributen krijgen hun datatype of doelklasse als achtervoegsel, zodat elke property
+precies één `rdfs:range` en haar eigen `dcterms:identifier` houdt. Gelijknamige modelpakketten krijgen de
+naam van het bovenliggende pakket als voorvoegsel, met een waarschuwing.
+
+Klassen zonder stereotype (in EA-modellen technische elementen zoals `ProxyConnector`) worden
+overgeslagen; datatype-klassen blijven. Packages met de namen `Diagram`, `Diagrammen intern gebruik`,
+`Tekenwijze` en `View*` worden met hun subpackages standaard weggelaten; pas dit aan met
+`--output_exclude_package_names` of schakel het uit met `--output_exclude_package_names ""`.
 
 ### Schema-vergelijking
 

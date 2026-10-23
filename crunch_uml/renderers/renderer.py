@@ -1,6 +1,7 @@
 import fnmatch
 import logging
 from abc import ABC, abstractmethod
+from typing import Optional
 
 import crunch_uml.db as db
 import crunch_uml.schema as sch
@@ -356,7 +357,7 @@ class ModelRenderer(Renderer):
 
     # Packagenaam-patronen die een renderer standaard uitsluit als de gebruiker
     # --output_exclude_package_names niet opgeeft (None: niets uitsluiten).
-    default_exclude_package_names = None
+    default_exclude_package_names: Optional[str] = None
 
     def excludePackagePatterns(self, args):
         """De patronen uit --output_exclude_package_names, of de renderer-default."""
