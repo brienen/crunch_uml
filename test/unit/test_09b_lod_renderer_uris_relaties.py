@@ -355,3 +355,50 @@ def test_uitsluiting_op_packagenaam_is_instelbaar(graaf):
         for bestand in (alles, eigen):
             if os.path.exists(bestand):
                 os.remove(bestand)
+
+
+# ---------------------------------------------------------------------------
+# 6. Namespace-botsingen
+# ---------------------------------------------------------------------------
+
+
+def test_gelijknamige_modelpakketten_krijgen_eigen_namespace(graaf):
+    """Twee pakketten 'Groepattribuutsoort' (onder RGBZ en RSGB) deelden één
+    namespace en één ontologie met twee identifiers."""
+    for ontologie, identifier in (("rgbz-groepattribuutsoort", "EAPK_GAS1"), ("rsgb-groepattribuutsoort", "EAPK_GAS2")):
+        uri = URIRef(BASE + ontologie + "/")
+        assert (uri, RDF.type, OWL.Ontology) in graaf
+        assert set(graaf.objects(uri, DCTERMS.identifier)) == {Literal(identifier)}
+    assert klasse(graaf, "Verblijfsadres") == URIRef(BASE + "rgbz-groepattribuutsoort/verblijfsadres")
+    assert klasse(graaf, "Correspondentieadres") == URIRef(BASE + "rsgb-groepattribuutsoort/correspondentieadres")
+    assert (URIRef(BASE + "groepattribuutsoort/"), None, None) not in graaf
+
+
+def test_gelijknamige_domeinen_krijgen_eigen_uri(graaf):
+    domein_type = URIRef(BASE + "Domein")
+    archief = [
+        d for d in graaf.subjects(RDF.type, domein_type) if str(graaf.value(d, RDFS.label)).casefold() == "archief"
+    ]
+    assert len(archief) == 2
+    for domein in archief:
+        assert len(set(graaf.objects(domein, DCTERMS.identifier))) == 1
+
+
+def test_elke_ontologie_en_elk_domein_heeft_precies_een_identifier(graaf):
+    entiteiten = set(graaf.subjects(RDF.type, OWL.Ontology)) | set(graaf.subjects(RDF.type, URIRef(BASE + "Domein")))
+    assert entiteiten
+    for entiteit in entiteiten:
+        assert len(set(graaf.objects(entiteit, DCTERMS.identifier))) == 1, entiteit
+
+
+def test_namespace_botsing_wordt_gemeld(graaf, caplog):
+    bestand = "./test/output/lod_fixes_waarschuwingen.ttl"
+    try:
+        with caplog.at_level(logging.WARNING):
+            exporteer(bestand)
+    finally:
+        if os.path.exists(bestand):
+            os.remove(bestand)
+    meldingen = [r.getMessage() for r in caplog.records if r.levelno == logging.WARNING]
+    assert any("groepattribuutsoort" in m and "EAPK_GAS1" in m and "EAPK_GAS2" in m for m in meldingen), meldingen
+    assert any("archief" in m and "EAPK_ARCHIEF" in m and "EAPK_ARCHIEF2" in m for m in meldingen), meldingen

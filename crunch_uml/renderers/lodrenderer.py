@@ -171,6 +171,45 @@ class LodRenderer(ModelRenderer):
         en blijven."""
         return bool((cls.stereotype or "").strip()) or bool(cls.is_datatype)
 
+    @staticmethod
+    def uniqueSlugs(packages, name_of, soort):
+        """Slug per package-id, uniek over de hele verzameling.
+
+        Pakketten met dezelfde slug (acht keer 'Diagram', twee keer
+        'Groepattribuutsoort' in het GGM) deelden één namespace, zodat hun
+        klassen door elkaar liepen en de ontologie twee identifiers kreeg.
+        Botsende pakketten krijgen de slug van het bovenliggende pakket als
+        voorvoegsel en, als dat niet volstaat, een volgnummer (deterministisch
+        op id). Er wordt gewaarschuwd, want het model zelf is dan dubbelzinnig.
+        """
+        groups: dict = {}
+        for pkg in packages:
+            slug = slugify(name_of(pkg) or "") or slugify(pkg.id or "") or "pakket"
+            groups.setdefault(slug, []).append(pkg)
+        result: dict = {}
+        taken = set(groups)
+        for slug in sorted(groups):
+            group = groups[slug]
+            if len(group) == 1:
+                result[group[0].id] = slug
+                continue
+            namen = ", ".join(sorted(f"{p.name} ({p.id})" for p in group))
+            logger.warning(
+                f"{len(group)} {soort} delen de naam '{slug}': {namen}; ze krijgen de naam van het"
+                " bovenliggende pakket als voorvoegsel"
+            )
+            for pkg in sorted(group, key=lambda p: p.id or ""):
+                parent = pkg.parent_package
+                parent_slug = slugify(name_of(parent) or "") if parent is not None else ""
+                candidate = f"{parent_slug}-{slug}" if parent_slug else slug
+                unique, n = candidate, 2
+                while unique in taken:
+                    unique = f"{candidate}-{n}"
+                    n += 1
+                taken.add(unique)
+                result[pkg.id] = unique
+        return result
+
     def addPackageHierarchy(self, g, models, myns, domain_ns, model_ns):
         """Voeg de pakkethiërarchie toe als Linked Data-entiteiten."""
         domein_cls = myns["Domein"]
@@ -186,12 +225,23 @@ class LodRenderer(ModelRenderer):
 
         seen = {}
 
+        # Alle bovenliggende (domein)pakketten vooraf verzamelen, zodat
+        # gelijknamige domeinen ('Archief' en 'archief') unieke URI's krijgen.
+        domains: dict = {}
+        for model in models:
+            parent = model.parent_package
+            while parent is not None and parent.name and parent.id not in domains:
+                if parent.id not in model_ns:
+                    domains[parent.id] = parent
+                parent = parent.parent_package
+        domain_slugs = self.uniqueSlugs(domains.values(), lambda p: p.name, "domeinpakketten")
+
         def entity_uri(pkg):
             # Een bovenliggend pakket kan zelf ook een model zijn: dan is de
             # ontologie-URI van dat model het ankerpunt, geen Domein-entiteit.
             if pkg.id in model_ns:
                 return URIRef(str(model_ns[pkg.id][1]))
-            return domain_ns[slugify(pkg.name)]
+            return domain_ns[domain_slugs.get(pkg.id) or slugify(pkg.name)]
 
         def add_package(pkg):
             if pkg.id in seen:
@@ -374,12 +424,13 @@ class LodRenderer(ModelRenderer):
             enum_by_name: dict = {}  # enumnaam (casefold) -> enum
             enum_by_uri: dict = {}  # enum uri -> enum (voor sh:in)
             skipped_classes: list = []
+            # Het modelsegment krijgt dezelfde slug-vorm als klassen en
+            # attributen (geen %20 of %28 in IRI's) en is uniek per model. De
+            # namespace wordt achter de basis geplakt: urljoin(base, "/slug/")
+            # gooide een eventueel pad in de basis-URI weg.
+            model_slugs = self.uniqueSlugs(models, lambda p: model_segment_name(p.name), "modelpakketten")
             for model in models:
-                # Het modelsegment krijgt dezelfde slug-vorm als klassen en
-                # attributen (geen %20 of %28 in IRI's). De namespace wordt
-                # achter de basis geplakt: urljoin(base, "/slug/") gooide een
-                # eventueel pad in de basis-URI weg.
-                modelname = slugify(model_segment_name(model.name))
+                modelname = model_slugs[model.id]
                 ns = Namespace(base + modelname + "/")
                 model_ns[model.id] = (modelname, ns)
                 for cls in model.classes:
