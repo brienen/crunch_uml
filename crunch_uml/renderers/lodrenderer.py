@@ -23,6 +23,10 @@ def slugify(name):
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
 
+# Enterprise Architect-GUID's: EAID_ (elementen) of EAPK_ (pakketten) met
+# alfanumerieke groepen; ook de synthetische id's van de parsers (EAID_dst...).
+_EA_GUID_RE = re.compile(r"^EA(ID|PK)_[0-9A-Za-z]+(_[0-9A-Za-z]+)*$")
+
 # Het losse woord 'Model' aan het begin of einde van een pakketnaam.
 _MODEL_WORD_RE = re.compile(r"^\s*model\b\s*|\s*\bmodel\s*$", re.IGNORECASE)
 
@@ -163,6 +167,31 @@ class LodRenderer(ModelRenderer):
     def writeToFile(self, graph, args):
         pass
 
+    def addIdentifier(self, g, uri, obj_id, what):
+        """Voeg dcterms:identifier toe en meld lege of afwijkende identifiers.
+
+        De GGM-export had één lege identifier en één zonder EAID_-prefix; zo'n
+        element is in Enterprise Architect niet terug te vinden. Een lege
+        identifier wordt niet als lege literal geschreven; identifiers die niet
+        op een EA-GUID lijken worden verzameld en aan het eind van de export in
+        één waarschuwing gemeld.
+        """
+        if obj_id is None or not str(obj_id).strip():
+            logger.warning(f"Lege identifier voor {what} <{uri}>; dcterms:identifier weggelaten")
+            return
+        obj_id = str(obj_id)
+        if not _EA_GUID_RE.match(obj_id):
+            self._odd_identifiers.setdefault(obj_id, f"{what} <{uri}>")
+        g.add((uri, DCTERMS.identifier, Literal(obj_id)))
+
+    def reportOddIdentifiers(self):
+        if self._odd_identifiers:
+            voorbeelden = ", ".join(f"'{k}' ({v})" for k, v in list(self._odd_identifiers.items())[:10])
+            logger.warning(
+                f"{len(self._odd_identifiers)} identifiers wijken af van het EA-GUID-patroon (EAID_.../EAPK_...):"
+                f" {voorbeelden}" + (" ..." if len(self._odd_identifiers) > 10 else "")
+            )
+
     @staticmethod
     def isRenderableClass(cls):
         """Klassen zonder stereotype zijn in EA-modellen technische elementen
@@ -253,7 +282,7 @@ class LodRenderer(ModelRenderer):
             else:
                 g.add((uri, RDF.type, domein_cls))
             g.add((uri, RDFS.label, Literal(pkg.name)))
-            g.add((uri, DCTERMS.identifier, Literal(pkg.id)))
+            self.addIdentifier(g, uri, pkg.id, "pakket")
             if pkg.definitie:
                 g.add((uri, RDFS.comment, Literal(pkg.definitie)))
             parent = pkg.parent_package
@@ -275,7 +304,7 @@ class LodRenderer(ModelRenderer):
         g.add((enum_uri, RDF.type, OWL.Class))
         g.add((enum_uri, RDF.type, SKOS.ConceptScheme))
         g.add((enum_uri, RDFS.label, Literal(enum.name)))
-        g.add((enum_uri, DCTERMS.identifier, Literal(enum.id)))
+        self.addIdentifier(g, enum_uri, enum.id, "enumeratie")
         if enum.definitie:
             g.add((enum_uri, RDFS.comment, Literal(enum.definitie)))
         if model_uri is not None:
@@ -293,7 +322,7 @@ class LodRenderer(ModelRenderer):
             g.add((concept_uri, SKOS.topConceptOf, enum_uri))
             if literal.name:
                 g.add((concept_uri, SKOS.prefLabel, Literal(literal.name)))
-            g.add((concept_uri, DCTERMS.identifier, Literal(literal.id)))
+            self.addIdentifier(g, concept_uri, literal.id, "enumeratiewaarde")
             if literal.definitie:
                 g.add((concept_uri, SKOS.definition, Literal(literal.definitie)))
         return concepts
@@ -383,6 +412,7 @@ class LodRenderer(ModelRenderer):
         return attr_uris, assoc_uris
 
     def render(self, args, zchema: sch.Schema):
+        self._odd_identifiers: dict = {}
         try:
             if args.linked_data_namespace is None:
                 logger.warning(
@@ -530,7 +560,7 @@ class LodRenderer(ModelRenderer):
                         # Voeg de klasse toe
                         g.add((class_uri, RDF.type, OWL.Class))
                         g.add((class_uri, RDFS.label, Literal(cls.name)))
-                        g.add((class_uri, DCTERMS.identifier, Literal(cls.id)))
+                        self.addIdentifier(g, class_uri, cls.id, "klasse")
                         g.add((class_uri, RDFS.isDefinedBy, model_uri))
                         if cls.definitie is not None:
                             g.add((class_uri, RDFS.comment, Literal(cls.definitie)))
@@ -543,7 +573,7 @@ class LodRenderer(ModelRenderer):
                             g.add((attr_uri, RDFS.domain, class_uri))
                             g.add((attr_uri, RDFS.label, Literal(attribute.name)))
                             g.add((attr_uri, RDFS.range, range_uri))
-                            g.add((attr_uri, DCTERMS.identifier, Literal(attribute.id)))
+                            self.addIdentifier(g, attr_uri, attribute.id, "attribuut")
                             if attribute.definitie is not None:
                                 g.add((attr_uri, RDFS.comment, Literal(attribute.definitie)))
 
@@ -564,7 +594,7 @@ class LodRenderer(ModelRenderer):
                         g.add((shape_uri, RDF.type, SH.NodeShape))
                         g.add((shape_uri, SH.targetClass, class_uri))
                         g.add((shape_uri, RDFS.label, Literal(cls.name)))
-                        g.add((shape_uri, DCTERMS.identifier, Literal(f"{cls.id}")))
+                        self.addIdentifier(g, shape_uri, cls.id, "SHACL-shape van klasse")
 
                         for attribute in self.rendered_attributes(cls):
                             prop_bnode = BNode()
@@ -639,7 +669,7 @@ class LodRenderer(ModelRenderer):
                             g.add((assoc_uri, RDFS.domain, from_cls))
                             g.add((assoc_uri, RDFS.range, to_cls))
                             g.add((assoc_uri, RDFS.label, Literal(label)))
-                            g.add((assoc_uri, DCTERMS.identifier, Literal(assoc.id)))
+                            self.addIdentifier(g, assoc_uri, assoc.id, "associatie")
                             if assoc.definitie is not None:
                                 g.add((assoc_uri, RDFS.comment, Literal(assoc.definitie)))
 
@@ -666,6 +696,7 @@ class LodRenderer(ModelRenderer):
                     f" -enumeratie): {overview}"
                 )
 
+            self.reportOddIdentifiers()
             self.writeToFile(g, args)
         except CrunchException:
             raise  # Laat eigen excepties door

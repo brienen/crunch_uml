@@ -402,3 +402,28 @@ def test_namespace_botsing_wordt_gemeld(graaf, caplog):
     meldingen = [r.getMessage() for r in caplog.records if r.levelno == logging.WARNING]
     assert any("groepattribuutsoort" in m and "EAPK_GAS1" in m and "EAPK_GAS2" in m for m in meldingen), meldingen
     assert any("archief" in m and "EAPK_ARCHIEF" in m and "EAPK_ARCHIEF2" in m for m in meldingen), meldingen
+
+
+# ---------------------------------------------------------------------------
+# 7. Identifiers
+# ---------------------------------------------------------------------------
+
+
+def test_lege_en_afwijkende_identifiers_worden_gemeld(graaf, caplog):
+    """De GGM-export had één lege identifier en één zonder EAID_-prefix; die
+    bleven onopgemerkt."""
+    bestand = "./test/output/lod_fixes_identifiers.ttl"
+    try:
+        with caplog.at_level(logging.WARNING):
+            graph = exporteer(bestand)
+    finally:
+        if os.path.exists(bestand):
+            os.remove(bestand)
+    meldingen = [r.getMessage() for r in caplog.records if r.levelno == logging.WARNING]
+    assert any("Lege identifier" in m and "priotype" in m for m in meldingen), meldingen
+    assert any("EA-GUID" in m and "'12345'" in m and "afwijkend" in m for m in meldingen), meldingen
+    # Een lege identifier wordt niet als lege literal geschreven; alle andere
+    # identifiers zijn gevuld.
+    assert (None, DCTERMS.identifier, Literal("")) not in graph
+    assert all(str(o).strip() for o in graph.objects(None, DCTERMS.identifier))
+    assert (klasse(graph, "Afwijkend"), DCTERMS.identifier, Literal("12345")) in graph
