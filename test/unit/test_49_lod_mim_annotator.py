@@ -199,6 +199,8 @@ def test_relatieklasse_is_subklasse_van_rdf_statement():
     assert (NS.behandelrelatie, RDFS.subClassOf, RDF.Statement) in graph
     assert (NS.behandelrelatie, MIM.unidirectioneel, Literal(True)) in graph
     assert (NS.behandelrelatie, MIM.aggregatietype, MIM.Geen) in graph
+    assert (NS.behandelrelatie, MIM.mogelijkGeenWaarde, Literal(False)) in graph
+    assert ann.ontbrekend[("Relatieklasse", "kardinaliteit")] == 1
 
 
 def test_gegevensgroeptype_en_gestructureerd_datatype_typering():
@@ -385,7 +387,10 @@ def test_waardebereik_en_eenheid_in_het_datatype_van_het_attribuut():
     assert (prop, MIM.minimumwaardeInclusief, Literal("0", datatype=XSD.decimal)) in graph
     assert (shape, SH.minInclusive, Literal("0", datatype=XSD.decimal)) in graph
     assert (shape, SH.maxInclusive, Literal("500", datatype=XSD.decimal)) in graph
-    assert (prop, MIM.eenheid, Literal("kg")) in graph
+    eenheid = graph.value(prop, MIM.eenheid)
+    assert (eenheid, RDF.type, URIRef("https://si-digital-framework.org/SI#MeasurementUnit")) in graph
+    assert (eenheid, RDFS.label, Literal("kg", lang="nl")) in graph
+    assert (prop, MIM.type, MIM.Decimal) in graph and (MIM.Decimal, RDF.type, MIM.PrimitiefDatatype) in graph
 
 
 def test_geometrie_krijgt_eigen_primitief_datatype():

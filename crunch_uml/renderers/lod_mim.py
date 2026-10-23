@@ -28,6 +28,8 @@ from crunch_uml.renderers import mim
 logger = logging.getLogger()
 
 MIM = mim.MIM
+# SI Digital Framework: de shapes verwachten een eenheid als si:MeasurementUnit.
+SI = Namespace("https://si-digital-framework.org/SI#")
 # Relatiemodellering in GGM-modellen: de relatiesoort (associatie) is leidend.
 RELATIEMODELLERINGSTYPE = MIM.RelatiesoortLeidend
 
@@ -268,8 +270,23 @@ class MimAnnotator:
             # EA's isAbstract wordt niet opgeslagen; MIM-default is false.
             g.add((class_uri, MIM.indicatieAbstractObject, Literal(False)))
         if soort == mim.RELATIEKLASSE:
+            # Een relatieklasse is ook een relatiesoort (mim:Relatieklasse
+            # rdfs:subClassOf mim:Relatiesoort): richting, aggregatie en de
+            # indicaties krijgen de MIM-defaults; bron, doel en kardinaliteit
+            # kent de bron niet (crunch_uml legt geen associatieklasse vast).
             g.add((class_uri, MIM.unidirectioneel, Literal(True)))
             g.add((class_uri, MIM.aggregatietype, MIM.Geen))
+            for pred in (
+                MIM.heeftTijdlijnGeldigheid,
+                MIM.heeftTijdlijnRegistratie,
+                MIM.indicatieMaterieleHistorie,
+                MIM.indicatieFormeleHistorie,
+                MIM.indicatieAfleidbaar,
+                MIM.mogelijkGeenWaarde,
+            ):
+                g.add((class_uri, pred, Literal(False)))
+            for veld in ("bron", "doel", "kardinaliteit"):
+                self._verplicht(soort, veld, False)
         if soort in (mim.REFERENTIELIJST, mim.CODELIJST):
             self._verplicht(
                 soort, "locatie", self._tekst(class_uri, MIM.locatie, getattr(cls, "uri", None), taal=False)
@@ -418,7 +435,15 @@ class MimAnnotator:
         anders een eigen primitief datatype; enumeraties, gestructureerde
         datatypen en referentielijsten verwijzen naar de eigen resource."""
         if kind == "datatype":
-            datatype = mim.mim_datatype(range_uri) or self.eigen_primitief_datatype(attribute.primitive, range_uri)
+            datatype = mim.mim_datatype(range_uri)
+            if datatype is not None:
+                # 6.4.6.2: de standaarddatatypen zijn mim:PrimitiefDatatype; de
+                # export zegt dat zelf, zodat sh:class mim:Datatype ook zonder
+                # mim.ttl klopt (dat bestand typeert mim:Decimal bovendien per
+                # abuis als 'mim:PrititiefDatatype').
+                self.g.add((datatype, RDF.type, MIM.PrimitiefDatatype))
+            else:
+                datatype = self.eigen_primitief_datatype(attribute.primitive, range_uri)
         else:
             datatype = range_uri
         self.g.add((prop_uri, MIM.type, datatype))
@@ -488,7 +513,15 @@ class MimAnnotator:
                 g.add((shape_node, sh_pred, literal))
         eenheid = mim.clean_value(getattr(attribute, "eenheid", None))
         if eenheid is not None:
-            g.add((prop_uri, MIM.eenheid, URIRef(eenheid) if _URI_RE.match(eenheid) else Literal(eenheid)))
+            if _URI_RE.match(eenheid):
+                g.add((prop_uri, MIM.eenheid, URIRef(eenheid)))
+            else:
+                # Een tekstuele eenheid ('kg') wordt een meeteenheid-node met
+                # die tekst als label; de shapes verwachten si:MeasurementUnit.
+                unit = BNode()
+                g.add((prop_uri, MIM.eenheid, unit))
+                g.add((unit, RDF.type, SI.MeasurementUnit))
+                g.add((unit, RDFS.label, self.lit(eenheid)))
 
     # ------------------------------------------------------------------
     # Relatiesoorten

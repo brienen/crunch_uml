@@ -7,8 +7,12 @@ Gebruik:
 
 De shapes (mim-shapes.ttl) en het vocabulaire (mim.ttl) komen standaard uit
 test/data/mim/ (kopie van https://docs.geostandaarden.nl/mim/mim/media/).
-Het vocabulaire gaat als ontologie-graaf mee, zodat sh:class-controles op
-mim:Datatype de subklassen (mim:PrimitiefDatatype, mim:Enumeratie, ...) zien.
+Het vocabulaire wordt in de datagraaf gemengd: de shapes controleren met
+sh:class op mim:Datatype (met de subklassen mim:PrimitiefDatatype,
+mim:Enumeratie, ...) en met sh:hasValue op skos:inScheme van de MIM-
+waardelijsten (authenticiteit, aggregatietypen, informatiemodeltypen), en die
+feiten staan in mim.ttl, niet in de export. pyshacl gebruikt een losse
+ontologiegraaf alleen voor inferentie, dus mengen is nodig.
 
 De uitvoer is een samenvatting per (shape, pad, constraint) met aantallen en
 voorbeeld-focusnodes; de exitcode is 0 als de export conformeert, anders 1.
@@ -35,13 +39,15 @@ MIM = Namespace("http://modellen.mim-standaard.nl/def/mim#")
 
 
 def valideer(data_graph: Graph, shapes_path=STANDAARD_SHAPES, ontologie_path=STANDAARD_ONTOLOGIE, inference="none"):
-    """Draai pyshacl en geef (conformeert, resultaatgraaf, tekst) terug."""
+    """Draai pyshacl op de export plus het MIM-vocabulaire en geef
+    (conformeert, resultaatgraaf, tekst) terug."""
     shapes = Graph().parse(str(shapes_path), format="turtle")
-    ontologie = Graph().parse(str(ontologie_path), format="turtle")
+    gemengd = Graph()
+    gemengd += data_graph
+    gemengd.parse(str(ontologie_path), format="turtle")
     return pyshacl.validate(
-        data_graph,
+        gemengd,
         shacl_graph=shapes,
-        ont_graph=ontologie,
         inference=inference,
         advanced=True,
         allow_warnings=False,
@@ -55,10 +61,24 @@ def kort(term, graph: Graph) -> str:
         return str(term)
 
 
+def rapport_resultaten(results: Graph):
+    """De resultaten die het rapport zelf meldt (sh:result). De geneste
+    details van sh:node/sh:xone (sh:detail) zijn ook sh:ValidationResult en
+    zouden anders dubbel en met vertekende componenten meetellen. Meldingen
+    over resources uit het MIM-vocabulaire zelf (mim:CharacterString e.d.,
+    meegemengd voor de controles) gaan niet over de export en vallen weg."""
+    for report in results.subjects(RDF.type, SH.ValidationReport):
+        for result in results.objects(report, SH.result):
+            focus = results.value(result, SH.focusNode)
+            if focus is not None and str(focus).startswith(str(MIM)):
+                continue
+            yield result
+
+
 def vat_samen(results: Graph, data_graph: Graph, max_voorbeelden=3):
     """Groepeer de validatieresultaten per (shape, pad, constraintcomponent)."""
     groepen = defaultdict(lambda: {"aantal": 0, "voorbeelden": [], "bericht": None, "ernst": None})
-    for result in results.subjects(RDF.type, SH.ValidationResult):
+    for result in rapport_resultaten(results):
         shape = results.value(result, SH.sourceShape)
         pad = results.value(result, SH.resultPath)
         component = results.value(result, SH.sourceConstraintComponent)
