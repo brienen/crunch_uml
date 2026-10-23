@@ -1405,6 +1405,13 @@ class Database:
         return cls._instance
 
     def _reset_database(self):
+        # Objecten die de sessie nog kent (uit een eerdere import of export in
+        # hetzelfde proces, vaak alleen nog als niet-opgeruimde referentiecycli)
+        # horen bij de tabellen die hieronder verdwijnen. Blijven ze in de
+        # identity map, dan maakt een herimport er UPDATE's van op rijen die
+        # niet meer bestaan ("expected to update 1 row(s); 0 were matched").
+        self.session.rollback()
+        self.session.expunge_all()
         Base.metadata.drop_all(bind=self.engine)  # Drop all tables
         Base.metadata.create_all(bind=self.engine)  # Create all tables
         self._write_datamodel_version()
