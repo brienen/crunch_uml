@@ -15,7 +15,11 @@ class _LazyModule:
     looks up the caller's region unless ``translators_default_region`` is set).
     Importing it only when a translation actually runs keeps every other
     command - ``crunch_uml -h``, import, pack, detect - offline and fast.
-    Attribute writes are forwarded too, so tests can monkeypatch ``ts``.
+    Attribute writes are forwarded too. Tests replace ``ts`` as a whole
+    (``monkeypatch.setattr(lang, "ts", ...)``) rather than an attribute on it:
+    reading an attribute triggers the import, and on a runner without network
+    that import fails, which pytest's monkeypatch reports as a missing
+    attribute.
     """
 
     def __init__(self, name):

@@ -248,7 +248,7 @@ def test_lang_translate_routes_to_ollama_when_backend_env_set(monkeypatch):
     def boom(*a, **kw):
         raise AssertionError("translators.ts.translate_text should not be called")
 
-    monkeypatch.setattr(lang.ts, "translate_text", boom)
+    monkeypatch.setattr(lang, "ts", SimpleNamespace(translate_text=boom))
 
     result = lang.translate("hallo", "en", "nl", context={"section": "classes"})
     assert result == "OLLAMA_RESULT"
@@ -269,7 +269,7 @@ def test_lang_translate_falls_back_to_translators_when_ollama_raises(monkeypatch
         ts_calls.append({"value": value, "to": to_language, "from": from_language})
         return f"TS:{value}"
 
-    monkeypatch.setattr(lang.ts, "translate_text", fake_ts)
+    monkeypatch.setattr(lang, "ts", SimpleNamespace(translate_text=fake_ts))
 
     result = lang.translate("hallo", "en", "nl")
     assert result == "TS:hallo"
@@ -288,7 +288,7 @@ def test_lang_translate_default_backend_skips_ollama(monkeypatch):
     def fake_ts(value, to_language, from_language, **kw):
         return f"TS:{value}"
 
-    monkeypatch.setattr(lang.ts, "translate_text", fake_ts)
+    monkeypatch.setattr(lang, "ts", SimpleNamespace(translate_text=fake_ts))
 
     result = lang.translate("hallo", "en", "nl")
     assert result == "TS:hallo"
