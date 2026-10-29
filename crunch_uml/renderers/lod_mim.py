@@ -55,6 +55,9 @@ class MimAnnotator:
         # (metagegeven, reden) -> aantal waarden die wel in de bron staan maar
         # niet te vertalen zijn (onleesbare datum, onbekende authenticiteit).
         self.onvertaald: Counter = Counter()
+        # Relaties waarvan de kardinaliteit in de bron staat maar niet te lezen is
+        # (EA: '1..' zonder bovengrens), met naam, zodat ze in het model te vinden zijn.
+        self.onbruikbare_kardinaliteit: list = []
         self.getypeerd: Counter = Counter()
         graph.bind("mim", MIM)
         graph.bind("skos", SKOS)
@@ -554,6 +557,10 @@ class MimAnnotator:
             self._verplicht(soort, "kardinaliteit", False)
             if mim.clean_value(assoc.dst_mult_start) or mim.clean_value(assoc.dst_mult_end):
                 self.onvertaald[("kardinaliteit", f"onbruikbaar: {assoc.dst_mult_start}..{assoc.dst_mult_end}")] += 1
+                self.onbruikbare_kardinaliteit.append(
+                    f"'{naam}' ({self._kort(bron_uri)} -> {self._kort(doel_uri)}): "
+                    f"{mim.clean_value(assoc.dst_mult_start) or ''}..{mim.clean_value(assoc.dst_mult_end) or ''}"
+                )
         kard_bron = mim.kardinaliteit(assoc.src_mult_start, assoc.src_mult_end)
         if kard_bron is not None:
             g.add((prop_uri, MIM.kardinaliteitRelatieBron, Literal(kard_bron)))
@@ -660,4 +667,14 @@ class MimAnnotator:
                 "Bronwaarden die niet te vertalen waren (metagegeven, reden: aantal): "
                 + "; ".join(f"{veld} ({reden}): {n}" for (veld, reden), n in sorted(self.onvertaald.items()))
             )
+        if self.onbruikbare_kardinaliteit:
+            regels.append(
+                "Relaties met een onbruikbare kardinaliteit in de bron (zet die in EA recht): "
+                + "; ".join(sorted(self.onbruikbare_kardinaliteit))
+            )
         return "\n".join(regels)
+
+    def _kort(self, uri) -> str:
+        """Het deel van een IRI na de basis-URI, voor leesbare meldingen."""
+        text = str(uri)
+        return text[len(self.base) :] if text.startswith(self.base) else text

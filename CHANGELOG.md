@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v0.8.5 (2026-10-29)
+
+Cleaner text in the Linked Data and the documentation, after a review of the GGM LOD site.
+
+- **Repeated memo text in EA tag values.** EA appends the text of a memo tag again behind a `#NOTES#` separator every time the profile is synchronised; GGM v3.0.0 has 681 such values, up to thirteen copies of one sentence (`mim:populatie` of Wijk and Buurt). `mim.clean_value` only cut at the first separator, so the LOD carried the repetitions. It now splits at every separator, drops the tag-definition notes (`Description: ...`) and keeps each distinct text once, in order; the Markdown/HTML/DOT renderers apply the same cleaning through `fix_and_format` (13 GGM pages showed raw `#NOTES#` text).
+- **HTML in LOD literals.** EA stores notes as HTML; the documentation renderers converted it, the LOD renderers wrote it as is (GGM ontology: 676 `<font>`, 216 `<ul>`/`<li>`, 164 `<b>`/`<i>`, 114 entities such as `&#233;`). Every language-tagged literal now goes through `mim.plain_text`: formatting tags disappear, entities become characters, `<br>` and block elements become line breaks, list items become `- ` lines (numbered for `<ol>`). Only text with a known HTML tag or entity is touched, so a name such as `bijstandsnorm 1 pnr < 21 jr` stays as it is.
+- **Unusable cardinalities are named.** An association whose multiplicity cannot be read (EA: `1..` without upper bound; GGM: 13 relations, among them *Woonplaats ligt in Gemeente*) got no `mim:kardinaliteit` and only a count in the log. The export summary now lists them by name, source and target, so they can be corrected in the model.
+
 ## v0.8.4 (2026-10-29)
 
 A model is now a package with at least one class *or enumeration*, and the Linked Data export is byte-for-byte reproducible.

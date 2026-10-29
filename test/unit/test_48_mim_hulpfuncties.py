@@ -33,6 +33,12 @@ from crunch_uml.renderers import mim
         ("<memo>#NOTES#Elf cijfers", "Elf cijfers"),
         # ... maar niet als daar alleen de tagdefinitie staat.
         ("<memo>#NOTES#Description: Een toelichting", None),
+        # Herhaalde memotekst (EA plakt die bij elke profielsynchronisatie opnieuw aan).
+        ("<memo>#NOTES#Zin.#NOTES#Zin.#NOTES#Zin.", "Zin."),
+        ("<memo>#NOTES#Zin.\n\n#NOTES#Zin.\n\n#NOTES#Zin.", "Zin."),
+        ("<memo>#NOTES#Eerste.#NOTES#Tweede.#NOTES#Eerste.", "Eerste.\n\nTweede."),
+        ("<memo>#NOTES#Tekst#NOTES#Description: Aanvullende beschrijving", "Tekst"),
+        ("\u2022\tTekst#NOTES#Description: A#NOTES#Description: A", "\u2022\tTekst"),
         ("<memo>", None),
         ("nan", None),
         ("None", None),
@@ -43,6 +49,36 @@ from crunch_uml.renderers import mim
 )
 def test_clean_value(ruw, verwacht):
     assert mim.clean_value(ruw) == verwacht
+
+
+@pytest.mark.parametrize(
+    "ruw,verwacht",
+    [
+        ('Representatie van <font color="#993300">Feature</font>.', "Representatie van Feature."),
+        ("cre&#235;ren en &amp;", "creëren en &"),
+        ("<b>Let op</b>: <i>x</i> en <u>y</u>", "Let op: x en y"),
+        (
+            "Woonplaats:\n<ul>\n\t<li>naam</li>\n\t<li>status </li>\n</ul>\nEinde",
+            "Woonplaats:\n\n- naam\n- status\n\nEinde",
+        ),
+        ("<ol><li>een</li><li>twee</li></ol>", "1. een\n2. twee"),
+        ("regel 1<br>regel 2<br/>regel 3", "regel 1\nregel 2\nregel 3"),
+        ("<p>Eerste</p><p>Tweede</p>", "Eerste\n\nTweede"),
+        # Geen HTML: ongemoeid, ook met '<' of '&' in een naam.
+        ("bijstandsnorm 1 pnr < 21 jr (adresloze)", "bijstandsnorm 1 pnr < 21 jr (adresloze)"),
+        ("Q & A", "Q & A"),
+        ("Gewone tekst\n\nmet alinea", "Gewone tekst\n\nmet alinea"),
+        ("", ""),
+        (None, None),
+    ],
+)
+def test_plain_text(ruw, verwacht):
+    assert mim.plain_text(ruw) == verwacht
+
+
+def test_lang_literal_maakt_platte_tekst_van_html():
+    assert mim.lang_literal('<font color="#1">A &amp; B</font> ', "nl") == Literal("A & B", lang="nl")
+    assert mim.lang_literal("x < 21", None) == Literal("x < 21")
 
 
 @pytest.mark.parametrize(

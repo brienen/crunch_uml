@@ -91,7 +91,15 @@ def bouw_model():
     cls("EAID_WOONPLAATS", "Woonplaats", "EAPK_BAG")
     # Zonder stereotype maar met EA-objecttype 'class': een gewone klasse (Aantal in
     # het GGM); een ProxyConnector met objecttype blijft technisch, ook mét stereotype.
-    cls("EAID_AANTAL", "Aantal", "EAPK_BAG", stereotype=None, object_type="class")
+    cls(
+        "EAID_AANTAL",
+        "Aantal",
+        "EAPK_BAG",
+        stereotype=None,
+        object_type="class",
+        definitie='Aantal <font color="#993300">objecten</font>, te cre&#235;ren:<ul><li>een</li><li>twee</li></ul>',
+        populatie="<memo>#NOTES#Alle aantallen.#NOTES#Alle aantallen.#NOTES#Alle aantallen.",
+    )
     cls("EAID_PROXY", "Proxy", "EAPK_BAG", stereotype="Objecttype", object_type="proxyconnector")
     schema.save(db.Enumeratie(id="EAID_TYPESTATUS", name="TypeStatus", package_id="EAPK_BAG"))
     schema.save(db.EnumerationLiteral(id="EAID_LIT_ACTIEF", name="actief", enumeratie_id="EAID_TYPESTATUS"))
@@ -631,3 +639,12 @@ def test_export_is_deterministisch(export):
         for path in (tweede, tweede_shapes):
             if os.path.exists(path):
                 os.remove(path)
+
+
+def test_html_en_herhaalde_memotekst_worden_platte_tekst(export):
+    """EA-notities zijn HTML en tagwaarden herhalen hun memotekst; de LOD krijgt platte tekst."""
+    ontologie = export["ontologie"]
+    assert (AANTAL, RDFS.comment, Literal("Aantal objecten, te creëren:\n\n- een\n- twee")) in ontologie
+    assert (AANTAL, MIM.populatie, Literal("Alle aantallen.")) in ontologie
+    for tekst in ontologie.objects(AANTAL, None):
+        assert "<font" not in str(tekst) and "#NOTES#" not in str(tekst)

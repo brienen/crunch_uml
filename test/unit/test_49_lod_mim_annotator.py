@@ -608,6 +608,9 @@ def test_relatiesoort_zonder_naam_gebruikt_de_rol_en_onbruikbare_kardinaliteit_w
     assert list(graph.objects(prop, MIM.kardinaliteit)) == []
     assert ann.ontbrekend[("Relatiesoort", "kardinaliteit")] == 1
     assert ann.onvertaald[("kardinaliteit", "onbruikbaar: -1..-1")] == 1
+    # De relatie staat met naam in de samenvatting, zodat ze in EA te vinden is.
+    assert ann.onbruikbare_kardinaliteit == ["'behandelaar' (zorg/patient -> zorg/zorgverlener): -1..-1"]
+    assert "'behandelaar' (zorg/patient -> zorg/zorgverlener): -1..-1" in ann.samenvatting()
 
 
 # ---------------------------------------------------------------------------
