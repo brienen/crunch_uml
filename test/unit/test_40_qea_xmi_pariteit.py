@@ -122,6 +122,33 @@ def test_inkomen_mim_qea_leest_aggregaties(inkomen):
     assert scalar(qea, "SELECT COUNT(*) FROM associations") == 70
 
 
+def pairs(con, sql):
+    return {(row[0], row[1]) for row in con.execute(sql)}
+
+
+def test_inkomen_mim_typenaam_code_en_rol_gelijk(inkomen):
+    """0.8.1 QEA left `primitive` empty whenever the classifier was known, so an
+    attribute lost its type as soon as the type class fell outside a consumer's
+    scope (GGM v3.0.0: 3,623 attributes without a type after the copy to the root
+    package); it also skipped the code of an enumeration value (t_attribute.Style)
+    and the role names of association ends. All three now agree with EA-XMI."""
+    qea, xmi = inkomen
+    # Every type name EA-XMI gives, QEA gives too (QEA also names the one type,
+    # 'Wet', that the XMI export leaves without a type string).
+    typ = "SELECT id, primitive FROM attributes WHERE primitive IS NOT NULL AND trim(primitive) <> '' AND {}"
+    assert pairs(xmi, typ.format(NON_PSEUDO)) <= pairs(qea, typ.format("1=1"))
+    # Attributes without a type in EA stay without a type name in both formats.
+    zonder_type = "primitive IS NULL OR trim(primitive) = ''"
+    assert ids(qea, "attributes", zonder_type) <= ids(xmi, "attributes", f"({zonder_type}) AND {NON_PSEUDO}")
+    code = "SELECT id, alias FROM enumerationliterals"
+    assert pairs(qea, code) == pairs(xmi, code)
+    # Roles on the associations both formats hold (EA-XMI also keeps connectors to
+    # elements outside the export, which QEA skips).
+    rol = "SELECT id, ifnull(src_role, '') || '|' || ifnull(dst_role, '') FROM associations WHERE id IN ({})"
+    gedeeld = ", ".join(f"'{i}'" for i in ids(qea, "associations") & ids(xmi, "associations"))
+    assert pairs(qea, rol.format(gedeeld)) == pairs(xmi, rol.format(gedeeld))
+
+
 @pytest.fixture(scope="module")
 def ggm240(tmp_path_factory):
     if not (os.path.exists(GGM240_QEA) and os.path.exists(GGM240_XMI)):
@@ -157,6 +184,15 @@ def test_ggm240_ids_van_enumeraties_en_waarden_gelijk(ggm240):
     assert ids(qea, "enumerations") == ids(xmi, "enumerations")
     assert ids(qea, "enumerationliterals") == ids(xmi, "enumerationliterals")
     assert not any("{" in i for i in ids(xmi, "enumerations"))
+    # Codes of enumeration values and role names of associations agree too.
+    assert pairs(qea, "SELECT id, alias FROM enumerationliterals") == pairs(
+        xmi, "SELECT id, alias FROM enumerationliterals"
+    )
+    assert scalar(qea, "SELECT COUNT(*) FROM enumerationliterals WHERE alias IS NOT NULL") > 100
+    rol = "SELECT id, ifnull(src_role, '') || '|' || ifnull(dst_role, '') FROM associations WHERE id IN ({})"
+    gedeeld = ", ".join(f"'{i}'" for i in ids(qea, "associations") & ids(xmi, "associations"))
+    assert pairs(qea, rol.format(gedeeld)) == pairs(xmi, rol.format(gedeeld))
+    assert scalar(qea, "SELECT COUNT(*) FROM associations WHERE src_role IS NOT NULL OR dst_role IS NOT NULL") > 0
 
 
 @pytest.mark.slow
