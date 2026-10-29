@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v0.8.4 (2026-10-29)
+
+A model is now a package with at least one class *or enumeration*, and the Linked Data export is byte-for-byte reproducible.
+
+- **Packages holding only enumerations are models.** `getModels()` selected packages by their classes, so a package with only enumerations (the GGM has three `Enumeratiesoort` packages next to the RSGB, RGBZ and IMBOR models and five `Datatypes` packages) was neither documented nor given a place in the Linked Data: its enumerations got the catch-all IRI `{namespace}enumeraties/{name}` instead of `kern/rsgbplus/rsgb/enumeratiesoort/boolean`, and the Markdown renderers wrote no page for it. Until 0.8.3 the copy transformer hid this by copying those enumerations into every model that used them. Every renderer that works per model (`jinja2`, `ggm_md`, `html`, `dot`, `model_overview_md`, `openapi`, `ttl`/`rdf`/`json-ld`, SQLAlchemy) now includes such packages; in the LOD they become an `owl:Ontology` in the package hierarchy like any other model.
+- **Same-named packages no longer overwrite each other's documentation.** The per-model Markdown, HTML and DOT renderers wrote `{output}_{package name}` and the last package of a name won. A name that occurs more than once now gets the parent package appended, `Datatypes (Reden aanvraag)`, and a further level when needed (`Datatypes (Inkomen > Reden aanvraag)`); a unique name stays as it was, so existing file names do not change. Templates receive the name as `model_name`.
+- **Deterministic SHACL output.** The property shapes, `sh:in` lists and measurement-unit nodes were blank nodes with a random label; rdflib sorts the objects of a predicate on that label, so the order of the property shapes in the shapes file changed with every export (GGM: over 28,000 moved lines per run, with nothing changed). Blank nodes now carry a label derived from shape and path (`mim.bnode`), so two exports of the same model give identical files. `test_52` checks this, and `test_54` the file names of same-named packages.
+
 ## v0.8.3 (2026-10-29)
 
 The copy transformer (`transform -ttp copy`) now yields the same copy on every run.

@@ -10,10 +10,11 @@ Shapes:      https://docs.geostandaarden.nl/mim/mim/media/mim-shapes.ttl
 """
 
 import datetime
+import hashlib
 import re
 from typing import Optional, Tuple
 
-from rdflib import Literal, Namespace, URIRef
+from rdflib import BNode, Literal, Namespace, URIRef
 from rdflib.namespace import XSD
 
 MIM = Namespace("http://modellen.mim-standaard.nl/def/mim#")
@@ -38,6 +39,19 @@ CODELIJST = "Codelijst"
 _NOTES_SEP = "#NOTES#"
 _TAG_META_RE = re.compile(r"^(description|values|default|type)\s*:", re.IGNORECASE)
 _PLACEHOLDERS = {"", "<memo>", "nan", "none", "null", "<niet gespecificeerd>", "<geen>"}
+
+
+def bnode(*parts):
+    """Blank node met een label dat uit zijn context volgt (sha1 van de delen).
+
+    rdflib sorteert de objecten van een predicaat op hun label; met het
+    willekeurige label van ``BNode()`` stonden de property shapes van een
+    NodeShape bij elke export in een andere volgorde (GGM: ruim 28.000
+    verplaatste regels per run). Met een label uit shape en pad is de
+    uitvoer bij gelijke invoer byte voor byte gelijk.
+    """
+    key = "|".join(str(part) for part in parts)
+    return BNode("b" + hashlib.sha1(key.encode("utf-8")).hexdigest()[:24])
 
 
 def clean_value(value) -> Optional[str]:

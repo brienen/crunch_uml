@@ -155,6 +155,13 @@ crunch_uml -sch mijn_model export -t jinja2 \
     --output_jinja2_templatedir ./templates/
 ```
 
+Een model is een pakket met minstens één klasse of enumeratie; een pakket met alleen enumeraties (in het GGM
+`Enumeratiesoort` naast een model, of `Datatypes`) krijgt dus ook een eigen bestand. Het bestand heet
+`{uitvoernaam}_{pakketnaam}.md`. Komt een pakketnaam vaker voor, dan krijgen die pakketten het bovenliggende
+pakket erachter, `{uitvoernaam}_Datatypes (Reden aanvraag).md`, en zo nodig nog een niveau hoger
+(`Datatypes (Inkomen > Reden aanvraag)`); een unieke naam blijft zoals hij was. Het template krijgt die naam
+mee als `model_name`.
+
 ### Linked Data (Turtle) exporteren
 
 ```bash
@@ -163,7 +170,7 @@ crunch_uml -sch mijn_model export -t ttl \
     --linked_data_namespace https://example.org/model/
 ```
 
-Elk modelpakket (een package met minstens één klasse) wordt een `owl:Ontology` met een eigen namespace
+Elk modelpakket (een package met minstens één klasse of enumeratie) wordt een `owl:Ontology` met een eigen namespace
 `{namespace}{pad}/`, waarin `{pad}` de pakketboom van het model volgt: de slugs van alle pakketten van de
 wortel tot en met het modelpakket, zonder volgnummer en zonder het losse woord *Model*
 (`99 Kern › Model BAG` → `kern/bag/`, `1 Veiligheid en Vergunningen › Model VTH` → `veiligheid-en-vergunningen/vth/`,

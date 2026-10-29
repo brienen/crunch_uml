@@ -4,9 +4,10 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 import crunch_uml.db as db
+from sqlalchemy import or_
 import crunch_uml.schema as sch
 from crunch_uml import const, util
-from crunch_uml.db import Class, Package
+from crunch_uml.db import Package
 from crunch_uml.exceptions import CrunchException
 from crunch_uml.registry import Registry
 
@@ -461,55 +462,33 @@ class ModelRenderer(Renderer):
         return False
 
     def getModels(self, args, schema: sch.Schema):
-        lst = []  # type: ignore
+        """De te renderen modelpakketten: elk pakket met klassen of enumeraties.
+
+        Een pakket met alleen enumeraties (in het GGM 'Enumeratiesoort' naast een model, of
+        'Datatypes') is ook een model: zijn enumeraties horen in de documentatie en de LOD
+        een eigen plek te hebben. Tot 0.8.3 telden alleen pakketten met klassen; zulke
+        enumeraties verschenen dan nergens, of als kopie in de modellen die ze gebruiken.
+        Daarna: beperkt tot of zonder de opgegeven pakket-id's en zonder de op naam
+        uitgesloten pakketten.
+        """
+        query = (
+            schema.get_session()
+            .query(Package)
+            .filter(
+                Package.schema_id == schema.schema_id,
+                or_(Package.classes.any(), Package.enumerations.any()),
+            )
+        )
+        excl_packageids = []
         if args.output_exclude_package_ids is not None:
-            # Get package_ids to exclude
-            excl_packageids = args.output_exclude_package_ids.split(",")
-            excl_packageids = [elem.strip() for elem in excl_packageids]
+            excl_packageids = [elem.strip() for elem in args.output_exclude_package_ids.split(",")]
         if args.output_package_ids is not None:
-            # Get package_ids to include
-            packageids = args.output_package_ids.split(",")
-            packageids = [elem.strip() for elem in packageids]
-
-            # subtract exclude list
-            if args.output_exclude_package_ids:
-                packageids = [pid for pid in packageids if pid not in excl_packageids]
-
-        # Now find packages
-        lst = []
-        if args.output_package_ids is not None:
-            # If list of p[ackage ids is supplied return query
-            lst = (
-                schema.get_session()
-                .query(Package)
-                .join(Class)
-                .filter(Package.id.in_(packageids), Package.schema_id == schema.schema_id)
-                .distinct()
-                .all()
-            )
-        elif args.output_exclude_package_ids is not None:
-            # If only list of excluded model supplied return query
-            lst = (
-                schema.get_session()
-                .query(Package)
-                .join(Class)
-                .filter(
-                    Package.id.notin_(excl_packageids),
-                    Package.schema_id == schema.schema_id,
-                )
-                .distinct()
-                .all()
-            )
-        else:
-            # If nothing is supplied return all model packages
-            lst = (
-                schema.get_session()
-                .query(Package)
-                .join(Class)
-                .filter(Package.schema_id == schema.schema_id)
-                .distinct()
-                .all()
-            )
+            packageids = [elem.strip() for elem in args.output_package_ids.split(",")]
+            packageids = [pid for pid in packageids if pid not in excl_packageids]
+            query = query.filter(Package.id.in_(packageids))
+        elif excl_packageids:
+            query = query.filter(Package.id.notin_(excl_packageids))
+        lst = query.all()
         patterns = self.excludePackagePatterns(args)
         if patterns:
             excluded = [package for package in lst if self.isExcludedByName(package, patterns)]

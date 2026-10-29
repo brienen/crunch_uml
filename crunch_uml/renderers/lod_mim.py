@@ -20,7 +20,7 @@ import re
 from collections import Counter
 from typing import Dict, Optional
 
-from rdflib import BNode, Graph, Literal, Namespace, URIRef
+from rdflib import Graph, Literal, Namespace, URIRef
 from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SH, SKOS, XSD
 
 from crunch_uml.renderers import mim
@@ -521,7 +521,7 @@ class MimAnnotator:
             else:
                 # Een tekstuele eenheid ('kg') wordt een meeteenheid-node met
                 # die tekst als label; de shapes verwachten si:MeasurementUnit.
-                unit = BNode()
+                unit = mim.bnode(prop_uri, "eenheid")
                 g.add((prop_uri, MIM.eenheid, unit))
                 g.add((unit, RDF.type, SI.MeasurementUnit))
                 g.add((unit, RDFS.label, self.lit(eenheid)))
@@ -610,11 +610,11 @@ class MimAnnotator:
         g.add((shape_uri, SH.targetClass, enum_uri))
         g.add((shape_uri, RDFS.label, self.lit(enum.name)))
         for pad in (RDFS.label, SKOS.notation, SKOS.definition):
-            prop = BNode()
+            prop = mim.bnode(shape_uri, pad)
             g.add((shape_uri, SH.property, prop))
             g.add((prop, SH.path, pad))
         for pad, waarde in ((RDF.type, enum_uri), (SKOS.inScheme, enum_uri)):
-            prop = BNode()
+            prop = mim.bnode(shape_uri, pad, waarde)
             g.add((shape_uri, SH.property, prop))
             g.add((prop, SH.path, pad))
             g.add((prop, SH.hasValue, waarde))

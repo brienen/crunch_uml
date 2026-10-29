@@ -41,6 +41,8 @@ GEBOUWD_OBJECT = URIRef(BAG + "gebouwd-object")
 WOONPLAATS = URIRef(BAG + "woonplaats")
 TYPE_STATUS = URIRef(BAG + "typestatus")
 ENERGIELABEL = URIRef(BAG + "energielabel")
+KERN_ENUMS = BASE + "kern/enumeratiesoort/"
+INDICATIE = URIRef(KERN_ENUMS + "indicatie")
 AANTAL = URIRef(BAG + "aantal")
 VESTIGING = URIRef(ECO + "vestiging")
 GEO_WKT = URIRef("http://www.opengis.net/ont/geosparql#wktLiteral")
@@ -118,6 +120,13 @@ def bouw_model():
     attr("EAID_PAND_NAAM", "naam", "EAID_PAND", "CharacterString", type_class="EAID_CHARACTERSTRING")
     attr("EAID_PAND_PUNT", "punt", "EAID_PAND", "GM_Point", type_class="EAID_GM_POINT")
     attr("EAID_VBO_OPP", "oppervlakte", "EAID_VBO", "N6")
+    # Pakket met alleen enumeraties naast het model (GGM: 'Enumeratiesoort'): ook een model,
+    # met IRI's langs de pakketboom; Woonplaats gebruikt zo'n enumeratie.
+    pkg("EAPK_KERN_ENUMS", "Enumeratiesoort", "EAPK_KERN")
+    schema.save(db.Enumeratie(id="EAID_INDICATIE", name="Indicatie", package_id="EAPK_KERN_ENUMS"))
+    for lid, naam in (("EAID_LIT_JA", "ja"), ("EAID_LIT_NEE", "nee")):
+        schema.save(db.EnumerationLiteral(id=lid, name=naam, enumeratie_id="EAID_INDICATIE"))
+    attr("EAID_WOONPLAATS_IND", "indicatie", "EAID_WOONPLAATS", enumeration="EAID_INDICATIE")
     attr("EAID_ONDERZOEK_DATUM", "datum", "EAID_ONDERZOEK", "Datum")
     assoc("EAID_AS_HEEFT", "heeft", "EAID_PAND", "EAID_VBO")
     assoc("EAID_AS_BETREFT", "betreft", "EAID_ONDERZOEK", "EAID_PAND")
@@ -584,5 +593,41 @@ def test_rdf_en_jsonld_views_zonder_kopregel(export):
     finally:
         shutil.rmtree(views, ignore_errors=True)
         for path in ("./test/output/lod_views_rdf.rdf", "./test/output/lod_views_rdf-shapes.rdf"):
+            if os.path.exists(path):
+                os.remove(path)
+
+
+# ---------------------------------------------------------------------------
+# 0.8.4: pakketten met alleen enumeraties en deterministische uitvoer
+# ---------------------------------------------------------------------------
+
+
+def test_enumeratiepakket_zonder_klassen_is_model(export):
+    """Een pakket met alleen enumeraties ('Enumeratiesoort' naast het model) is een model:
+    zijn enumeraties krijgen een IRI langs de pakketboom, niet de verzamel-IRI enumeraties/...,
+    en het pakket is een ontologie in de hiërarchie."""
+    ontologie, shapes = export["ontologie"], export["shapes"]
+    assert (INDICATIE, RDF.type, MIM.Enumeratie) in ontologie
+    assert (URIRef(KERN_ENUMS + "indicatie/ja"), SKOS.inScheme, INDICATIE) in ontologie
+    assert (URIRef(KERN_ENUMS), RDF.type, OWL.Ontology) in ontologie
+    assert (URIRef(BAG + "woonplaats/indicatie"), RDFS.range, INDICATIE) in ontologie
+    wezen = [s for s in set(ontologie.subjects()) if str(s).startswith(BASE + "enumeraties/")]
+    assert not wezen, wezen
+    # De toegestane waarden staan in de sh:in-lijst van de shape van Woonplaats.
+    assert (None, RDF.first, URIRef(KERN_ENUMS + "indicatie/ja")) in shapes
+
+
+def test_export_is_deterministisch(export):
+    """Twee exports van hetzelfde model geven byte-gelijke bestanden: de blank nodes van de
+    property shapes dragen een label uit hun context, en rdflib sorteert objecten op label."""
+    tweede = "./test/output/lod_views_2.ttl"
+    tweede_shapes = "./test/output/lod_views_2-shapes.ttl"
+    exporteer(tweede, ["--lod_version", "v1.0", "--lod_shapes_file", tweede_shapes])
+    try:
+        for eerste, latere in ((OUTPUT, tweede), (SHAPES, tweede_shapes)):
+            with open(eerste, "rb") as fa, open(latere, "rb") as fb:
+                assert fa.read() == fb.read(), f"{eerste} en {latere} verschillen"
+    finally:
+        for path in (tweede, tweede_shapes):
             if os.path.exists(path):
                 os.remove(path)
