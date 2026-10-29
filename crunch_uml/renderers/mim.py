@@ -85,6 +85,29 @@ def clean_value(value) -> Optional[str]:
     return text
 
 
+def split_tag_value(value):
+    """(Value, Notes) voor een EA-repository uit een databasewaarde.
+
+    De database kan de XMI-vorm ``waarde#NOTES#notities`` bevatten. De
+    repository bewaart de waarde en de notities apart: ``Value`` wordt het
+    deel vóór de scheider; bij een memo (``<memo>``) wordt de tekst erachter,
+    ontdubbeld en zonder tagdefinities, de ``Notes``. Anders is Notes None:
+    de notities van de tagdefinitie in de repository blijven dan staan. Zo
+    komt ``#NOTES#`` nooit in de repository terecht (GGM v3.0.0 had 1.960
+    tagwaarden met de scheider in Value door eerder terugschrijven).
+    """
+    if value is None:
+        return None, None
+    text = str(value)
+    if _NOTES_SEP not in text:
+        return text, None
+    head, *tails = (part.strip() for part in text.split(_NOTES_SEP))
+    if head.casefold() == "<memo>":
+        delen = [tail for tail in tails if tail and not _TAG_META_RE.match(tail)]
+        return "<memo>", "\r\n\r\n".join(dict.fromkeys(delen))
+    return head, None
+
+
 # ---------------------------------------------------------------------------
 # HTML uit EA-notities
 # ---------------------------------------------------------------------------

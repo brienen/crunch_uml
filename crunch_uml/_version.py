@@ -7,7 +7,7 @@ an editable install keeps reporting the version it was installed with.
 
 import os
 
-__version__ = "0.8.5"
+__version__ = "0.8.6"
 
 
 def producer_build(repo=None):

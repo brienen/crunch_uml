@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v0.8.6 (2026-10-29)
+
+Memo tags round-trip correctly between an EA repository and the database.
+
+- **The `qea` parser reads memo texts.** EA stores a memo-typed tagged value as `<memo>` in `Value` with the text in `Notes`; the parser read only `Value`, so every memo text came through as the placeholder and was missing from documentation and Linked Data (GGM v3.0.0: 148 element tags, 1,586 attribute tags such as Toelichting, Regels, Patroon and Waardenverzameling, 160 relation tags). The parser now passes `<memo>#NOTES#text`, the form of the EA-XMI export, so `mim.clean_value` treats both sources alike and the text is kept. The XMI export itself leaves memo texts out, so the `.qea` is the only source that has them.
+- **The EA repository updater never writes `#NOTES#` into a repository.** `export -t earepo`/`-t eamimrepo` wrote a database value such as `BRP#NOTES#Description: ...` or `<memo>#NOTES#text` verbatim into the `Value` column; every later XMI export appended the notes again, and the GGM repository ended up with 1,960 tag values carrying the separator and memo texts repeated up to thirteen times. The updater now writes the value before the separator into `Value` and, for a memo, the text (each distinct part once, tag-definition notes dropped) into `Notes`, and compares both columns before deciding that a tag changed (`mim.split_tag_value`). Rewriting the same database twice changes nothing.
+- `test_55` covers the round trip on the Monumenten fixture, `test_19` the memo texts of the GGM 2.4.0 repository, `test_48` the split.
+
 ## v0.8.5 (2026-10-29)
 
 Cleaner text in the Linked Data and the documentation, after a review of the GGM LOD site.

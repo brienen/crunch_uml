@@ -307,6 +307,10 @@ crunch_uml -sch mijn_model export -f model.qea -t earepo \
     --tag_strategy upsert
 ```
 
+Tagwaarden worden gesplitst zoals de repository ze bewaart: de waarde vóór `#NOTES#` in `Value`, de memotekst
+(elk deel één keer, zonder tagdefinities) in `Notes`; `#NOTES#` komt nooit in de repository terecht. Een
+databasewaarde die al gelijk is aan de repository wordt niet opnieuw geschreven.
+
 !!! warning "Let op bij EA Repository updates"
     De `earepo`-renderer werkt direct op een Enterprise Architect repository. Maak altijd een backup voordat je `--tag_strategy replace` gebruikt, want dit vervangt alle bestaande tags.
 

@@ -28,6 +28,7 @@ from crunch_uml.db import (
     UMLTagsRelation,
 )
 from crunch_uml.exceptions import CrunchException
+from crunch_uml.renderers import mim
 from crunch_uml.renderers.renderer import ModelRenderer, RendererRegistry
 
 logger = logging.getLogger()
@@ -122,6 +123,18 @@ class EARepoUpdater(ModelRenderer):
         else:
             return None, None, None, None, None
 
+    @staticmethod
+    def get_notes_column(table):
+        """De kolom met de notities van een tagged value (memotekst of tagdefinitie)."""
+        return "Notes" if table == "t_objectproperties" else "NOTES"
+
+    @staticmethod
+    def split_tag(value):
+        """(Value, Notes) voor de repository; zie mim.split_tag_value. Een tuple blijft een tuple."""
+        if isinstance(value, tuple):
+            return value
+        return mim.split_tag_value(value)
+
     def update_sequence(self, session, sequence_name, increment=1):
         try:
             # Controleer of de sequence al bestaat
@@ -167,13 +180,30 @@ class EARepoUpdater(ModelRenderer):
             ea_guid_column,
         ) = self.get_tablefields(table_name)
 
-        stmt = (
-            update(table)
-            .where(table.c[ea_guid_column] == bindparam("_ea_guid"))
-            .values({tag_value_column: bindparam("_value")})
-        )
-        params = [{"_ea_guid": key, "_value": value} for key, value in update_dict.items()]
-        session.execute(stmt, params)
+        notes_column = self.get_notes_column(table_name)
+        # Waarde en memotekst apart: '#NOTES#' komt nooit in de repository.
+        zonder_notes = []
+        met_notes = []
+        for key, value in update_dict.items():
+            waarde, notes = self.split_tag(value)
+            if notes is None:
+                zonder_notes.append({"_ea_guid": key, "_value": waarde})
+            else:
+                met_notes.append({"_ea_guid": key, "_value": waarde, "_notes": notes})
+        if zonder_notes:
+            stmt = (
+                update(table)
+                .where(table.c[ea_guid_column] == bindparam("_ea_guid"))
+                .values({tag_value_column: bindparam("_value")})
+            )
+            session.execute(stmt, zonder_notes)
+        if met_notes:
+            stmt = (
+                update(table)
+                .where(table.c[ea_guid_column] == bindparam("_ea_guid"))
+                .values({tag_value_column: bindparam("_value"), notes_column: bindparam("_notes")})
+            )
+            session.execute(stmt, met_notes)
 
     def insert_repo(self, insert_dict, session, table_name, metadata, object_id):
         """Batched INSERT — one sequence-allocation for the whole batch,
@@ -196,16 +226,20 @@ class EARepoUpdater(ModelRenderer):
         high = self.update_sequence(session, table_name, increment=n)
         first_id = high - n + 1
 
-        rows = [
-            {
+        notes_column = self.get_notes_column(table_name)
+        rows = []
+        for i, (key, value) in enumerate(insert_dict.items()):
+            waarde, notes = self.split_tag(value)
+            row = {
                 "PropertyID": first_id + i,
                 tag_id_child_column: object_id,
                 tag_property_column: key,
-                tag_value_column: value,
+                tag_value_column: waarde,
                 "ea_guid": util.get_repo_guid(),
             }
-            for i, (key, value) in enumerate(insert_dict.items())
-        ]
+            if notes is not None:
+                row[notes_column] = notes
+            rows.append(row)
         session.execute(insert(table), rows)
 
     def delete_repo(self, delete_dict, session, table_name, metadata, object_id):
@@ -570,8 +604,15 @@ class EARepoUpdater(ModelRenderer):
                     .filter_by(**{tag_id_child_column: getattr(existing_record, tag_id_parent_column)})
                     .all()
                 )
+                notes_column = self.get_notes_column(tag_table)
                 db_tags = {getattr(tag, tag_property_column): getattr(tag, tag_value_column) for tag in db_tags_query}
                 db_tags = {util.map_field_name_from_EARepo(k, const.EA_REPO_MAPPER): v for k, v in db_tags.items()}
+                db_notes = {
+                    util.map_field_name_from_EARepo(getattr(tag, tag_property_column), const.EA_REPO_MAPPER): getattr(
+                        tag, notes_column, None
+                    )
+                    for tag in db_tags_query
+                }
 
                 db_tags_keys = {getattr(tag, tag_property_column): getattr(tag, 'ea_guid') for tag in db_tags_query}
                 db_tags_keys = {
@@ -583,14 +624,22 @@ class EARepoUpdater(ModelRenderer):
                         {tag_property_column: util.map_field_name_to_EARepo(name)}
                     )
 
-                # Bepaal welke tags zijn gewijzigd
+                # Bepaal welke tags zijn gewijzigd. Een databasewaarde kan de XMI-vorm
+                # 'waarde#NOTES#notities' hebben; vergelijk waarde en memotekst apart met de
+                # kolommen Value en Notes van de repository.
+                def gewijzigd(col):
+                    waarde, notes = mim.split_tag_value(data_dict[col])
+                    if (waarde or "") != (db_tags[col] or ""):
+                        return True
+                    return notes is not None and notes != (db_notes.get(col) or "")
+
                 tags_changed = {
-                    db_tags_keys[col]: data_dict[col]
+                    db_tags_keys[col]: mim.split_tag_value(data_dict[col])
                     for col in data_dict
-                    if col in uml_tag_names and col in db_tags.keys() and data_dict[col] != db_tags[col]
+                    if col in uml_tag_names and col in db_tags.keys() and gewijzigd(col)
                 }
                 tags_new = {
-                    util.map_field_name_to_EARepo(col): data_dict[col]
+                    util.map_field_name_to_EARepo(col): mim.split_tag_value(data_dict[col])
                     for col in data_dict
                     if col in uml_tag_names and col not in db_tags.keys()
                 }
@@ -1625,7 +1674,8 @@ class EAMIMRepoUpdater(EARepoUpdater):
                 elif (
                     datatype_input.startswith("n")
                     or datatype_input.startswith("int")
-                    or datatype_input in [
+                    or datatype_input
+                    in [
                         "ìnt",
                         "number",
                         "integer",

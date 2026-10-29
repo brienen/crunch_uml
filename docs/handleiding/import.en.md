@@ -54,6 +54,10 @@ crunch_uml import -f model.xmi -t eaxmi -db_create
 crunch_uml import -f model.qea -t qea -db_create
 ```
 
+EA stores memo tags (long texts such as explanation, rules and pattern) as `<memo>` with the text in the
+`Notes` column; the parser passes that text on as `<memo>#NOTES#text`, the form of the XMI export, so the
+renderers show it. The XMI export itself leaves memo texts out.
+
 ### Import JSON with column mapping
 
 ```bash
