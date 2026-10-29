@@ -205,7 +205,8 @@ class MimAnnotator:
         versie = mim.clean_value(versie) or mim.clean_value(getattr(pkg, "version", None))
         if versie:
             g.add((uri, OWL.versionInfo, Literal(versie)))
-            g.add((uri, OWL.versionIRI, URIRef(self.base + slugify(versie) + "/")))
+            if segment := mim.version_segment(versie):
+                g.add((uri, OWL.versionIRI, URIRef(self.base + segment + "/")))
         gewijzigd_literal = mim.date_literal(gewijzigd) or mim.date_literal(getattr(pkg, "modified", None))
         if gewijzigd_literal is not None:
             g.add((uri, DCTERMS.modified, gewijzigd_literal))

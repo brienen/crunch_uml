@@ -2,7 +2,7 @@
 """Valideer een LOD-export van crunch_uml tegen de MIM 1.2-shapes.
 
 Gebruik:
-    python tools/validate_mim_lod.py export.ttl [--shapes PAD] [--ontologie PAD]
+    python tools/validate_mim_lod.py export.ttl [export-shapes.ttl ...] [--shapes PAD] [--ontologie PAD]
                                      [--max-voorbeelden N] [--json RAPPORT.json]
 
 De shapes (mim-shapes.ttl) en het vocabulaire (mim.ttl) komen standaard uit
@@ -116,7 +116,11 @@ def tel_focusnodes_per_type(data_graph: Graph):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("export", help="LOD-export (Turtle) van crunch_uml")
+    parser.add_argument(
+        "export",
+        nargs="+",
+        help="LOD-export (Turtle) van crunch_uml; meerdere bestanden (ontologie en shapes) worden samengevoegd",
+    )
     parser.add_argument("--shapes", default=str(STANDAARD_SHAPES), help="MIM-shapes (mim-shapes.ttl)")
     parser.add_argument("--ontologie", default=str(STANDAARD_ONTOLOGIE), help="MIM-vocabulaire (mim.ttl)")
     parser.add_argument("--inference", default="none", choices=["none", "rdfs", "owlrl", "both"])
@@ -124,12 +128,16 @@ def main(argv=None):
     parser.add_argument("--json", help="schrijf de samenvatting ook als JSON naar dit bestand")
     args = parser.parse_args(argv)
 
-    data_graph = Graph().parse(args.export, format="turtle")
+    # Meerdere bestanden (bijvoorbeeld de ontologie en de apart geschreven
+    # SHACL-shapes van --lod_shapes_file) worden als één graaf gevalideerd.
+    data_graph = Graph()
+    for pad in args.export:
+        data_graph.parse(pad, format="turtle")
     conformeert, results, _ = valideer(data_graph, args.shapes, args.ontologie, args.inference)
     rijen = vat_samen(results, data_graph, args.max_voorbeelden)
     typen = tel_focusnodes_per_type(data_graph)
 
-    print(f"Export: {args.export} ({len(data_graph)} triples)")
+    print(f"Export: {', '.join(args.export)} ({len(data_graph)} triples)")
     print("MIM-getypeerde resources: " + ", ".join(f"{soort} {aantal}" for soort, aantal in typen.items()))
     print(
         f"Conformeert: {'ja' if conformeert else 'nee'}; {sum(rij['aantal'] for rij in rijen)} meldingen in {len(rijen)} groepen"

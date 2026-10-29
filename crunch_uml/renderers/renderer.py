@@ -132,6 +132,37 @@ def add_args(argumentparser, subparser_dict):
         help="MIM-informatiemodeltype van het model (mim:informatiemodeltype). Standaard 'logisch'.",
     )
     output_subparser.add_argument(
+        "--lod_shapes_file",
+        type=str,
+        help=(
+            "Linked-data-renderers: schrijf de SHACL-shapes (sh:NodeShape, sh:PropertyShape, sh:in-lijsten en"
+            " alle andere sh:-triples) naar dit bestand in plaats van in het uitvoerbestand, dat dan alleen de"
+            " RDFS/OWL-ontologie met de MIM-metagegevens bevat. Het shapes-bestand importeert de ontologie"
+            " (owl:imports); de extensie volgt het uitvoertype."
+        ),
+    )
+    output_subparser.add_argument(
+        "--lod_views_dir",
+        type=str,
+        help=(
+            "Linked-data-renderers: schrijf per diagram een view (deelmodel) in deze map: de klassen en"
+            " enumeraties op het diagram met al hun attributen en waarden (en de enumeraties die het type van"
+            " zo'n attribuut zijn), en de associaties en generalisaties tussen die elementen, als deelgraaf van"
+            " de ontologie (dezelfde IRI's, zonder SHACL). Pad:"
+            " {map}/{domein}/{model}/{diagram}.{ext}; graph-IRI {namespace}[{versie}/]{domein}/{model}/{diagram},"
+            " in Turtle ook als kopregel '# graph: <...>'."
+        ),
+    )
+    output_subparser.add_argument(
+        "--lod_views_exclude",
+        type=str,
+        help=(
+            "Kommagescheiden naampatronen (hoofdletterongevoelig, * en ? toegestaan) van diagrammen, en van"
+            f" packages waar die diagrammen onder vallen, die geen view worden. Standaard '{const.LOD_VIEWS_EXCLUDE_NAMES}';"
+            " geef een lege string op om niets uit te sluiten."
+        ),
+    )
+    output_subparser.add_argument(
         "-js_url",
         "--json_schema_url",
         type=str,

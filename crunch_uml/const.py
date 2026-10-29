@@ -33,6 +33,11 @@ DEFAULT_LOD_NS = "http://example.org/myns/"
 # Packagenaam-patronen (fnmatch, hoofdletterongevoelig) die de LOD-renderers
 # standaard met hun subpackages weglaten: EA-diagramhulpmiddelen, geen model.
 LOD_EXCLUDE_PACKAGE_NAMES = "Diagram,Diagrammen intern gebruik,Tekenwijze,View*"
+# Naampatronen (fnmatch, hoofdletterongevoelig) van diagrammen en van de
+# packages daarboven die de LOD-renderers standaard niet als view (deelmodel)
+# exporteren. Het patroon 'Diagram' ontbreekt bewust: de diagrammen staan in
+# EA-modellen juist in packages met die naam.
+LOD_VIEWS_EXCLUDE_NAMES = "Diagrammen intern gebruik,Tekenwijze,View*"
 DEFAULT_SCHEMA = "default"
 
 ORPHAN_CLASS = "<Orphan Class>"

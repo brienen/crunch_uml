@@ -110,6 +110,9 @@ crunch_uml -sch my_schema export -t <type> -f <file>
 | `--lod_title`, `--lod_publisher`, `--lod_license` | Title, publisher and licence of the information model (`dcterms:title`, `dcterms:publisher`, `dcterms:license`) |
 | `--lod_informatiedomein` | Functional domain of the information model (`mim:informatiedomein`) |
 | `--lod_informatiemodeltype` | `conceptueel`, `logisch` (default) or `technisch` (`mim:informatiemodeltype`) |
+| `--lod_shapes_file` | Write the SHACL shapes to this file; the output file then holds only the RDFS/OWL ontology |
+| `--lod_views_dir` | Directory for the views: one subgraph of the ontology per diagram (`{dir}/{path}.{ext}`) |
+| `--lod_views_exclude` | Name patterns of diagrams and of packages above them that get no view (default `Diagrammen intern gebruik,Tekenwijze,View*`; `""` excludes nothing) |
 | `-js_url, --json_schema_url` | URL for JSON Schema references |
 | `--mapper` | JSON string for renaming columns in output |
 | `--entity_name` | Specific entity to export (with CSV) |
@@ -162,13 +165,19 @@ crunch_uml -sch my_model export -t ttl \
 ```
 
 Every model package (a package with at least one class) becomes an `owl:Ontology` with its own namespace
-`{namespace}{model}/`, where `{model}` is the slug of the package name without the standalone word *Model*
-(`Model Kern RGBZ` → `kern-rgbz/`). Classes get `{model}/{class}`, attributes and associations
-`{model}/{class}/{name}`. Same-named associations from one class get the target class as suffix
-(`project/heeft-projectlocatie`), nameless associations are named `{role or relatie}-{target}` and
-same-named attributes get their datatype or target class as suffix, so every property keeps exactly one
-`rdfs:range` and its own `dcterms:identifier`. Model packages sharing a name are prefixed with the parent
-package name, with a warning.
+`{namespace}{path}/`, where `{path}` follows the package tree of the model: the slugs of all packages from
+the root down to the model package, without ordering numbers and without the standalone word *Model*
+(`99 Kern › Model BAG` → `kern/bag/`, `1 Veiligheid en Vergunningen › Model VTH` →
+`veiligheid-en-vergunningen/vth/`). The root package is the base URI itself; a package named like the root
+(EA's model node) and a package *Diagram* give no segment, and a package named like its classless parent
+(`BAG › Model BAG`, also chained: `Omgevingswet › Model Omgevingswet › Model Omgevingswet`) merges into
+that parent: one segment `bag/`, with the deepest package representing the parent in the hierarchy. Every intermediate package is a `mim:Domein` at
+`{namespace}{path}/` (`kern/`). Classes get `{path}/{class}`, attributes and associations
+`{path}/{class}/{name}`; the views use the same segments. Same-named associations from one class get the
+target class as suffix (`project/heeft-projectlocatie`), nameless associations are named
+`{role or relatie}-{target}` and same-named attributes get their datatype or target class as suffix, so
+every property keeps exactly one `rdfs:range` and its own `dcterms:identifier`. Same-named packages under
+one parent get a sequence number, with a warning.
 
 Classes without a stereotype (technical EA elements such as `ProxyConnector`) are skipped; datatype
 classes stay. Packages named `Diagram`, `Diagrammen intern gebruik`, `Tekenwijze` and `View*` are left
@@ -208,8 +217,66 @@ Validate against the MIM shapes (pyshacl, from `dev_requirements.txt`):
 python tools/validate_mim_lod.py ontology.ttl
 ```
 
+Ordering numbers that sort packages in EA are dropped from the segment (`99 Kern` → `domein/kern`,
+`3 Economie` → `economie/`); the `owl:versionIRI` is `{namespace}{version}/` with the version as given
+(`v3.0.0/`). Technical EA elements (`Boundary`, `ProxyConnector`, `Text`) are skipped on their EA
+object type (`object_type`, given by the `qea` and `eaxmi` parsers), so a class without a stereotype
+stays a class; without an object type the old rule applies (no stereotype means technical, datatype
+classes stay). Attributes typed through their classifier to a DataType element named after a primitive
+datatype (the MIM11 primitives `CharacterString`, `Date`, `Integer`, `Boolean`, ..., datatypes such as
+`Bedrag` and `GUID`, GML geometries such as `GM_Point`) become `owl:DatatypeProperty` with the XSD or
+GeoSPARQL type; enumeration values sharing a slug (`A`, `A+`, `A++`) get a sequence number (`a`, `a-2`,
+`a-3`), and leading and trailing whitespace of names and definitions is dropped from the literals.
+
 The tool checks the export against `test/data/mim/mim-shapes.ttl` (with `mim.ttl` as vocabulary) and
 summarises the findings per shape, path and constraint with example resources; `--json` writes the report.
+
+#### Separate SHACL shapes
+
+With `--lod_shapes_file shapes.ttl` the renderer writes the SHACL layer to its own file: the NodeShapes under
+`{namespace}shapes/` with everything said about them, the PropertyShapes (blank nodes) with their `sh:in`
+lists, every triple with an `sh:` predicate and the typing `a sh:NodeShape` (also of structured and custom
+primitive datatypes, which in MIM 6.4.6 are the NodeShape themselves). The output file then holds only the
+RDFS/OWL ontology with the MIM metadata. The shapes file is an `owl:Ontology` at `{namespace}shapes/` that
+imports the ontology (`owl:imports`); the ontology points to it with `rdfs:seeAlso`. Together both files
+are triple for triple equal to the unsplit export. The extension of the shapes file follows the output
+type. The validator takes several files:
+
+```bash
+python tools/validate_mim_lod.py ontology.ttl shapes.ttl
+```
+
+#### Views: submodels per diagram
+
+With `--lod_views_dir dir` the renderer writes a *view* for every diagram in the model: a subgraph of the
+ontology with the same IRIs and without SHACL. A view holds:
+
+* the classes and enumerations on the diagram, with everything the ontology says about them (typing,
+  labels, MIM metadata);
+* all their attributes and enumeration values, and the enumerations that type such an attribute, even
+  when they are not drawn; other types outside the diagram stay references (`rdfs:range`, `mim:type`);
+* the associations whose source and target are both on the diagram and the generalizations between
+  classes on the diagram. The view follows the elements on the diagram, not the drawing: a connector
+  hidden on the diagram in EA (*Hidden*) is included. An `rdfs:subClassOf` to a class outside the
+  diagram is left out.
+
+Each file lands at `{dir}/{path}.{ext}`, where `{path}` follows the package tree of the model: the slugs of
+the packages above the diagram (without ordering number; model packages without the word *Model*) and the
+slug of the diagram name, for example `kern/bag/onderzoek` for the diagram *Onderzoek* in *99 Kern › Model
+BAG › Diagram*. The root package, a package with the same name as the root package (EA's model node) and
+the package *Diagram* give no segment. The graph IRI of the view is `{namespace}[{version}/]{path}`: with
+`--lod_version v3.0.0` that is `{namespace}v3.0.0/kern/bag/onderzoek`, under the `owl:versionIRI` of the
+information model and free of collisions with term IRIs. In Turtle that IRI is also the first line of the
+file, as `# graph: <...>`, so a loader can derive the named graph. The view describes itself as an
+`owl:Ontology` with `rdfs:label`, `dcterms:identifier` (the EA GUID of the diagram), `dcterms:isPartOf`
+the information model and `owl:versionInfo`. Without `--lod_version` a diagram named like a class in the
+same package gets no description of its own, with a warning.
+
+Diagrams without classes or enumerations from the ontology (package diagrams, diagrams holding only
+excluded classes) give no view; of same-named diagrams in one package only the first is written, with a
+warning. `--lod_views_exclude` (name patterns of diagrams and of the packages above them; default
+`Diagrammen intern gebruik,Tekenwijze,View*`, `""` disables it) leaves diagrams out. Existing files in the
+directory are overwritten; files of diagrams that no longer exist are not removed.
 
 ### Schema comparison
 

@@ -25,12 +25,13 @@ FIXTURE = "./test/data/MIM_LOD_Fixture.xml"
 SCHEMA = "mim_lod"
 BASE = "https://voorbeeld.nl/lod/"
 OUTPUT = "./test/output/mim_lod.ttl"
-ZORG = Namespace(BASE + "zorg/")
-GROEP = Namespace(BASE + "groepattribuutsoort/")
-CDT = Namespace(BASE + "complex-datatype/")
+# Het pad volgt de pakketboom: Testmodel Zorg (wortel) > Domein Zorg > Model Zorg.
+ZORG = Namespace(BASE + "domein-zorg/zorg/")
+GROEP = Namespace(BASE + "domein-zorg/groepattribuutsoort/")
+CDT = Namespace(BASE + "domein-zorg/complex-datatype/")
 SHAPES = Namespace(BASE + "shapes/")
 INFORMATIEMODEL = URIRef(BASE)
-DOMEIN = URIRef(BASE + "domein/domein-zorg")
+DOMEIN = URIRef(BASE + "domein-zorg/")
 
 
 @pytest.fixture(scope="module")
@@ -92,7 +93,7 @@ def test_wortelpakket_is_informatiemodel_met_versie_en_mim_metadata(graaf):
     assert (INFORMATIEMODEL, MIM.informatiedomein, Literal("Zorg")) in graaf
     assert (INFORMATIEMODEL, MIM.datumOpname, Literal("2024-01-15", datatype=XSD.date)) in graaf
     assert (INFORMATIEMODEL, OWL.versionInfo, Literal("v1.2.3")) in graaf
-    assert (INFORMATIEMODEL, OWL.versionIRI, URIRef(BASE + "v1-2-3/")) in graaf
+    assert (INFORMATIEMODEL, OWL.versionIRI, URIRef(BASE + "v1.2.3/")) in graaf
     assert (INFORMATIEMODEL, DCTERMS.modified, Literal("2026-10-01", datatype=XSD.date)) in graaf
     assert (INFORMATIEMODEL, DCTERMS.publisher, URIRef("https://www.delft.nl/")) in graaf
     assert (INFORMATIEMODEL, DCTERMS.license, URIRef("https://creativecommons.org/licenses/by/4.0/")) in graaf
@@ -246,7 +247,7 @@ def test_attribuutsoort_met_metagegevens_en_shape(graaf):
     assert (shape, SH.maxLength, Literal(80)) in graaf
     assert (shape, SH.pattern, Literal("^[A-Za-z ]+$")) in graaf
     assert (shape, SH.name, Literal("naam", lang="nl")) in graaf
-    assert (SHAPES["zorg/patient"], SH.property, shape) in graaf
+    assert (SHAPES["domein-zorg/zorg/patient"], SH.property, shape) in graaf
 
 
 def test_waardebereik_eenheid_en_enumeratie_attribuut(graaf):
@@ -321,7 +322,7 @@ def test_relatiesoort_met_kardinaliteit_en_shape_op_bronklasse(graaf):
     assert (relatie, MIM.mogelijkGeenWaarde, Literal(False)) in graaf
     assert (relatie, MIM.definitie, Literal("De zorgverlener die de patient behandelt.", lang="nl")) in graaf
     shape = shape_van(graaf, relatie)
-    assert (SHAPES["zorg/patient"], SH.property, shape) in graaf
+    assert (SHAPES["domein-zorg/zorg/patient"], SH.property, shape) in graaf
     assert (shape, SH["class"], ZORG.zorgverlener) in graaf
     assert (shape, SH.nodeKind, SH.IRI) in graaf
     assert (shape, SH.minCount, Literal(1)) in graaf
@@ -345,7 +346,7 @@ def test_gegevensgroeptype_en_gegevensgroep(graaf):
     adres = GROEP.adres
     assert (adres, RDF.type, OWL.Class) in graaf
     assert (adres, RDF.type, MIM.Gegevensgroeptype) in graaf
-    assert (SHAPES["groepattribuutsoort/adres"], SH.targetClass, adres) in graaf
+    assert (SHAPES["domein-zorg/groepattribuutsoort/adres"], SH.targetClass, adres) in graaf
     groep = ZORG["patient/adres"]
     assert (groep, RDF.type, OWL.ObjectProperty) in graaf
     assert (groep, RDF.type, MIM.Gegevensgroep) in graaf
@@ -398,7 +399,7 @@ def test_enumeratie_en_waarden(graaf):
     assert (enum, RDF.type, MIM.Enumeratie) in graaf
     assert (enum, RDFS.subClassOf, SKOS.Concept) in graaf
     assert (enum, MIM.datumOpname, Literal("2016-05-01", datatype=XSD.date)) in graaf
-    shape = SHAPES["zorg/patientstatus"]
+    shape = SHAPES["domein-zorg/zorg/patientstatus"]
     assert (shape, RDF.type, SH.NodeShape) in graaf
     assert (shape, SH.targetClass, enum) in graaf
     actief = ZORG["patientstatus/actief"]

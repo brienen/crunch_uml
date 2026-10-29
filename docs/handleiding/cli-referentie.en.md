@@ -80,6 +80,9 @@ crunch_uml export [-h] -f FILE -t TYPE [-pi IDS] [-xpi IDS] [-xpn PATTERNS]
 | | `--lod_title`, `--lod_publisher`, `--lod_license` | Title, publisher and licence of the information model (`dcterms:`) |
 | | `--lod_informatiedomein` | Functional domain (`mim:informatiedomein`) |
 | | `--lod_informatiemodeltype` | `conceptueel`, `logisch` (default) or `technisch` |
+| | `--lod_shapes_file` | SHACL shapes in this separate file; output file holds only the ontology |
+| | `--lod_views_dir` | Directory for views (one subgraph of the ontology per diagram) |
+| | `--lod_views_exclude` | Name patterns of diagrams/packages without a view (default `Diagrammen intern gebruik,Tekenwijze,View*`) |
 | `-js_url` | `--json_schema_url` | URL for JSON Schema |
 | `-vt` | `--version_type` | EA version update: `minor`, `major`, `none` |
 | `-ts` | `--tag_strategy` | EA tag strategy: `update`, `upsert`, `replace` |
