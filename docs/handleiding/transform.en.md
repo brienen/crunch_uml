@@ -53,6 +53,10 @@ crunch_uml transform -ttp copy -sch_to flat_model -rt_pkg EAPK_12345 \
     -m_gen True
 ```
 
+### Ids of copies
+
+Every copy keeps the id (the EA GUID) of its source; the copy lives in another schema, so the ids do not clash. An enumeration outside the copied package that an attribute or a diagram uses is copied once, also under its own id; every attribute and diagram refers to that one copy. Only an attribute materialized from a superclass into a subclass with `-m_gen True` gets an id of its own (`EAID_inherited_` followed by a hash of source attribute and subclass), because the superclass keeps its own attribute. Two runs of the transformer therefore give the same copy: exports and comparisons (`diff`) of that copy differ only where the model differs.
+
 ## Plugin Transformer
 
 For custom transformations you can write your own Python plugin:
