@@ -84,7 +84,7 @@ def test_kop_heeft_de_afgesproken_vorm(packed):
     assert artifact["format"] == "semtk-crunch-artifact"
     assert artifact["format_version"] == 1
     assert artifact["datamodel_version"] == db.DATAMODEL_VERSION == 1
-    assert artifact["producer"]["crunch_version"] == "0.8.0"
+    assert artifact["producer"]["crunch_version"] == "0.8.1"
     assert artifact["producer"]["producer_build"]
     assert set(artifact["source"]) == {
         "detected_format",

@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## v0.8.1 (2026-10-29)
 
 The Linked Data export can now be split into an RDFS/OWL ontology and a separate SHACL file, and can write one view (submodel) per EA diagram as a subgraph of the ontology, for publication as named graphs. Built for the GGM v3.0.0 LOD pipeline, where the views replace a hand-maintained generator.
 
