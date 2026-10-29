@@ -53,6 +53,10 @@ crunch_uml transform -ttp copy -sch_to plat_model -rt_pkg EAPK_12345 \
     -m_gen True
 ```
 
+### Id's van kopieën
+
+Elke kopie houdt het id (de EA-GUID) van haar bron; de kopie staat in een ander schema, dus dat botst niet. Een enumeratie die buiten het gekopieerde pakket ligt maar door een attribuut of een diagram wordt gebruikt, wordt één keer meegekopieerd, ook met haar eigen id; alle attributen en diagrammen verwijzen naar die ene kopie. Alleen een attribuut dat met `-m_gen True` uit een superklasse in een subklasse wordt gematerialiseerd krijgt een eigen id (`EAID_inherited_` gevolgd door een hash van bronattribuut en subklasse), omdat de superklasse haar eigen attribuut houdt. Twee runs van de transformer geven daardoor dezelfde kopie: exports en vergelijkingen (`diff`) op die kopie verschillen alleen waar het model verschilt.
+
 ## Plugin Transformer
 
 Voor custom transformaties kun je een eigen Python-plugin schrijven:

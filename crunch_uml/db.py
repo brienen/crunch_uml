@@ -28,6 +28,7 @@ from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy.orm.relationships import RelationshipProperty
 
 import crunch_uml.const as const
+import crunch_uml.ea_ids as ea_ids
 import crunch_uml.util as util
 from crunch_uml._version import __version__
 from crunch_uml.exceptions import CrunchException
@@ -778,6 +779,16 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
             return None
 
     def copy_attributes(self, copy_instance, materialize_generalizations=False):
+        """Kopieert de attributen van deze klasse naar ``copy_instance`` (een kopie van deze klasse,
+        of bij materialize_generalizations een kopie van een subklasse).
+
+        Elke kopie houdt het id van de bron, zodat de kopie bij elke run dezelfde is. De enige
+        uitzondering is een attribuut dat uit een superklasse in een subklasse wordt
+        gematerialiseerd: de superklasse houdt in de kopie haar eigen attribuut met het bron-id,
+        dus de subklasse krijgt een afgeleid id (ea_ids.materialized_attribute_id). De enumeratie
+        van een attribuut komt met de gekopieerde boom mee als ze daarin ligt, en wordt anders
+        één keer meegekopieerd; zie Enumeratie.copy_into_scope.
+        """
         with warnings.catch_warnings():
             warnings.simplefilter("ignore" if suppress_warnings else "default", category=sa_exc.SAWarning)
 
@@ -786,26 +797,17 @@ class Class(Base, UMLBase, UMLTags):  # type: ignore
                 attribute.name for attribute in copy_instance.attributes if attribute.name and attribute.name != "None"
             ]
 
-            # Voer eventuele extra stappen uit voor de literals
             for attribute in self.attributes:
                 if attribute.name not in copy_attr_lst:  # only add attributes whos name not already present
                     attribute_copy = attribute.get_copy(self)
-                    if self.name != copy_instance.name:  # When copy from superclass the attribute should get new ID
-                        attribute_copy.id = util.getEAGuid()
+                    if self.name != copy_instance.name:  # Gematerialiseerd uit een superklasse: eigen id
+                        attribute_copy.id = ea_ids.materialized_attribute_id(attribute.id, copy_instance.id)
 
-                    # copy enumeration if necesary
-                    if attribute.enumeration and (
-                        attribute.enumeration not in self.package.get_enumerations_inscope()
-                        or self.name != copy_instance.name
-                    ):
-                        copy_enum = attribute.enumeration.get_copy(copy_instance.package)
-                        copy_enum.id = util.getEAGuid()  # to avoid doubles give new ID
-                        for literal in copy_enum.literals:
-                            literal.id = util.getEAGuid()
-                        attribute_copy.enumeration_id = copy_enum.id
+                    if attribute.enumeration is not None:
+                        attribute.enumeration.copy_into_scope(copy_instance.package)
 
                     # set class
-                    attribute_copy.clazz_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
+                    attribute_copy.clazz_id = copy_instance.id  # Verwijzen naar de nieuwe klasse
                     copy_instance.attributes.append(attribute_copy)
 
             if materialize_generalizations:
@@ -998,6 +1000,32 @@ class Enumeratie(Base, UMLBase, UMLTags):  # type: ignore
             literal_copy.enumeratie_id = copy_instance.id  # Verwijzen naar de nieuwe Enumeratie
             copy_instance.literals.append(literal_copy)
         return copy_instance
+
+    def copy_into_scope(self, target_package):
+        """Zorgt dat deze enumeratie bestaat in de kopie waarin ``target_package`` ligt, met haar eigen id.
+
+        Ligt de enumeratie binnen het gekopieerde pakket (de wortel van de kopie heeft het id van
+        dat pakket), dan komt ze met de boom mee en gebeurt er niets. Ligt ze erbuiten, dan wordt
+        ze één keer naar ``target_package`` gekopieerd; een kopie die er al staat (door een ander
+        attribuut of een diagram) wordt hergebruikt. Het id blijft dat van de bron: de kopie staat
+        in een ander schema, dus het botst niet, en elke run geeft dezelfde kopie. Geeft de
+        enumeratie in de kopie terug, of None als ze met de boom meekomt.
+        """
+        if target_package is None:
+            return None
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore" if suppress_warnings else "default", category=sa_exc.SAWarning)
+            root = target_package.get_root_package()
+            package = self.package
+            while package is not None:
+                if package.id == root.id:
+                    return None  # binnen de scope: komt (of is) met de boom mee
+                package = package.parent_package
+            for enum in root.get_enumerations_inscope():
+                if enum.id == self.id:
+                    return enum
+            logger.debug(f"Enumeration {self.name} outside of scope copied to package {target_package.name}")
+            return self.get_copy(target_package)
 
     def make_copy_to_schema(self, sch, parent=None, recursive=True, materialize_generalizations=False):
         if parent is not None or isinstance(parent, Package):

@@ -18,6 +18,13 @@ whatever the source format. Three EA quirks make that non-trivial:
 * **Placeholders.** Classes the XMI parser invents for dangling association
   ends get a hash of their context (:func:`placeholder_class_id`) instead of
   a random uuid, so two parses of the same file give identical rows.
+* **Materialized attributes.** The copy transformer with
+  ``--materialize_generalizations`` copies the attributes of a superclass into
+  the subclass; the superclass keeps its own attribute with the source id in
+  the same schema, so the subclass's copy needs an id of its own. It gets a
+  hash of source attribute and subclass (:func:`materialized_attribute_id`),
+  so every run of the transformer yields the same ids. All other copies the
+  transformer makes keep the id of their source.
 """
 
 import hashlib
@@ -27,6 +34,7 @@ logger = logging.getLogger()
 
 SYNTHETIC_ID_PREFIX = "EAID_syn_"
 PLACEHOLDER_ID_PREFIX = "EAID_orphan_"
+MATERIALIZED_ID_PREFIX = "EAID_inherited_"
 _ID_PREFIXES = ("EAID_", "EAPK_")
 
 
@@ -67,6 +75,16 @@ def placeholder_class_id(association_id, member_end_id):
     """Deterministic id for a placeholder class of a dangling association end."""
     key = f"{association_id or ''}|{member_end_id or ''}"
     return PLACEHOLDER_ID_PREFIX + hashlib.sha1(key.encode("utf-8")).hexdigest()
+
+
+def materialized_attribute_id(attribute_id, subclass_id):
+    """Deterministic id for a superclass attribute materialized into a subclass.
+
+    The same source attribute materialized into the same subclass always gets
+    the same id; into another subclass, a different one.
+    """
+    key = f"{attribute_id or ''}|{subclass_id or ''}"
+    return MATERIALIZED_ID_PREFIX + hashlib.sha1(key.encode("utf-8")).hexdigest()
 
 
 class SyntheticIdMinter:

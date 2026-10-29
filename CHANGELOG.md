@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.8.3 (2026-10-29)
+
+The copy transformer (`transform -ttp copy`) now yields the same copy on every run.
+
+- **Copies keep the id of their source.** Every attribute whose enumeration lay outside the package of its own class got a fresh copy of that enumeration, with all its values, under a random uuid4 id, on every run, also when the enumeration lay inside the copied package tree and came along anyway. GGM v3.0.0 has 2 `Boolean` enumerations; its copy had 21, and 210 enumerations and 1,905 values carried a new id per run, so every documentation, LOD and `diff` run differed from the previous one on ids alone (73 of 135 LOD views, 75 of 76 enumerations in the diff). Now an enumeration inside the copied package comes along with the tree under its own id and is simply referenced; one outside it is copied exactly once, under the source id, and attributes and diagrams share that copy (as the diagram copy already did). The only ids the transformer still mints are those of attributes materialized from a superclass with `--materialize_generalizations`, since the superclass keeps its own attribute in the same schema: `EAID_inherited_` plus a hash of source attribute and subclass (`ea_ids.materialized_attribute_id`), the same on every run. `test_53` checks that two runs give identical copies, with and without materialization.
+
 ## v0.8.2 (2026-10-29)
 
 Three gaps in the `qea` parser, found by comparing the GGM v3.0.0 read as `.qea` with the same model read as EA-XMI (preparation for the GGM pipeline's switch to the `.qea`):
