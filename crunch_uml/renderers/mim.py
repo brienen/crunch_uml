@@ -147,8 +147,26 @@ def normalize_number(value) -> Optional[str]:
     return text
 
 
+_VERSION_SEGMENT_RE = re.compile(r"[^A-Za-z0-9._-]+")
+
+
+def version_segment(versie) -> Optional[str]:
+    """Een versie als IRI-padsegment: ``v3.0.0`` blijft ``v3.0.0`` (punten zijn
+    toegestaan in een IRI-pad), spaties en andere tekens worden ``-``. Wordt
+    gebruikt voor ``owl:versionIRI`` en voor de graph-IRI's van views, zodat
+    beide onder ``{basis}{versie}/`` vallen."""
+    text = clean_value(versie)
+    if text is None:
+        return None
+    return _VERSION_SEGMENT_RE.sub("-", text).strip("-.") or None
+
+
 def lang_literal(text, lang: Optional[str]) -> Literal:
-    """Literal met taaltag als er een taal is ingesteld, anders zonder."""
+    """Literal met taaltag als er een taal is ingesteld, anders zonder.
+    Witruimte aan begin en eind valt weg: EA bewaart een naam als
+    'woonplaats ingetrokken ' met spatie, en die hoort niet in een label."""
+    if isinstance(text, str):
+        text = text.strip()
     return Literal(text, lang=lang) if lang else Literal(text)
 
 

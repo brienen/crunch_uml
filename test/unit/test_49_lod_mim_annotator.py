@@ -96,7 +96,7 @@ def test_informatiemodel_krijgt_versie_en_mim_metadata():
     assert (uri, MIM.informatiedomein, Literal("Gemeentelijke overheid")) in graph
     assert (uri, MIM.datumOpname, Literal("2024-01-15", datatype=XSD.date)) in graph
     assert (uri, OWL.versionInfo, Literal("v3.0.0")) in graph
-    assert (uri, OWL.versionIRI, URIRef(BASE + "v3-0-0/")) in graph
+    assert (uri, OWL.versionIRI, URIRef(BASE + "v3.0.0/")) in graph
     assert (uri, DCTERMS.modified, Literal("2026-10-01", datatype=XSD.date)) in graph
     assert (uri, DCTERMS.publisher, URIRef("https://www.delft.nl/")) in graph
     assert (uri, DCTERMS.license, URIRef("https://creativecommons.org/licenses/by/4.0/")) in graph

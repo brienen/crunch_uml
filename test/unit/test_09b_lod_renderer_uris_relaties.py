@@ -248,7 +248,10 @@ def test_pakket_model_houdt_een_segment(graaf):
 
 def test_alleen_los_woord_model_wordt_verwijderd(graaf):
     assert klasse(graaf, "Woning") == URIRef(BASE + "gegevensmodel-wonen/woning")
+    # 'Archief Model' onder domein 'Archief' heeft dezelfde slug als zijn ouder en
+    # gaat erin op: één segment.
     assert klasse(graaf, "Archiefstuk") == URIRef(BASE + "archief/archiefstuk")
+    assert (URIRef(BASE + "archief/"), DCTERMS.identifier, Literal("EAPK_ARCHIEF_MODEL")) in graaf
 
 
 # ---------------------------------------------------------------------------
@@ -387,24 +390,31 @@ def test_uitsluiting_op_packagenaam_is_instelbaar(graaf):
 
 def test_gelijknamige_modelpakketten_krijgen_eigen_namespace(graaf):
     """Twee pakketten 'Groepattribuutsoort' (onder RGBZ en RSGB) deelden één
-    namespace en één ontologie met twee identifiers."""
-    for ontologie, identifier in (("rgbz-groepattribuutsoort", "EAPK_GAS1"), ("rsgb-groepattribuutsoort", "EAPK_GAS2")):
+    namespace en één ontologie met twee identifiers; het pad volgt nu de
+    pakketboom, dus ze liggen vanzelf uit elkaar."""
+    for ontologie, identifier in (("rgbz/groepattribuutsoort", "EAPK_GAS1"), ("rsgb/groepattribuutsoort", "EAPK_GAS2")):
         uri = URIRef(BASE + ontologie + "/")
         assert (uri, RDF.type, OWL.Ontology) in graaf
         assert set(graaf.objects(uri, DCTERMS.identifier)) == {Literal(identifier)}
-    assert klasse(graaf, "Verblijfsadres") == URIRef(BASE + "rgbz-groepattribuutsoort/verblijfsadres")
-    assert klasse(graaf, "Correspondentieadres") == URIRef(BASE + "rsgb-groepattribuutsoort/correspondentieadres")
+    assert klasse(graaf, "Verblijfsadres") == URIRef(BASE + "rgbz/groepattribuutsoort/verblijfsadres")
+    assert klasse(graaf, "Correspondentieadres") == URIRef(BASE + "rsgb/groepattribuutsoort/correspondentieadres")
     assert (URIRef(BASE + "groepattribuutsoort/"), None, None) not in graaf
+    # Domeinen liggen op hun pad, niet onder een aparte 'domein/'-namespace.
+    assert (URIRef(BASE + "rgbz/"), RDF.type, MIM.Domein) in graaf
+    assert (URIRef(BASE + "rgbz/groepattribuutsoort/"), DCTERMS.isPartOf, URIRef(BASE + "rgbz/")) in graaf
+    assert not [s for s in graaf.subjects() if str(s).startswith(BASE + "domein/")]
 
 
 def test_gelijknamige_domeinen_krijgen_eigen_uri(graaf):
-    domein_type = MIM.Domein
-    archief = [
-        d for d in graaf.subjects(RDF.type, domein_type) if str(graaf.value(d, RDFS.label)).casefold() == "archief"
-    ]
-    assert len(archief) == 2
-    for domein in archief:
-        assert len(set(graaf.objects(domein, DCTERMS.identifier))) == 1
+    """'Archief' en 'archief' onder de wortel: de eerste wordt vertegenwoordigd
+    door zijn model 'Archief Model' op archief/, de tweede is het domein op
+    archief-2/ met daaronder Model Depot."""
+    assert (URIRef(BASE + "archief-2/"), RDF.type, MIM.Domein) in graaf
+    assert (URIRef(BASE + "archief-2/"), DCTERMS.identifier, Literal("EAPK_ARCHIEF2")) in graaf
+    assert (URIRef(BASE + "archief-2/depot/"), DCTERMS.isPartOf, URIRef(BASE + "archief-2/")) in graaf
+    assert klasse(graaf, "Depot") == URIRef(BASE + "archief-2/depot/depot")
+    for entiteit in (URIRef(BASE + "archief/"), URIRef(BASE + "archief-2/")):
+        assert len(set(graaf.objects(entiteit, DCTERMS.identifier))) == 1
 
 
 def test_elke_ontologie_en_elk_domein_heeft_precies_een_identifier(graaf):
@@ -423,8 +433,12 @@ def test_namespace_botsing_wordt_gemeld(graaf, caplog):
         if os.path.exists(bestand):
             os.remove(bestand)
     meldingen = [r.getMessage() for r in caplog.records if r.levelno == logging.WARNING]
-    assert any("groepattribuutsoort" in m and "EAPK_GAS1" in m and "EAPK_GAS2" in m for m in meldingen), meldingen
-    assert any("archief" in m and "EAPK_ARCHIEF" in m and "EAPK_ARCHIEF2" in m for m in meldingen), meldingen
+    # Gelijknamige pakketten onder verschillende ouders botsen niet meer;
+    # gelijknamige pakketten onder dezelfde ouder ('Archief' en 'archief' onder
+    # de wortel) wel: de tweede krijgt een volgnummer.
+    assert not any("groepattribuutsoort" in m.casefold() for m in meldingen), meldingen
+    assert any("archief" in m and "EAPK_ARCHIEF2" in m and "volgnummer" in m for m in meldingen), meldingen
+    assert klasse(graaf, "Depot") == URIRef(BASE + "archief-2/depot/depot")
 
 
 # ---------------------------------------------------------------------------

@@ -1,3 +1,4 @@
+import fnmatch
 import logging
 import os
 import re
@@ -8,6 +9,7 @@ from rdflib import BNode, Graph, Literal, Namespace, URIRef
 from rdflib.collection import Collection
 from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SH, SKOS, XSD
 
+import crunch_uml.db as db
 import crunch_uml.schema as sch
 from crunch_uml import const
 from crunch_uml.exceptions import CrunchException
@@ -31,16 +33,29 @@ _EA_GUID_RE = re.compile(r"^EA(ID|PK)_[0-9A-Za-z]+(_[0-9A-Za-z]+)*$")
 
 # Het losse woord 'Model' aan het begin of einde van een pakketnaam.
 _MODEL_WORD_RE = re.compile(r"^\s*model\b\s*|\s*\bmodel\s*$", re.IGNORECASE)
+# Een volgnummer waarmee EA-pakketten en -diagrammen op volgorde worden gezet:
+# '3 Economie', '99 Kern', '0 Bestuur, Politiek en Ondersteuning'.
+_ORDER_PREFIX_RE = re.compile(r"^\s*\d+[\s._-]+(?=\S)")
+
+
+def strip_order_prefix(name):
+    """Naam zonder het volgnummer vooraan: '99 Kern' -> 'Kern', '3 Economie' ->
+    'Economie'. Het nummer ordent de pakketten in EA en is geen betekenis, dus
+    hoort niet in een IRI. Een naam die alleen uit een nummer bestaat blijft."""
+    name = (name or "").strip()
+    return _ORDER_PREFIX_RE.sub("", name).strip() or name
 
 
 def model_segment_name(name):
-    """Naam van een modelpakket zonder het losse woord 'Model' voor- of achteraan.
+    """Naam van een modelpakket zonder volgnummer en zonder het losse woord
+    'Model' voor- of achteraan.
 
-    'Model Kern RGBZ' -> 'Kern RGBZ', 'RSGB Model' -> 'RSGB'; 'Gegevensmodel
-    Wonen' blijft intact. Blijft er niets over (pakket 'Model'), dan is de
-    volledige naam het segment, zodat de IRI nooit een leeg segment krijgt.
+    'Model Kern RGBZ' -> 'Kern RGBZ', 'RSGB Model' -> 'RSGB', '3 Economie' ->
+    'Economie'; 'Gegevensmodel Wonen' blijft intact. Blijft er niets over
+    (pakket 'Model'), dan is de volledige naam het segment, zodat de IRI nooit
+    een leeg segment krijgt.
     """
-    name = (name or "").strip()
+    name = strip_order_prefix(name)
     cleaned = _MODEL_WORD_RE.sub("", name).strip()
     return cleaned or name
 
@@ -91,6 +106,9 @@ _XSD_TYPEMAP = {
     "boolean": XSD.boolean,
     "bool": XSD.boolean,
     "indicatie": XSD.boolean,
+    "uri": XSD.anyURI,
+    "anyuri": XSD.anyURI,
+    "url": XSD.anyURI,
 }
 
 # GML-/geometrietypen -> geo:wktLiteral (GeoSPARQL).
@@ -113,6 +131,19 @@ _GEOMETRY_TYPES = {
     "punt",
     "vlak",
     "lijn",
+    # ISO 19107 / GML3-datatypen zoals het GGM ze als DataType-elementen kent.
+    "gm_object",
+    "gm_primitive",
+    "gm_aggregate",
+    "gm_point",
+    "gm_multipoint",
+    "gm_curve",
+    "gm_multicurve",
+    "gm_linestring",
+    "gm_surface",
+    "gm_multisurface",
+    "gm_polygon",
+    "gm_multipolygon",
 }
 
 
@@ -174,12 +205,268 @@ class LodRenderer(ModelRenderer):
 
     default_exclude_package_names = const.LOD_EXCLUDE_PACKAGE_NAMES
 
+    # Serialisatie van de subklassen: rdflib-formaat en bestandsextensie.
+    rdf_format = "turtle"
+    extension = ".ttl"
+
     # Taaltag voor labels, definities en toelichtingen (--lod_language);
     # None geeft literals zonder taaltag.
     _lang: Optional[str] = "nl"
+    # Slug van het wortelpakket; een naamgenoot eronder levert geen padsegment.
+    _root_slug: Optional[str] = None
+
+    # ------------------------------------------------------------------
+    # Uitvoer: ontologie, SHACL-shapes en views
+    # ------------------------------------------------------------------
+
+    def writeGraph(self, path, graph, header=None):
+        """Serialiseer een graaf naar ``path``; ``header`` (een Turtle-
+        commentaarregel zoals ``# graph: <...>``) alleen in Turtle."""
+        data = graph.serialize(format=self.rdf_format)
+        with open(path, "w", encoding="utf-8") as file:
+            if header and self.rdf_format == "turtle":
+                file.write(header + "\n\n")
+            file.write(data)
+
+    def outputPath(self, outputfile):
+        """Het uitvoerpad met de extensie van dit formaat."""
+        base_name, _ = os.path.splitext(outputfile)
+        return base_name + self.extension
 
     def writeToFile(self, graph, args):
-        pass
+        self.writeGraph(self.outputPath(args.outputfile), graph)
+
+    def writeOutput(self, g, args, zchema, shape_ns, context):
+        """Schrijf de export: het uitvoerbestand, en op verzoek de SHACL-shapes
+        apart (``--lod_shapes_file``) en de views per diagram (``--lod_views_dir``).
+
+        De views zijn altijd deelgrafen van de ontologie zonder SHACL, ook als
+        het uitvoerbestand zelf ontologie en shapes samen bevat.
+        """
+        shapes_file = getattr(args, "lod_shapes_file", None)
+        views_dir = getattr(args, "lod_views_dir", None)
+        ontology = g
+        if shapes_file or views_dir:
+            ontology, shapes = self.splitShapes(g, shape_ns)
+        if shapes_file:
+            shapes_path = self.outputPath(shapes_file)
+            self.addShapesHeader(ontology, shapes, shape_ns, args)
+            self.writeToFile(ontology, args)
+            self.writeGraph(shapes_path, shapes)
+            logger.info(
+                f"Ontologie ({len(ontology)} triples) geschreven naar {self.outputPath(args.outputfile)};"
+                f" SHACL-shapes ({len(shapes)} triples) naar {shapes_path}"
+            )
+        else:
+            self.writeToFile(g, args)
+        if views_dir:
+            self.writeViews(ontology, args, zchema, context)
+
+    @staticmethod
+    def splitShapes(g, shape_ns):
+        """Verdeel de graaf in (ontologie, shapes).
+
+        Naar de shapes gaat elke triple met SHACL-vocabulaire: de NodeShapes
+        onder ``{basis}shapes/`` met alles wat erover gezegd wordt, elke triple
+        met een ``sh:``-predicaat, de typering ``a sh:NodeShape`` (ook van
+        gestructureerde en eigen primitieve datatypen, die in MIM 6.4.6 zelf
+        de NodeShape zijn) en alle blank nodes (PropertyShapes en de
+        ``sh:in``-lijsten; de ontologie zelf bevat er geen). De rest — klassen,
+        properties, enumeraties, pakketten en hun MIM-metagegevens — is de
+        ontologie. Beide grafen houden de prefix-bindingen van de export.
+        """
+        ontology, shapes = Graph(), Graph()
+        for prefix, namespace in g.namespaces():
+            ontology.bind(prefix, namespace)
+            shapes.bind(prefix, namespace)
+        shape_prefix = str(shape_ns)
+        sh_prefix = str(SH)
+        for s, p, o in g:
+            is_shape = (
+                isinstance(s, BNode)
+                or (isinstance(s, URIRef) and str(s).startswith(shape_prefix))
+                or str(p).startswith(sh_prefix)
+                or (p == RDF.type and o in (SH.NodeShape, SH.PropertyShape))
+            )
+            (shapes if is_shape else ontology).add((s, p, o))
+        return ontology, shapes
+
+    def addShapesHeader(self, ontology, shapes, shape_ns, args):
+        """De shapes-graaf als eigen owl:Ontology op ``{basis}shapes/`` die de
+        ontologie importeert; de ontologie verwijst ernaar met rdfs:seeAlso."""
+        shapes_iri = URIRef(str(shape_ns))
+        base_iri = URIRef(self.annotator.base)
+        titel = next(ontology.objects(base_iri, DCTERMS.title), None)
+        shapes.add((shapes_iri, RDF.type, OWL.Ontology))
+        shapes.add((shapes_iri, RDFS.label, self.lit(f"{titel or 'Ontologie'} (SHACL)")))
+        shapes.add((shapes_iri, OWL.imports, base_iri))
+        versie = mim.clean_value(getattr(args, "lod_version", None))
+        if versie:
+            shapes.add((shapes_iri, OWL.versionInfo, Literal(versie)))
+        ontology.add((base_iri, RDFS.seeAlso, shapes_iri))
+
+    @staticmethod
+    def viewExcludePatterns(args):
+        """De patronen uit --lod_views_exclude, of de standaardlijst."""
+        value = getattr(args, "lod_views_exclude", None)
+        if value is None:
+            value = const.LOD_VIEWS_EXCLUDE_NAMES
+        if not value:
+            return []
+        return [pattern.strip().casefold() for pattern in value.split(",") if pattern.strip()]
+
+    def isExcludedView(self, diagram, patterns):
+        """Waar als de diagramnaam of een package erboven een patroon matcht."""
+        if not patterns:
+            return False
+        name = (diagram.name or "").casefold()
+        if any(fnmatch.fnmatchcase(name, pattern) for pattern in patterns):
+            return True
+        return self.isExcludedByName(diagram.package, patterns)
+
+    def viewSegments(self, diagram):
+        """De padsegmenten van een view: het pakketpad van het diagram
+        (:meth:`packagePath`, dezelfde segmenten als de term-IRI's) gevolgd
+        door de slug van de diagramnaam zonder volgnummer."""
+        segments = list(self.packagePath(diagram.package))
+        segments.append(slugify(strip_order_prefix(diagram.name)) or slugify(diagram.id or "") or "diagram")
+        return segments
+
+    def viewGraph(self, ontology, diagram, context):
+        """De deelgraaf van één diagram, of None als er niets op staat dat in
+        de ontologie zit.
+
+        Inhoud: de klassen en enumeraties op het diagram met alles wat de
+        ontologie erover zegt, al hun attributen en enumeratiewaarden, de
+        enumeraties die het type van zo'n attribuut zijn (met hun waarden, ook
+        als ze niet getekend zijn), de associaties waarvan bron en doel op het
+        diagram staan en de generalisaties tussen diagramelementen. De view
+        volgt de elementen op het diagram, niet de tekenwijze: een connector
+        die in EA op het diagram verborgen is ('Hidden') telt mee. Een
+        rdfs:subClassOf naar een klasse buiten het diagram blijft weg; andere
+        verwijzingen naar elementen buiten het diagram (rdfs:range, mim:type)
+        blijven staan, want het zijn dezelfde IRI's als in de ontologie.
+        """
+        class_dict = context["class_dict"]
+        enum_uris = context["enum_uris"]
+        enum_by_uri = context["enum_by_uri"]
+        prop_uris = context["prop_uris"]
+        model_class_uris = context["model_class_uris"]
+
+        on_classes = [cls for cls in diagram.classes if cls.id in class_dict]
+        on_enums = [enum for enum in diagram.enumerations if enum.id in enum_uris]
+        if not on_classes and not on_enums:
+            return None
+        on_ids = {cls.id for cls in on_classes}
+
+        subjects = set()
+        enums = {enum_uris[enum.id]: enum for enum in on_enums}
+        supers: dict = {}  # klasse-URI -> toegestane superklasse-URI's
+        for cls in on_classes:
+            class_uri = class_dict[cls.id]
+            subjects.add(class_uri)
+            attr_uris, assoc_uris = prop_uris.get(cls.id, ({}, {}))
+            subjects.update(attr_uris.values())
+            for attr_uri in attr_uris.values():
+                for range_uri in ontology.objects(attr_uri, RDFS.range):
+                    if range_uri in enum_by_uri:
+                        enums.setdefault(range_uri, enum_by_uri[range_uri])
+            for assoc in cls.uitgaande_associaties:
+                dst_id = getattr(assoc.dst_class, "id", None)
+                if dst_id in on_ids and assoc.id in assoc_uris:
+                    subjects.add(assoc_uris[assoc.id])
+            supers[class_uri] = {
+                class_dict[gener.superclass.id]
+                for gener in cls.superclasses
+                if gener.superclass is not None and gener.superclass.id in on_ids
+            }
+        for enum_uri, enum in enums.items():
+            subjects.add(enum_uri)
+            subjects.update(self.conceptUris(enum_uri, enum).values())
+
+        view = Graph()
+        for prefix, namespace in ontology.namespaces():
+            view.bind(prefix, namespace)
+        for subject in subjects:
+            for pred, obj in ontology.predicate_objects(subject):
+                if pred == RDFS.subClassOf and obj in model_class_uris and obj not in supers.get(subject, ()):
+                    continue
+                view.add((subject, pred, obj))
+        return view
+
+    def writeViews(self, ontology, args, zchema, context):
+        """Schrijf per diagram een view naar ``--lod_views_dir``.
+
+        Bestand: ``{map}/{segmenten}.{ext}``; graph-IRI ``{basis}[{versie}/]{segmenten}``
+        (de versie uit ``--lod_version`` als segment, zodat de view-IRI's nooit
+        met term-IRI's botsen en onder de owl:versionIRI vallen), in Turtle als
+        kopregel ``# graph: <...>``. De view beschrijft zichzelf als
+        owl:Ontology met label, EA-identifier, dcterms:isPartOf het
+        informatiemodel en owl:versionInfo.
+        """
+        views_dir = args.lod_views_dir
+        patterns = self.viewExcludePatterns(args)
+        versie = mim.clean_value(getattr(args, "lod_version", None))
+        version_segment = mim.version_segment(versie) if versie else None
+        base = self.annotator.base
+        base_iri = URIRef(base)
+
+        diagrams = zchema.get_session().query(db.Diagram).filter(db.Diagram.schema_id == zchema.schema_id).all()
+        diagrams.sort(key=lambda d: (d.name or "", d.id or ""))
+        written: list = []
+        excluded: list = []
+        empty: list = []
+        duplicates: list = []
+        seen_paths: dict = {}
+        for diagram in diagrams:
+            label = f"{diagram.name} ({diagram.id})"
+            if self.isExcludedView(diagram, patterns):
+                excluded.append(label)
+                continue
+            view = self.viewGraph(ontology, diagram, context)
+            if view is None:
+                empty.append(label)
+                continue
+            segments = self.viewSegments(diagram)
+            pad = "/".join(segments)
+            if pad in seen_paths:
+                duplicates.append(f"{label} krijgt hetzelfde pad '{pad}' als {seen_paths[pad]}")
+                continue
+            seen_paths[pad] = label
+            view_iri = URIRef(base + (f"{version_segment}/" if version_segment else "") + pad)
+            if (view_iri, None, None) in ontology:
+                logger.warning(
+                    f"View-IRI <{view_iri}> van diagram {label} is al een term in de ontologie; de view krijgt"
+                    " geen eigen beschrijving. Geef --lod_version op om de views onder een versiesegment te zetten."
+                )
+            else:
+                view.add((view_iri, RDF.type, OWL.Ontology))
+                view.add((view_iri, RDFS.label, self.lit(diagram.name or pad)))
+                if diagram.definitie:
+                    view.add((view_iri, RDFS.comment, self.lit(diagram.definitie)))
+                self.addIdentifier(view, view_iri, diagram.id, "diagram")
+                view.add((view_iri, DCTERMS.isPartOf, base_iri))
+                if versie:
+                    view.add((view_iri, OWL.versionInfo, Literal(versie)))
+            path = os.path.join(views_dir, *segments) + self.extension
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            self.writeGraph(path, view, header=f"# graph: <{view_iri}>")
+            written.append(pad)
+
+        logger.info(
+            f"{len(written)} views geschreven naar {views_dir}"
+            + (f"; {len(excluded)} diagrammen op naam uitgesloten" if excluded else "")
+            + (f"; {len(empty)} diagrammen zonder inhoud in de ontologie overgeslagen" if empty else "")
+        )
+        if empty:
+            logger.debug("Diagrammen zonder inhoud in de ontologie: " + ", ".join(empty))
+        if duplicates:
+            logger.warning(
+                f"{len(duplicates)} diagrammen overgeslagen omdat hun pad al bezet is (gelijknamige diagrammen"
+                " in hetzelfde pakket): " + "; ".join(duplicates[:10]) + (" ..." if len(duplicates) > 10 else "")
+            )
+        if not written:
+            logger.warning("Geen views geschreven: geen diagram met klassen of enumeraties uit de ontologie.")
 
     def lit(self, text):
         """Tekstliteral in de taal van de export (MIM 6.4.9.2: rdfs:label met
@@ -213,90 +500,152 @@ class LodRenderer(ModelRenderer):
 
     @staticmethod
     def isRenderableClass(cls):
-        """Klassen zonder stereotype zijn in EA-modellen technische elementen
-        (ProxyConnector, diagram- en view-hulpklassen) en horen niet in de
-        ontologie; datatype-klassen hebben van nature geen Objecttype-stereotype
-        en blijven."""
+        """Is deze klasse een modelklasse, of een technisch EA-element?
+
+        Als de bron het EA-objecttype meegeeft (``object_type``, sinds 0.7.0:
+        'class', 'datatype', 'boundary', 'proxyconnector', 'text', en
+        'enumeration' voor de plaatsvervanger van een associatie-uiteinde op een
+        enumeratie) beslist dat: alleen klassen en datatypen horen in de
+        ontologie. Een klasse die de modelleur geen stereotype gaf (Aantal,
+        Rol) blijft dan gewoon een klasse. Zonder objecttype (oudere databases,
+        generieke formaten) geldt de oude regel: klassen zonder stereotype zijn
+        technische elementen (ProxyConnector, diagramhulpklassen), tenzij het
+        datatype-klassen zijn."""
+        kind = (getattr(cls, "object_type", None) or "").strip().casefold()
+        if kind:
+            return kind in ("class", "datatype")
         return bool((cls.stereotype or "").strip()) or bool(cls.is_datatype)
 
     @staticmethod
-    def uniqueSlugs(packages, name_of, soort):
-        """Slug per package-id, uniek over de hele verzameling.
+    def isRootPackage(pkg):
+        """Het wortelpakket: zonder (benoemde) ouder. Dat is het informatiemodel
+        op de basis-URI."""
+        return pkg.parent_package is None or not pkg.parent_package.name
 
-        Pakketten met dezelfde slug (acht keer 'Diagram', twee keer
-        'Groepattribuutsoort' in het GGM) deelden één namespace, zodat hun
-        klassen door elkaar liepen en de ontologie twee identifiers kreeg.
-        Botsende pakketten krijgen de slug van het bovenliggende pakket als
-        voorvoegsel en, als dat niet volstaat, een volgnummer (deterministisch
-        op id). Er wordt gewaarschuwd, want het model zelf is dan dubbelzinnig.
+    def packagePath(self, pkg):
+        """Het pad van een pakket als lijst segmenten, van wortel naar pakket:
+        de basis van alle IRI's van zijn klassen (``{basis}kern/bag/pand``),
+        van zijn eigen ontologie-IRI (``{basis}kern/bag/``) en van de views.
+
+        Elk pakket levert zijn naam als slug zonder volgnummer en zonder het
+        losse woord 'Model' ('99 Kern' -> kern, 'Model BAG' -> bag, 'RSGB
+        Model' -> rsgb). Geen segment leveren: het wortelpakket
+        (de basis-URI), een pakket met dezelfde naam als het wortelpakket (in
+        EA is de modelknoop vaak een naamgenoot van het informatiemodelpakket
+        eronder) en een package 'Diagram' (de EA-map met diagrammen naast
+        het model). Een pakket met dezelfde naam als zijn ouder zonder
+        klassen (de EA-conventies 'BAG' > 'Model BAG' en 'Omgevingswet' >
+        'Model Omgevingswet' > 'Model Omgevingswet') gaat in die ouder op:
+        één segment 'bag', en het diepste pakket vertegenwoordigt de ouder in
+        de hiërarchie. Omdat het pad de boom
+        volgt, zijn gelijknamige pakketten op verschillende plaatsen vanzelf
+        uniek; alleen gelijknamige pakketten onder dezelfde ouder krijgen een
+        volgnummer, met een waarschuwing. Eén keer berekend per pakket
+        (deterministisch: wie het eerst komt houdt het kale pad, en de
+        aanroeper loopt de modellen op id af).
         """
-        groups: dict = {}
-        for pkg in packages:
-            slug = slugify(name_of(pkg) or "") or slugify(pkg.id or "") or "pakket"
-            groups.setdefault(slug, []).append(pkg)
-        result: dict = {}
-        taken = set(groups)
-        for slug in sorted(groups):
-            group = groups[slug]
-            if len(group) == 1:
-                result[group[0].id] = slug
-                continue
-            namen = ", ".join(sorted(f"{p.name} ({p.id})" for p in group))
-            logger.warning(
-                f"{len(group)} {soort} delen de naam '{slug}': {namen}; ze krijgen de naam van het"
-                " bovenliggende pakket als voorvoegsel"
-            )
-            for pkg in sorted(group, key=lambda p: p.id or ""):
+        if pkg is None:
+            return []
+        cache = self.__dict__.setdefault("_package_paths", {})
+        if pkg.id in cache:
+            return cache[pkg.id]
+        if self.isRootPackage(pkg):
+            self._root_slug = slugify(strip_order_prefix(pkg.name))
+            path: list = []
+        else:
+            parent_path = self.packagePath(pkg.parent_package)
+            plain = slugify(strip_order_prefix(pkg.name))
+            if not plain or plain == getattr(self, "_root_slug", None) or plain == "diagram":
+                path = list(parent_path)
+            else:
+                slug = slugify(model_segment_name(pkg.name)) or plain
+                owners = self.__dict__.setdefault("_path_owners", {})
+                merged = self.__dict__.setdefault("_merged", {})
                 parent = pkg.parent_package
-                parent_slug = slugify(name_of(parent) or "") if parent is not None else ""
-                candidate = f"{parent_slug}-{slug}" if parent_slug else slug
-                unique, n = candidate, 2
-                while unique in taken:
-                    unique = f"{candidate}-{n}"
-                    n += 1
-                taken.add(unique)
-                result[pkg.id] = unique
-        return result
+                if (
+                    parent_path
+                    and parent_path[-1] == slug
+                    and not self.isRootPackage(parent)
+                    and not parent.classes
+                    and parent.id not in merged
+                ):
+                    # 'BAG' > 'Model BAG': het pakket gaat op in zijn ouder.
+                    merged[parent.id] = pkg.id
+                    cache[pkg.id] = list(parent_path)
+                    return cache[pkg.id]
+                candidate, n = tuple(parent_path) + (slug,), 2
+                while candidate in owners and owners[candidate] != pkg.id:
+                    if n == 2:
+                        logger.warning(
+                            f"Pakket '{pkg.name}' ({pkg.id}) heeft dezelfde naam als een ander pakket onder"
+                            f" dezelfde ouder ({owners[candidate]}); het krijgt een volgnummer in zijn pad"
+                        )
+                    candidate, n = tuple(parent_path) + (f"{slug}-{n}",), n + 1
+                owners[candidate] = pkg.id
+                path = list(candidate)
+        cache[pkg.id] = path
+        return path
 
-    def addPackageHierarchy(self, g, models, domain_ns, model_ns, args):
+    @staticmethod
+    def schemaPackage(parent, pkg_id):
+        """Het subpakket van ``parent`` met dit id (het model dat in de ouder opgaat)."""
+        for sub in parent.subpackages:
+            if sub.id == pkg_id:
+                return sub
+        raise CrunchException(f"Subpakket {pkg_id} van {parent.name} niet gevonden")
+
+    def packageUri(self, pkg):
+        """De ontologie-IRI van een pakket: de basis-URI plus zijn pad, met
+        afsluitende slash; het wortelpakket is de basis-URI zelf."""
+        path = self.packagePath(pkg)
+        return URIRef(self.annotator.base + ("/".join(path) + "/" if path else ""))
+
+    def addPackageHierarchy(self, g, models, args):
         """Voeg de pakkethiërarchie toe als owl:Ontology-entiteiten.
 
         Het wortelpakket is het informatiemodel (``mim:Informatiemodel``, op de
         basis-URI, met versie- en MIM-metadata uit de ``--lod_*``-opties); elk
-        ander pakket in de hiërarchie is een ``mim:Domein`` (MIM 6.4.7.1).
-        Kinderen verwijzen met ``dcterms:isPartOf`` omhoog, ouders importeren
-        hun kinderen met ``owl:imports`` (6.4.9.40).
+        ander pakket in de hiërarchie is een ``mim:Domein`` (MIM 6.4.7.1) op
+        ``{basis}{pad}/``, of de ontologie van het model als het pakket
+        klassen heeft. Kinderen verwijzen met ``dcterms:isPartOf`` omhoog,
+        ouders importeren hun kinderen met ``owl:imports`` (6.4.9.40).
+        Pakketten zonder eigen segment (naamgenoot van de wortel, 'Diagram')
+        worden overgeslagen: hun kinderen hangen aan de eerstvolgende ouder.
         """
         seen = {}
+        is_root = self.isRootPackage
+        merged = self.__dict__.setdefault("_merged", {})  # ouder-id -> id van het model dat erin opgaat
 
-        # Alle bovenliggende (domein)pakketten vooraf verzamelen, zodat
-        # gelijknamige domeinen ('Archief' en 'archief') unieke URI's krijgen.
-        domains: dict = {}
-        for model in models:
-            parent = model.parent_package
-            while parent is not None and parent.name and parent.id not in domains:
-                if parent.id not in model_ns:
-                    domains[parent.id] = parent
+        def visible_parent(pkg):
+            """De eerste ouder met een eigen IRI; een ouder waarin dit model
+            opgaat wordt overgeslagen, een ouder die door zijn model wordt
+            vertegenwoordigd levert (via add_package) dat model."""
+            parent = pkg.parent_package
+            while parent is not None and parent.name and not is_root(parent):
+                if merged.get(parent.id) == pkg.id:
+                    pkg, parent = parent, parent.parent_package
+                    continue
+                if parent.id in merged or self.packagePath(parent) != self.packagePath(parent.parent_package):
+                    return parent
                 parent = parent.parent_package
-        domain_slugs = self.uniqueSlugs(domains.values(), lambda p: p.name, "domeinpakketten")
-
-        def is_root(pkg):
-            return pkg.parent_package is None or not pkg.parent_package.name
-
-        def entity_uri(pkg):
-            # Een bovenliggend pakket kan zelf ook een model zijn: dan is de
-            # ontologie-URI van dat model het ankerpunt, geen domein-URI.
-            if pkg.id in model_ns:
-                return URIRef(str(model_ns[pkg.id][1]))
-            if is_root(pkg):
-                # Het informatiemodel zelf: de basis-URI van de export.
-                return URIRef(self.annotator.base)
-            return domain_ns[domain_slugs.get(pkg.id) or slugify(pkg.name)]
+            return parent
 
         def add_package(pkg):
             if pkg.id in seen:
                 return seen[pkg.id]
-            uri = entity_uri(pkg)
+            if pkg.id in merged:
+                # Dit pakket wordt vertegenwoordigd door het model dat erin opgaat.
+                seen[pkg.id] = add_package(self.schemaPackage(pkg, merged[pkg.id]))
+                return seen[pkg.id]
+            if (
+                not is_root(pkg)
+                and self.packagePath(pkg) == self.packagePath(pkg.parent_package)
+                and merged.get(getattr(pkg.parent_package, "id", None)) != pkg.id
+            ):
+                # Transparant pakket: geen eigen IRI, de ouder is het ankerpunt.
+                seen[pkg.id] = add_package(visible_parent(pkg) or pkg.parent_package)
+                return seen[pkg.id]
+            uri = self.packageUri(pkg)
             seen[pkg.id] = uri
             if is_root(pkg):
                 self.annotator.annotate_informatiemodel(
@@ -310,13 +659,12 @@ class LodRenderer(ModelRenderer):
                     informatiemodeltype=getattr(args, "lod_informatiemodeltype", None) or "logisch",
                 )
             else:
-                namespace = str(model_ns[pkg.id][1]) if pkg.id in model_ns else str(uri)
-                self.annotator.annotate_domein(uri, pkg, namespace)
+                self.annotator.annotate_domein(uri, pkg, str(uri))
             g.add((uri, RDFS.label, self.lit(pkg.name)))
             self.addIdentifier(g, uri, pkg.id, "pakket")
             if pkg.definitie:
                 g.add((uri, RDFS.comment, self.lit(pkg.definitie)))
-            parent = pkg.parent_package
+            parent = visible_parent(pkg)
             if parent is not None and parent.name:
                 parent_uri = add_package(parent)
                 g.add((uri, DCTERMS.isPartOf, parent_uri))
@@ -326,9 +674,40 @@ class LodRenderer(ModelRenderer):
         for model in models:
             add_package(model)
 
-    @staticmethod
-    def enumConceptUri(enum_uri, literal):
-        return URIRef(f"{enum_uri}/{slugify(literal.name) if literal.name else slugify(literal.id)}")
+    def conceptUris(self, enum_uri, enum):
+        """IRI per enumeratiewaarde (literal-id -> IRI), uniek binnen de
+        enumeratie: ``{enumeratie}/{slug van de naam}``. Waarden met dezelfde
+        slug (A, A+ en A++ van een energielabel worden alle drie 'a') krijgen
+        in alfabetische volgorde een volgnummer: a, a-2, a-3. Eén keer berekend
+        per enumeratie, zodat ontologie, sh:in-lijsten en views dezelfde IRI's
+        gebruiken."""
+        cache = self.__dict__.setdefault("_concept_uris", {})
+        if enum.id in cache:
+            return cache[enum.id]
+        groups: dict = {}
+        for literal in enum.literals:
+            slug = slugify(literal.name) if literal.name else slugify(literal.id or "")
+            groups.setdefault(slug or "waarde", []).append(literal)
+        uris: dict = {}
+        taken = set(groups)
+        for slug, group in groups.items():
+            if len(group) == 1:
+                uris[group[0].id] = URIRef(f"{enum_uri}/{slug}")
+                continue
+            namen = ", ".join(f"'{lit.name}'" for lit in group)
+            logger.warning(
+                f"{len(group)} waarden van enumeratie '{enum.name}' delen de IRI-slug '{slug}' ({namen});"
+                " ze krijgen een volgnummer"
+            )
+            for n, literal in enumerate(sorted(group, key=lambda lit: (lit.name or "", lit.id or "")), start=1):
+                candidate = slug if n == 1 else f"{slug}-{n}"
+                while n > 1 and candidate in taken:
+                    n += 1
+                    candidate = f"{slug}-{n}"
+                taken.add(candidate)
+                uris[literal.id] = URIRef(f"{enum_uri}/{candidate}")
+        cache[enum.id] = uris
+        return uris
 
     def addEnumeration(self, g, enum, enum_uri, model_uri, shape_uri):
         """Render één enumeratie als owl:Class + skos:ConceptScheme (en
@@ -347,8 +726,9 @@ class LodRenderer(ModelRenderer):
         self.annotator.annotate_enumeration(enum_uri, enum, shape_uri)
 
         concepts = []
+        concept_uris = self.conceptUris(enum_uri, enum)
         for literal in enum.literals:
-            concept_uri = self.enumConceptUri(enum_uri, literal)
+            concept_uri = concept_uris[literal.id]
             concepts.append(concept_uri)
             g.add((concept_uri, RDF.type, SKOS.Concept))
             # Het concept is óók instantie van de enumeratieklasse, zodat de
@@ -450,6 +830,7 @@ class LodRenderer(ModelRenderer):
 
     def render(self, args, zchema: sch.Schema):
         self._odd_identifiers: dict = {}
+        self._concept_uris: dict = {}
         try:
             if args.linked_data_namespace is None:
                 logger.warning(
@@ -470,10 +851,8 @@ class LodRenderer(ModelRenderer):
 
             # Namespaces en bindings
             shape_ns = Namespace(base + "shapes/")
-            domain_ns = Namespace(base + "domein/")
             g.bind("sh", SH)
             g.bind("shape", shape_ns)
-            g.bind("domein", domain_ns)
             g.bind("geo", GEO)
             g.bind("dcterms", DCTERMS)
 
@@ -497,14 +876,21 @@ class LodRenderer(ModelRenderer):
             enum_by_name: dict = {}  # enumnaam (casefold) -> enum
             enum_by_uri: dict = {}  # enum uri -> enum (voor sh:in)
             skipped_classes: list = []
-            # Het modelsegment krijgt dezelfde slug-vorm als klassen en
-            # attributen (geen %20 of %28 in IRI's) en is uniek per model. De
-            # namespace wordt achter de basis geplakt: urljoin(base, "/slug/")
-            # gooide een eventueel pad in de basis-URI weg.
-            model_slugs = self.uniqueSlugs(models, lambda p: model_segment_name(p.name), "modelpakketten")
+            # De namespace van een model is de basis plus zijn pakketpad
+            # (packagePath: 'kern/bag' voor 99 Kern > Model BAG), met dezelfde
+            # slug-vorm als klassen en attributen (geen %20 of %28 in IRI's).
+            # De namespace wordt achter de basis geplakt: urljoin(base, "/slug/")
+            # gooide een eventueel pad in de basis-URI weg. De modellen worden
+            # op id afgelopen, zodat gelijknamige pakketten onder één ouder
+            # altijd hetzelfde volgnummer krijgen.
+            self._package_paths: dict = {}
+            self._path_owners: dict = {}
+            self._root_slug = None
+            for model in sorted(models, key=lambda m: m.id or ""):
+                self.packagePath(model)
             for model in models:
-                modelname = model_slugs[model.id]
-                ns = Namespace(base + modelname + "/")
+                modelname = "/".join(self.packagePath(model))
+                ns = Namespace(str(self.packageUri(model)))
                 model_ns[model.id] = (modelname, ns)
                 for cls in model.classes:
                     if not cls.name:
@@ -563,8 +949,19 @@ class LodRenderer(ModelRenderer):
                 datatype-mapping op de typenaam en tenslotte naam-matching."""
                 if attribute.enumeration is not None and attribute.enumeration.name:
                     return "enum", enum_uri_for(attribute.enumeration), None
-                if attribute.type_class is not None and attribute.type_class.id in class_dict:
-                    return "object", class_dict[attribute.type_class.id], None
+                if attribute.type_class is not None:
+                    # Een typeklasse met de naam van een primitief datatype is een
+                    # datatype, geen objecttype: in EA zijn de MIM11-primitieven
+                    # (CharacterString, Date, Integer, Boolean, ...) en datatypen
+                    # als Bedrag of GUID DataType-elementen waar attributen via hun
+                    # classifier naar verwijzen. De XSD-mapping wint dan; anders
+                    # zou elk zo getypeerd attribuut een owl:ObjectProperty met
+                    # een gestructureerd datatype als range worden.
+                    dtype, max_length = map_datatype(attribute.type_class.name)
+                    if dtype is not None:
+                        return "datatype", dtype, max_length
+                    if attribute.type_class.id in class_dict:
+                        return "object", class_dict[attribute.type_class.id], None
                 dtype, max_length = map_datatype(attribute.primitive)
                 if dtype is not None:
                     return "datatype", dtype, max_length
@@ -581,7 +978,7 @@ class LodRenderer(ModelRenderer):
             # Pakkethiërarchie: wortel als mim:Informatiemodel, overige pakketten
             # als mim:Domein (allemaal owl:Ontology), met dcterms:isPartOf omhoog
             # en owl:imports omlaag.
-            self.addPackageHierarchy(g, models, domain_ns, model_ns, args)
+            self.addPackageHierarchy(g, models, args)
 
             # Property-URI's per klasse (attributen én associaties), uniek binnen
             # de klasse; ook de SHACL-shapes en het relatieblok gebruiken deze.
@@ -593,6 +990,7 @@ class LodRenderer(ModelRenderer):
                 for model in models:
                     modelname, ns = model_ns[model.id]
                     model_uri = URIRef(str(ns))
+                    shape_prefix = modelname + "/" if modelname else ""
                     verwerkt_voor = len(prop_uris)
 
                     for cls in model.classes:
@@ -636,7 +1034,7 @@ class LodRenderer(ModelRenderer):
                             logger.warning(f"Enumeratie zonder naam overgeslagen: {enum.id}")
                             continue
                         self.addEnumeration(
-                            g, enum, enum_uris[enum.id], model_uri, shape_ns[modelname + "/" + slugify(enum.name)]
+                            g, enum, enum_uris[enum.id], model_uri, shape_ns[shape_prefix + slugify(enum.name)]
                         )
 
                     # Add SHACL NodeShapes for each class
@@ -651,7 +1049,7 @@ class LodRenderer(ModelRenderer):
                             # NodeShape is (6.4.6.3/6.4.6.4).
                             shape_uri = class_uri
                         else:
-                            shape_uri = shape_ns[modelname + "/" + slugify(cls.name)]
+                            shape_uri = shape_ns[shape_prefix + slugify(cls.name)]
                             g.add((shape_uri, RDF.type, SH.NodeShape))
                             g.add((shape_uri, SH.targetClass, class_uri))
                             g.add((shape_uri, RDFS.label, self.lit(cls.name)))
@@ -685,11 +1083,8 @@ class LodRenderer(ModelRenderer):
                                 enum = enum_by_uri.get(range_uri)
                                 if enum is not None and enum.literals:
                                     list_node = BNode()
-                                    Collection(
-                                        g,
-                                        list_node,
-                                        [self.enumConceptUri(range_uri, lit) for lit in enum.literals],
-                                    )
+                                    concept_uris = self.conceptUris(range_uri, enum)
+                                    Collection(g, list_node, [concept_uris[lit.id] for lit in enum.literals])
                                     g.add((prop_bnode, SH["in"], list_node))
                             g.add((prop_bnode, SH.name, self.lit(attribute.name)))
                             if attribute.definitie:
@@ -793,9 +1188,16 @@ class LodRenderer(ModelRenderer):
                     f" -enumeratie): {overview}"
                 )
 
-            self.reportOddIdentifiers()
             logger.info(self.annotator.samenvatting())
-            self.writeToFile(g, args)
+            context = {
+                "class_dict": class_dict,
+                "enum_uris": enum_uris,
+                "enum_by_uri": enum_by_uri,
+                "prop_uris": prop_uris,
+                "model_class_uris": set(class_dict.values()),
+            }
+            self.writeOutput(g, args, zchema, shape_ns, context)
+            self.reportOddIdentifiers()
         except CrunchException:
             raise  # Laat eigen excepties door
         except Exception as e:
@@ -810,18 +1212,10 @@ class LodRenderer(ModelRenderer):
     + 'Needs parameter "output_lod_url".',
 )
 class TTLRenderer(LodRenderer):
-    """
-    Renders all model packages using jinja2 and a template.
-    A model package is a package with at least 1 class inside
-    """
+    """Linked Data-ontologie in Turtle."""
 
-    def writeToFile(self, graph, args):
-        # get filename
-        base_name, ext = os.path.splitext(args.outputfile)
-        outputfile = f"{base_name}.ttl"
-
-        with open(outputfile, "w") as file:
-            file.write(graph.serialize(format="turtle"))
+    rdf_format = "turtle"
+    extension = ".ttl"
 
 
 @RendererRegistry.register(
@@ -831,18 +1225,10 @@ class TTLRenderer(LodRenderer):
     + ' Needs parameter "output_lod_url".',
 )
 class RDFRenderer(LodRenderer):
-    """
-    Renders all model packages using jinja2 and a template.
-    A model package is a package with at least 1 class inside
-    """
+    """Linked Data-ontologie in RDF/XML."""
 
-    def writeToFile(self, graph, args):
-        # get filename
-        base_name, ext = os.path.splitext(args.outputfile)
-        outputfile = f"{base_name}.rdf"
-
-        with open(outputfile, "w") as file:
-            file.write(graph.serialize(format="xml"))
+    rdf_format = "xml"
+    extension = ".rdf"
 
 
 @RendererRegistry.register(
@@ -852,15 +1238,7 @@ class RDFRenderer(LodRenderer):
     + ' Needs parameter "output_lod_url".',
 )
 class JSONLDRenderer(LodRenderer):
-    """
-    Renders all model packages using jinja2 and a template.
-    A model package is a package with at least 1 class inside
-    """
+    """Linked Data-ontologie in JSON-LD."""
 
-    def writeToFile(self, graph, args):
-        # get filename
-        base_name, ext = os.path.splitext(args.outputfile)
-        outputfile = f"{base_name}.jsonld"
-
-        with open(outputfile, "w") as file:
-            file.write(graph.serialize(format="json-ld"))
+    rdf_format = "json-ld"
+    extension = ".jsonld"

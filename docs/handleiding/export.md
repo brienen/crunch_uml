@@ -109,6 +109,9 @@ crunch_uml -sch mijn_schema export -t <type> -f <bestand>
 | `--lod_title`, `--lod_publisher`, `--lod_license` | Titel, uitgever en licentie van het informatiemodel (`dcterms:title`, `dcterms:publisher`, `dcterms:license`) |
 | `--lod_informatiedomein` | Functioneel domein van het informatiemodel (`mim:informatiedomein`) |
 | `--lod_informatiemodeltype` | `conceptueel`, `logisch` (standaard) of `technisch` (`mim:informatiemodeltype`) |
+| `--lod_shapes_file` | Schrijf de SHACL-shapes naar dit bestand; het uitvoerbestand bevat dan alleen de RDFS/OWL-ontologie |
+| `--lod_views_dir` | Map voor de views: per diagram een deelgraaf van de ontologie (`{map}/{pad}.{ext}`) |
+| `--lod_views_exclude` | Naampatronen van diagrammen en van pakketten erboven die geen view worden (standaard `Diagrammen intern gebruik,Tekenwijze,View*`; `""` sluit niets uit) |
 | `-js_url, --json_schema_url` | URL voor JSON Schema referenties |
 | `--mapper` | JSON-string voor het hernoemen van kolommen in output |
 | `--entity_name` | Specifieke entiteit om te exporteren (bij CSV) |
@@ -161,16 +164,32 @@ crunch_uml -sch mijn_model export -t ttl \
 ```
 
 Elk modelpakket (een package met minstens één klasse) wordt een `owl:Ontology` met een eigen namespace
-`{namespace}{model}/`, waarin `{model}` de slug van de pakketnaam is zonder het losse woord *Model*
-(`Model Kern RGBZ` → `kern-rgbz/`). Klassen krijgen `{model}/{klasse}`, attributen en associaties
-`{model}/{klasse}/{naam}`. Gelijknamige associaties vanuit één klasse krijgen de doelklasse als
+`{namespace}{pad}/`, waarin `{pad}` de pakketboom van het model volgt: de slugs van alle pakketten van de
+wortel tot en met het modelpakket, zonder volgnummer en zonder het losse woord *Model*
+(`99 Kern › Model BAG` → `kern/bag/`, `1 Veiligheid en Vergunningen › Model VTH` → `veiligheid-en-vergunningen/vth/`,
+`99 Kern › RGBZPlus › Model RGBZ › Model Kern RGBZ` → `kern/rgbzplus/rgbz/kern-rgbz/`).
+Het wortelpakket is de basis-URI zelf; een pakket met dezelfde naam als de wortel (EA's modelknoop)
+en een package *Diagram* leveren geen segment, en een pakket met dezelfde naam als zijn ouder zonder
+klassen (`BAG › Model BAG`, ook geschakeld: `Omgevingswet › Model Omgevingswet › Model Omgevingswet`) gaat
+in die ouder op: één segment `bag/`, waarbij het diepste pakket de ouder in de hiërarchie vertegenwoordigt. Elk tussenliggend pakket is een `mim:Domein` op
+`{namespace}{pad}/` (`kern/`). Klassen krijgen `{pad}/{klasse}`, attributen en associaties
+`{pad}/{klasse}/{naam}`; de views gebruiken dezelfde segmenten. Gelijknamige associaties vanuit één klasse krijgen de doelklasse als
 achtervoegsel (`project/heeft-projectlocatie`), naamloze associaties heten `{rol of relatie}-{doelklasse}`
 en gelijknamige attributen krijgen hun datatype of doelklasse als achtervoegsel, zodat elke property
 precies één `rdfs:range` en haar eigen `dcterms:identifier` houdt. Gelijknamige modelpakketten krijgen de
-naam van het bovenliggende pakket als voorvoegsel, met een waarschuwing.
+naam van het bovenliggende pakket als voorvoegsel, met een waarschuwing. Volgnummers waarmee pakketten in
+EA op volgorde staan vallen uit het segment (`99 Kern` → `domein/kern`, `3 Economie` → `economie/`); de
+`owl:versionIRI` is `{namespace}{versie}/` met de versie zoals opgegeven (`v3.0.0/`).
 
-Klassen zonder stereotype (in EA-modellen technische elementen zoals `ProxyConnector`) worden
-overgeslagen; datatype-klassen blijven. Packages met de namen `Diagram`, `Diagrammen intern gebruik`,
+Technische EA-elementen (`Boundary`, `ProxyConnector`, `Text`) worden overgeslagen op hun EA-objecttype
+(`object_type`, dat de `qea`- en `eaxmi`-parsers meegeven); een klasse zonder stereotype blijft dan een
+klasse. Kent de bron geen objecttype, dan geldt de oude regel: klassen zonder stereotype zijn technisch,
+datatype-klassen blijven. Attributen getypeerd via de classifier naar een DataType-element met de naam
+van een primitief datatype (de MIM11-primitieven `CharacterString`, `Date`, `Integer`, `Boolean`, ...,
+datatypen als `Bedrag` en `GUID`, GML-geometrieën als `GM_Point`) worden `owl:DatatypeProperty` met het
+XSD- of GeoSPARQL-type; enumeratiewaarden met dezelfde slug (`A`, `A+`, `A++`) krijgen een volgnummer
+(`a`, `a-2`, `a-3`) en witruimte aan het begin en eind van namen en definities valt uit de literals.
+Packages met de namen `Diagram`, `Diagrammen intern gebruik`,
 `Tekenwijze` en `View*` worden met hun subpackages standaard weggelaten; pas dit aan met
 `--output_exclude_package_names` of schakel het uit met `--output_exclude_package_names ""`.
 
@@ -209,6 +228,55 @@ python tools/validate_mim_lod.py ontologie.ttl
 
 De tool toetst de export aan `test/data/mim/mim-shapes.ttl` (met `mim.ttl` als vocabulaire) en vat de
 meldingen samen per shape, pad en constraint, met voorbeeld-resources; `--json` schrijft het rapport weg.
+
+#### SHACL-shapes apart
+
+Met `--lod_shapes_file shapes.ttl` schrijft de renderer de SHACL-laag naar een eigen bestand: de NodeShapes
+onder `{namespace}shapes/` met alles wat erover gezegd wordt, de PropertyShapes (blank nodes) met hun
+`sh:in`-lijsten, elke triple met een `sh:`-predicaat en de typering `a sh:NodeShape` (ook van
+gestructureerde en eigen primitieve datatypen, die in MIM 6.4.6 zelf de NodeShape zijn). Het uitvoerbestand
+bevat dan alleen de RDFS/OWL-ontologie met de MIM-metagegevens. Het shapes-bestand is een `owl:Ontology` op
+`{namespace}shapes/` die de ontologie importeert (`owl:imports`); de ontologie verwijst ernaar met
+`rdfs:seeAlso`. Samen zijn beide bestanden triple voor triple gelijk aan de ongesplitste export. De
+extensie van het shapes-bestand volgt het uitvoertype. De validator neemt meerdere bestanden:
+
+```bash
+python tools/validate_mim_lod.py ontologie.ttl shapes.ttl
+```
+
+#### Views: deelmodellen per diagram
+
+Met `--lod_views_dir map` schrijft de renderer per diagram in het model een *view*: een deelgraaf van de
+ontologie met dezelfde IRI's en zonder SHACL. Een view bevat:
+
+* de klassen en enumeraties op het diagram, met alles wat de ontologie erover zegt (typering, labels,
+  MIM-metagegevens);
+* al hun attributen en enumeratiewaarden, en de enumeraties die het type van zo'n attribuut zijn, ook als
+  die niet getekend zijn; andere typen buiten het diagram blijven een verwijzing (`rdfs:range`,
+  `mim:type`);
+* de associaties waarvan bron én doel op het diagram staan en de generalisaties tussen klassen op het
+  diagram. De view volgt de elementen op het diagram, niet de tekenwijze: een connector die in EA op het
+  diagram verborgen is (*Hidden*) telt mee. Een `rdfs:subClassOf` naar een klasse buiten het diagram
+  blijft weg.
+
+Elk bestand komt op `{map}/{pad}.{ext}`, waarbij `{pad}` de pakketboom van het model volgt: de slugs van de
+pakketten boven het diagram (zonder volgnummer; modelpakketten zonder het woord *Model*) en de slug van de
+diagramnaam, bijvoorbeeld `kern/bag/onderzoek` voor het diagram *Onderzoek* in *99 Kern › Model BAG ›
+Diagram*. Het wortelpakket, een pakket met dezelfde naam als het wortelpakket (EA's modelknoop) en het
+package *Diagram* leveren geen segment. De graph-IRI van de view is `{namespace}[{versie}/]{pad}`: met
+`--lod_version v3.0.0` dus `{namespace}v3.0.0/kern/bag/onderzoek`, onder de `owl:versionIRI` van het
+informatiemodel en zonder botsing met term-IRI's. In Turtle staat die IRI ook als kopregel
+`# graph: <...>` bovenaan het bestand, zodat een loader de named graph kan afleiden. De view beschrijft
+zichzelf als `owl:Ontology` met `rdfs:label`, `dcterms:identifier` (de EA-GUID van het diagram),
+`dcterms:isPartOf` het informatiemodel en `owl:versionInfo`. Zonder `--lod_version` krijgt een diagram
+met dezelfde naam als een klasse in hetzelfde pakket geen eigen beschrijving, met een waarschuwing.
+
+Diagrammen zonder klassen of enumeraties uit de ontologie (pakketdiagrammen, diagrammen met alleen
+uitgesloten klassen) leveren geen view; van gelijknamige diagrammen in hetzelfde pakket wordt alleen het
+eerste geschreven, met een waarschuwing. Met `--lod_views_exclude` (naampatronen van diagrammen én van
+de pakketten erboven; standaard `Diagrammen intern gebruik,Tekenwijze,View*`, `""` schakelt het uit)
+laat je diagrammen weg. Bestaande bestanden in de map worden overschreven; verdwenen diagrammen worden
+niet opgeruimd.
 
 ### Schema-vergelijking
 

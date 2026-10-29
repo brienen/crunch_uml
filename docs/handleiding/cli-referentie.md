@@ -80,6 +80,9 @@ crunch_uml export [-h] -f FILE -t TYPE [-pi IDS] [-xpi IDS] [-xpn PATRONEN]
 | | `--lod_title`, `--lod_publisher`, `--lod_license` | Titel, uitgever en licentie van het informatiemodel (`dcterms:`) |
 | | `--lod_informatiedomein` | Functioneel domein (`mim:informatiedomein`) |
 | | `--lod_informatiemodeltype` | `conceptueel`, `logisch` (standaard) of `technisch` |
+| | `--lod_shapes_file` | SHACL-shapes apart in dit bestand; uitvoerbestand alleen de ontologie |
+| | `--lod_views_dir` | Map voor views (deelgraaf van de ontologie per diagram) |
+| | `--lod_views_exclude` | Naampatronen van diagrammen/pakketten zonder view (standaard `Diagrammen intern gebruik,Tekenwijze,View*`) |
 | `-js_url` | `--json_schema_url` | URL voor JSON Schema |
 | `-vt` | `--version_type` | EA versie-update: `minor`, `major`, `none` |
 | `-ts` | `--tag_strategy` | EA tag-strategie: `update`, `upsert`, `replace` |
