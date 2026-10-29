@@ -274,7 +274,7 @@ class QEAParser(Parser):
             sa.text(
                 "SELECT a.ID, a.Object_ID, a.Name, a.Type, a.Classifier, "
                 "a.LowerBound, a.UpperBound, a.Notes, a.ea_guid, a.Scope, "
-                "a.Stereotype, o.Object_Type "
+                "a.Stereotype, a.Style, o.Object_Type "
                 "FROM t_attribute a "
                 "JOIN t_object o ON a.Object_ID = o.Object_ID "
                 f"WHERE o.Object_Type IN ({_sql_list(MODEL_OBJECT_TYPES)}) "
@@ -298,8 +298,11 @@ class QEAParser(Parser):
                 ea_guid,
                 scope,
                 stereotype,
+                style,
                 parent_type,
             ) = row
+            attr_type = attr_type.strip() if isinstance(attr_type, str) else attr_type
+            style = style.strip() if isinstance(style, str) else style
 
             parent_eaid = self._obj_id_map.get(obj_id)
             eaid = guid_to_eaid(ea_guid)
@@ -311,12 +314,16 @@ class QEAParser(Parser):
             self._attr_id_map[attr_id] = eaid
 
             if parent_type == "Enumeration":
+                # De code van een enumeratiewaarde staat in EA in het veld Style
+                # (de XMI exporteert hem als <style value="...">, en daar leest
+                # de eaxmi-parser hem als alias).
                 literal = db.EnumerationLiteral(
                     id=eaid,
                     name=name,
                     enumeratie_id=parent_eaid,
                     definitie=normalize_newlines(notes),
                     stereotype=stereotype,
+                    alias=style or None,
                 )
                 logger.debug(f"EnumerationLiteral {name} met id {eaid}")
                 schema.save(literal)
@@ -336,11 +343,16 @@ class QEAParser(Parser):
                         else:
                             enumeration_id = classifier_eaid
 
+                # De typenaam (t_attribute.Type) gaat altijd mee, ook als de
+                # classifier bekend is: zo leest een consument het type ook als
+                # de typeklasse buiten zijn scope valt (een kopie naar een
+                # wortelpakket neemt de datatypeklassen van MIM11 of GML niet
+                # mee), en de eaxmi-parser levert dezelfde typenaam.
                 attribute = db.Attribute(
                     id=eaid,
                     name=name,
                     clazz_id=parent_eaid,
-                    primitive=attr_type if not type_class_id and not enumeration_id else None,
+                    primitive=attr_type or None,
                     type_class_id=type_class_id,
                     enumeration_id=enumeration_id,
                     definitie=normalize_newlines(notes),
@@ -371,7 +383,8 @@ class QEAParser(Parser):
         rows = conn.execute(
             sa.text(
                 "SELECT Connector_ID, Name, Connector_Type, SourceCard, DestCard, "
-                "Start_Object_ID, End_Object_ID, ea_guid, Notes, Stereotype "
+                "Start_Object_ID, End_Object_ID, ea_guid, Notes, Stereotype, "
+                "SourceRole, DestRole "
                 "FROM t_connector "
                 f"WHERE Connector_Type IN ({_sql_list(ASSOCIATION_CONNECTOR_TYPES + ('Generalization',))}) "
                 "ORDER BY Connector_ID"
@@ -399,7 +412,11 @@ class QEAParser(Parser):
                 ea_guid,
                 notes,
                 stereotype,
+                src_role,
+                dst_role,
             ) = row
+            src_role = src_role.strip() if isinstance(src_role, str) else src_role
+            dst_role = dst_role.strip() if isinstance(dst_role, str) else dst_role
 
             src_eaid = self._obj_id_map.get(start_obj_id)
             dst_eaid = self._obj_id_map.get(end_obj_id)
@@ -445,6 +462,10 @@ class QEAParser(Parser):
                     src_mult_end=src_mult_end,
                     dst_mult_start=dst_mult_start,
                     dst_mult_end=dst_mult_end,
+                    # Rolnamen van de uiteinden (t_connector.SourceRole/DestRole;
+                    # de eaxmi-parser leest ze uit <source>/<target><role name>).
+                    src_role=src_role or None,
+                    dst_role=dst_role or None,
                     definitie=normalize_newlines(notes),
                     stereotype=stereotype,
                 )

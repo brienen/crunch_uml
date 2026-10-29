@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v0.8.2 (2026-10-29)
+
+Three gaps in the `qea` parser, found by comparing the GGM v3.0.0 read as `.qea` with the same model read as EA-XMI (preparation for the GGM pipeline's switch to the `.qea`):
+
+- **Type name of every attribute.** `primitive` (the type name, `t_attribute.Type`) is now always filled, also when the classifier is known and `type_class_id`/`enumeration_id` is set. Before, an attribute typed through its classifier had no type name at all, so a consumer whose scope does not contain the type class — the GGM copies the model to its root package, which leaves the MIM11, GGM Datatypes and GML3 datatype classes behind — saw no type: 3,623 of 4,542 GGM attributes had an empty type column in the generated documentation and were missing from the Linked Data (846 instead of 4,303 `mim:Attribuutsoort`). EA-XMI always carried the type name; both formats now agree.
+- **Codes of enumeration values.** The code of an enumeration value lives in `t_attribute.Style` (EA-XMI exports it as `<style value="...">`, which the `eaxmi` parser already read into `alias`); the `qea` parser now reads it too, so `skos:notation`/`mim:code` no longer disappear in a `.qea`-based LOD export (GGM: 780 codes).
+- **Role names of associations.** `t_connector.SourceRole`/`DestRole` are now read into `src_role`/`dst_role`, as the `eaxmi` parser does from `<source>/<target><role>`; nameless associations get their role-based IRI and label again (GGM: 43 roles).
+
+`test_40` (cross-format parity) checks all three on the InkomenMIM and GGM 2.4.0 fixture pairs.
+
 ## v0.8.1 (2026-10-29)
 
 The Linked Data export can now be split into an RDFS/OWL ontology and a separate SHACL file, and can write one view (submodel) per EA diagram as a subgraph of the ontology, for publication as named graphs. Built for the GGM v3.0.0 LOD pipeline, where the views replace a hand-maintained generator.

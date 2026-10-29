@@ -1,4 +1,4 @@
-"""Version metadata (0.8.1): one source, reported truthfully.
+"""Version metadata (0.8.2): one source, reported truthfully.
 
 0.6.0 run markers said '0.4.11' - importlib.metadata of an editable install -
 while setup.py said 0.6.0. A minimum-version gate on the marker was therefore
@@ -29,8 +29,8 @@ def _dispose_singleton():
         db.Database._instance = None
 
 
-def test_versie_is_081_en_komt_uit_een_bron():
-    assert crunch_uml.__version__ == "0.8.1"
+def test_versie_is_082_en_komt_uit_een_bron():
+    assert crunch_uml.__version__ == "0.8.2"
     with open("setup.py", encoding="utf-8") as f:
         setup = f.read()
     assert "crunch_uml/_version.py" in setup
