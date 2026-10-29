@@ -22,7 +22,8 @@ import pytest
 import crunch_uml.db as db
 import crunch_uml.schema as sch
 from crunch_uml import cli, const
-from crunch_uml.parsers.qeaparser import guid_to_eaid, normalize_newlines
+from crunch_uml.parsers.qeaparser import guid_to_eaid, normalize_newlines, tag_value
+from crunch_uml.renderers import mim
 
 GGM_QEA = "./test/data/Gemeentelijk Gegevensmodel 2.4.0.qea"
 SCHEMA = "ggm24_completeness"
@@ -214,7 +215,7 @@ def test_object_tagged_values_are_applied(imported_schema, src_cursor):
     column. This exercises phase 5 — the same loop where dropping the
     per-row save() saved ~50 seconds on this fixture."""
     rows = src_cursor.execute("""
-        SELECT o.ea_guid, o.Object_Type, LOWER(op.Property) AS prop, op.Value
+        SELECT o.ea_guid, o.Object_Type, LOWER(op.Property) AS prop, op.Value, op.Notes
         FROM t_objectproperties op
         JOIN t_object o ON op.Object_ID = o.Object_ID
         WHERE o.Object_Type IN ('Class', 'DataType', 'Enumeration')
@@ -232,8 +233,9 @@ def test_object_tagged_values_are_applied(imported_schema, src_cursor):
     }
     mismatches = []
     sample = rows[: min(200, len(rows))]
-    for ea_guid, obj_type, prop, expected in sample:
+    for ea_guid, obj_type, prop, expected, notes in sample:
         eaid = guid_to_eaid(ea_guid)
+        expected = tag_value(expected, notes)  # memo: de tekst staat in Notes
         # An enumeration can share its id with a placeholder class; look it up by type.
         if obj_type == "Enumeration":
             obj = imported_schema.get_enumeration(eaid)
@@ -256,7 +258,7 @@ def test_attribute_tagged_values_are_applied(imported_schema, src_cursor):
     via the parser's _attr_id_map (numeric ID → eaid). Verify a real
     sample reaches the ORM column."""
     rows = src_cursor.execute("""
-        SELECT a.ea_guid, LOWER(at.Property) AS prop, at.VALUE
+        SELECT a.ea_guid, LOWER(at.Property) AS prop, at.VALUE, at.NOTES
         FROM t_attributetag at
         JOIN t_attribute a ON at.ElementID = a.ID
         JOIN t_object o    ON a.Object_ID = o.Object_ID
@@ -276,8 +278,9 @@ def test_attribute_tagged_values_are_applied(imported_schema, src_cursor):
     }
     mismatches = []
     sample = rows[: min(100, len(rows))]
-    for ea_guid, prop, expected in sample:
+    for ea_guid, prop, expected, notes in sample:
         eaid = guid_to_eaid(ea_guid)
+        expected = normalize_newlines(tag_value(expected, notes))  # memo: de tekst staat in NOTES
         attr = imported_schema.get_attribute(eaid)
         if attr is None:
             mismatches.append((eaid, prop, expected, "<attribute not found>"))
@@ -328,3 +331,27 @@ def test_literals_with_null_ea_guid_are_imported_with_synthetic_ids(imported_sch
     assert synth_attr + synth_lit == src_n, (
         f"Expected {src_n} synthetic-id rows in total, got " f"{synth_attr} attributes + {synth_lit} literals"
     )
+
+
+@pytest.mark.slow
+def test_memo_tags_take_their_text_from_notes(imported_schema, src_cursor):
+    """EA bewaart een memo-tag als '<memo>' in VALUE met de tekst in NOTES; de parser
+    geeft die tekst door in de XMI-vorm '<memo>#NOTES#tekst' (0.8.6), zodat
+    mim.clean_value de tekst oplevert. Tot 0.8.5 bleef alleen '<memo>' over."""
+    rows = src_cursor.execute("""
+        SELECT a.ea_guid, LOWER(at.Property) AS prop, at.NOTES
+        FROM t_attributetag at
+        JOIN t_attribute a ON at.ElementID = a.ID
+        JOIN t_object o    ON a.Object_ID = o.Object_ID
+        WHERE o.Object_Type IN ('Class', 'DataType')
+          AND a.ea_guid IS NOT NULL
+          AND LOWER(at.Property) IN ('toelichting', 'patroon')
+          AND at.VALUE = '<memo>' AND at.NOTES IS NOT NULL AND TRIM(at.NOTES) != ''
+        """).fetchall()
+    assert len(rows) > 20, "Expected memo tags with notes in the GGM fixture"
+    for ea_guid, prop, notes in rows[:50]:
+        attr = imported_schema.get_attribute(guid_to_eaid(ea_guid))
+        assert attr is not None
+        actual = getattr(attr, prop)
+        assert actual == normalize_newlines(f"<memo>#NOTES#{notes}")
+        assert mim.clean_value(actual) == normalize_newlines(notes).strip()

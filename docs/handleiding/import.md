@@ -54,6 +54,10 @@ crunch_uml import -f model.xmi -t eaxmi -db_create
 crunch_uml import -f model.qea -t qea -db_create
 ```
 
+Memo-tags (lange teksten zoals toelichting, regels en patroon) bewaart EA als `<memo>` met de tekst in de
+kolom `Notes`; de parser geeft die tekst door als `<memo>#NOTES#tekst`, de vorm van de XMI-export, zodat de
+renderers de tekst tonen. De XMI-export zelf laat memoteksten weg.
+
 ### JSON importeren met kolom-mapping
 
 ```bash

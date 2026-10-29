@@ -54,6 +54,24 @@ def test_clean_value(ruw, verwacht):
 @pytest.mark.parametrize(
     "ruw,verwacht",
     [
+        ("BRP", ("BRP", None)),
+        ("BRP#NOTES#Description: De registratie ...", ("BRP", None)),
+        ("#NOTES#Description: De datum ...", ("", None)),
+        ("<memo>#NOTES#Elf cijfers", ("<memo>", "Elf cijfers")),
+        ("<memo>#NOTES#Zin.#NOTES#Zin.#NOTES#Zin.", ("<memo>", "Zin.")),
+        ("<memo>#NOTES#Eerste.#NOTES#Tweede.", ("<memo>", "Eerste.\r\n\r\nTweede.")),
+        ("<memo>#NOTES#Description: Een toelichting", ("<memo>", "")),
+        ("<memo>", ("<memo>", None)),
+        (None, (None, None)),
+    ],
+)
+def test_split_tag_value(ruw, verwacht):
+    assert mim.split_tag_value(ruw) == verwacht
+
+
+@pytest.mark.parametrize(
+    "ruw,verwacht",
+    [
         ('Representatie van <font color="#993300">Feature</font>.', "Representatie van Feature."),
         ("cre&#235;ren en &amp;", "creëren en &"),
         ("<b>Let op</b>: <i>x</i> en <u>y</u>", "Let op: x en y"),

@@ -30,6 +30,21 @@ def _sql_list(values):
     return ", ".join(f"'{value}'" for value in values)
 
 
+def tag_value(value, notes):
+    """De waarde van een tagged value in de vorm die de XMI-export geeft.
+
+    EA bewaart een memo-tag als ``<memo>`` in Value met de tekst in Notes; de
+    XMI-export schrijft ``<memo>#NOTES#tekst``. Die vorm geven we ook, zodat
+    ``mim.clean_value`` beide bronnen gelijk behandelt en de tekst niet
+    verloren gaat (GGM v3.0.0: 148 element-, 1.586 attribuut- en 160
+    relatietags). Bij een gewone tag blijft Value de waarde; de Notes
+    bevatten dan de tagdefinitie, die blijft weg.
+    """
+    if value is not None and str(value).strip().casefold() == "<memo>" and notes and str(notes).strip():
+        return f"<memo>#NOTES#{notes}"
+    return value
+
+
 def guid_to_eaid(guid):
     """Convert EA GUID {XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX} to EAID_ format.
 
@@ -525,7 +540,7 @@ class QEAParser(Parser):
         # Object tagged values (packages, classes, datatypes, enumerations).
         rows = conn.execute(
             sa.text(
-                "SELECT op.Object_ID, op.Property, op.Value, o.Object_Type "
+                "SELECT op.Object_ID, op.Property, op.Value, op.Notes, o.Object_Type "
                 "FROM t_objectproperties op "
                 "JOIN t_object o ON op.Object_ID = o.Object_ID "
                 f"WHERE o.Object_Type IN ({_sql_list(MODEL_OBJECT_TYPES + ('Package',))}) "
@@ -533,9 +548,10 @@ class QEAParser(Parser):
             )
         ).fetchall()
 
-        for obj_id, prop, value, obj_type in rows:
+        for obj_id, prop, value, notes, obj_type in rows:
             if prop is None:
                 continue
+            value = tag_value(value, notes)
             if obj_type == "Package":
                 obj = packages_by_id.get(self._pkg_obj_map.get(obj_id))
             elif obj_type == "Enumeration":
@@ -551,7 +567,7 @@ class QEAParser(Parser):
         # Attribute tagged values.
         attr_rows = conn.execute(
             sa.text(
-                "SELECT at.ElementID, at.Property, at.VALUE "
+                "SELECT at.ElementID, at.Property, at.VALUE, at.NOTES "
                 "FROM t_attributetag at "
                 "JOIN t_attribute a ON at.ElementID = a.ID "
                 "JOIN t_object o ON a.Object_ID = o.Object_ID "
@@ -560,10 +576,11 @@ class QEAParser(Parser):
             )
         ).fetchall()
 
-        for elem_id, prop, value in attr_rows:
+        for elem_id, prop, value, notes in attr_rows:
             eaid = self._attr_id_map.get(elem_id)
             if eaid is None or prop is None:
                 continue
+            value = tag_value(value, notes)
             field = fixtag(prop)
             attr = attrs_by_id.get(eaid)
             if attr is not None and hasattr(attr, field):
@@ -572,7 +589,7 @@ class QEAParser(Parser):
         # Connector tagged values (associations, aggregations, realisations).
         conn_rows = conn.execute(
             sa.text(
-                "SELECT ct.ElementID, ct.Property, ct.VALUE "
+                "SELECT ct.ElementID, ct.Property, ct.VALUE, ct.NOTES "
                 "FROM t_connectortag ct "
                 "JOIN t_connector c ON ct.ElementID = c.Connector_ID "
                 f"WHERE c.Connector_Type IN ({_sql_list(ASSOCIATION_CONNECTOR_TYPES)}) "
@@ -580,10 +597,11 @@ class QEAParser(Parser):
             )
         ).fetchall()
 
-        for elem_id, prop, value in conn_rows:
+        for elem_id, prop, value, notes in conn_rows:
             eaid = self._conn_id_map.get(elem_id)
             if eaid is None or prop is None:
                 continue
+            value = tag_value(value, notes)
             field = fixtag(prop)
             assoc = assocs_by_id.get(eaid)
             if assoc is not None and hasattr(assoc, field):
