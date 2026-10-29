@@ -3,8 +3,9 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Optional
 
-import crunch_uml.db as db
 from sqlalchemy import or_
+
+import crunch_uml.db as db
 import crunch_uml.schema as sch
 from crunch_uml import const, util
 from crunch_uml.db import Package
