@@ -859,7 +859,7 @@ class LodRenderer(ModelRenderer):
             # Get list of packages that are to be rendered
             models = self.getModels(args, zchema)
             if not models:
-                msg = "Geen modellen gevonden om te renderen. Controleer of het schema pakketten met klassen bevat."
+                msg = "Geen modellen gevonden om te renderen. Controleer of het schema pakketten met klassen of enumeraties bevat."
                 logger.error(msg)
                 raise CrunchException(msg)
 
@@ -1057,8 +1057,8 @@ class LodRenderer(ModelRenderer):
                         shape_uris[cls.id] = shape_uri
 
                         for attribute in self.rendered_attributes(cls):
-                            prop_bnode = BNode()
                             attr_uri = attr_uris[attribute.id]
+                            prop_bnode = mim.bnode(shape_uri, attr_uri)
                             g.add((shape_uri, SH.property, prop_bnode))
                             g.add((prop_bnode, SH.path, attr_uri))
                             kind, range_uri, max_length = resolve_range(attribute)
@@ -1082,7 +1082,7 @@ class LodRenderer(ModelRenderer):
                                 # Toegestane waarden expliciet opsommen.
                                 enum = enum_by_uri.get(range_uri)
                                 if enum is not None and enum.literals:
-                                    list_node = BNode()
+                                    list_node = mim.bnode(shape_uri, attr_uri, "in")
                                     concept_uris = self.conceptUris(range_uri, enum)
                                     Collection(g, list_node, [concept_uris[lit.id] for lit in enum.literals])
                                     g.add((prop_bnode, SH["in"], list_node))
@@ -1153,7 +1153,7 @@ class LodRenderer(ModelRenderer):
                                 g.add((assoc_uri, RDFS.comment, self.lit(assoc.definitie)))
                             # De relatie als sh:property van de NodeShape van de
                             # bronklasse (6.4.5.6, 6.4.9.31/32), met kardinaliteit.
-                            prop_bnode = BNode()
+                            prop_bnode = mim.bnode(shape_uris[cls.id], assoc_uri)
                             g.add((shape_uris[cls.id], SH.property, prop_bnode))
                             g.add((prop_bnode, SH.path, assoc_uri))
                             g.add((prop_bnode, getattr(SH, "class"), to_cls))
@@ -1208,7 +1208,7 @@ class LodRenderer(ModelRenderer):
 @RendererRegistry.register(
     "ttl",
     descr="Renderer that renders Linked Data ontology in turtle from the supplied models, "
-    + "where a model is a package that includes at least one Class. "
+    + "where a model is a package that includes at least one class or enumeration. "
     + 'Needs parameter "output_lod_url".',
 )
 class TTLRenderer(LodRenderer):
@@ -1221,7 +1221,7 @@ class TTLRenderer(LodRenderer):
 @RendererRegistry.register(
     "rdf",
     descr="Renderer that renders Linked Data ontology in RDF from the supplied models, "
-    + "where a model is a package that includes at least one Class. "
+    + "where a model is a package that includes at least one class or enumeration. "
     + ' Needs parameter "output_lod_url".',
 )
 class RDFRenderer(LodRenderer):
@@ -1234,7 +1234,7 @@ class RDFRenderer(LodRenderer):
 @RendererRegistry.register(
     "json-ld",
     descr="Renderer that renders Linked Data ontology in JSON-LD from the supplied models, "
-    + "where a model is a package that includes at least one Class. "
+    + "where a model is a package that includes at least one class or enumeration. "
     + ' Needs parameter "output_lod_url".',
 )
 class JSONLDRenderer(LodRenderer):

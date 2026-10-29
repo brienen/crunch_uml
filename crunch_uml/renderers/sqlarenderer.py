@@ -118,7 +118,7 @@ def getFilename(inputfilename: str, extension: str, package: db.Package):
         "Renderer that renders SQLAlchemy 2.0 files. It uses Jinja2 and renders one file per model filled with classes"
         " of that model, "
     )
-    + "where a model is a package that includes at least one Class. ",
+    + "where a model is a package that includes at least one class or enumeration. ",
 )
 class SQLARenderer(Jinja2Renderer):
     """

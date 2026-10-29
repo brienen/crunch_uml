@@ -319,7 +319,7 @@ def fix_and_format_text(text: str, mode: str = "markdown", depth: int = 1) -> st
 @RendererRegistry.register(
     "jinja2",
     descr="Renderer that uses Jinja2 to renders one file per model in the database, "
-    + "where a model is a package that includes at least one Class. "
+    + "where a model is a package that includes at least one class or enumeration. "
     + ' Needs parameter "output_jinja2_template" and "output_jinja2_templatedir".',
 )
 class Jinja2Renderer(ModelRenderer):
@@ -443,8 +443,49 @@ class Jinja2Renderer(ModelRenderer):
             "\n".join(["> " + line for line in s.splitlines()]) if isinstance(s, str) else s
         )
 
+    def modelNames(self, models):
+        """Unieke naam per model, voor de bestandsnaam.
+
+        Gelijknamige pakketten (het GGM heeft drie 'Enumeratiesoort' en zes 'Datatypes')
+        kregen hetzelfde bestand en overschreven elkaar. Een naam die vaker voorkomt krijgt
+        het bovenliggende pakket erachter, 'Datatypes (Reden aanvraag)', en zo nodig nog een
+        niveau hoger, 'Datatypes (Inkomen > Reden aanvraag)'. Een unieke naam blijft zoals hij was.
+        """
+        names = {}
+        groups: dict = {}
+        for pkg in models:
+            groups.setdefault((pkg.name or "").strip().casefold(), []).append(pkg)
+        for group in groups.values():
+            labels = {pkg.id: pkg.name for pkg in group}
+            level = 0
+            while len(set(labels.values())) < len(group):
+                level += 1
+                ouders = {}
+                for pkg in group:
+                    keten = []
+                    parent = pkg.parent_package
+                    for _ in range(level):
+                        if parent is None or not parent.name:
+                            break
+                        keten.insert(0, parent.name)
+                        parent = parent.parent_package
+                    ouders[pkg.id] = keten
+                if all(len(keten) < level for keten in ouders.values()):
+                    logger.warning(
+                        f"Gelijknamige pakketten '{group[0].name}' zijn niet te onderscheiden op hun "
+                        "bovenliggende pakketten; zij delen één uitvoerbestand."
+                    )
+                    break
+                labels = {
+                    pkg.id: f"{pkg.name} ({' > '.join(ouders[pkg.id])})" if ouders[pkg.id] else pkg.name
+                    for pkg in group
+                }
+            names.update(labels)
+        return names
+
     def getFilename(self, inputfilename, extension, uml_generic):
-        return f"{inputfilename}_{uml_generic.name}{extension}"
+        name = getattr(self, "_model_names", {}).get(uml_generic.id, uml_generic.name)
+        return f"{inputfilename}_{name}{extension}"
 
     def render(self, args, schema: sch.Schema):
         # setup output filename
@@ -471,12 +512,13 @@ class Jinja2Renderer(ModelRenderer):
             msg = "Cannot render output: packages do not exist"
             logger.error(msg)
             raise CrunchException(msg)
+        self._model_names = self.modelNames(models)
 
         # Render all packages that are named
         for index, package in enumerate(models):
             # Render output
             template = env.get_template(template)
-            output = template.render(package=package, args=args)
+            output = template.render(package=package, args=args, model_name=self._model_names.get(package.id))
 
             outputfilename = (
                 self.getFilename(filename, extension, package)
@@ -490,7 +532,7 @@ class Jinja2Renderer(ModelRenderer):
 @RendererRegistry.register(
     "ggm_md",
     descr="Renderer renders one basic markdown file per model in the database, "
-    + "where a model is a package that includes at least one Class. ",
+    + "where a model is a package that includes at least one class or enumeration. ",
 )
 class GGM_MDRenderer(Jinja2Renderer):
     template = "ggm_markdown.j2"  # type: ignore
@@ -663,6 +705,7 @@ class PlainHTMLRenderer(Jinja2Renderer):
         self.addFilters(env)
 
         models = self.getModels(args, schema)
+        self._model_names = self.modelNames(models)
         if not models:
             msg = "No packages found to render for PlainHTMLRenderer"
             logger.error(msg)
@@ -745,6 +788,7 @@ class ERDiagramRenderer(Jinja2Renderer):
         self.addFilters(env)
 
         models = self.getModels(args, schema)
+        self._model_names = self.modelNames(models)
         if not models:
             msg = "No packages found to render for ERDiagramRenderer"
             logger.error(msg)
