@@ -1674,8 +1674,7 @@ class EAMIMRepoUpdater(EARepoUpdater):
                 elif (
                     datatype_input.startswith("n")
                     or datatype_input.startswith("int")
-                    or datatype_input
-                    in [
+                    or datatype_input in [
                         "ìnt",
                         "number",
                         "integer",
