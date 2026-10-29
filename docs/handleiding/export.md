@@ -188,6 +188,12 @@ naam van het bovenliggende pakket als voorvoegsel, met een waarschuwing. Volgnum
 EA op volgorde staan vallen uit het segment (`99 Kern` → `domein/kern`, `3 Economie` → `economie/`); de
 `owl:versionIRI` is `{namespace}{versie}/` met de versie zoals opgegeven (`v3.0.0/`).
 
+Teksten uit EA (definities, toelichtingen, MIM-tagwaarden) worden platte tekst: HTML-opmaak zoals `<font>`, `<b>` en
+`<i>` valt weg, entiteiten (`&#235;`) worden tekens, en lijstitems worden regels met `- `. Van een memo-tag die EA bij
+elke profielsynchronisatie opnieuw achter `#NOTES#` heeft geplakt, blijft elke tekst één keer over. Relaties waarvan de
+multipliciteit in EA niet te lezen is (`1..` zonder bovengrens) krijgen geen `mim:kardinaliteit`; de samenvatting in het
+log noemt ze bij naam.
+
 Technische EA-elementen (`Boundary`, `ProxyConnector`, `Text`) worden overgeslagen op hun EA-objecttype
 (`object_type`, dat de `qea`- en `eaxmi`-parsers meegeven); een klasse zonder stereotype blijft dan een
 klasse. Kent de bron geen objecttype, dan geldt de oude regel: klassen zonder stereotype zijn technisch,

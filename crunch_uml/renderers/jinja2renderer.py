@@ -14,6 +14,7 @@ from markdownify import markdownify as md
 import crunch_uml.schema as sch
 from crunch_uml import const, db, util
 from crunch_uml.exceptions import CrunchException
+from crunch_uml.renderers import mim
 from crunch_uml.renderers.renderer import ClassRenderer, ModelRenderer, RendererRegistry
 
 logger = logging.getLogger()
@@ -209,6 +210,11 @@ def fix_and_format_text(text: str, mode: str = "markdown", depth: int = 1) -> st
     if not text:
         return ""
 
+    if mim.NOTES_SEP in text:
+        # EA-tagwaarde met de notities van de tagdefinitie en herhaalde memotekst erachter.
+        text = mim.clean_value(text) or ""
+        if not text:
+            return ""
     text = fix_mojibake(text)
     raw = text.strip()
 

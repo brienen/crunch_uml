@@ -185,6 +185,12 @@ target class as suffix (`project/heeft-projectlocatie`), nameless associations a
 every property keeps exactly one `rdfs:range` and its own `dcterms:identifier`. Same-named packages under
 one parent get a sequence number, with a warning.
 
+Text from EA (definitions, explanations, MIM tag values) becomes plain text: HTML formatting such as `<font>`, `<b>`
+and `<i>` is dropped, entities (`&#235;`) become characters, and list items become `- ` lines. Of a memo tag that EA
+has appended again behind `#NOTES#` at every profile synchronisation, each text is kept once. Relations whose
+multiplicity cannot be read in EA (`1..` without an upper bound) get no `mim:kardinaliteit`; the summary in the log
+names them.
+
 Classes without a stereotype (technical EA elements such as `ProxyConnector`) are skipped; datatype
 classes stay. Packages named `Diagram`, `Diagrammen intern gebruik`, `Tekenwijze` and `View*` are left
 out with their subpackages by default; adjust this with `--output_exclude_package_names` or disable it

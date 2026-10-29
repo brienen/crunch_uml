@@ -12,8 +12,10 @@ Shapes:      https://docs.geostandaarden.nl/mim/mim/media/mim-shapes.ttl
 import datetime
 import hashlib
 import re
+import warnings
 from typing import Optional, Tuple
 
+from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning, NavigableString
 from rdflib import BNode, Literal, Namespace, URIRef
 from rdflib.namespace import XSD
 
@@ -37,6 +39,7 @@ CODELIJST = "Codelijst"
 # een memo-tag staat vóór '#NOTES#' de placeholder '<memo>' en erachter soms
 # de echte tekst.
 _NOTES_SEP = "#NOTES#"
+NOTES_SEP = _NOTES_SEP
 _TAG_META_RE = re.compile(r"^(description|values|default|type)\s*:", re.IGNORECASE)
 _PLACEHOLDERS = {"", "<memo>", "nan", "none", "null", "<niet gespecificeerd>", "<geen>"}
 
@@ -60,22 +63,83 @@ def clean_value(value) -> Optional[str]:
     * ``'BRP#NOTES#Description: ...'`` -> ``'BRP'``;
     * ``'<memo>#NOTES#Elf cijfers'`` -> ``'Elf cijfers'`` (memo-tekst), maar
       ``'<memo>#NOTES#Description: ...'`` -> None (alleen tagdefinitie);
+    * ``'<memo>#NOTES#Zin.#NOTES#Zin.#NOTES#Zin.'`` -> ``'Zin.'``: EA plakt bij
+      elke synchronisatie van het profiel de memotekst opnieuw achter een
+      scheider (GGM v3.0.0: 681 tagwaarden, tot dertien herhalingen);
+      verschillende delen blijven staan, gescheiden door een lege regel;
     * placeholders (``'<memo>'``, ``'nan'``, lege string) -> None.
     """
     if value is None:
         return None
     text = str(value)
     if _NOTES_SEP in text:
-        head, tail = text.split(_NOTES_SEP, 1)
-        head, tail = head.strip(), tail.strip()
-        if head.casefold() == "<memo>" and tail and not _TAG_META_RE.match(tail):
-            text = tail
+        head, *tails = (part.strip() for part in text.split(_NOTES_SEP))
+        if head.casefold() == "<memo>":
+            delen = [tail for tail in tails if tail and not _TAG_META_RE.match(tail)]
+            text = "\n\n".join(dict.fromkeys(delen))  # ontdubbeld, in volgorde
         else:
             text = head
     text = text.strip()
     if text.casefold() in _PLACEHOLDERS:
         return None
     return text
+
+
+# ---------------------------------------------------------------------------
+# HTML uit EA-notities
+# ---------------------------------------------------------------------------
+
+# EA bewaart notities als HTML (<font color=...>, <b>, <i>, <ul><li>) met
+# entiteiten (&#235;). Alleen tekst met zo'n bekende tag of entiteit wordt
+# omgezet; een naam als 'bijstandsnorm 1 pnr < 21 jr' blijft ongemoeid.
+_HTML_TAG_RE = re.compile(
+    r"</?(font|b|i|u|s|em|strong|ul|ol|li|p|br|div|span|a|sup|sub|table|tbody|thead|tr|td|th"
+    r"|h[1-6]|pre|code|hr|blockquote)\b[^>]*>",
+    re.IGNORECASE,
+)
+_HTML_ENTITY_RE = re.compile(r"&(#\d+|#x[0-9a-fA-F]+|[a-zA-Z]+);")
+_BLOCK_TAGS = ["p", "div", "ul", "ol", "tr", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "pre", "hr", "table"]
+
+
+def plain_text(text):
+    """Platte tekst uit de HTML die EA in notities bewaart.
+
+    Opmaak (``<font>``, ``<b>``, ``<i>``) valt weg, entiteiten worden tekens,
+    ``<br>`` en blokelementen worden regeleinden en lijstitems regels met
+    ``- `` (genummerd bij ``<ol>``). Tekst zonder HTML komt onveranderd terug.
+    """
+    if not isinstance(text, str) or not (_HTML_TAG_RE.search(text) or _HTML_ENTITY_RE.search(text)):
+        return text
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=MarkupResemblesLocatorWarning)
+        soup = BeautifulSoup(text, "html.parser")
+    for br in soup.find_all("br"):
+        br.replace_with("\n")
+    for lijst in soup.find_all(["ul", "ol"]):
+        for kind in list(lijst.children):  # witruimte tussen de items geeft anders lege regels
+            if isinstance(kind, NavigableString) and not kind.strip():
+                kind.extract()
+    for li in soup.find_all("li"):
+        lijst = li.find_parent(["ol", "ul"])
+        if lijst is not None and lijst.name == "ol":
+            prefix = f"{len(li.find_previous_siblings('li')) + 1}. "
+        else:
+            prefix = "- "
+        li.insert(0, "\n" + prefix)
+    for cel in soup.find_all(["td", "th"]):
+        cel.append(" ")
+    for blok in soup.find_all(_BLOCK_TAGS):
+        blok.insert(0, "\n")
+        blok.append("\n")
+    regels = [re.sub(r"[ \t\r\f\v]+", " ", regel).strip() for regel in soup.get_text().splitlines()]
+    uit: list = []
+    for regel in regels:
+        if regel == "" and (not uit or uit[-1] == ""):
+            continue
+        uit.append(regel)
+    while uit and uit[-1] == "":
+        uit.pop()
+    return "\n".join(uit)
 
 
 _TRUE_WORDS = {"ja", "j", "true", "waar", "yes", "y", "1"}
@@ -178,9 +242,10 @@ def version_segment(versie) -> Optional[str]:
 def lang_literal(text, lang: Optional[str]) -> Literal:
     """Literal met taaltag als er een taal is ingesteld, anders zonder.
     Witruimte aan begin en eind valt weg: EA bewaart een naam als
-    'woonplaats ingetrokken ' met spatie, en die hoort niet in een label."""
+    'woonplaats ingetrokken ' met spatie, en die hoort niet in een label.
+    HTML uit EA-notities wordt platte tekst (plain_text)."""
     if isinstance(text, str):
-        text = text.strip()
+        text = plain_text(text).strip()
     return Literal(text, lang=lang) if lang else Literal(text)
 
 
