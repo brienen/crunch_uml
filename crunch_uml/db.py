@@ -398,11 +398,14 @@ class UMLTagsAttribute(UMLTagsCommon, UMLTagsHistory, UMLTagsNumeriek, UMLTagsMe
     patroon = Column(String)
     formeel_patroon = Column(String)
     indicatie_classificerend = Column(String)
-    mogelijk_geen_waarde = Column(String, default="Ja")
+    # Geen default: NULL als de bron niets zegt. Een default "Ja" liet bij elk
+    # model zonder deze tag sh:minCount vervallen (MIM 6.4.9.18); de LOD-export
+    # kiest zelf de MIM-default (Nee) als de waarde ontbreekt.
+    mogelijk_geen_waarde = Column(String)
 
 
 class UMLTagsRelation(UMLTagsCommon, UMLTagsHistory, UMLTagsMetadata):
-    mogelijk_geen_waarde = Column(String, default="Ja")
+    mogelijk_geen_waarde = Column(String)  # geen default, zie UMLTagsAttribute
 
 
 class UMLTagsGeneralization(UMLTagsCommon):
@@ -1149,7 +1152,7 @@ class Association(Base, UML_Generic, UMLTagsRelation):  # type: ignore
                 return False
         else:
             try:
-                return int(self.src_mult_start) > 1
+                return int(self.src_mult_end) > 1
             except (ValueError, TypeError):
                 return False
 

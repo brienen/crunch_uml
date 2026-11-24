@@ -228,7 +228,8 @@ De metagegevens uit de EA-tags gaan mee als `mim:herkomst`, `mim:herkomstDefinit
 `mim:indicatieClassificerend`, `mim:mogelijkGeenWaarde`, `mim:eenheid` en het waardebereik
 (`sh:minInclusive` e.d.). Tagwaarden worden ontdaan van de `#NOTES#`-notities van de tagdefinitie en van
 `<memo>`-placeholders. De kardinaliteit komt uit de multipliciteit in het model: `sh:minCount`/`sh:maxCount`
-volgens MIM 6.4.9.15, waarbij `sh:minCount` vervalt als *mogelijk geen waarde* Ja is (6.4.9.18). Wat de bron
+volgens MIM 6.4.9.15, waarbij `sh:minCount` vervalt als *mogelijk geen waarde* Ja is (6.4.9.18). Dat geldt
+alleen als het model die tag zelf op Ja zet; zonder tag blijft `sh:minCount` staan. Wat de bron
 niet levert wordt niet verzonnen; alleen de MIM-defaults (indicaties `false`, kardinaliteit `1..1`,
 `mim:unidirectioneel true`, `mim:aggregatietype mim:Geen`) worden uitgeschreven, en aan het eind van de
 export logt crunch_uml welke verplichte metagegevens de bron niet bevat.
