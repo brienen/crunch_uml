@@ -55,8 +55,9 @@ class {{ class.getSQLAName()  }}(Base):
     {%- for associatie in class.uitgaande_associaties -%}
         {%- if not associatie.hasOrphan() %}
         {#- Source: {{ associatie.getType(class) }} {{ associatie.id }} Source_mult: {{ associatie.src_mult_end }} Dest_mult: {{ associatie.dst_mult_end }} #}
+            {#- De sleutel naar de doelklasse is verplicht als de doelzijde minimaal 1 is. #}
             {%- if associatie.getType(class) == 'n-1' %}
-    {{ associatie.dst_class.getSQLAAttrName() }}_id: Mapped[{{ 'int' if associatie.src_mult_start != '1' else 'Optional[int]' }}] = mapped_column(ForeignKey("{{ associatie.dst_class.getSQLATableName() }}.id"), index=True, nullable={{ associatie.src_mult_start == '1' }})
+    {{ associatie.dst_class.getSQLAAttrName() }}_id: Mapped[{{ 'int' if associatie.isVerplicht(dst=True) else 'Optional[int]' }}] = mapped_column(ForeignKey("{{ associatie.dst_class.getSQLATableName() }}.id"), index=True, nullable={{ not associatie.isVerplicht(dst=True) }})
     {{ associatie.dst_class.getSQLAAttrName() }}: Mapped[{{ associatie.dst_class.getSQLAName() }}] = relationship(back_populates="{{ class.getSQLAAttrName() | meervoud}}")
             {%- elif associatie.getType(class) == '1-1' %}
     {{ associatie.dst_class.getSQLAAttrName() }}: Mapped[{{ associatie.dst_class.getSQLAName() }}] = relationship(back_populates="{{ class.getSQLAAttrName() }}")
@@ -70,11 +71,12 @@ class {{ class.getSQLAName()  }}(Base):
     {%- for associatie in class.inkomende_associaties -%}
         {%- if not associatie.hasOrphan() %}
         {#- Dest: {{ associatie.getType(class) }} {{ associatie.id }} Source_mult: {{ associatie.src_mult_end }} Dest_mult: {{ associatie.dst_mult_end }} #}
+            {#- De sleutel naar de bronklasse is verplicht als de bronzijde minimaal 1 is. #}
             {%- if associatie.getType(class) in ['1-1'] %}
-    {{ associatie.src_class.getSQLAAttrName() }}_id: Mapped[{{ 'int' if associatie.dst_mult_start != '1' else 'Optional[int]' }}] = mapped_column(ForeignKey("{{ associatie.src_class.getSQLATableName() }}.id"), index=True, nullable={{ associatie.dst_mult_start == '1' }})
+    {{ associatie.src_class.getSQLAAttrName() }}_id: Mapped[{{ 'int' if associatie.isVerplicht(dst=False) else 'Optional[int]' }}] = mapped_column(ForeignKey("{{ associatie.src_class.getSQLATableName() }}.id"), index=True, nullable={{ not associatie.isVerplicht(dst=False) }})
     {{ associatie.src_class.getSQLAAttrName() }}: Mapped[{{ associatie.src_class.getSQLAName() }}] = relationship(back_populates="{{ class.getSQLAAttrName() }}")
             {%- elif associatie.getType(class) in ['1-n'] %}
-    {{ associatie.src_class.getSQLAAttrName() }}_id: Mapped[{{ 'int' if associatie.dst_mult_start != '1' else 'Optional[int]' }}] = mapped_column(ForeignKey("{{ associatie.src_class.getSQLATableName() }}.id"), index=True, nullable={{ associatie.dst_mult_start == '1' }})
+    {{ associatie.src_class.getSQLAAttrName() }}_id: Mapped[{{ 'int' if associatie.isVerplicht(dst=False) else 'Optional[int]' }}] = mapped_column(ForeignKey("{{ associatie.src_class.getSQLATableName() }}.id"), index=True, nullable={{ not associatie.isVerplicht(dst=False) }})
     {{ associatie.src_class.getSQLAAttrName() }}: Mapped[{{ associatie.src_class.getSQLAName() }}] = relationship(back_populates="{{ class.getSQLAAttrName() | meervoud}}")
             {%- elif associatie.getType(class) == 'n-1' %}
     {{ associatie.src_class.getSQLAAttrName() | meervoud}}: Mapped[List[{{ associatie.src_class.getSQLAName() }}]] = relationship(back_populates="{{ class.getSQLAAttrName() }}")

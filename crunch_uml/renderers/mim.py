@@ -137,7 +137,11 @@ def plain_text(text):
         warnings.simplefilter("ignore", category=MarkupResemblesLocatorWarning)
         soup = BeautifulSoup(text, "html.parser")
     for br in soup.find_all("br"):
-        br.replace_with("\n")
+        # Niet replace_with: sommige combinaties van Python en BeautifulSoup
+        # lezen '<br/>tekst' als een <br> met de tekst erin, en die tekst
+        # verdween dan mee.
+        br.insert_before("\n")
+        br.unwrap()
     for lijst in soup.find_all(["ul", "ol"]):
         for kind in list(lijst.children):  # witruimte tussen de items geeft anders lege regels
             if isinstance(kind, NavigableString) and not kind.strip():

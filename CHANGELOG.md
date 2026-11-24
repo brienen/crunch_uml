@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v0.8.7 (2026-11-24)
+
+Nothing is invented for what the source does not say: a model without the *mogelijk geen waarde* tag gets its `sh:minCount` back.
+
+- **`sh:minCount` was missing for every model without the tag *mogelijk geen waarde*.** The column `mogelijk_geen_waarde` of attributes and relations had the default `Ja`, so anything imported without that tag (any non-MIM model, and a MIM model that leaves the tag empty) counted as *mogelijk geen waarde* and the Linked Data export dropped `sh:minCount` per MIM 6.4.9.18 while still writing `sh:maxCount` and `mim:mogelijkGeenWaarde true` (Monumenten XMI 2.1: 32 attributes with `1..1`, 32 `sh:maxCount`, no `sh:minCount`). The column has no default any more; the export falls back to the MIM default (Nee), so `sh:minCount` is only dropped when the model says Ja. The invented `Ja` also no longer reaches the JSON, Excel and CSV exports or the tags written by `export -t earepo`/`-t eamimrepo`. **Re-import the model**: a database filled by an earlier version still holds the `Ja` and cannot tell it from a real one.
+- **A missing relation multiplicity is NULL.** The `xmi`/`eaxmi` parsers stored the text `None` for an association end without `lowerValue`/`upperValue`; it showed up as such in the JSON, Excel and CSV exports.
+- **Foreign keys in the SQLAlchemy export.** `export -t sqla` derived `nullable` and `Optional[int]` from the lower bound at the wrong end of the relation, so a key was mandatory or optional by coincidence (Zaak `0..*` → Behandelaar `0..1` gave a mandatory key). The key now follows the end it points to: mandatory when that end has a lower bound of at least 1.
+- **`plain_text` keeps the text after a `<br/>`.** Some combinations of Python and BeautifulSoup (Python 3.11.15 with beautifulsoup4 4.12.3) parse `<br/>text` as a `<br>` that contains the text, and the text disappeared with the tag: `regel 1<br>regel 2<br/>regel 3` came out as two lines.
+- `Association.isGelimiteerdMeervoudig(dst=False)` looked at the lower instead of the upper bound of the source end.
+- `test_56` covers the missing tag on the Monumenten XMI with both parsers, the NULL multiplicity, the upper bound and the foreign keys.
+
 ## v0.8.6 (2026-10-29)
 
 Memo tags round-trip correctly between an EA repository and the database.

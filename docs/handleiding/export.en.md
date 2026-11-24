@@ -218,7 +218,8 @@ The metadata from the EA tags travels as `mim:herkomst`, `mim:herkomstDefinitie`
 `mim:indicatieClassificerend`, `mim:mogelijkGeenWaarde`, `mim:eenheid` and the value range
 (`sh:minInclusive` etc.). Tag values are stripped of the `#NOTES#` tag-definition notes and `<memo>`
 placeholders. Cardinality comes from the multiplicity in the model: `sh:minCount`/`sh:maxCount` per
-MIM 6.4.9.15, where `sh:minCount` is dropped when *mogelijk geen waarde* is Ja (6.4.9.18). Nothing is
+MIM 6.4.9.15, where `sh:minCount` is dropped when *mogelijk geen waarde* is Ja (6.4.9.18). That only
+happens when the model itself sets the tag to Ja; without the tag `sh:minCount` stays. Nothing is
 invented: only the MIM defaults (indications `false`, cardinality `1..1`, `mim:unidirectioneel true`,
 `mim:aggregatietype mim:Geen`) are written, and at the end of the export crunch_uml logs which mandatory
 metadata the source lacks.
