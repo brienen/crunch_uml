@@ -4,7 +4,7 @@ import logging
 from openpyxl import Workbook
 
 import crunch_uml.schema as sch
-from crunch_uml import const, db, util
+from crunch_uml import const, db, generator, util
 from crunch_uml.renderers.renderer import Renderer, RendererRegistry
 
 logger = logging.getLogger()
@@ -19,6 +19,10 @@ class XLSXRenderer(Renderer):
         # sourcery skip: use-named-expression
         wb = Workbook()
         wb.remove(wb.active)  # type: ignore # Remove default sheet
+        # Which crunch_uml wrote the workbook: in the document properties
+        # (File > Info in Excel), not on a sheet, since every sheet is a table.
+        wb.properties.creator = generator.label()
+        wb.properties.description = generator.generated_by()
 
         # Retrieve all models dynamically
         base = db.Base

@@ -47,6 +47,12 @@ suppress_warnings = True
 # additively migratable.
 DATAMODEL_VERSION = 1
 DATAMODEL_VERSION_KEY = "datamodel_version"
+# Which crunch_uml wrote this database, in the same meta table: the version
+# that created the tables (set once, on creation) and the version of the last
+# import or transform. A database made before 0.8.8 has neither until it is
+# written again; the per-import history is in crunch_uml_runs.
+CRUNCH_VERSION_CREATED_KEY = "crunch_version_created"
+CRUNCH_VERSION_LAST_WRITE_KEY = "crunch_version_last_write"
 
 # The meta table deliberately lives in its own MetaData, NOT in Base.metadata:
 # the generic renderers/parsers iterate Base.metadata.tables and must never
@@ -1472,6 +1478,7 @@ class Database:
         self._table_empty_at_start = {}
         self._inserted_keys = {}
         self._write_datamodel_version()
+        self._write_meta(CRUNCH_VERSION_CREATED_KEY, _crunch_version())
         # The model data the run markers vouched for is gone — stale
         # "completed" rows would falsely promise consistent schemas.
         self._clear_import_runs()
@@ -1485,11 +1492,13 @@ class Database:
             logger.warning(f"Could not clear import run markers: {e}")
 
     def _check_and_create_database(self):
+        created = False
         try:
             inspector = inspect(self.engine)
             if Package.__tablename__ not in inspector.get_table_names():
                 # If the 'packages' table does not exist, create all tables
                 Base.metadata.create_all(bind=self.engine)
+                created = True
             else:
                 stored_version = self._read_datamodel_version()
                 if stored_version is not None and stored_version != DATAMODEL_VERSION:
@@ -1520,7 +1529,10 @@ class Database:
         except OperationalError:
             # If the database does not exist or is not reachable, create it
             Base.metadata.create_all(bind=self.engine)
+            created = True
         self._write_datamodel_version()
+        if created:
+            self._write_meta(CRUNCH_VERSION_CREATED_KEY, _crunch_version())
 
     def _resolve_version_mismatch_policy(self):
         """Effective mismatch policy: an explicit CLI choice wins; 'auto'
@@ -1594,20 +1606,61 @@ class Database:
             return None
 
     def _write_datamodel_version(self):
+        self._write_meta(DATAMODEL_VERSION_KEY, str(DATAMODEL_VERSION))
+
+    def _write_meta(self, key, value):
+        """Set ``key`` in crunch_uml_meta. Best-effort: bookkeeping never
+        blocks the work it describes."""
         try:
             _meta_metadata.create_all(bind=self.engine, checkfirst=True)
             with self.engine.begin() as connection:
                 updated = connection.execute(
-                    update(crunch_meta_table)
-                    .where(crunch_meta_table.c.key == DATAMODEL_VERSION_KEY)
-                    .values(value=str(DATAMODEL_VERSION))
+                    update(crunch_meta_table).where(crunch_meta_table.c.key == key).values(value=value)
                 ).rowcount
                 if not updated:
-                    connection.execute(
-                        insert(crunch_meta_table).values(key=DATAMODEL_VERSION_KEY, value=str(DATAMODEL_VERSION))
-                    )
+                    connection.execute(insert(crunch_meta_table).values(key=key, value=value))
         except OperationalError as e:
-            logger.warning(f"Could not write datamodel version to database: {e}")
+            logger.warning(f"Could not write {key} to database: {e}")
+
+    def _read_meta(self, key):
+        """Value of ``key`` in crunch_uml_meta, or None when it is not there."""
+        try:
+            if crunch_meta_table.name not in inspect(self.engine).get_table_names():
+                return None
+            with self.engine.connect() as connection:
+                row = connection.execute(
+                    select(crunch_meta_table.c.value).where(crunch_meta_table.c.key == key)
+                ).first()
+            return None if row is None else row[0]
+        except OperationalError:
+            return None
+
+    def record_writer(self):
+        """Note that this crunch_uml wrote to the database (import, transform)."""
+        self._write_meta(CRUNCH_VERSION_LAST_WRITE_KEY, _crunch_version())
+
+    def writer_versions(self):
+        """(created with, last written with): the crunch_uml versions noted in
+        the database, None where the database does not say."""
+        return self._read_meta(CRUNCH_VERSION_CREATED_KEY), self._read_meta(CRUNCH_VERSION_LAST_WRITE_KEY)
+
+    def last_import_version(self, schema_id):
+        """The crunch_uml version of the latest completed import into
+        ``schema_id``, or None when no import run is recorded for it (a schema
+        made by a transform, or a database from before the run markers)."""
+        try:
+            if crunch_runs_table.name not in inspect(self.engine).get_table_names():
+                return None
+            with self.engine.connect() as connection:
+                row = connection.execute(
+                    select(crunch_runs_table.c.crunch_version)
+                    .where(crunch_runs_table.c.schema_id == schema_id)
+                    .where(crunch_runs_table.c.completed_at.is_not(None))
+                    .order_by(crunch_runs_table.c.started_at.desc())
+                ).first()
+            return None if row is None else row[0]
+        except OperationalError:
+            return None
 
     def _add_missing_tables_and_columns(self, inspector):
         """Lightweight additive migration for existing database files.

@@ -54,6 +54,9 @@ crunch_uml -db_url postgresql://user:pass@localhost/crunch import -f model.xmi -
 Controleer of de installatie werkt:
 
 ```bash
+# Welke versie draait er?
+crunch_uml --version
+
 # Importeer een XMI-bestand en maak een nieuwe database aan
 crunch_uml import -f jouw_model.xmi -t eaxmi -db_create
 

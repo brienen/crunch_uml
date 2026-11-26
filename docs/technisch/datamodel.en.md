@@ -262,6 +262,8 @@ Every crunch_uml database carries a datamodel version number in the `crunch_uml_
 
 The version number (`DATAMODEL_VERSION` in `crunch_uml/db.py`) is only bumped for schema changes the additive migration cannot handle (renamed or retyped columns, changed primary keys or semantics). The `crunch_uml_meta` table deliberately lives outside the ORM model, so it never shows up in json/xlsx/csv exports.
 
+Since 0.8.8 the same table records which crunch_uml created the database (`crunch_version_created`, set when the tables are created) and which one wrote to it last (`crunch_version_last_write`, set by every import and transform). A database from before 0.8.8 lacks the first key: who made it is unknown and is not invented.
+
 #### Diagram coverage matrix
 
 Which parsers and renderers read or write diagram membership and geometry:

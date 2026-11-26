@@ -51,6 +51,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "{{ args.json_schema_url }}",
+    "$comment": {{ generated_by|tojson }},
     "title": "{{ clazz.name }}",
 {{ class_body(clazz) }}
 {%- set enums = clazz.package.get_root_package().get_enumerations_inscope()|list %}

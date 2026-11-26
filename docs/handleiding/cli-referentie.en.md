@@ -5,12 +5,13 @@ Complete overview of all commands and options in crunch_uml.
 ## Global Options
 
 ```bash
-crunch_uml [-h] [-v] [-d] [-w] [-db_url URL] [-sch SCHEMA] {import,transform,export} ...
+crunch_uml [-h] [-V] [-v] [-d] [-w] [-db_url URL] [-sch SCHEMA] {import,transform,export} ...
 ```
 
 | Option | Long | Description |
 |---|---|---|
-| `-h` | `--help` | Show help text |
+| `-h` | `--help` | Show help text (starts with the version) |
+| `-V` | `--version` | Show the crunch_uml version (with the git commit when run from a source checkout) and exit |
 | `-v` | `--verbose` | Set log level to INFO |
 | `-d` | `--debug` | Set log level to DEBUG |
 | `-w` | `--do_not_suppress_warnings` | Don't suppress warnings |

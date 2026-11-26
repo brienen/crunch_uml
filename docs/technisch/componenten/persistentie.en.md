@@ -94,6 +94,8 @@ Every database contains a version marker in the `crunch_uml_meta` table (deliber
 
 `DATAMODEL_VERSION` (in `db.py`) is only bumped for changes the additive migration cannot handle (renamed/retyped columns, changed primary keys or semantics).
 
+Next to the datamodel version, `crunch_uml_meta` records which crunch_uml created the database (`crunch_version_created`) and which one wrote to it last (`crunch_version_last_write`; `Database.record_writer()`, called after every import and transform). `Database.last_import_version(schema)` reads from `crunch_uml_runs` which version imported a schema; the export warns when that differs from the running one.
+
 ## Mixins
 
 ```mermaid

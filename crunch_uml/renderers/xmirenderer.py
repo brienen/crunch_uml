@@ -22,6 +22,7 @@ from lxml import etree
 import crunch_uml.schema as sch
 from crunch_uml import const
 from crunch_uml import ea_geometry as geo
+from crunch_uml import generator
 from crunch_uml.renderers.renderer import Renderer, RendererRegistry
 
 logger = logging.getLogger()
@@ -216,6 +217,10 @@ class XMIRenderer(Renderer):
         extension = etree.SubElement(root, XMI + "Extension")
         _set_attrs(extension, extender="Enterprise Architect", extenderID="6.5")
         self._render_extension(extension, schema)
+
+        # The exporter attributes above must name Enterprise Architect, so the
+        # real producer goes in a comment ahead of the root element.
+        root.addprevious(etree.Comment(f" {generator.generated_by()} "))
 
         tree = etree.ElementTree(root)
         tree.write(args.outputfile, pretty_print=True, xml_declaration=True, encoding="UTF-8")

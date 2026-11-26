@@ -9,11 +9,12 @@ The presentation layer forms the contact point with the user and handles command
 Main entrypoint registered as `crunch_uml` console script. Provides three subcommands:
 
 ```bash
-crunch_uml [-v] [-d] [-w] [-db_url URL] [-sch SCHEMA] {import,transform,export} ...
+crunch_uml [-V] [-v] [-d] [-w] [-db_url URL] [-sch SCHEMA] {import,transform,export} ...
 ```
 
 | Argument | Description |
 |---|---|
+| `-V / --version` | Show the crunch_uml version and exit |
 | `-v / --verbose` | INFO-level logging |
 | `-d / --debug` | DEBUG-level logging |
 | `-db_url` | Database connection string |

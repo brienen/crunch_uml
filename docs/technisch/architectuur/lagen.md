@@ -9,11 +9,12 @@ De presentatielaag vormt het contactpunt met de gebruiker en regelt commando-ver
 Hoofd-entrypoint geregistreerd als `crunch_uml` console-script. Biedt drie subcommando's:
 
 ```bash
-crunch_uml [-v] [-d] [-w] [-db_url URL] [-sch SCHEMA] {import,transform,export} ...
+crunch_uml [-V] [-v] [-d] [-w] [-db_url URL] [-sch SCHEMA] {import,transform,export} ...
 ```
 
 | Argument | Beschrijving |
 |---|---|
+| `-V / --version` | Versie van crunch_uml tonen en stoppen |
 | `-v / --verbose` | INFO-level logging |
 | `-d / --debug` | DEBUG-level logging |
 | `-db_url` | Database connection string |

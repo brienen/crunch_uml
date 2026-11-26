@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v0.8.8 (2026-11-26)
+
+Everything crunch_uml produces says which crunch_uml made it.
+
+- **`crunch_uml --version`.** The command line had no way to show its version. `-V`/`--version` prints `crunch_uml 0.8.8`, followed by the git commit when run from a source checkout; `-h` starts with the version, and the first log line of every `import`, `transform` and `export` names it.
+- **The exports carry the version.** Linked Data (`ttl`, `rdf`, `json-ld`) gets `pav:createdWith <https://github.com/brienen/crunch_uml/releases/tag/v0.8.8>` on the `owl:Ontology` that describes the file (the ontology, the shapes file and each view), and Turtle and RDF/XML also a comment line at the top. `xmi` gets an XML comment ahead of the root element (the `exporter` attributes keep naming Enterprise Architect, or EA refuses the file), `xlsx` the document properties, `json` a top-level `_generator` entry that the import skips, `json_schema` a `$comment`, and the text formats a comment on the first line: `ggm_md`, `model_stats_md` and `diff_md` in HTML, `sqla`, `shex` and `profile` with `#`, `uml_mmd` with `%%`. Your own Jinja2 templates can use `{{ generated_by }}`, `{{ crunch_uml_version }}` and `{{ crunch_uml_url }}`. Only the version is written, never a build or a timestamp: the same model exported twice by the same release still gives the same bytes. `csv` and `i18n` are left as they are: CSV has no place for it, and in an i18n file every top-level key is a language.
+- **The database knows who wrote it.** `crunch_uml_meta` gets `crunch_version_created` (set when the tables are created) and `crunch_version_last_write` (set by every import and transform), next to the version per import that `crunch_uml_runs` already kept. A database from before 0.8.8 gets no invented creator.
+- **An export warns when the schema was imported by another version.** A new crunch_uml exporting from a database filled by an older one still carries what the old import stored, which is how a fix can seem to have no effect; the export now says `Schema 'default' was imported with crunch_uml 0.8.6, this is crunch_uml 0.8.8` and that the model has to be imported again.
+- **`shex`, `uml_mmd` and `model_stats_md` work again.** They stopped with `'Attribute' object has no attribute 'datatype'` or `'Enumeratie' object has no attribute 'values'` on any model with attributes or enumerations.
+- `test_57` covers the command line, the database, the warning and every export format.
+
 ## v0.8.7 (2026-11-24)
 
 Nothing is invented for what the source does not say: a model without the *mogelijk geen waarde* tag gets its `sh:minCount` back.

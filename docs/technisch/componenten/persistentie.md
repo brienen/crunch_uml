@@ -94,6 +94,8 @@ Elke database bevat een versiemarkering in de tabel `crunch_uml_meta` (bewust bu
 
 `DATAMODEL_VERSION` (in `db.py`) wordt alléén opgehoogd bij wijzigingen die de additieve migratie niet aankan (hernoemde/hertypeerde kolommen, gewijzigde primary keys of semantiek).
 
+Naast de datamodelversie houdt `crunch_uml_meta` bij welke crunch_uml de database aanmaakte (`crunch_version_created`) en welke er het laatst in schreef (`crunch_version_last_write`; `Database.record_writer()`, aangeroepen na elke import en transformatie). `Database.last_import_version(schema)` leest uit `crunch_uml_runs` met welke versie een schema is ingelezen; de export waarschuwt als dat een andere is dan de draaiende.
+
 ## Mixins
 
 ```mermaid

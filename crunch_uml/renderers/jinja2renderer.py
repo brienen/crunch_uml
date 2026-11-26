@@ -12,7 +12,7 @@ from jinja2 import Environment, FileSystemLoader
 from markdownify import markdownify as md
 
 import crunch_uml.schema as sch
-from crunch_uml import const, db, util
+from crunch_uml import const, db, generator, util
 from crunch_uml.exceptions import CrunchException
 from crunch_uml.renderers import mim
 from crunch_uml.renderers.renderer import ClassRenderer, ModelRenderer, RendererRegistry
@@ -371,6 +371,13 @@ class Jinja2Renderer(ModelRenderer):
         return template, templatedir
 
     def addFilters(self, env):
+        # Welke crunch_uml de uitvoer schreef, voor elk template (ook een eigen
+        # template): {{ generated_by }}, {{ crunch_uml_version }} en
+        # {{ crunch_uml_url }}. De meegeleverde templates zetten de regel als
+        # commentaar bovenaan.
+        env.globals["generated_by"] = generator.generated_by()
+        env.globals["crunch_uml_version"] = generator.as_dict()["version"]
+        env.globals["crunch_uml_url"] = generator.HOMEPAGE
 
         # Zet tekst om naar snake_case
         env.filters["snake_case"] = lambda s: (inflection.underscore(s.replace(" ", "")) if isinstance(s, str) else "")

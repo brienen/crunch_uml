@@ -262,6 +262,8 @@ Elke crunch_uml-database bevat een versienummer van het datamodel in de tabel `c
 
 Het versienummer (`DATAMODEL_VERSION` in `crunch_uml/db.py`) wordt alléén opgehoogd bij schemawijzigingen die de additieve migratie niet aankan (hernoemde of hertypeerde kolommen, gewijzigde primary keys of semantiek). De tabel `crunch_uml_meta` staat bewust buiten het ORM-model en verschijnt dus niet in json/xlsx/csv-exports.
 
+Dezelfde tabel bewaart sinds 0.8.8 welke crunch_uml de database aanmaakte (`crunch_version_created`, gezet bij het aanmaken van de tabellen) en welke er het laatst in schreef (`crunch_version_last_write`, gezet door elke import en transformatie). Een database van vóór 0.8.8 heeft de eerste sleutel niet: wie haar maakte is niet bekend en wordt niet verzonnen.
+
 #### Dekkingsmatrix diagrammen
 
 Welke parsers en renderers diagram-membership en geometrie lezen of schrijven:

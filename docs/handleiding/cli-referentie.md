@@ -5,12 +5,13 @@ Compleet overzicht van alle commando's en opties in crunch_uml.
 ## Globale opties
 
 ```bash
-crunch_uml [-h] [-v] [-d] [-w] [-db_url URL] [-sch SCHEMA] {import,transform,export} ...
+crunch_uml [-h] [-V] [-v] [-d] [-w] [-db_url URL] [-sch SCHEMA] {import,transform,export} ...
 ```
 
 | Optie | Lang | Beschrijving |
 |---|---|---|
-| `-h` | `--help` | Toon helptekst |
+| `-h` | `--help` | Toon helptekst (begint met de versie) |
+| `-V` | `--version` | Toon de versie van crunch_uml (met de git-commit vanuit een broncheckout) en stop |
 | `-v` | `--verbose` | Zet log-niveau op INFO |
 | `-d` | `--debug` | Zet log-niveau op DEBUG |
 | `-w` | `--do_not_suppress_warnings` | Onderdruk waarschuwingen niet |
