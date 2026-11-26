@@ -11,7 +11,7 @@ from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SH, SKOS, XSD
 
 import crunch_uml.db as db
 import crunch_uml.schema as sch
-from crunch_uml import const
+from crunch_uml import const, generator
 from crunch_uml.exceptions import CrunchException
 from crunch_uml.renderers import mim
 from crunch_uml.renderers.lod_mim import MimAnnotator
@@ -21,6 +21,8 @@ logger = logging.getLogger()
 
 # GeoSPARQL: geometrische datatypes worden als WKT-literal gemodelleerd.
 GEO = Namespace("http://www.opengis.net/ont/geosparql#")
+# Provenance, Authoring and Versioning: pav:createdWith noemt het programma dat een bestand schreef.
+PAV = Namespace("http://purl.org/pav/")
 
 
 def slugify(name):
@@ -219,13 +221,28 @@ class LodRenderer(ModelRenderer):
     # Uitvoer: ontologie, SHACL-shapes en views
     # ------------------------------------------------------------------
 
-    def writeGraph(self, path, graph, header=None):
+    def writeGraph(self, path, graph, header=None, about=None):
         """Serialiseer een graaf naar ``path``; ``header`` (een Turtle-
-        commentaarregel zoals ``# graph: <...>``) alleen in Turtle."""
+        commentaarregel zoals ``# graph: <...>``) alleen in Turtle.
+
+        Elk bestand zegt welke crunch_uml het schreef: als ``pav:createdWith``
+        op ``about``, de owl:Ontology die het bestand beschrijft (in elk
+        formaat, als die er is), en als commentaarregel bovenaan in Turtle en
+        RDF/XML. Alleen de versie, geen build of tijdstip: dezelfde export
+        geeft dezelfde bytes."""
+        if about is not None and (about, RDF.type, OWL.Ontology) in graph:
+            graph.bind("pav", PAV)
+            graph.add((about, PAV.createdWith, URIRef(generator.release_iri())))
         data = graph.serialize(format=self.rdf_format)
         with open(path, "w", encoding="utf-8") as file:
-            if header and self.rdf_format == "turtle":
-                file.write(header + "\n\n")
+            if self.rdf_format == "turtle":
+                if header:
+                    file.write(header + "\n")
+                file.write(f"# {generator.generated_by()}\n\n")
+            elif data.startswith("<?xml"):
+                # RDF/XML: het commentaar hoort na de XML-declaratie.
+                declaration, _, rest = data.partition("\n")
+                data = f"{declaration}\n<!-- {generator.generated_by()} -->\n{rest}"
             file.write(data)
 
     def outputPath(self, outputfile):
@@ -234,7 +251,7 @@ class LodRenderer(ModelRenderer):
         return base_name + self.extension
 
     def writeToFile(self, graph, args):
-        self.writeGraph(self.outputPath(args.outputfile), graph)
+        self.writeGraph(self.outputPath(args.outputfile), graph, about=URIRef(self.annotator.base))
 
     def writeOutput(self, g, args, zchema, shape_ns, context):
         """Schrijf de export: het uitvoerbestand, en op verzoek de SHACL-shapes
@@ -252,7 +269,7 @@ class LodRenderer(ModelRenderer):
             shapes_path = self.outputPath(shapes_file)
             self.addShapesHeader(ontology, shapes, shape_ns, args)
             self.writeToFile(ontology, args)
-            self.writeGraph(shapes_path, shapes)
+            self.writeGraph(shapes_path, shapes, about=URIRef(str(shape_ns)))
             logger.info(
                 f"Ontologie ({len(ontology)} triples) geschreven naar {self.outputPath(args.outputfile)};"
                 f" SHACL-shapes ({len(shapes)} triples) naar {shapes_path}"
@@ -450,7 +467,7 @@ class LodRenderer(ModelRenderer):
                     view.add((view_iri, OWL.versionInfo, Literal(versie)))
             path = os.path.join(views_dir, *segments) + self.extension
             os.makedirs(os.path.dirname(path), exist_ok=True)
-            self.writeGraph(path, view, header=f"# graph: <{view_iri}>")
+            self.writeGraph(path, view, header=f"# graph: <{view_iri}>", about=view_iri)
             written.append(pad)
 
         logger.info(

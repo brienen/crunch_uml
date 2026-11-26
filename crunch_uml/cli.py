@@ -9,7 +9,8 @@ import crunch_uml.parsers.parser as parsers
 import crunch_uml.renderers.renderer as renderers
 import crunch_uml.schema as sch
 import crunch_uml.transformers.transformer as transformers
-from crunch_uml import const
+from crunch_uml import const, generator
+from crunch_uml._version import __version__ as crunch_uml_version
 from crunch_uml.db import Database
 from crunch_uml.parsers.eaxmiparser import EAXMIParser  # noqa: F401
 from crunch_uml.parsers.multiple_parsers import CSVParser  # noqa: F401
@@ -77,9 +78,34 @@ def _propagate_translate_args_to_env(args):
         os.environ["CRUNCH_UML_TRANSLATE_ALLOW_ONLINE"] = "1"
 
 
+def _report_import_version(database, schema_name):
+    """Say which crunch_uml imported the schema that is about to be exported.
+
+    An export made by a new crunch_uml from a database filled by an older one
+    still carries what the old import stored: a fix in a parser, or in the
+    values an import fills in, only shows after a re-import."""
+    imported_with = database.last_import_version(schema_name)
+    if imported_with is None:
+        return
+    if imported_with == crunch_uml_version:
+        logger.info(f"Schema '{schema_name}' was imported with {generator.NAME} {imported_with}.")
+    else:
+        logger.warning(
+            f"Schema '{schema_name}' was imported with {generator.NAME} {imported_with}, this is"
+            f" {generator.label()}. Changes to the import since then only show after importing the model again."
+        )
+
+
 def main(args=None):
     """The main entrypoint for this script used in the setup.py file."""
-    argumentparser = argparse.ArgumentParser(description=const.DESCRIPTION)
+    argumentparser = argparse.ArgumentParser(description=f"{generator.label()}. {const.DESCRIPTION}")
+    argumentparser.add_argument(
+        "-V",
+        "--version",
+        action="version",
+        version=generator.version_line(),
+        help="show the version of crunch_uml (with the git commit when run from a source checkout) and exit",
+    )
     argumentparser.add_argument("-v", "--verbose", action="store_true", help="set log level INFO")
     argumentparser.add_argument("-d", "--debug", action="store_true", help="set log level to DEBUG")
     argumentparser.add_argument(
@@ -152,6 +178,10 @@ def main(args=None):
     if args.command == const.CMD_DETECT:
         return pack.run_detect(args)
 
+    # Which crunch_uml is running: the first line of every import, transform
+    # and export, so a log always says what produced the result.
+    logger.info(generator.version_line())
+
     try:
         # Parse input
         if args.command == const.CMD_IMPORT:
@@ -176,6 +206,7 @@ def main(args=None):
                 parser = parsers.ParserRegistry.getinstance(args.inputtype)
                 parser.parse(args, schema)
                 database.commit()
+                database.record_writer()
                 database.complete_import_run(run_id)
                 logger.info("Succes! parsed all data and saved it in database")
             except Exception as ex:
@@ -196,6 +227,7 @@ def main(args=None):
                 transformer = transformers.TransformerRegistry.getinstance(args.transformationtype)
                 transformer.transform(args, database)
                 database.commit()
+                database.record_writer()
                 logger.info(
                     f"Succes! transformed input with transformer {transformer} from schema {args.schema_from} to schema"
                     f" {args.schema_to}"
@@ -214,6 +246,7 @@ def main(args=None):
         elif args.command == const.CMD_EXPORT:
             database = Database(args.database_url, db_create=False, on_version_mismatch=args.on_version_mismatch)
             schema = sch.Schema(database, schema_name=args.schema_name)
+            _report_import_version(database, args.schema_name)
             logger.info(f"Starting rendering with outputtype {args.outputtype}")
             renderer = renderers.RendererRegistry.getinstance(args.outputtype)
             renderer.render(args, schema)

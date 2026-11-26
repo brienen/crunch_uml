@@ -229,6 +229,15 @@ Vergelijkt twee schema's via `--compare_schema_name` en genereert een markdown d
 !!! note "OpenAPI Renderer"
     Genereer OpenAPI/Swagger specificaties voor REST API's.
 
+## Versiestempel in de uitvoer
+
+Elke renderer zet in zijn uitvoer welke crunch_uml hem schreef. De formulering komt uit één module,
+`crunch_uml/generator.py`: `generated_by()` voor een commentaarregel, `as_dict()` voor JSON, `release_iri()` voor
+Linked Data (`pav:createdWith`) en `version_line()` voor `--version` en de log. De Jinja2-renderers geven
+`generated_by`, `crunch_uml_version` en `crunch_uml_url` als globale variabelen aan elk template. Een nieuwe
+renderer gebruikt dezelfde functies en schrijft alleen de versie, geen build of tijdstip, zodat de uitvoer
+reproduceerbaar blijft. Het overzicht per formaat staat in de [handleiding](../../handleiding/export.md#versie-informatie-in-de-uitvoer).
+
 ## Een nieuwe renderer toevoegen
 
 ```python

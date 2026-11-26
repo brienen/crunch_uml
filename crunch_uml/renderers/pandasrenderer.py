@@ -11,7 +11,7 @@ import sqlalchemy
 from sqlalchemy.ext.hybrid import hybrid_property
 
 import crunch_uml.schema as sch
-from crunch_uml import const, db, lang, util
+from crunch_uml import const, db, generator, lang, util
 from crunch_uml.renderers.renderer import Renderer, RendererRegistry
 
 logger = logging.getLogger()
@@ -133,6 +133,9 @@ class JSONRenderer(Renderer):
     def render(self, args, schema: sch.Schema):
         all_data = self.get_all_data(args, schema)
         all_data = self.rename_keys(all_data, json.loads(args.mapper))
+        # Which crunch_uml wrote the file. No table has this name, so the
+        # json parser skips the entry on import.
+        all_data[generator.JSON_KEY] = generator.as_dict()
         with open(args.outputfile, "w") as json_file:
             json.dump(all_data, json_file, default=str, indent=4, sort_keys=True)
 
@@ -473,6 +476,13 @@ class CSVRenderer(Renderer):
             df.to_csv(f"{args.outputfile}_{table_name}.csv", index=False)
 
 
+def _datatype_name(attr):
+    """Naam van het datatype van een attribuut: de primitieve naam, of de naam
+    van de enumeratie of klasse waar het naar verwijst."""
+    datatype = attr.getDatatype()
+    return datatype if datatype is None or isinstance(datatype, str) else datatype.name
+
+
 @RendererRegistry.register(
     "shex",
     descr="Renderer that generates Shape Expressions (ShEx) schema from the model.",
@@ -492,13 +502,14 @@ class SHexRenderer(Renderer):
     def render(self, args, schema: sch.Schema):
         filename, _ = os.path.splitext(args.outputfile)
         with open(f"{filename}.shex", "w") as f:
+            f.write(f"# {generator.generated_by()}\n\n")
             for pkg in schema.get_all_packages():
                 for clazz in pkg.classes:
                     # Start de beschrijving van een ShEx shape voor elke klasse
                     f.write(f"<{clazz.name}> {{\n")
                     for attr in clazz.attributes:
                         # Voeg een propertyregel toe voor elk attribuut met naam en datatype
-                        f.write(f"  {attr.name} xsd:{attr.datatype} ;\n")
+                        f.write(f"  {attr.name} xsd:{_datatype_name(attr)} ;\n")
                     f.write("}\n\n")
 
 
@@ -512,6 +523,7 @@ class DataProfilerRenderer(Renderer):
         base = db.Base
         models = base.metadata.tables
         with open(args.outputfile, "w") as out:
+            out.write(f"# {generator.generated_by()}\n")
             for table_name in models:
                 model = base.model_lookup_by_table_name(table_name)
                 if not model:
@@ -528,12 +540,13 @@ class UMLClassDiagramRenderer(Renderer):
     def render(self, args, schema: sch.Schema):
         filename, _ = os.path.splitext(args.outputfile)
         with open(f"{filename}.mmd", "w") as f:
+            f.write(f"%% {generator.generated_by()}\n")
             f.write("classDiagram\n")
             for pkg in schema.get_all_packages():
                 for clazz in pkg.classes:
                     f.write(f"  class {clazz.name} {{\n")
                     for attr in clazz.attributes:
-                        f.write(f"    +{attr.name}: {attr.datatype}\n")
+                        f.write(f"    +{attr.name}: {_datatype_name(attr)}\n")
                     f.write("  }\n")
                 for clazz in pkg.classes:
                     for assoc in getattr(clazz, "uitgaande_associaties", []):
@@ -556,12 +569,13 @@ class ModelStatisticsMarkdownRenderer(Renderer):
             for clazz in pkg.classes
         )
         total_enumerations = sum(len(pkg.enumerations) for pkg in schema.get_all_packages())
-        total_enum_values = sum(len(enum.values) for pkg in schema.get_all_packages() for enum in pkg.enumerations)
+        total_enum_values = sum(len(enum.literals) for pkg in schema.get_all_packages() for enum in pkg.enumerations)
 
         avg_attributes_per_class = total_attributes / total_classes if total_classes else 0
         avg_associations_per_class = total_associations / total_classes if total_classes else 0
 
         with open(args.outputfile, "w") as f:
+            f.write(f"<!-- {generator.generated_by()} -->\n")
             f.write("# Model Statistics\n\n")
             f.write(f"- **Packages**: {total_packages}\n")
             f.write(f"- **Classes**: {total_classes}\n")
@@ -575,21 +589,17 @@ class ModelStatisticsMarkdownRenderer(Renderer):
             # Laatste gewijzigde packages
             recent_packages = sorted(
                 schema.get_all_packages(),
-                key=lambda p: (
-                    getattr(p, "modified", float('-inf'))
-                    if hasattr(p, "modified")
-                    else getattr(p, "created", float('-inf'))
-                ),
+                key=lambda p: p.modified or p.created or "",
                 reverse=True,
             )[:5]
 
             f.write("\n## Recently Modified Packages\n\n")
             for pkg in recent_packages:
                 f.write(f"- **{pkg.name}** ")
-                if hasattr(pkg, "modified") and pkg.updated_at:
-                    f.write(f"(last updated: {pkg.updated_at})\n")
-                elif hasattr(pkg, "created") and pkg.created_at:
-                    f.write(f"(created: {pkg.created_at})\n")
+                if pkg.modified:
+                    f.write(f"(last updated: {pkg.modified})\n")
+                elif pkg.created:
+                    f.write(f"(created: {pkg.created})\n")
                 else:
                     f.write("(no timestamp available)\n")
 
@@ -1461,6 +1471,7 @@ class SchemaDiffMarkdownRenderer(Renderer):
                 )
 
         with open(args.outputfile, "w", encoding="utf-8") as f:
+            f.write(f"<!-- {generator.generated_by()} -->\n")
             f.write("\n".join(lines).rstrip() + "\n")
 
     # ------------------------------------------------------------------

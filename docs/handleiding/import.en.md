@@ -98,6 +98,8 @@ When crunch_uml writes to a shared database (say, a PostgreSQL staging database 
 
 **Run markers.** Every `import` invocation writes a row to the `crunch_uml_runs` table (outside the data model, so it never leaks into exports): at the start with an empty `completed_at`, and only after the successful commit is `completed_at` stamped as the very last step. External readers should only consume schemas whose latest run has a `completed_at` — a row without one means "in progress or aborted" (crunch_uml writes table-by-table, non-transactionally, so reading halfway yields a torn model).
 
+**Version of the writer.** The `crunch_uml_runs` table keeps the crunch_uml version of every import (`crunch_version`). In addition `crunch_uml_meta` records which version created the database (`crunch_version_created`) and which one wrote to it last (`crunch_version_last_write`, set by every import and transform). An export from a schema that was imported by another version gives a warning: an improvement in a parser only shows after a new import.
+
 **Version policy.** When a database carries a different datamodel version, `-on_version_mismatch` decides what happens: `recreate` (historical behaviour: discard everything and rebuild), `fail` (stop without touching anything), or the default `auto` — which only recreates the local default database and fails on any explicitly provided `-db_url`. A mismatched crunch_uml version can therefore no longer accidentally wipe a shared staging database:
 
 ```bash

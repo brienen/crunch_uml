@@ -80,12 +80,13 @@ pip install -e .
 ## General Options
 
 ```bash
-crunch_uml [-h] [-v] [-d] [-w] [-db_url DATABASE_URL] [-sch SCHEMA] {import,transform,export} ...
+crunch_uml [-h] [-V] [-v] [-d] [-w] [-db_url DATABASE_URL] [-sch SCHEMA] {import,transform,export} ...
 ```
 
 | Option | Description |
 |---|---|
 | `-h, --help` | Show help message and exit |
+| `-V, --version` | Show the crunch_uml version and exit. Every export also says which version wrote it |
 | `-v, --verbose` | Set log level to INFO |
 | `-d, --debug` | Set log level to DEBUG |
 | `-w, --do_not_suppress_warnings` | Do not suppress warnings |
